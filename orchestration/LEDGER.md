@@ -12,7 +12,7 @@ their own work. Timestamps are recorded in Pacific time on 2026-08-10.
 |---|---|---|---|---|---|
 | W0 | Verify the untouched validation baseline | 2026-08-10 11:18 PDT | 2026-08-10 11:21 PDT | PASS | merged as `5374438`; integration gate green |
 | P1 | Profile current integration-path costs | 2026-08-10 11:22 PDT | — | RUNNING | `sol/w-p1` |
-| P2 | Prove lint gates fail on controlled mutations | 2026-08-10 11:22 PDT | — | RUNNING | `sol/w-p2` |
+| P2 | Prove lint gates fail on controlled mutations | 2026-08-10 11:22 PDT | 2026-08-10 11:27 PDT | PASS | merged as `d3e86e9`; 7/7 meta-tests; integration gate green |
 | P3 | Build deterministic grammar and byte fuzz harness | 2026-08-10 11:23 PDT | — | RUNNING | `sol/w-p3` |
 | P4 | Add seeded property tests | 2026-08-10 11:23 PDT | — | RUNNING | `sol/w-p4` |
 | P5 | Add adversarial audited-surface tests | 2026-08-10 11:24 PDT | — | RUNNING | `sol/w-p5` |
