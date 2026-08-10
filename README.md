@@ -27,8 +27,14 @@ The engine is deliberately narrow: it deterministically classifies
 structured fact profiles that the caller assembles and supplies, and seals
 the decision. It does not retrieve records, store lifecycle state, enforce
 policy, run clarification dialogues, or execute effects. Those live in the
-host system. Some schema-required inputs are bound for future semantics and
-are classification-inert today (disclosed under "What this does not claim").
+host system — [HOST_OBLIGATIONS.md](HOST_OBLIGATIONS.md) is the explicit,
+testable contract for that division (state truthfulness, atomicity,
+derive-don't-assert, applicability calibration, input binding, effects).
+Some schema-required inputs are bound for future semantics and are
+classification-inert today; the machine-checked ledger of exactly which
+fields carry classification authority is
+`grounded-0_4/authority_register_0_4.json`, and known defects with their
+enforcement are recorded in [ERRATA.md](ERRATA.md).
 
 The 30 operations — the 28-operation accepted core plus the two
 supplemental rows — cover the obligation surface a careful receiver faces:
@@ -257,13 +263,46 @@ non-authoritative for classification; that non-authority is the tested
 property, exercised by the similarity-lure and intent-change metamorphic
 families.
 
+## After the external review: the grounded 0.4 layer
+
+An independent external review (2026-08-10, against cc6f3657) confirmed the
+conformance engineering and pressed on what conformance cannot prove. Its
+findings were reproduced probe-for-probe and answered additively — zero
+sealed 0.2/0.3 bytes changed:
+
+- `grounded-0_4/rr_api.py` — a library API (`decide`, in-process, ~3 ms vs
+  ~105 ms via the stdio ABI) and an audited surface (`decide_audited`) whose
+  seal binds the request bytes, the decision-input digest, and the frozen
+  receipt, and which carries the matched-predicate witness trace and derived
+  record references the sealed response lacks.
+- `grounded-0_4/closures_0_4.json` — tighten-only closure predicates fixing
+  the confirmed OBL-30 holes (caller projections now cross-checked against
+  the verdict rows they summarize; disposition exhaustiveness derived, not
+  trusted).
+- `grounded-0_4/authority_register_0_4.json` +
+  `grounded-0_4/lint_contract.py` — a both-directions, CI-gated ledger of
+  which fact fields carry classification authority, wire-format uniqueness
+  law, and the closure tighten-only law, so these defect classes cannot be
+  reintroduced silently by future generations.
+- `proof/` — the review's own bar, executed: native records from a real
+  multi-agent coordination system, a smaller schema+policy gate as the
+  comparator, referee-held ground truth. Result (internal held-out tier):
+  the calibrated adapter detected 18/18 defects including the relational
+  one the gate structurally misses, at zero false holds; the uncalibrated
+  run exposed and measured the applicability gap (ERRATA E7). Full
+  protocol and limits in `proof/README.md`.
+
+`grounded-0_4/test_grounded_0_4.py` (504 checks) pins parity with every
+frozen fixture plus the review's probes as regressions.
+
 ## Contributing / re-verification
 
 The highest-value additions are adversarial: a coverage-guided fuzzing
 campaign against the reference runner, and an independent second
 implementation cross-tested against the same fixture packs. Both are
 welcome; neither exists yet. To re-verify what is here, run the conformance
-suite (both modes), then re-derive every seal per the RUNBOOK.
+suite (both modes), then re-derive every seal per the RUNBOOK, then run the
+grounded-0.4 regression and lint gate.
 
 ## Provenance and exclusions
 

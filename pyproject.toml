@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "receiver-reliance"
+version = "1.2.0.dev0"
+description = "Deterministic receiver-reliance decision engine: frozen 30-operation conformance surface plus the grounded 0.4 audited API"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Apache-2.0" }
+authors = [{ name = "James Dimachkie" }]
+
+[tool.setuptools]
+packages = ["receiver_reliance"]
+
+# Supported integration mode today: editable install from a repo checkout
+# (`pip install -e .`). The package locates the frozen engine and contracts
+# relative to the checkout; a self-contained wheel (bundling the sealed
+# contract/fixture data) is future work tracked in ERRATA-adjacent notes.

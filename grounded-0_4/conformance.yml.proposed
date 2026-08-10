@@ -1,0 +1,36 @@
+# PROPOSED replacement for .github/workflows/conformance.yml — NOT active.
+# The workflow file is guard-protected in this workspace; James applies this
+# by copying it over .github/workflows/conformance.yml. Adds the grounded-0.4
+# regression and the contract lint gate to the existing matrix.
+
+name: conformance
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  conformance:
+    name: conformance (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Accepted 0.2 suite (in-process, 800 checks)
+        run: python -B baseline-run/implementation-output-0.2/run_conformance_0_2.py
+      - name: Composed 0.2 + 0.3 suite (in-process, 907 checks)
+        run: python -B baseline-run/implementation-output-0.3/run_conformance_0_3.py --suite all
+      - name: Grounded 0.4 regression (parity, binding, closures — 504 checks)
+        run: python -B grounded-0_4/test_grounded_0_4.py
+      - name: Contract lint gate (authority register, wire formats, closure law)
+        run: python -B grounded-0_4/lint_contract.py --gate
