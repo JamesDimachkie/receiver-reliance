@@ -208,6 +208,16 @@ def _read_state(path: pathlib.Path, args: argparse.Namespace) -> dict[str, Any]:
         )
     if not isinstance(state.get("chunks"), dict) or not isinstance(state.get("runs"), list):
         raise CampaignConfigurationError("checkpoint collections are malformed")
+    recorded_machine = state.get("machine")
+    current_machine = _machine_record()
+    if not isinstance(recorded_machine, dict) or (
+        recorded_machine.get("python") != current_machine["python"]
+        or pathlib.Path(str(recorded_machine.get("python_executable", ""))).resolve()
+        != pathlib.Path(current_machine["python_executable"]).resolve()
+    ):
+        raise CampaignConfigurationError(
+            "checkpoint Python runtime differs from the current interpreter"
+        )
     return state
 
 
@@ -353,6 +363,10 @@ def _run_chunk(
 
     elapsed = time.perf_counter() - started
     summary = _parse_summary(stdout)
+    oracle_validator_failed = any(
+        line.startswith("FAIL ") and "harness response validator raised" in line
+        for line in stdout.splitlines()
+    )
     status = "harness_error"
     classification = "harness_or_configuration_failure"
     completed_cases = 0
@@ -402,8 +416,15 @@ def _run_chunk(
             and summary["failures"] > 0
             and not summary["budget_exhausted"]
         ):
-            status = "breach"
-            classification = "candidate_runner_invariant_breach"
+            if oracle_validator_failed:
+                status = "harness_error"
+                classification = "oracle_validator_failure_not_runner_finding"
+                errors.append(
+                    "oracle response validator raised; this is not classified as a runner finding"
+                )
+            else:
+                status = "breach"
+                classification = "candidate_runner_invariant_breach"
         else:
             errors.append("oracle exit/verdict/stderr combination is not a valid completed result")
 
@@ -511,10 +532,11 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     plans = _plans(args.target_cases, args.chunk_size, args.base_seed)
+    plan_ids = {str(plan.chunk_id) for plan in plans}
     existing_completed = sum(
         record.get("cases", 0)
-        for record in state["chunks"].values()
-        if _is_completed(record)
+        for chunk_id, record in state["chunks"].items()
+        if chunk_id in plan_ids and _is_completed(record)
     )
     if args.phase == "pilot" and existing_completed == 0 and args.target_cases < 20_000:
         print("rr-campaign: configuration error: initial pilot must target at least 20000 cases", file=sys.stderr)
@@ -529,6 +551,27 @@ def main(argv: list[str] | None = None) -> int:
     if state["campaign_launch_epoch"] is not None:
         deadline_epoch = state["campaign_launch_epoch"] + MAX_FULL_WALL_SECONDS
 
+    resume_utc = _utc_now()
+    for prior_run in state["runs"]:
+        if prior_run.get("status") == "running":
+            prior_run.update(
+                {
+                    "added_cases_durable": max(
+                        0, existing_completed - prior_run.get("starting_completed_cases", 0)
+                    ),
+                    "finished_utc": resume_utc,
+                    "status": "interrupted",
+                    "stop_reason": "inferred_external_process_termination_before_resume",
+                }
+            )
+            state["events"].append(
+                {
+                    "event": "inferred_interruption",
+                    "run_id": prior_run.get("run_id"),
+                    "utc": resume_utc,
+                }
+            )
+
     pending = [plan for plan in plans if not _is_completed(state["chunks"].get(str(plan.chunk_id), {}))]
     run_id = len(state["runs"])
     run_record: dict[str, Any] = {
@@ -541,6 +584,7 @@ def main(argv: list[str] | None = None) -> int:
         "chunk_budget_seconds": args.chunk_budget_seconds,
         "case_timeout_seconds": args.case_timeout_seconds,
         "max_retries": args.max_retries,
+        "runtime": _machine_record(),
         "retries": 0,
         "status": "running",
     }
