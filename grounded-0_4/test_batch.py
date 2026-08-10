@@ -11,14 +11,17 @@ from __future__ import annotations
 
 import argparse
 import base64
+import hashlib
 import importlib.util
 import io
 import json
 import pathlib
+import random
 import statistics
 import subprocess
 import sys
 import time
+import tracemalloc
 from dataclasses import dataclass
 
 HERE = pathlib.Path(__file__).resolve().parent
@@ -125,6 +128,240 @@ def physical_lines(raw: bytes) -> list[bytes]:
     if parts[-1]:
         lines.append(parts[-1])
     return lines
+
+
+def make_line(total_length: int, pattern: bytes, terminated: bool) -> bytes:
+    body_length = total_length - (1 if terminated else 0)
+    if body_length < 0 or not pattern or b"\n" in pattern:
+        raise ValueError("invalid deterministic line recipe")
+    body = (pattern * (body_length // len(pattern) + 1))[:body_length]
+    return body + (b"\n" if terminated else b"")
+
+
+class RepeatingLineSource:
+    """Generate one arbitrarily long physical line without retaining it."""
+
+    def __init__(self, content_length: int, terminated: bool) -> None:
+        self.remaining = content_length
+        self.newline_pending = terminated
+        self.max_requested = 0
+        self.calls = 0
+
+    def readline(self, size: int = -1) -> bytes:
+        if size < 0:
+            raise AssertionError("batch reader attempted an unbounded readline")
+        self.calls += 1
+        self.max_requested = max(self.max_requested, size)
+        if self.remaining:
+            count = min(size, self.remaining)
+            self.remaining -= count
+            chunk = b"x" * count
+            if self.remaining == 0 and self.newline_pending and count < size:
+                self.newline_pending = False
+                chunk += b"\n"
+            return chunk
+        if self.newline_pending:
+            self.newline_pending = False
+            return b"\n"
+        return b""
+
+
+def repeated_line_digest(content_length: int, terminated: bool) -> str:
+    digest = hashlib.sha256()
+    block = b"x" * rr_batch._READ_CHUNK_BYTES
+    remaining = content_length
+    while remaining:
+        count = min(len(block), remaining)
+        digest.update(block[:count])
+        remaining -= count
+    if terminated:
+        digest.update(b"\n")
+    return digest.hexdigest().upper()
+
+
+def transport_regression_gate() -> tuple[int, int]:
+    """Pin the two RO1 transport findings and broader boundary properties."""
+
+    class ShortWriteSink:
+        def __init__(self) -> None:
+            self.data = bytearray()
+            self.calls = 0
+            self.flush_offsets: list[int] = []
+            self.plan = (1, 2, 3, 5, 8, 13, 21, 34)
+
+        def write(self, data: bytes | memoryview) -> int:
+            count = min(len(data), self.plan[self.calls % len(self.plan)])
+            self.calls += 1
+            self.data.extend(data[:count])
+            return count
+
+        def flush(self) -> None:
+            self.flush_offsets.append(len(self.data))
+
+    short_requests = [b"\n", b"{}\r\n"]
+    short_expected = [audited_bytes(raw) for raw in short_requests]
+    short_sink = ShortWriteSink()
+    short_exit = rr_batch.serve(io.BytesIO(b"".join(short_requests)), short_sink)
+    check("ro1:short-write:exit-zero", short_exit == 0, str(short_exit))
+    check("ro1:short-write:multiple-calls", short_sink.calls > len(short_requests), str(short_sink.calls))
+    check("ro1:short-write:full-bytes", bytes(short_sink.data) == b"".join(short_expected))
+    check(
+        "ro1:short-write:flush-after-each-complete-response",
+        short_sink.flush_offsets == [len(short_expected[0]), sum(map(len, short_expected))],
+        repr(short_sink.flush_offsets),
+    )
+    check(
+        "ro1:short-write:full-lf-framing",
+        bytes(short_sink.data).splitlines(keepends=True) == short_expected,
+    )
+
+    class NoProgressSink:
+        def __init__(self, result: int | None) -> None:
+            self.result = result
+            self.flushes = 0
+
+        def write(self, _data: bytes | memoryview) -> int | None:
+            return self.result
+
+        def flush(self) -> None:
+            self.flushes += 1
+
+    for label, result in (("zero", 0), ("none", None)):
+        sink = NoProgressSink(result)
+        try:
+            rr_batch.serve(io.BytesIO(b"\n"), sink)
+        except BlockingIOError as error:
+            check(f"ro1:{label}-write:raises", "made no progress" in str(error), str(error))
+        except Exception as error:  # noqa: BLE001 - wrong exception is a regression
+            check(f"ro1:{label}-write:raises", False, repr(error))
+        else:
+            check(f"ro1:{label}-write:raises", False, "no exception")
+        check(f"ro1:{label}-write:no-flush", sink.flushes == 0, str(sink.flushes))
+
+    class FailingSink:
+        def __init__(self) -> None:
+            self.data = bytearray()
+            self.calls = 0
+            self.flushes = 0
+
+        def write(self, data: bytes | memoryview) -> int:
+            self.calls += 1
+            if self.calls == 1:
+                self.data.extend(data[:17])
+                return 17
+            raise OSError("deliberate-sink-failure")
+
+        def flush(self) -> None:
+            self.flushes += 1
+
+    failing_sink = FailingSink()
+    failure_expected = audited_bytes(b"\n")
+    try:
+        rr_batch.serve(io.BytesIO(b"\n"), failing_sink)
+    except OSError as error:
+        check("ro1:raised-write:propagates", str(error) == "deliberate-sink-failure", str(error))
+    except Exception as error:  # noqa: BLE001 - wrong exception is a regression
+        check("ro1:raised-write:propagates", False, repr(error))
+    else:
+        check("ro1:raised-write:propagates", False, "no exception")
+    check("ro1:raised-write:prefix-honored", bytes(failing_sink.data) == failure_expected[:17])
+    check("ro1:raised-write:no-flush", failing_sink.flushes == 0, str(failing_sink.flushes))
+
+    class InvalidCountSink(NoProgressSink):
+        def write(self, data: bytes | memoryview) -> int:
+            return len(data) + 1
+
+    invalid_sink = InvalidCountSink(1)
+    try:
+        rr_batch.serve(io.BytesIO(b"\n"), invalid_sink)
+    except OSError as error:
+        check("ro1:overcount-write:raises", "invalid byte count" in str(error), str(error))
+    except Exception as error:  # noqa: BLE001 - wrong exception is a regression
+        check("ro1:overcount-write:raises", False, repr(error))
+    else:
+        check("ro1:overcount-write:raises", False, "no exception")
+    check("ro1:overcount-write:no-flush", invalid_sink.flushes == 0, str(invalid_sink.flushes))
+
+    maximum = rr_api.b1.MAX_INPUT_BYTES
+    seed = 0x524F32
+    rng = random.Random(seed)
+    deltas = [1, 2, 3, 17, 255, 256, 257, rr_batch._READ_CHUNK_BYTES - 1,
+              rr_batch._READ_CHUNK_BYTES, rr_batch._READ_CHUNK_BYTES + 1,
+              1_048_583, 2_097_169]
+    deltas.extend(rng.randrange(1, 1_500_000) for _ in range(8))
+    patterns = (b"x", b"\xff\x00{}", b"\r ", b'{"format_version":"B1-WRAPPER-SEMANTIC-REQUEST-0.2"}')
+    overlimit_cases = 0
+    for index, delta in enumerate(deltas):
+        terminated = index % 2 == 0
+        raw = make_line(maximum + delta, patterns[index % len(patterns)], terminated)
+        expected = audited_bytes(raw)
+        sink = io.BytesIO()
+        actual_exit = rr_batch.serve(io.BytesIO(raw), sink)
+        actual = sink.getvalue()
+        check(f"ro1:overlimit:{index}:length", len(raw) == maximum + delta, str(len(raw)))
+        check(f"ro1:overlimit:{index}:exit-zero", actual_exit == 0, str(actual_exit))
+        check(f"ro1:overlimit:{index}:one-shot-parity", actual == expected)
+        check(f"ro1:overlimit:{index}:lf-framing", actual.endswith(b"\n") and b"\r" not in actual)
+        parsed = json.loads(actual)
+        check(
+            f"ro1:overlimit:{index}:full-raw-digest",
+            parsed["audit"]["request_raw_sha256"] == hashlib.sha256(raw).hexdigest().upper(),
+        )
+        overlimit_cases += 1
+
+    # Pin both sides of the exact boundary.  The in-bound cases must take the
+    # ordinary audited path even though they are as large as the frozen cap.
+    for index, terminated in enumerate((False, True)):
+        raw = make_line(maximum, b"z", terminated)
+        sink = io.BytesIO()
+        actual_exit = rr_batch.serve(io.BytesIO(raw), sink)
+        check(f"ro1:boundary:{index}:exit-zero", actual_exit == 0, str(actual_exit))
+        check(f"ro1:boundary:{index}:one-shot-parity", sink.getvalue() == audited_bytes(raw))
+
+    # An oversized terminated line must be drained as exactly one record so
+    # subsequent ordinary, empty, and oversized records remain aligned.
+    over_a = make_line(maximum + 333, b"A", True)
+    ordinary = b"{}\n"
+    over_b = make_line(maximum + 777, b"\xffB", True)
+    alignment_stream = over_a + ordinary + over_b + b"\n"
+    alignment_expected = b"".join(audited_bytes(raw) for raw in (over_a, ordinary, over_b, b"\n"))
+    alignment_sink = io.BytesIO()
+    alignment_exit = rr_batch.serve(io.BytesIO(alignment_stream), alignment_sink)
+    check("ro1:alignment:exit-zero", alignment_exit == 0, str(alignment_exit))
+    check("ro1:alignment:four-responses", len(alignment_sink.getvalue().splitlines()) == 4)
+    check("ro1:alignment:one-shot-parity", alignment_sink.getvalue() == alignment_expected)
+
+    # Peak retained memory is bounded by the frozen cap even when physical
+    # line length scales from roughly 2x to 8x that cap.  The source generates
+    # bytes incrementally, so the measurement cannot hide a prebuilt line.
+    memory_peaks: list[int] = []
+    peak_limit = maximum + 8 * rr_batch._READ_CHUNK_BYTES
+    for multiplier, extra, terminated in ((2, 17, False), (8, 31, True)):
+        content_length = maximum * multiplier + extra
+        expected_digest = repeated_line_digest(content_length, terminated)
+        source = RepeatingLineSource(content_length, terminated)
+        sink = io.BytesIO()
+        tracemalloc.start()
+        memory_exit = rr_batch.serve(source, sink)
+        _current, peak = tracemalloc.get_traced_memory()
+        tracemalloc.stop()
+        memory_peaks.append(peak)
+        parsed = json.loads(sink.getvalue())
+        check(f"ro1:memory:{multiplier}x:exit-zero", memory_exit == 0, str(memory_exit))
+        check(f"ro1:memory:{multiplier}x:bounded-read", source.max_requested == rr_batch._READ_CHUNK_BYTES)
+        check(f"ro1:memory:{multiplier}x:raw-digest", parsed["audit"]["request_raw_sha256"] == expected_digest)
+        check(f"ro1:memory:{multiplier}x:peak-bounded", peak <= peak_limit, f"peak={peak} limit={peak_limit}")
+        overlimit_cases += 1
+    check(
+        "ro1:memory:not-line-scaled",
+        abs(memory_peaks[1] - memory_peaks[0]) <= 2 * rr_batch._READ_CHUNK_BYTES,
+        repr(memory_peaks),
+    )
+    print(
+        f"batch transport: seed=0x{seed:X} overlimit_cases={overlimit_cases} "
+        f"peak_memory_bytes={max(memory_peaks)} peaks={','.join(map(str, memory_peaks))}"
+    )
+    return overlimit_cases, max(memory_peaks)
 
 
 def fuzz_parity_gate() -> tuple[int, int, int]:
@@ -352,11 +589,13 @@ def main() -> int:
     fixtures = load_fixtures()
     fixture_count, semantic_count, semantic_raw = functional_gate(fixtures)
     fuzz_count, fuzz_fast, fuzz_special = fuzz_parity_gate()
+    overlimit_count, peak_memory = transport_regression_gate()
     if args.perf:
         performance_gate(semantic_raw)
     print(
         f"batch regression: fixtures={fixture_count} semantic={semantic_count} "
         f"fuzz={fuzz_count} fuzz_fast={fuzz_fast} fuzz_special={fuzz_special} "
+        f"overlimit={overlimit_count} peak_memory_bytes={peak_memory} "
         f"checks={checks} failures={failures} perf={'on' if args.perf else 'off'}"
     )
     return 1 if failures else 0
