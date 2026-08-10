@@ -1,0 +1,307 @@
+{
+ "burden": {
+  "b1_decisions_with_fabrication": 384,
+  "b1_fabricated_fields_total": 768,
+  "b1_request_bytes_mean": 2572
+ },
+ "disagreement_samples": {
+  "LIFECYCLE|clean|b1_only": [
+   {
+    "b1_reasons": [
+     "class:MALFORMED_OR_BOUNDARY"
+    ],
+    "baseline_reasons": [],
+    "defect_types": [],
+    "provenance": "real",
+    "record_id": "REC_AB4D0B964839750A"
+   },
+   {
+    "b1_reasons": [
+     "class:MALFORMED_OR_BOUNDARY"
+    ],
+    "baseline_reasons": [],
+    "defect_types": [],
+    "provenance": "real",
+    "record_id": "REC_9C97837B6ABF745D"
+   },
+   {
+    "b1_reasons": [
+     "class:MALFORMED_OR_BOUNDARY"
+    ],
+    "baseline_reasons": [],
+    "defect_types": [],
+    "provenance": "real",
+    "record_id": "REC_9F66153D26E662B6"
+   }
+  ],
+  "SUPERSEDE|defective|b1_only": [
+   {
+    "b1_reasons": [
+     "class:OMISSION_OR_INCOMPLETE",
+     "OBL-15: authoritative semantic basis is absent or inconsistent"
+    ],
+    "baseline_reasons": [],
+    "defect_types": [
+     "reliance_on_superseded_version"
+    ],
+    "provenance": "seeded",
+    "record_id": "REC_CF16C9DCF404B900"
+   }
+  ]
+ },
+ "disagreements_summary": {
+  "LIFECYCLE|clean|b1_only": 133,
+  "SUPERSEDE|defective|b1_only": 1
+ },
+ "latency": {
+  "b1": {
+   "mean_ms": 2.998,
+   "p95_ms": 4.782
+  },
+  "b1_calibrated": {
+   "mean_ms": 2.048,
+   "p95_ms": 4.423
+  },
+  "b1_subprocess": {
+   "mean_ms": 104.99,
+   "p95_ms": 110.482
+  },
+  "baseline": {
+   "mean_ms": 0.009,
+   "p95_ms": 0.001
+  }
+ },
+ "overall": {
+  "b1": {
+   "detection_rate": 1.0,
+   "false_hold_rate": 0.341,
+   "fn": 0,
+   "fp": 133,
+   "n": 408,
+   "tn": 257,
+   "tp": 18
+  },
+  "b1_calibrated": {
+   "detection_rate": 1.0,
+   "false_hold_rate": 0.0,
+   "fn": 0,
+   "fp": 0,
+   "n": 408,
+   "tn": 390,
+   "tp": 18
+  },
+  "baseline": {
+   "detection_rate": 0.9444,
+   "false_hold_rate": 0.0,
+   "fn": 1,
+   "fp": 0,
+   "n": 408,
+   "tn": 390,
+   "tp": 17
+  }
+ },
+ "per_defect_type": {
+  "lifecycle_order_violation": {
+   "b1": {
+    "caught": 3,
+    "n": 3
+   },
+   "b1_calibrated": {
+    "caught": 3,
+    "n": 3
+   },
+   "baseline": {
+    "caught": 3,
+    "n": 3
+   }
+  },
+  "missing_reference_target": {
+   "b1": {
+    "caught": 3,
+    "n": 3
+   },
+   "b1_calibrated": {
+    "caught": 3,
+    "n": 3
+   },
+   "baseline": {
+    "caught": 3,
+    "n": 3
+   }
+  },
+  "pin_hash_mismatch": {
+   "b1": {
+    "caught": 3,
+    "n": 3
+   },
+   "b1_calibrated": {
+    "caught": 3,
+    "n": 3
+   },
+   "baseline": {
+    "caught": 3,
+    "n": 3
+   }
+  },
+  "recorded_use_outside_declared_scope": {
+   "b1": {
+    "caught": 3,
+    "n": 3
+   },
+   "b1_calibrated": {
+    "caught": 3,
+    "n": 3
+   },
+   "baseline": {
+    "caught": 3,
+    "n": 3
+   }
+  },
+  "reliance_on_superseded_version": {
+   "b1": {
+    "caught": 1,
+    "n": 1
+   },
+   "b1_calibrated": {
+    "caught": 1,
+    "n": 1
+   },
+   "baseline": {
+    "caught": 0,
+    "n": 1
+   }
+  },
+  "stale_reference_path": {
+   "b1": {
+    "caught": 5,
+    "n": 5
+   },
+   "b1_calibrated": {
+    "caught": 5,
+    "n": 5
+   },
+   "baseline": {
+    "caught": 5,
+    "n": 5
+   }
+  }
+ },
+ "per_family": {
+  "LIFECYCLE": {
+   "b1": {
+    "detection_rate": 1.0,
+    "false_hold_rate": 0.6394,
+    "fn": 0,
+    "fp": 133,
+    "n": 211,
+    "tn": 75,
+    "tp": 3
+   },
+   "b1_calibrated": {
+    "detection_rate": 1.0,
+    "false_hold_rate": 0.0,
+    "fn": 0,
+    "fp": 0,
+    "n": 211,
+    "tn": 208,
+    "tp": 3
+   },
+   "baseline": {
+    "detection_rate": 1.0,
+    "false_hold_rate": 0.0,
+    "fn": 0,
+    "fp": 0,
+    "n": 211,
+    "tn": 208,
+    "tp": 3
+   }
+  },
+  "REF": {
+   "b1": {
+    "detection_rate": 1.0,
+    "false_hold_rate": 0.0,
+    "fn": 0,
+    "fp": 0,
+    "n": 20,
+    "tn": 9,
+    "tp": 11
+   },
+   "b1_calibrated": {
+    "detection_rate": 1.0,
+    "false_hold_rate": 0.0,
+    "fn": 0,
+    "fp": 0,
+    "n": 20,
+    "tn": 9,
+    "tp": 11
+   },
+   "baseline": {
+    "detection_rate": 1.0,
+    "false_hold_rate": 0.0,
+    "fn": 0,
+    "fp": 0,
+    "n": 20,
+    "tn": 9,
+    "tp": 11
+   }
+  },
+  "SCOPE": {
+   "b1": {
+    "detection_rate": 1.0,
+    "false_hold_rate": 0.0,
+    "fn": 0,
+    "fp": 0,
+    "n": 173,
+    "tn": 170,
+    "tp": 3
+   },
+   "b1_calibrated": {
+    "detection_rate": 1.0,
+    "false_hold_rate": 0.0,
+    "fn": 0,
+    "fp": 0,
+    "n": 173,
+    "tn": 170,
+    "tp": 3
+   },
+   "baseline": {
+    "detection_rate": 1.0,
+    "false_hold_rate": 0.0,
+    "fn": 0,
+    "fp": 0,
+    "n": 173,
+    "tn": 170,
+    "tp": 3
+   }
+  },
+  "SUPERSEDE": {
+   "b1": {
+    "detection_rate": 1.0,
+    "false_hold_rate": 0.0,
+    "fn": 0,
+    "fp": 0,
+    "n": 4,
+    "tn": 3,
+    "tp": 1
+   },
+   "b1_calibrated": {
+    "detection_rate": 1.0,
+    "false_hold_rate": 0.0,
+    "fn": 0,
+    "fp": 0,
+    "n": 4,
+    "tn": 3,
+    "tp": 1
+   },
+   "baseline": {
+    "detection_rate": 0.0,
+    "false_hold_rate": 0.0,
+    "fn": 1,
+    "fp": 0,
+    "n": 4,
+    "tn": 3,
+    "tp": 0
+   }
+  }
+ }
+}
