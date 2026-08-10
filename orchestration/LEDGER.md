@@ -15,8 +15,10 @@ their own work. Timestamps are recorded in Pacific time on 2026-08-10.
 | P2 | Prove lint gates fail on controlled mutations | 2026-08-10 11:22 PDT | 2026-08-10 11:27 PDT | PASS | merged as `d3e86e9`; 7/7 meta-tests; integration gate green |
 | P3 | Build deterministic grammar and byte fuzz harness | 2026-08-10 11:23 PDT | — | RUNNING | `sol/w-p3` |
 | P4 | Add seeded property tests | 2026-08-10 11:23 PDT | 2026-08-10 11:30 PDT | PASS | merged as `331f78f`; 2,296 checks; integration gate green |
-| P5 | Add adversarial audited-surface tests | 2026-08-10 11:24 PDT | — | RUNNING | `sol/w-p5` |
-| P6 | Build synthetic proof corpus and regressions | 2026-08-10 11:24 PDT | — | RUNNING | `sol/w-p6` |
+| P5 | Add adversarial audited-surface tests | 2026-08-10 11:24 PDT | 2026-08-10 11:30 PDT | RED — valid defect | commit `df6f7d7`; 6,496/6,497 pass; held for F1 fix |
+| P6 | Build synthetic proof corpus and regressions | 2026-08-10 11:24 PDT | 2026-08-10 11:33 PDT | PASS | merged as `105dc33`; 7 proof tests; integration gate green |
 | P7 | Draft proposed 0.5 core wire and audit rules | 2026-08-10 11:24 PDT | — | RUNNING | `sol/w-p7` |
 | P8 | Draft proposed 0.5 semantics and compact profile | 2026-08-10 11:25 PDT | — | RUNNING | `sol/w-p8` |
 | P9 | Audit documentary counts, paths, commands, and digests | 2026-08-10 11:28 PDT | — | RUNNING | `sol/w-p9` |
+| F1 | Fix audited-reference exact-key false positive | 2026-08-10 11:31 PDT | — | RUNNING | `sol/w-f1`; author-separated from P5 |
+| I1 | Build independent composed-surface implementation | 2026-08-10 11:32 PDT | — | RUNNING | `sol/w-i1`; contract-only custody before first light |
