@@ -166,7 +166,8 @@ reasons). The 0.3 generation closes both gaps additively — zero accepted
 - a dated, hash-pinned prior-art snapshot fixing the completeness basis,
   with a treadmill guard: later prior art is absorbed only at an explicit
   versioned re-freeze, never by reopening a sealed acceptance;
-- an extended reference implementation (`implementation-output-0.3/`)
+- an extended reference implementation
+  (`baseline-run/implementation-output-0.3/`)
   covering all 30 operations in both execution modes, built by a separate
   lane from the fixture author.
 
@@ -270,8 +271,9 @@ conformance engineering and pressed on what conformance cannot prove. Its
 findings were reproduced probe-for-probe and answered additively — zero
 sealed 0.2/0.3 bytes changed:
 
-- `grounded-0_4/rr_api.py` — a library API (`decide`, in-process, ~3 ms vs
-  ~105 ms via the stdio ABI) and an audited surface (`decide_audited`) whose
+- `grounded-0_4/rr_api.py` — a library API (`decide`; the recorded proof run
+  measured 2.998 ms in-process vs 104.99 ms via the stdio ABI, see
+  `proof/RESULTS.md`) and an audited surface (`decide_audited`) whose
   seal binds the request bytes, the decision-input digest, and the frozen
   receipt, and which carries the matched-predicate witness trace and derived
   record references the sealed response lacks.
@@ -301,8 +303,10 @@ The highest-value additions are adversarial: a coverage-guided fuzzing
 campaign against the reference runner, and an independent second
 implementation cross-tested against the same fixture packs. Both are
 welcome; neither exists yet. To re-verify what is here, run the conformance
-suite (both modes), then re-derive every seal per the RUNBOOK, then run the
-grounded-0.4 regression and lint gate.
+suite (both modes), then re-derive every seal per the RUNBOOK, then, from the
+repository root, run `python -B grounded-0_4/test_grounded_0_4.py`,
+`python -B grounded-0_4/lint_contract.py --gate`, and
+`python -B grounded-0_4/test_lint_gate.py`.
 
 ## Provenance and exclusions
 
@@ -332,11 +336,14 @@ toolchain (reproduce it from the official CPython 3.12.4 Windows embeddable
 zip,
 `https://www.python.org/ftp/python/3.12.4/python-3.12.4-embed-amd64.zip`,
 SHA-256 `15fea3c9367653a85086fe37216b4d1a1c78688fa5e1587e1db0b0f658856564`,
-with `python312._pth` left stock and site imports disabled), the research
+with `baseline-run/toolchain/python312._pth` left stock and site imports
+disabled), the research
 program's source components, and internal process records. The toolchain's
-provenance manifest (`TOOLCHAIN_MANIFEST_0_1.json`) is withheld because it
+provenance manifest (`baseline-run/toolchain/TOOLCHAIN_MANIFEST_0_1.json`) is
+withheld because it
 carries machine-path provisioning evidence; the contract pins its path,
 byte length, and digest under `toolchain_manifest_tree_reference`, so a
 future release of it is verifiable against these bytes. Both conformance
-modes run without it; only manifest regeneration requires it (see the
-RUNBOOK).
+modes run without the provenance manifest; the sealed ABI mode still requires
+the separately reproduced `baseline-run/toolchain/python.exe`. Only manifest
+regeneration requires the manifest itself (see the RUNBOOK).

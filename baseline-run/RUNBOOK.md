@@ -29,7 +29,7 @@ implementation (one program that produces it).
 | `fixtures/PRIMARY_BASELINE_SEMANTIC_FIXTURE_PACK_0_2.json` | 112 byte-exact semantic request/response pairs (28 operations x 4 classes) plus 370 competence mutation cases. |
 | `fixtures/B1_WRAPPER_PARITY_FIXTURE_PACK_0_2.json` | 112 wrapper pairs / 224 arms (B1 vs B1-ATTENTION), transcripts, 10 negative cases, 4 metamorphic cases. |
 | `receipts/PRIMARY_BASELINE_FIXTURE_ACCEPTANCE_RECEIPT_0_2.json` | Independent acceptance receipt for the fixture packs (sealed; carries per-section entry, arm, pair, and class counts). |
-| `implementation-output-0.2/` | Reference implementation (`pcb_runner.py` + `b1_capabilities.py`), conformance harness, manifest, and receipts. |
+| `implementation-output-0.2/` | Reference implementation (`implementation-output-0.2/pcb_runner.py` + `implementation-output-0.2/b1_capabilities.py`), conformance harness, manifest, and receipts. |
 | `implementation-output-0.3/` | Composed reference implementation covering all 30 operations (28 accepted + 2 supplemental), its conformance harness (runs BOTH suites), manifest, and receipts. Built by a separate lane; see `../ACCEPTANCE.md`. |
 | `../supplemental-0_3/control/` | The supplemental 0.3 contract (two decision-table rows, composed 30-operation schemas, versioned wrapper interface) and the composed 30-row capability matrix. |
 | `../supplemental-0_3/fixtures/` | Supplemental sealed packs: 12 semantic entries + 53 competence cases; 12 wrapper pairs / 24 arms + 10 negatives + 8 metamorphic cases across five named families. |
@@ -49,7 +49,7 @@ Any CPython 3.12 works for the in-process mode. The pinned toolchain is only
 needed to reproduce the sealed subprocess-ABI mode. From this directory:
 
 ```bash
-python implementation-output-0.2/run_conformance_0_2.py
+python -B implementation-output-0.2/run_conformance_0_2.py
 ```
 
 Expected output: `mode=in-process counts={"semantic": 112, "competence": 370,
@@ -64,7 +64,7 @@ harness, not the fixture packs.)
 The composed runner covers all 30 operations and runs both suites:
 
 ```bash
-python implementation-output-0.3/run_conformance_0_3.py --suite all
+python -B implementation-output-0.3/run_conformance_0_3.py --suite all
 ```
 
 Expected output: two lines — `mode=in-process suite=0.2 ... total=800
@@ -85,13 +85,13 @@ release. Reproduce it first:
    and verify its SHA-256 is
    `15fea3c9367653a85086fe37216b4d1a1c78688fa5e1587e1db0b0f658856564`.
 2. Unzip it to `toolchain/` (so `toolchain/python.exe` exists) and leave
-   `python312._pth` stock — site imports stay disabled.
+   `toolchain/python312._pth` stock — site imports stay disabled.
 
 The sealed mode is Windows-specific (the pinned interpreter is the Windows
 embeddable build). The in-process mode is portable to any CPython 3.12.
 
 ```bash
-python implementation-output-0.2/run_conformance_0_2.py --subprocess
+python -B implementation-output-0.2/run_conformance_0_2.py --subprocess
 ```
 
 Regenerating the implementation manifests and receipts requires the
@@ -99,14 +99,17 @@ toolchain provenance manifest (`toolchain/TOOLCHAIN_MANIFEST_0_1.json`),
 which is NOT distributed in this release — it carries machine-path
 provisioning evidence. The contract pins its path, byte length, and raw
 digest under `toolchain_manifest_tree_reference`, so a future release of
-it is verifiable. Without it, BOTH emitters exit with an error
-(`emit_manifest_0_2.py` with `FileNotFoundError`; `emit_manifest_0_3.py`
-reporting the missing manifest); nothing else in this tree needs it —
-both conformance runners run without it in both modes. With the full
-toolchain provenance present:
+it is verifiable. Without the provenance manifest, BOTH emitters exit with
+an error
+(`implementation-output-0.2/emit_manifest_0_2.py` with `FileNotFoundError`;
+`implementation-output-0.3/emit_manifest_0_3.py` reporting the missing
+manifest); nothing else in this tree needs the
+manifest. Both conformance runners run without the provenance manifest in
+both modes; the sealed ABI mode still requires `toolchain/python.exe`. With
+the full toolchain provenance present:
 
 ```bash
-python implementation-output-0.2/emit_manifest_0_2.py
+python -B implementation-output-0.2/emit_manifest_0_2.py
 ```
 
 ## Run one request by hand
@@ -114,7 +117,7 @@ python implementation-output-0.2/emit_manifest_0_2.py
 Every fixture entry carries its exact request bytes. To execute one:
 
 ```bash
-python - <<'EOF'
+python -B - <<'EOF'
 import base64, json, subprocess
 pack = json.load(open("fixtures/PRIMARY_BASELINE_SEMANTIC_FIXTURE_PACK_0_2.json", encoding="utf-8"))
 entry = pack["entries"][0]

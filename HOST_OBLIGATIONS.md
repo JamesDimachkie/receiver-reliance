@@ -57,8 +57,8 @@ register marks `semantic`.
 Obligations demand their full fact profile; the contract has no abstention
 mechanism (recorded gap, see `ERRATA.md` E7). If a record genuinely lacks an
 obligation's semantics (a lifecycle with no acknowledgment event, say), the
-host must decline to force the mapping — forcing it measured a 32.6%
-false-hold rate on real records in `proof/RESULTS.md`; declining measured
+host must decline to force the mapping — forcing it produced 133 false holds
+among 390 clean records (34.1%) in `proof/RESULTS.md`; declining measured
 0% with no detection loss.
 
 *Conformance check:* your adapter declares, per obligation, the native
@@ -75,9 +75,9 @@ transcripts and verify with the core transcript evaluator. Do not present a
 bare sealed receipt as evidence of *what* was decided — it proves only that
 *a* decision of that class was sealed under that request id.
 
-*Conformance check:* `grounded-0_4/test_grounded_0_4.py` (the BINDING
-section) — two different fact profiles must never share an audit seal in
-your pipeline.
+*Conformance check:* `python -B grounded-0_4/test_grounded_0_4.py` (the
+BINDING section) — two different fact profiles must never share an audit
+seal in your pipeline.
 
 ## H6. Effects
 

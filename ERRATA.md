@@ -2,7 +2,8 @@
 
 Confirmed against the artifact at cc6f3657 by reproducing the external
 review's probes (conformance 800+107 green; OBL-08/OBL-30 mutation probes;
-OBL-26 replay; wire-format collision; 199/24 fact-field authority census).
+OBL-26 replay; wire-format collision; 199 required fields / 24 never-referenced
+fields in the fact-field authority census).
 Sealed 0.2/0.3 bytes are never edited: fixes land additively in
 `grounded-0_4/` or are scheduled for the next sealed generation. Each
 erratum names its enforcement so the class cannot recur silently.
@@ -13,18 +14,21 @@ erratum names its enforcement so the class cannot recur silently.
 the composed 0.3 surfaces, which behave incompatibly on 0.3-only operations
 (same bytes: ERR_SCHEMA from 0.2, PASS from 0.3). There is no wire-level
 negotiation. *Status:* grandfathered by name in the authority register;
-`lint_contract.py` L2 fails CI on any NEW collision. Next sealed generation
-must declare a distinct format string and reject undeclared generations.
+`grounded-0_4/lint_contract.py` L2 fails CI on any NEW collision. Next
+sealed generation must declare a distinct format string and reject
+undeclared generations.
 
 ## E2 — Sealed responses do not bind the decision input
 
 Ordinary (non-effect) responses carry no digest of the facts they judged;
 materially different fact profiles under one request id produce
 byte-identical receipts, and `record_references` is hard-coded empty.
-*Status:* fixed on the additive surface — `rr_api.decide_audited` seals
+*Status:* fixed on the additive surface —
+`grounded-0_4/rr_api.py::decide_audited` seals
 `request_raw_sha256` + `decision_input_sha256` + the frozen receipt into an
 audit object, carries the matched-predicate witness trace and derived record
-references (`test_grounded_0_4.py` BINDING section enforces divergence).
+references (`grounded-0_4/test_grounded_0_4.py` BINDING section enforces
+divergence).
 Next sealed generation folds these fields into the sealed response schema.
 
 ## E3 — Envelope digests bind the inert half of the request
@@ -52,9 +56,9 @@ stale, left the sealed verdict byte-identical VALID: the projections and
 the disposition ledger were trusted, not derived, though fully derivable
 from other supplied fields. *Status:* fixed on the audited surface by
 tighten-only closures (verdict/projection agreement; derived disposition
-exhaustiveness — `closures_0_4.json`); regression-pinned. The intent tuple
-remains non-authoritative BY CONTRACT (disclosed); the register carries it
-as `inert_disclosed`.
+exhaustiveness — `grounded-0_4/closures_0_4.json`); regression-pinned. The
+intent tuple remains non-authoritative BY CONTRACT (disclosed); the register
+carries it as `inert_disclosed`.
 
 ## E6 — Recorded contract non-closures (unchanged from ACCEPTANCE.md)
 
@@ -66,8 +70,8 @@ sealed revision, not implementation defects.
 ## E7 — No applicability/abstention mechanism
 
 Every operation demands its full fact profile; a host whose records lack an
-obligation's semantics must fabricate values (and eat false holds — a
-measured 32.6% clean-record hold rate when OBL-17 was forced onto
+obligation's semantics must fabricate values (and eat false holds — 133 of
+390 clean records, a 34.1% false-hold rate, when OBL-17 was forced onto
 acknowledgment-less lifecycles) or refuse outside the contract. *Status:*
 host-side calibration is specified in `HOST_OBLIGATIONS.md` H4 and measured
 in `proof/`; next sealed generation should admit an explicit
