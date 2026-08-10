@@ -19,6 +19,12 @@ rr-campaign: verdict=PASS cases=8000/8000 runner_executions=16000 chunks=8/8 bre
 
 Exit counts were `0: 529`, `1: 535`, and `2: 6,936`. Every completed chunk was classified `no_invariant_breach`.
 
+Exact strategy counts:
+
+```json
+{"bit_flip":256,"bom":256,"byte_delete":256,"byte_insert":256,"byte_splice":256,"crlf":256,"deep_known_envelope":256,"deep_nesting":256,"duplicate_key":256,"empty_input":256,"fixture_core_defect":264,"fixture_core_valid":264,"fixture_wrapper_defect":264,"fixture_wrapper_valid":264,"grammar_binding_mismatch":264,"grammar_drop_required":264,"grammar_fact_shape":256,"grammar_unknown_member":264,"grammar_wrong_type":264,"huge_integer":256,"invalid_utf8":256,"lone_surrogate":256,"missing_lf":256,"nfc_key":256,"nfc_value":256,"noncanonical_whitespace":256,"random_grammar":256,"root_scalar":256,"trailing_bytes":256,"truncate":256,"utf8_edges":256}
+```
+
 ## Frozen execution identity
 
 - Python: `C:\Users\james\AppData\Local\Python\pythoncore-3.12-64\python.exe`, CPython 3.12.10 (64-bit).
