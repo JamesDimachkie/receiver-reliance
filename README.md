@@ -70,6 +70,10 @@ exit 0. `baseline-run/RUNBOOK.md` documents the layout, the sealed
 subprocess-ABI mode, running single requests by hand, and how to read
 fixtures.
 
+For one concrete handoff decided end to end (the records, the exact
+commands, and byte-pinned responses for a clean, a violated, and an
+unresolved case), see [EXAMPLE.md](EXAMPLE.md).
+
 ## Design properties worth stealing
 
 - **Everything is digest-pinned.** Fixture packs, receipts, and responses
