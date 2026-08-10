@@ -147,48 +147,48 @@ and to `ERR_SCHEMA` on stock 3.14 and non-Windows 3.12. Author-separated review
 of the first fix showed the divergence was broader than a bare array: deep
 objects and well-formed-looking envelopes with deep inner values diverged too,
 one class as far as `ERR_INTERNAL`. Only inputs past the 128-level nesting limit
-were affected; all 720 fixture-pinned checks were identical across builds.
+were affected. All 720 fixture-pinned checks were identical across builds.
 
-Root cause: an input's classification could depend on the depth at which a
-given CPython build aborts `json.loads` (and downstream recursive
+Root cause: for a deeply nested input, the classification depended on the
+depth at which a given CPython build aborts `json.loads` (and downstream recursive
 canonicalization or schema evaluation), which is interpreter- and
 platform-specific. The frozen precedence law already ranks `ERR_SCHEMA`
 (root-type, 80) above `ERR_LIMIT` (structural, 90), and the shallow siblings
 `schema-root-beats-nesting-limit` (depth 130) and `schema-root-beats-item-limit`
 assert exactly that — but a deep input reached the recursive parser before the
-root type could be classified, so the answer moved with the interpreter.
+root type was classified, so the answer moved with the interpreter.
 
 Fix: inputs past the 128-level nesting limit are now classified at the parse
 layer from the iterative, depth-immune scan alone, before the recursive tree
 parser runs — the same fence the wrapper transcript evaluator already applied at
 `_strict_wire_value` (round-7 R7-DIV-004), extended to the main parse path. The
-scan sees the whole input at any depth; the shallow envelope of the
+scan sees the whole input at any depth. The shallow envelope of the
 protocol-error response (core vs wrapper, echoed `request_id`) is read
 iteratively. No recursive operation runs on a structure past the nesting limit,
-so classification is a pure function of the input bytes: the full response bytes
+so classification is a pure function of the input bytes. The full response bytes
 are byte-identical on CPython 3.12.4, 3.12.10, and 3.14.5 (across a major-version
-boundary) for every affected class — bare arrays, unknown-format objects,
+boundary) for every affected class: bare arrays, unknown-format objects,
 known-format objects, wrapper requests, and valid-looking envelopes with deep
 inner values (the former `ERR_INTERNAL` case). Three error-law closures pin
-these classes as regression cases; the composed suite is now 800 + 107 = 907
+these classes as regression cases. The composed suite is now 800 + 107 = 907
 checks and passes on all three interpreters and on the Linux/macOS/Windows CI
 matrix.
 
 The change touches only the iterative scanner (one additive depth flag) and
-`pcb_runner`'s parse/dispatch path; no fixture pack, contract, or schema
+`pcb_runner`'s parse/dispatch path. No fixture pack, contract, or schema
 changed, and the 720 fixture-pinned response bytes and their seals are
 byte-unchanged. The implementation manifests and build receipts were
 regenerated to pin the new source bytes and the two added closures (digests in
 "Final accepted state" above and in the 0.3 acceptance chain).
 
-Also in v1.1: a repository `.gitattributes` marks every file binary so git never
-rewrites line endings on checkout — a Git-for-Windows `autocrlf` clone had been
-converting the content-addressed files to CRLF and breaking the digest
-self-check on load.
+Also in v1.1: a repository `.gitattributes` tells git to treat every file as
+binary, so git never rewrites line endings on checkout. A Git-for-Windows
+`autocrlf` clone was converting the content-addressed files to CRLF, which broke
+the digest self-check on load.
 
 Provenance: the v1.0 implementation and its ten-round acceptance stand as
 recorded. The v1.1 determinism correction was authored by the lead reasoning
-lane and independently reviewed by a separate author-separated lane; that
+lane and independently reviewed by a separate author-separated lane. That
 review rejected a first, narrower fix for missing the deep-object classes, which
 produced the parse-layer design recorded here. The reviewer's identity and final
 disposition are recorded with this release.
