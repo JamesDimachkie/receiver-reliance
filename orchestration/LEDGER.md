@@ -23,3 +23,5 @@ their own work. Timestamps are recorded in Pacific time on 2026-08-10.
 | F1 | Fix audited-reference exact-key false positive | 2026-08-10 11:31 PDT | 2026-08-10 11:34 PDT | CANDIDATE GREEN | `d6d1fa9`; awaiting RF1 before merge |
 | I1 | Build independent composed-surface implementation | 2026-08-10 11:32 PDT | — | RUNNING | `sol/w-i1`; contract-only custody before first light |
 | RF1 | Refute F1 exact-key fix | 2026-08-10 11:34 PDT | — | RUNNING | `sol/w-rf1`; fresh-context adversarial review |
+| T1 | Run deterministic million-input fuzz campaign | 2026-08-10 11:38 PDT | — | RUNNING | `sol/w-t1`; six-hour cap, durable chunks |
+| T2 | Run cross-interpreter validation matrix | 2026-08-10 11:39 PDT | — | RUNNING | `sol/w-t2` |
