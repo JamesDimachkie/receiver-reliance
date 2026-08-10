@@ -339,18 +339,10 @@ def validate_paths(fixtures: list[Fixture], child_timeout: int) -> None:
     run_stdio(fixtures[0], child_timeout)
 
 
-def child_environment() -> dict[str, str]:
-    environment = os.environ.copy()
-    environment["PYTHONDONTWRITEBYTECODE"] = "1"
-    environment["PYTHONHASHSEED"] = "0"
-    return environment
-
-
 def run_child(command: list[str], timeout: int, input_bytes: bytes | None = None) -> subprocess.CompletedProcess[bytes]:
     return subprocess.run(
         command,
         cwd=REPO,
-        env=child_environment(),
         input=input_bytes,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -361,7 +353,7 @@ def run_child(command: list[str], timeout: int, input_bytes: bytes | None = None
 
 def run_stdio(fixture: Fixture, timeout: int) -> None:
     result = run_child(
-        [sys.executable, "-B", str(RUNNER), "execute"], timeout, fixture.raw
+        [sys.executable, "-I", "-B", str(RUNNER), "execute"], timeout, fixture.raw
     )
     if result.stdout != fixture.expected:
         raise RuntimeError(f"stdio byte parity failed for {fixture.entry_id}")
@@ -407,21 +399,21 @@ def profile_startup(warmups: int, repetitions: int, timeout: int) -> dict[str, A
     probes = [
         startup_probe(
             "interpreter_process_noop",
-            [sys.executable, "-B", "-c", "pass"],
+            [sys.executable, "-I", "-B", "-c", "pass"],
             warmups,
             repetitions,
             timeout,
         ),
         startup_probe(
             "interpreter_plus_engine_import",
-            [sys.executable, "-B", "-c", import_source],
+            [sys.executable, "-I", "-B", "-c", import_source],
             warmups,
             repetitions,
             timeout,
         ),
         startup_probe(
             "interpreter_plus_engine_import_plus_authority_load_verify",
-            [sys.executable, "-B", "-c", authority_source],
+            [sys.executable, "-I", "-B", "-c", authority_source],
             warmups,
             repetitions,
             timeout,
@@ -665,10 +657,8 @@ def main() -> int:
             "inner_loops": args.inner_loops,
             "memory_loops": args.memory_loops,
             "child_timeout_seconds": args.child_timeout,
-            "child_environment_overrides": {
-                "PYTHONDONTWRITEBYTECODE": "1",
-                "PYTHONHASHSEED": "0",
-            },
+            "child_isolated_mode": True,
+            "child_python_flags": ["-I", "-B"],
         },
         "parity_precheck": {
             "status": "pass",

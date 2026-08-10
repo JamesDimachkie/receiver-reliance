@@ -5,9 +5,9 @@
 **PASS — measurement baseline only; no engine optimization was made.** The
 stdlib-only profiler completed byte-parity prechecks and measured all 124
 committed semantic fixture entries. On this host, a fresh-process stdio
-decision had a 127.001 ms median corpus-average latency versus 3.955 ms for
-`decide()` in process. The paired ratio median was 32.257x. Interleaved
-`decide_audited()` measurements were 1.030x the `decide()` cost at the paired
+decision had a 154.984 ms median corpus-average latency versus 5.119 ms for
+`decide()` in process. The paired ratio median was 30.274x. Interleaved
+`decide_audited()` measurements were 1.033x the `decide()` cost at the paired
 ratio median.
 
 These numbers are a baseline for comparison on this host, not portable
@@ -17,7 +17,8 @@ isolated serialization cost.
 
 ## Environment and run configuration
 
-- Source SHA: `7581bdaa018b1af6ff214aec7870577f9eeda75c`
+- Frozen engine source SHA: `7581bdaa018b1af6ff214aec7870577f9eeda75c`
+- Profiler parent SHA at measurement: `d1be3d70ed1c3aabf3663ce0bf4768b3d8b193a7`
 - Python: CPython 3.12.10, MSC v.1943, 64-bit
 - Executable: `C:\Users\james\AppData\Local\Python\pythoncore-3.12-64\python.exe`
 - Platform: Windows 11 `10.0.26200`, AMD64
@@ -31,13 +32,29 @@ isolated serialization cost.
 - Inner loops: 5 calls averaged per in-process timing sample; stdio uses 1
   fresh process per sample
 - Memory: 1 full 124-entry corpus loop per sample, 5 samples after 1 warmup
-- Child environment overrides: `PYTHONDONTWRITEBYTECODE=1`,
-  `PYTHONHASHSEED=0`
+- Child Python flags: `-I -B`, matching the fixed subprocess ABI in both
+  frozen conformance runners and the runbook's one-request command
 - Percentile method: linear interpolation over sorted samples
 
 The profiler first checked `decide()` output, the sealed response inside
 `decide_audited()`, and fresh-process stdio output against the committed
 expected bytes. All 124 entries passed before timing began.
+
+### Why stdio uses isolated mode
+
+Isolated mode is part of the intended fixed subprocess ABI, not an optional
+hardening variant:
+
+- Both frozen conformance runners invoke their subprocess path as
+  `[toolchain, "-I", "-B", pcb_runner.py, "execute"]` and describe it as the
+  fixed ABI.
+- `baseline-run/RUNBOOK.md` calls this the sealed subprocess-ABI mode and uses
+  `python -I -B .../pcb_runner.py execute` in its single-request example.
+- `README.md` routes single-request use to that sealed subprocess ABI.
+
+The original P1 report accidentally measured `-B` without `-I`. Every number
+in this corrected report comes from a new default five-sample run using
+`-I -B`; the earlier stdio figures are superseded.
 
 ## Integration-path latency
 
@@ -48,16 +65,16 @@ time-of-run bias.
 
 | Path | Raw samples (ms/decision) | n | min | median | mean | pstdev | p95 | max |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
-| `decide()` in process | 3.880119, 3.984005, 3.954842, 3.874466, 3.966138 | 5 | 3.874466 | 3.954842 | 3.931914 | 0.045593 | 3.980432 | 3.984005 |
-| `decide_audited()` in process | 4.068325, 4.102818, 4.031440, 4.077119, 4.024906 | 5 | 4.024906 | 4.068325 | 4.060922 | 0.029116 | 4.097678 | 4.102818 |
-| fresh-process stdio | 129.773336, 128.513523, 126.155617, 127.001104, 125.678360 | 5 | 125.678360 | 127.001104 | 127.424388 | 1.519298 | 129.521374 | 129.773336 |
+| `decide()` in process | 5.125130, 5.147125, 5.117556, 5.027911, 5.119398 | 5 | 5.027911 | 5.119398 | 5.107424 | 0.041129 | 5.142726 | 5.147125 |
+| `decide_audited()` in process | 5.342227, 5.286149, 5.288240, 5.321474, 5.175358 | 5 | 5.175358 | 5.288240 | 5.282690 | 0.057640 | 5.338076 | 5.342227 |
+| fresh-process stdio (`-I -B`) | 156.396369, 155.355519, 151.663302, 152.528397, 154.984114 | 5 | 151.663302 | 154.984114 | 154.185540 | 1.788974 | 156.188199 | 156.396369 |
 
 Paired comparison samples and summaries:
 
 | Comparison | Raw ratio samples | n | min | median | mean | pstdev | p95 | max |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
-| stdio / `decide()` | 33.445713, 32.257369, 31.899029, 32.778996, 31.687844 | 5 | 31.687844 | 32.257369 | 32.413790 | 0.634773 | 33.312369 | 33.445713 |
-| `decide_audited()` / `decide()` | 1.048505, 1.029822, 1.019368, 1.052305, 1.014818 | 5 | 1.014818 | 1.029822 | 1.032964 | 0.015097 | 1.051545 | 1.052305 |
+| stdio / `decide()` | 30.515593, 30.182973, 29.635886, 30.336334, 30.273896 | 5 | 29.635886 | 30.273896 | 30.188936 | 0.297169 | 30.479741 | 30.515593 |
+| `decide_audited()` / `decide()` | 1.042359, 1.027010, 1.033353, 1.058387, 1.010931 | 5 | 1.010931 | 1.033353 | 1.034408 | 0.015781 | 1.055181 | 1.058387 |
 
 ## Spread across all 124 semantic fixture entries
 
@@ -67,9 +84,9 @@ process scheduling.
 
 | Path | n | min | median | mean | pstdev | p95 | max | Fastest / slowest entry by median |
 |---|---:|---:|---:|---:|---:|---:|---:|---|
-| `decide()` | 124 | 3.145700 | 3.784590 | 3.853513 | 0.438556 | 4.665313 | 5.879340 | `SEMFX-OBL-01-INV-6BE1DD9792EF03D1` / `SEMFX-OBL-22-IO-291939EAD3C56032` |
-| `decide_audited()` | 124 | 3.313400 | 3.895510 | 3.987376 | 0.498888 | 4.993499 | 7.289780 | `SEMFX-OBL-02-CTRL-40AA7A46632A77A9` / `SEMFX-OBL-22-IO-291939EAD3C56032` |
-| fresh-process stdio | 124 | 109.470300 | 122.594900 | 125.892269 | 12.974300 | 149.082185 | 185.124300 | `SEMFX-OBL-12-CTRL-0872B8AD3612FCDD` / `SEMFX-OBL-06-FAIL-9C6AAE9F73C40A3A` |
+| `decide()` | 124 | 3.389500 | 4.608990 | 5.005281 | 1.312078 | 8.011049 | 8.751740 | `SEMFX-OBL-03-FAIL-3C938464DFACBB5A` / `SEMFX-OBL-29-IO-5F7E5E0A995BC8C9` |
+| `decide_audited()` | 124 | 3.411800 | 4.714290 | 5.175306 | 1.460924 | 8.757627 | 10.089440 | `SEMFX-OBL-02-IO-240A61327FBD9401` / `SEMFX-OBL-29-INV-29D474BA69CE7F2D` |
+| fresh-process stdio (`-I -B`) | 124 | 120.622400 | 146.491300 | 151.798326 | 19.925308 | 190.290145 | 257.315800 | `SEMFX-OBL-01-FAIL-A85C56149C721165` / `SEMFX-OBL-21-INV-42CC45E35ACBF1AB` |
 
 ## Startup and direct component probes
 
@@ -80,12 +97,12 @@ they do not form additive phases.
 
 | Probe | Raw samples (ms) | n | min | median | mean | pstdev | p95 | max |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
-| interpreter process, no-op | 44.8335, 36.5897, 36.1558, 35.5491, 36.4112 | 5 | 35.5491 | 36.4112 | 37.9079 | 3.4807 | 43.1847 | 44.8335 |
-| interpreter + engine import | 106.8117, 87.2625, 104.8062, 93.6149, 84.3939 | 5 | 84.3939 | 93.6149 | 95.3778 | 9.0470 | 106.4106 | 106.8117 |
-| interpreter + import + authority load/verify | 100.3117, 101.7376, 102.1488, 99.8526, 112.6263 | 5 | 99.8526 | 101.7376 | 103.3354 | 4.7234 | 110.5308 | 112.6263 |
+| isolated interpreter process, no-op | 29.1355, 28.6358, 31.2195, 30.5295, 32.7529 | 5 | 28.6358 | 30.5295 | 30.4546 | 1.4779 | 32.4462 | 32.7529 |
+| isolated interpreter + engine import | 81.7695, 96.8686, 88.1404, 79.1924, 89.8296 | 5 | 79.1924 | 88.1404 | 87.1601 | 6.2432 | 95.4608 | 96.8686 |
+| isolated interpreter + import + authority load/verify | 102.7015, 112.3533, 118.1979, 110.1401, 134.2183 | 5 | 102.7015 | 112.3533 | 115.5222 | 10.5838 | 131.0142 | 134.2183 |
 
-For orientation only, the median residuals are 57.204 ms for import minus
-no-op and 8.123 ms for authority minus import. Because the processes are
+For orientation only, the median residuals are 57.611 ms for import minus
+no-op and 24.213 ms for authority minus import. Because the processes are
 different observations and the sample distributions overlap, these
 subtractions are **not causal phase measurements**.
 
@@ -96,7 +113,7 @@ the application cache cold, but it does not flush filesystem or OS caches.
 
 | Raw samples (ms) | n | min | median | mean | pstdev | p95 | max |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| 6.6029, 7.3091, 6.6146, 6.3411, 7.2826 | 5 | 6.3411 | 6.6146 | 6.8301 | 0.3928 | 7.3038 | 7.3091 |
+| 11.7570, 6.7690, 13.8917, 7.4450, 10.8239 | 5 | 6.7690 | 10.8239 | 10.1373 | 2.6752 | 13.4648 | 13.8917 |
 
 ### Direct valid-path components
 
@@ -110,17 +127,17 @@ These direct probes are deliberately non-additive:
 
 | Probe | Raw corpus-average samples (ms/decision) | n | min | median | mean | pstdev | p95 | max |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
-| schema walk, valid path | 3.380558, 3.256491, 3.322988, 3.226768, 3.262078 | 5 | 3.226768 | 3.262078 | 3.289777 | 0.055117 | 3.369044 | 3.380558 |
-| classify | 0.013178, 0.012939, 0.012774, 0.013717, 0.012475 | 5 | 0.012475 | 0.012939 | 0.013017 | 0.000418 | 0.013609 | 0.013717 |
-| seal primitive | 0.012958, 0.013306, 0.012921, 0.013223, 0.013173 | 5 | 0.012921 | 0.013173 | 0.013116 | 0.000151 | 0.013290 | 0.013306 |
+| schema walk, valid path | 6.358455, 6.307933, 6.311439, 6.346472, 6.345278 | 5 | 6.307933 | 6.345278 | 6.333915 | 0.020343 | 6.356059 | 6.358455 |
+| classify | 0.028167, 0.026243, 0.026111, 0.024243, 0.023972 | 5 | 0.023972 | 0.026111 | 0.025747 | 0.001527 | 0.027783 | 0.028167 |
+| seal primitive | 0.029863, 0.028662, 0.031929, 0.028814, 0.029320 | 5 | 0.028662 | 0.029320 | 0.029718 | 0.001183 | 0.031516 | 0.031929 |
 
 The corresponding 124-entry median spreads were:
 
 | Probe | n | min | median | mean | pstdev | p95 | max |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| schema walk | 124 | 2.662640 | 3.195860 | 3.215324 | 0.339366 | 3.811390 | 4.283800 |
-| classify | 124 | 0.001100 | 0.007610 | 0.012289 | 0.016122 | 0.032298 | 0.097160 |
-| seal primitive | 124 | 0.011540 | 0.012540 | 0.012784 | 0.001216 | 0.013648 | 0.021260 |
+| schema walk | 124 | 5.451120 | 6.210710 | 6.309203 | 0.446632 | 7.318100 | 7.828880 |
+| classify | 124 | 0.002420 | 0.013750 | 0.024151 | 0.035462 | 0.073623 | 0.209980 |
+| seal primitive | 124 | 0.016860 | 0.026780 | 0.027045 | 0.004804 | 0.032916 | 0.047180 |
 
 ## Peak traced memory
 
@@ -132,8 +149,8 @@ memory.
 | Workload | Raw peak samples (bytes) | n | min | median | mean | pstdev | p95 | max |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
 | application-cache-cold authority load/verify | 4,206,836; 4,206,836; 4,206,836; 4,206,836; 4,206,836 | 5 | 4,206,836 | 4,206,836 | 4,206,836 | 0 | 4,206,836 | 4,206,836 |
-| `decide()`, one full corpus | 43,451; 43,194; 44,275; 42,954; 42,598 | 5 | 42,598 | 43,194 | 43,294.4 | 565.2 | 44,110.2 | 44,275 |
-| `decide_audited()`, one full corpus | 87,055; 87,218; 86,956; 86,021; 86,507 | 5 | 86,021 | 86,956 | 86,751.4 | 434.7 | 87,185.4 | 87,218 |
+| `decide()`, one full corpus | 45,186; 44,875; 45,068; 45,193; 44,921 | 5 | 44,875 | 45,068 | 45,048.6 | 131.5 | 45,191.6 | 45,193 |
+| `decide_audited()`, one full corpus | 86,845; 86,630; 87,477; 86,737; 86,724 | 5 | 86,630 | 86,737 | 86,882.6 | 304.9 | 87,350.6 | 87,477 |
 
 ## Exact rerun commands
 
@@ -141,6 +158,13 @@ Run from the repository root:
 
 ```powershell
 python -B perf/profile.py --output perf/profile-run.json
+```
+
+For each timed stdio decision, the profiler executes the ABI-equivalent child
+command below with fixture bytes on stdin:
+
+```powershell
+python -I -B baseline-run/implementation-output-0.3/pcb_runner.py execute
 ```
 
 The defaults used by this baseline are explicit equivalents of:
@@ -181,6 +205,8 @@ Observed verdict: **PASS**. All commands exited 0:
   host activity, and filesystem-cache noise.
 - The stdio figure is a whole fresh-process integration cost. It does not
   identify how much is process creation versus import, engine, or pipes.
+- Isolated mode is included in every child and startup wall probe; the report
+  makes no estimate for the isolated-mode flag alone.
 - Startup probes overlap, and median subtraction cannot establish causality.
 - Direct component probes cover valid semantic fixtures, use prebuilt objects
   where stated, and must not be summed into the end-to-end latency.
