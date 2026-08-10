@@ -172,6 +172,42 @@ def _trace(node: dict[str, Any], doc: Any, out: list[dict[str, Any]]) -> bool:
     return fired
 
 
+def _classify_traced(
+    operation_handle: str,
+    decision_input: dict[str, Any],
+    sealed_class: str,
+) -> tuple[str, dict[str, bool], list[dict[str, Any]]]:
+    """Classify once while retaining the selected predicate's witness.
+
+    This mirrors ``b1.classify`` precedence and short-circuiting.  The frozen
+    response's class identifies the one predicate that needs witness
+    instrumentation; preceding predicates still run through the frozen
+    evaluator, so an earlier match or a false sealed predicate is detected by
+    the existing sealed-class cross-check.  The selected predicate is traced
+    instead of first being classified and then evaluated a second time.
+    """
+    predicates = b1.decision_table()[operation_handle]
+    first_match: dict[str, bool] = {}
+    matched: str | None = None
+    witness: list[dict[str, Any]] = []
+    for class_name in _CLASS_ORDER:
+        if matched is None:
+            if class_name == sealed_class:
+                branch: list[dict[str, Any]] = []
+                fired = _trace(predicates[class_name], decision_input, branch)
+            else:
+                branch = []
+                fired = b1.eval_predicate(predicates[class_name], decision_input)
+            first_match[class_name] = fired
+            if fired:
+                matched = class_name
+                if class_name == sealed_class:
+                    witness = branch
+        else:
+            first_match[class_name] = False
+    return matched or "VALID", first_match, witness
+
+
 def derive_record_references(facts: Any, prefix: str = "") -> list[str]:
     """Deterministic extraction of record identifiers actually present in the
     fact profile: string leaves whose key names a record id (contains
@@ -220,17 +256,16 @@ def decide_audited(request: dict[str, Any] | bytes) -> dict[str, Any]:
         obligation_id = semantic["obligation_id"]
         operation_handle = semantic["operation_handle"]
         audit["decision_input_sha256"] = b1.sha256_upper(b1.jcs_bytes(decision_input))
-        behavior, fired_map = b1.classify(operation_handle, decision_input)
         output = response.get("output") or {}
         sealed_class = (
             (output.get("result_object") or {}).get("behavior_class")
             or (output.get("payload") or {}).get("behavior_class")
         )
+        behavior, fired_map, witness = _classify_traced(
+            operation_handle, decision_input, sealed_class
+        )
         if behavior != sealed_class:  # defense in depth; must never happen
             raise RuntimeError("trace classification diverged from sealed response")
-        witness: list[dict[str, Any]] = []
-        if behavior != "VALID":
-            _trace(b1.decision_table()[operation_handle][behavior], decision_input, witness)
         audit["first_match_predicates"] = fired_map
         audit["matched_class_witness"] = witness
         audit["record_references"] = derive_record_references(decision_input.get("facts"))
