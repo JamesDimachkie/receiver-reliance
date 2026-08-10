@@ -1,0 +1,6 @@
+# This artifact is content-addressed: the implementation sources, fixture
+# packs, and receipts are pinned by SHA-256, and the runtime self-checks those
+# digests at load time. Treat every file as binary so git never rewrites line
+# endings on checkout — a CRLF conversion (Git-for-Windows autocrlf default)
+# would change the bytes and break the digest self-check on a fresh clone.
+* -text

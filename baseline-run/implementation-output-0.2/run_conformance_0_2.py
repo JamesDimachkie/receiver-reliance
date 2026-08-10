@@ -442,7 +442,25 @@ def error_law_cases() -> list[tuple[str, bytes, str, str]]:
         ("dup-beats-recursion-limit",
          b'[{"a":0,"a":1},' + b"[" * 5000 + b"0" + b"]" * 5000 + b"]\n",
          "ERR_DUPLICATE_KEY", ""),
-        ("recursion-limit-alone", b"[" * 5000 + b"0" + b"]" * 5000 + b"\n", "ERR_LIMIT", ""),
+        # v1.1 determinism correction (author-separated review 2026-08-10):
+        # inputs past the 128-level nesting limit are classified from the
+        # iterative scan alone, before the recursive tree parser runs, so the
+        # result no longer depends on the depth at which a given CPython build
+        # aborts json.loads. A non-object root over the nesting limit selects
+        # ERR_SCHEMA (80) over the pooled ERR_LIMIT (90), identical to the
+        # shallow schema-root-beats-* siblings above; the earlier "ERR_LIMIT"
+        # expectation encoded only the pinned 3.12.4 C stack. These three
+        # closures cover bare-array, unknown-format-object, and deep-inner
+        # envelope roots — the classes the fix must keep deterministic across
+        # interpreters (verified on 3.12.4, 3.12.10, and 3.14.5).
+        ("schema-root-beats-recursion-limit", b"[" * 5000 + b"0" + b"]" * 5000 + b"\n", "ERR_SCHEMA", ""),
+        ("schema-format-beats-recursion-limit",
+         b'{"format_version":"X","x":' + b"[" * 5000 + b"0" + b"]" * 5000 + b"}\n",
+         "ERR_SCHEMA", "/format_version"),
+        ("core-inner-beats-recursion-limit",
+         b'{"format_version":"B1-SEMANTIC-DECISION-REQUEST-0.2","inner_request":{"input":'
+         + b"[" * 5000 + b"0" + b"]" * 5000 + b"}}\n",
+         "ERR_SCHEMA", ""),
         ("int-digit-cap-is-number", b"1" * 5000 + b"\n", "ERR_NUMBER", ""),
         ("int-digit-cap-negative-is-number", b"-" + b"1" * 5000 + b"\n", "ERR_NUMBER", ""),
         # round-7 closures: pointer-accurate hook detections and

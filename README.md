@@ -1,6 +1,6 @@
 # Receiver-reliance baseline — conformance suite and reference implementation
 
-Release 1.0, composed generation. License: Apache-2.0 (see `LICENSE`;
+Release 1.1, composed generation. License: Apache-2.0 (see `LICENSE`;
 Copyright 2026 James Dimachkie).
 
 ## What this is, and where it comes from
@@ -53,19 +53,19 @@ Requires any CPython 3.12. From `baseline-run/`:
 python -B implementation-output-0.2/run_conformance_0_2.py
 ```
 
-Expected: `... failures=0`, exit 0. The run reports 798 checks: 720
+Expected: `... failures=0`, exit 0. The run reports 800 checks: 720
 fixture-pinned (112 semantic entries, 370 competence mutations, 224 wrapper
-arms, 10 negatives, 4 metamorphic relations) plus 78 harness-owned
+arms, 10 negatives, 4 metamorphic relations) plus 80 harness-owned
 deterministic error-selection closures.
 
 The composed runner executes the accepted 0.2 suite AND the supplemental
-0.3 suite (905 checks total) under the composed 30-operation interface:
+0.3 suite (907 checks total) under the composed 30-operation interface:
 
 ```bash
 python -B implementation-output-0.3/run_conformance_0_3.py --suite all
 ```
 
-Expected: two summary lines, `798 ... failures=0` and `107 ... failures=0`,
+Expected: two summary lines, `800 ... failures=0` and `107 ... failures=0`,
 exit 0. `baseline-run/RUNBOOK.md` documents the layout, the sealed
 subprocess-ABI mode, running single requests by hand, and how to read
 fixtures.

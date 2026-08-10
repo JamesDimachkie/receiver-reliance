@@ -26,10 +26,10 @@ bytes alone.
 ## Final accepted state
 
 - Implementation manifest self-zero SHA-256:
-  `5F3A7CE04F9D92035525025C4C464CD4F5E3D644B2CAA42A0975A2176919C2C6`
+  `DE4BD0886F35096CC411F4E502BC30B7951344C7EB507A6FAFA9BBAEF4FA8402`
 - Build-receipt self-zero SHA-256:
-  `7518F55FB61BBC4965BAF6725998AF36E47A22005A3F0702638EB83CD68458B1`
-- Conformance: 798 checks green, in-process and pinned-toolchain
+  `30D880DBB72A5FDCE58D43CFD8838FD79B7786AD4AD3DCB069B8388F7924A943`
+- Conformance: 800 checks green, in-process and pinned-toolchain
   subprocess-ABI. The 720 fixture-pinned checks were byte-identical in
   every round; only harness closures and the implementation grew.
 
@@ -99,11 +99,11 @@ rounds.
 lane also wrote the 0.2 implementation (exposure disclosed in the 0.3
 contract), the 0.3 implementation extension was built by a different lane
 and covers all 30 operations in both execution modes. Manifest self-zero
-`8D6B67C3C2454E394FC4363850F0CB3DE7F1C6C4A70956C7C1EFD21CA75B9230`;
+`78089DFC2AEF21349655067D2DEB54CBDEF557E5FA29CD4A27668B03C3A2B50E`;
 build-receipt self-zero
-`F6D3394A5F24DC453400E275AD745E2DBCA560C1E5E2C1EECED2449BF78F215D`;
+`94415D89EA778C46C27B49C2757F5522033639F33CC5F65314E0FD26A5C9B6D9`;
 implementation tree seal
-`A9849351F3576569C855CF7E45429C1DCA2D8210B92B186CF3AB0708FADA3B58`.
+`BEE90E62010D7F810A8993CD5D9E1382F6E7EE5A8DE6B83A30655E0E6B47264A`.
 
 **Adversarial implementation acceptance — ACCEPT at round 1.** Under the
 same charter as the ten-round 0.2 loop (cap 5, stop at the first round
@@ -138,6 +138,61 @@ Ledgered like the two 0.2 non-closures: inert within the admitted input
 space, misclassifies nothing, re-activates at any future versioned enum
 extension.
 
+## v1.1 — cross-interpreter determinism correction (2026-08-10)
+
+Running the conformance suite on CPython builds other than the pinned 3.12.4
+exposed an interpreter-dependent classification of deeply nested inputs. A
+pathologically deep (5000-level) bare array resolved to `ERR_LIMIT` on 3.12.4
+and to `ERR_SCHEMA` on stock 3.14 and non-Windows 3.12. Author-separated review
+of the first fix showed the divergence was broader than a bare array: deep
+objects and well-formed-looking envelopes with deep inner values diverged too,
+one class as far as `ERR_INTERNAL`. Only inputs past the 128-level nesting limit
+were affected; all 720 fixture-pinned checks were identical across builds.
+
+Root cause: an input's classification could depend on the depth at which a
+given CPython build aborts `json.loads` (and downstream recursive
+canonicalization or schema evaluation), which is interpreter- and
+platform-specific. The frozen precedence law already ranks `ERR_SCHEMA`
+(root-type, 80) above `ERR_LIMIT` (structural, 90), and the shallow siblings
+`schema-root-beats-nesting-limit` (depth 130) and `schema-root-beats-item-limit`
+assert exactly that — but a deep input reached the recursive parser before the
+root type could be classified, so the answer moved with the interpreter.
+
+Fix: inputs past the 128-level nesting limit are now classified at the parse
+layer from the iterative, depth-immune scan alone, before the recursive tree
+parser runs — the same fence the wrapper transcript evaluator already applied at
+`_strict_wire_value` (round-7 R7-DIV-004), extended to the main parse path. The
+scan sees the whole input at any depth; the shallow envelope of the
+protocol-error response (core vs wrapper, echoed `request_id`) is read
+iteratively. No recursive operation runs on a structure past the nesting limit,
+so classification is a pure function of the input bytes: the full response bytes
+are byte-identical on CPython 3.12.4, 3.12.10, and 3.14.5 (across a major-version
+boundary) for every affected class — bare arrays, unknown-format objects,
+known-format objects, wrapper requests, and valid-looking envelopes with deep
+inner values (the former `ERR_INTERNAL` case). Three error-law closures pin
+these classes as regression cases; the composed suite is now 800 + 107 = 907
+checks and passes on all three interpreters and on the Linux/macOS/Windows CI
+matrix.
+
+The change touches only the iterative scanner (one additive depth flag) and
+`pcb_runner`'s parse/dispatch path; no fixture pack, contract, or schema
+changed, and the 720 fixture-pinned response bytes and their seals are
+byte-unchanged. The implementation manifests and build receipts were
+regenerated to pin the new source bytes and the two added closures (digests in
+"Final accepted state" above and in the 0.3 acceptance chain).
+
+Also in v1.1: a repository `.gitattributes` marks every file binary so git never
+rewrites line endings on checkout — a Git-for-Windows `autocrlf` clone had been
+converting the content-addressed files to CRLF and breaking the digest
+self-check on load.
+
+Provenance: the v1.0 implementation and its ten-round acceptance stand as
+recorded. The v1.1 determinism correction was authored by the lead reasoning
+lane and independently reviewed by a separate author-separated lane; that
+review rejected a first, narrower fix for missing the deep-object classes, which
+produced the parse-layer design recorded here. The reviewer's identity and final
+disposition are recorded with this release.
+
 ## How to reproduce
 
 From `baseline-run/`, with any CPython 3.12:
@@ -146,7 +201,7 @@ From `baseline-run/`, with any CPython 3.12:
 python -B implementation-output-0.2/run_conformance_0_2.py
 ```
 
-The composed suite (accepted 0.2 plus supplemental 0.3, 905 checks):
+The composed suite (accepted 0.2 plus supplemental 0.3, 907 checks):
 
 ```bash
 python -B implementation-output-0.3/run_conformance_0_3.py --suite all

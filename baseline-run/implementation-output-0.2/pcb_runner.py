@@ -62,6 +62,167 @@ def _protocol_error(
     return response, response["exit_code"]
 
 
+_STRING_TOKEN = re.compile(r'"(?:[^"\\\x00-\x1f]|\\(?:["\\/bfnrt]|u[0-9a-fA-F]{4}))*"')
+_ENVELOPE_KEYS = ("format_version", "request_id", "operation_handle", "configuration")
+
+
+class _OverLimit:
+    """Marker for an input rejected at the parse layer for exceeding the
+    nesting limit. Carries the shallow depth-1 envelope fields used to shape
+    its protocol-error response; the winning error code/pointer travel in the
+    detected list beside it."""
+
+    __slots__ = ("fields",)
+
+    def __init__(self, fields: dict[str, str]) -> None:
+        self.fields = fields
+
+
+def _read_string_token(payload: str, i: int) -> tuple[str | None, int]:
+    """Decode one JSON string beginning at payload[i] == '"'. Returns
+    (decoded, index-after-close), or (None, i) if it is not a clean token."""
+    match = _STRING_TOKEN.match(payload, i)
+    if match is None:
+        return None, i
+    try:
+        return json.loads(match.group()), match.end()
+    except ValueError:
+        return None, i
+
+
+def _skip_json_value(payload: str, i: int) -> int:
+    """Advance past one JSON value at payload[i] without recursion, matching
+    brackets iteratively and honoring string literals, so it is safe on
+    structures too deep for the recursive parser."""
+    n = len(payload)
+    ch = payload[i]
+    if ch == '"':
+        _, j = _read_string_token(payload, i)
+        return j if j > i else n
+    if ch in "{[":
+        depth = 0
+        while i < n:
+            c = payload[i]
+            if c == '"':
+                _, j = _read_string_token(payload, i)
+                if j <= i:
+                    return n
+                i = j
+                continue
+            if c in "{[":
+                depth += 1
+            elif c in "}]":
+                depth -= 1
+                if depth == 0:
+                    return i + 1
+            i += 1
+        return n
+    while i < n and payload[i] not in ",}] \t\n\r":
+        i += 1
+    return i
+
+
+def _shallow_root_and_fields(payload: str) -> tuple[bool, dict[str, str]]:
+    """Whether the root is an object, and the depth-1 envelope string fields
+    (format_version, request_id, operation_handle, configuration), read
+    iteratively so the reader is safe on inputs past the recursive parser's
+    reach. Only used to shape a protocol-error envelope for over-limit inputs;
+    the winning error code and pointer come from the iterative scan, never
+    from here. Anything unreadable is omitted and the error builders supply
+    their own defaults."""
+    fields: dict[str, str] = {}
+    n = len(payload)
+    i = 0
+    while i < n and payload[i] in " \t\n\r":
+        i += 1
+    if i >= n or payload[i] != "{":
+        return False, fields
+    i += 1
+    key: str | None = None
+    expect_key = True
+    while i < n:
+        while i < n and payload[i] in " \t\n\r":
+            i += 1
+        if i >= n:
+            break
+        ch = payload[i]
+        if ch == "}":
+            break
+        if ch == ",":
+            i += 1
+            expect_key = True
+            key = None
+            continue
+        if ch == ":":
+            i += 1
+            expect_key = False
+            continue
+        if expect_key:
+            if ch != '"':
+                break
+            token, j = _read_string_token(payload, i)
+            if token is None:
+                break
+            key = token
+            i = j
+        elif ch == '"':
+            token, j = _read_string_token(payload, i)
+            if token is None:
+                break
+            if key in _ENVELOPE_KEYS and isinstance(token, str):
+                fields[key] = token
+            i = j
+            key = None
+        else:
+            # Non-string value for a duplicated envelope key: json.loads keeps
+            # the LAST value, so a later non-string occurrence must clear any
+            # earlier cached string. This keeps the shallow envelope a faithful
+            # last-value mirror of the parser (author-separated review
+            # 2026-08-10).
+            if key in _ENVELOPE_KEYS:
+                fields.pop(key, None)
+            i = _skip_json_value(payload, i)
+            key = None
+            if i >= n:
+                break
+    return True, fields
+
+
+def _over_nesting_result(
+    payload: str,
+    scan: dict[str, Any],
+    detected: list[tuple[str, str]],
+    framing_error: bool,
+) -> tuple[_OverLimit, list[tuple[str, str]]]:
+    """Deterministic classification of an input past the 128-level nesting
+    limit, from the iterative scan's depth-immune facts alone — no recursive
+    parse runs, so the result is a pure function of the bytes. Mirrors the
+    completed-parse classification of an over-limit, non-dispatchable value:
+    a non-object root fails schema at the root; an object with an unknown or
+    absent format_version fails at /format_version; a known-format object
+    fails schema at the root. The structural limit and any parse-layer fault
+    the scan already found are pooled; precedence then pointer order pick the
+    winner."""
+    root_is_object, fields = _shallow_root_and_fields(payload)
+    pooled = list(detected)
+    if not root_is_object:
+        pooled.append(("ERR_SCHEMA", ""))
+    elif fields.get("format_version") in (
+        b1.CORE_REQUEST_FORMAT,
+        b1.WRAPPER_REQUEST_FORMAT,
+    ):
+        pooled.append(("ERR_SCHEMA", ""))
+    else:
+        pooled.append(("ERR_SCHEMA", "/format_version"))
+    pooled.append(("ERR_LIMIT", ""))
+    if framing_error or scan["canonical"] or not scan["complete"]:
+        pooled.append(("ERR_JSON", ""))
+    ordered = sorted(
+        set(pooled), key=lambda item: (b1.ERRORS[item[0]][1], _pointer_key(item[1]))
+    )
+    return _OverLimit(fields), ordered
+
+
 def _parse(raw: bytes) -> tuple[Any | None, list[tuple[str, str]]]:
     """Return the parsed value and EVERY detected parse-layer error.
 
@@ -96,6 +257,16 @@ def _parse(raw: bytes) -> tuple[Any | None, list[tuple[str, str]]]:
         detected.append(("ERR_NFC", min(scan["nfc"], key=_pointer_key)))
     if scan["number"]:
         detected.append(("ERR_NUMBER", min(scan["number"], key=_pointer_key)))
+    if scan["nesting_exceeded"]:
+        # An input past the 128-level nesting limit must never reach the
+        # recursive tree parser: the depth at which CPython aborts json.loads
+        # (and any recursive canonicalization or schema walk downstream) is
+        # interpreter- and platform-specific, which made classification of
+        # deep inputs interpreter-dependent. Classify from the iterative
+        # scan's depth-immune facts alone — the same fence the wrapper
+        # transcript evaluator already applies at _strict_wire_value
+        # (round-7 R7-DIV-004), extended to the main parse path.
+        return _over_nesting_result(payload, scan, detected, framing_error)
     try:
         value = json.loads(
             payload,
@@ -104,17 +275,12 @@ def _parse(raw: bytes) -> tuple[Any | None, list[tuple[str, str]]]:
             parse_int=_guarded_int,
         )
     except RecursionError:
-        # Nesting beyond interpreter capacity is far past the packet's
-        # 128-level limit: the deterministic resource limit, pooled with
-        # everything the full-input scan already detected (round-6 R6-002,
-        # round-7 R7-DIV-003 — the scan is iterative, so it saw the whole
-        # input even though the tree parser could not).
-        detected.append(("ERR_LIMIT", ""))
-        if framing_error or scan["canonical"] or not scan["complete"]:
-            detected.append(("ERR_JSON", ""))
-        return None, sorted(
-            set(detected), key=lambda item: (b1.ERRORS[item[0]][1], _pointer_key(item[1]))
-        )
+        # Unreachable by construction: the nesting gate above catches every
+        # input deep enough to recurse (MAX_NESTING is far below any CPython
+        # abort depth). Kept as defense-in-depth, routed through the SAME
+        # deterministic classifier so it cannot reintroduce interpreter
+        # dependence.
+        return _over_nesting_result(payload, scan, detected, framing_error)
     except (UnicodeDecodeError, json.JSONDecodeError, ValueError):
         detected.append(("ERR_JSON", ""))
         if scan["limit"]:
@@ -166,6 +332,19 @@ def _core_schema_error_pool(request: dict[str, Any]) -> list[str]:
 
 def _execute(raw: bytes) -> tuple[dict[str, Any], int]:
     parsed, detected = _parse(raw)
+    if isinstance(parsed, _OverLimit):
+        # Over-nesting: already fully classified from scan facts. Shape the
+        # protocol-error response from the shallow envelope fields so its
+        # shell (core vs wrapper, echoed request_id) matches what the
+        # completed-parse path would emit, deterministically.
+        code, pointer = min(
+            detected, key=lambda item: (b1.ERRORS[item[0]][1], _pointer_key(item[1]))
+        )
+        wrapper = parsed.fields.get("format_version") == b1.WRAPPER_REQUEST_FORMAT
+        response, exit_code = _protocol_error(code, pointer, parsed.fields, wrapper)
+        if len(b1.jcs_bytes(response)) + 1 > b1.MAX_OUTPUT_BYTES:
+            response, exit_code = _protocol_error("ERR_LIMIT", "", parsed.fields, wrapper)
+        return response, exit_code
     wrapper = isinstance(parsed, dict) and parsed.get("format_version") == b1.WRAPPER_REQUEST_FORMAT
     core = isinstance(parsed, dict) and parsed.get("format_version") == b1.CORE_REQUEST_FORMAT
     try:

@@ -661,6 +661,7 @@ def scan_parse_profile(payload: str) -> dict[str, Any]:
         "duplicate": False,
         "canonical": False,
         "limit": False,
+        "nesting_exceeded": False,
         "complete": False,
     }
 
@@ -722,12 +723,14 @@ def scan_parse_profile(payload: str) -> dict[str, Any]:
             elif ch == "{":
                 if len(stack) + 1 > MAX_NESTING:
                     result["limit"] = True
+                    result["nesting_exceeded"] = True
                 stack.append(["obj", pointer, None, set(), 0])
                 i += 1
                 state = "first_key"
             elif ch == "[":
                 if len(stack) + 1 > MAX_NESTING:
                     result["limit"] = True
+                    result["nesting_exceeded"] = True
                 stack.append(["arr", pointer, 0])
                 i += 1
                 state = "first_item"

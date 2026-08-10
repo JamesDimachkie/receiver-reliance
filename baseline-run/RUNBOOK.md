@@ -53,9 +53,10 @@ python implementation-output-0.2/run_conformance_0_2.py
 ```
 
 Expected output: `mode=in-process counts={"semantic": 112, "competence": 370,
-"wrapper_arms": 224, "negative": 10, "metamorphic": 4, "error_law": 78}
+"wrapper_arms": 224, "negative": 10, "metamorphic": 4, "error_law": 80}
 failures=0` and exit code 0. (`error_law` is the harness's own
-deterministic closure: 55 parse-layer/limit/canonicality cases, 19
+deterministic closure: 57 parse-layer/limit/canonicality cases (including the
+three deep-nesting schema-vs-limit determinism closures added in v1.1), 19
 fixture-derived joint-pool, class-precedence, and family/output-cap
 cases, and 4 transcript-evaluator strictness guards; it lives in the
 harness, not the fixture packs.)
@@ -66,7 +67,7 @@ The composed runner covers all 30 operations and runs both suites:
 python implementation-output-0.3/run_conformance_0_3.py --suite all
 ```
 
-Expected output: two lines — `mode=in-process suite=0.2 ... total=798
+Expected output: two lines — `mode=in-process suite=0.2 ... total=800
 failures=0` (byte-identical behavior to the 0.2 runner across the accepted
 surface) and `mode=in-process suite=0.3 counts={"competence": 53,
 "metamorphic": 8, "negative": 10, "semantic": 12, "wrapper_arms": 24}

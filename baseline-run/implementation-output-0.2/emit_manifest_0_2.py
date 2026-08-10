@@ -87,7 +87,7 @@ def main() -> int:
             "wrapper_arms": 224,
             "negative_cases": 10,
             "metamorphic_cases": 4,
-            "error_law_cases": 78,
+            "error_law_cases": 80,
         },
         "failures": 0,
         "semantic_pack_raw_sha256": b1.sha256_upper(semantic_raw),
