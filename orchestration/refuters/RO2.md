@@ -1,0 +1,200 @@
+# R-O2 refutation — corrected persistent audited NDJSON batch mode
+
+## Verdict
+
+**PASS — NO DEFECT FOUND.** The correction fixes both independently
+reproduced RO1 defects. Across the candidate's 2,160-check suite, the full
+expanded gate, and fresh R-O2 probes, no valid-`BinaryIO` byte divergence,
+state leak, framing error, false clean write, flush-order defect, or
+physical-line-scaled memory growth was found.
+
+The reviewed candidate is the exact two-commit cherry-pick onto integration
+`8a30d1aaa13e5bfddb84df9cc6db2731fd8e0d8b`:
+
+- O1 `cfe503aeefbb547b19a831fdb2484d6f81b60372`, local cherry-pick
+  `c722d07d947549937daa24585b6f0b84577a5198`;
+- correction `0e1ff1188e20d36d984bbcb4e90c55dd0f92ddc5`, local cherry-pick
+  `0b78d83de044fb85c0b39ee53f568caec301b3f4`.
+
+No candidate, sealed, workflow, dependency, or external-workspace file was
+modified. R-O2 owns only this report.
+
+## RO1 defects reproduced before testing the correction
+
+R-O2 loaded the pre-correction `rr_batch.py` directly from local commit
+`c722d07d947549937daa24585b6f0b84577a5198` and reproduced both integrated
+RO1 findings:
+
+| RO1 defect | Fresh R-O2 observation |
+|---|---|
+| ignored short write | one-third sink accepted 271 of 814 response bytes; one write, one flush, `serve()` returned 0, output was not LF-terminated |
+| unbounded physical line | first `readline` received no size argument; a 33,554,433-byte line peaked at 67,108,963 traced bytes before returning the 840-byte limit response |
+
+The corrected implementation instead passed a 65,536-byte bound on every
+observed read, streamed the complete overlimit digest, and looped until each
+response was fully accepted before flush.
+
+## Fresh R-O2 transport falsification
+
+### Writes, exceptions, and flush boundaries
+
+A seeded transport harness (`0x524F3257`) completed **479 checks with zero
+failures**. Its writer attack included 128 independently generated positive
+short-write schedules over three consecutive responses. Every schedule
+reconstructed all bytes exactly and flushed at precisely the three
+complete-response offsets.
+
+Ten failure-path cases started after a real 17-byte or 13-byte accepted
+prefix: zero, `None`, negative, oversized, `bool`, and floating return values;
+raised `OSError`; raised `BlockingIOError`; a `BlockingIOError` raised after
+accepting a further seven bytes; and a flush exception. Results were as
+required:
+
+- zero and `None` raised `BlockingIOError`;
+- negative, over-count, `bool`, and floating counts raised `OSError`;
+- write exceptions propagated with the already accepted prefix preserved;
+- no incomplete response was flushed or reported as success; and
+- the deliberate flush exception occurred only after all 814 response bytes
+  had been accepted.
+
+The same harness used conforming short `readline(size)` fragments, including
+one-byte fragments, CRLF, invalid UTF-8, and an unterminated EOF record. It
+proved that the first sink write occurred only after the complete physical
+request had been read and the response had been constructed.
+
+### Read contract attacks
+
+Custom sources returning more than the requested size, `None`, text, or a
+`bytearray` all failed closed with no output and no flush. A deliberately
+nonconforming source that returned `b"a\nb\n"` from one `readline(size)` call
+was silently treated as one record rather than two. That observation is not a
+candidate divergence: `BinaryIO.readline(size)` promises at most one line,
+and the production `sys.stdin.buffer` cannot make that return. It remains an
+explicit residual for hosts that pass objects which violate the declared
+interface.
+
+### Exact boundaries, raw parity, and stream alignment
+
+The R-O2 harness checked all nine combinations of total byte length
+`MAX_INPUT_BYTES-1`, `MAX_INPUT_BYTES`, and `MAX_INPUT_BYTES+1` with LF, CRLF,
+or EOF termination. Every result was byte-identical to isolated
+`decide_audited(raw)`. For every case, `request_raw_sha256` matched the full
+physical bytes and the self-zero `audit_sha256` recomputed exactly. Each
+overlimit case also matched the candidate's streaming construction of the
+frozen `ERR_LIMIT` audit bytes as well as the isolated result.
+
+A five-record sequence combining an overlimit LF record, an ordinary record,
+an overlimit CRLF record, an empty line, and an unterminated EOF record stayed
+aligned and equaled five isolated results byte-for-byte. An additional seeded
+raw corpus (`0x524F3243`) covered **2,048 arbitrary binary physical lines** of
+0–1,025 bytes, including NUL, CR, high bytes, empty lines, and invalid UTF-8;
+the complete persistent output equaled the concatenated isolated audit bytes.
+
+The candidate's checked-in fixture/fuzz differential additionally
+covered all **372 committed requests** (112 + 12 semantic, 224 + 24 wrapper
+arms) and **256 deterministic fuzz cases** (`0x0B10F042`), with exact audited
+byte parity.
+
+### Memory and repeated huge-line state
+
+A procedural source generated bytes without prebuilding its input. Final
+traced peaks were:
+
+| workload | input shape | peak traced bytes |
+|---|---|---:|
+| exact-cap ordinary | 16,777,216 bytes, EOF | 33,585,569 |
+| first overlimit byte | 16,777,217 bytes, EOF | 16,787,984 |
+| eight-times overlimit | 134,217,759 bytes plus LF | 16,853,585 |
+| four huge lines interleaved with four ordinary records | 385,876,142 huge-line body bytes total | 16,860,699 |
+| 12 separate repeated overlimit invocations | 17,825,799–17,825,810 bytes each | 16,856,441 maximum |
+
+The 12-invocation current-allocation span after collection was **872 bytes**.
+The eight-record repeated-huge stream preserved exact order, SHA, response
+count, and bytes. Peak memory did not scale with overlimit physical-line
+length. The exact-cap ordinary path temporarily joins retained chunks and
+then parses the complete allowed request, explaining its roughly 2× cap peak;
+it remains O(MAX), not O(physical-line length).
+
+The candidate's checked-in memory probes independently reported identical
+16,853,617-byte peaks for roughly 2× and 8× overlimit lines.
+
+### Subprocess, CWD, environment, Unicode, and empty input
+
+A **24-check** fresh-process harness ran `python -I -B` from a temporary
+Unicode CWD under hostile `PYTHONPATH`, `PYTHONHOME`,
+`PYTHONIOENCODING=utf-16`, random hash seed, `LC_ALL=C`, `LANG=C`, a changed
+timezone, and Unicode environment data. It found zero failures:
+
+- zero-byte stdin produced zero-byte stdout and a clean exit;
+- LF and CRLF each represented one physical request and matched isolated
+  bytes;
+- UTF-8 Unicode request bytes remained exact;
+- an interactive reader received no byte while the first request was
+  incomplete;
+- five requests sent in 1-, 7-, 257-, and 4,093-byte chunks each became
+  readable before stdin closed; and
+- repeated valid, malformed, empty-line, Unicode, and unterminated records
+  preserved order, stdout parity, empty stderr, and exit 0.
+
+## Candidate suite and expanded gate
+
+Two candidate performance-suite executions passed. The final expanded-gate
+execution reported:
+
+```text
+batch transport: seed=0x524F32 overlimit_cases=22 peak_memory_bytes=16853617 peaks=16853617,16853617
+batch regression: fixtures=372 semantic=124 fuzz=256 fuzz_fast=223 fuzz_special=33 overlimit=22 peak_memory_bytes=16853617 checks=2160 failures=0 perf=on
+```
+
+Every expanded-gate command exited zero:
+
+- accepted conformance: 800 checks, failures=0;
+- composed conformance: 800 + 107 checks, failures=0;
+- grounded regression: 504 checks, failures=0;
+- contract lint: 0 findings;
+- lint meta-test: 7 checks, failures=0;
+- properties: 2,296 checks, failures=0 at `0x5EED8785`;
+- audit adversarial: 6,497 checks, failures=0;
+- portable proof harness: 7 tests, OK;
+- fuzz CI smoke: 31/31 at `0x0B10F042`, failures=0, budget not exhausted; and
+- corrected batch: 2,160 checks, failures=0.
+
+## Paired performance and arithmetic
+
+Both R-O2 executions used the same 124 semantic requests, three alternating
+paired samples, and a fresh isolated batch child per sample:
+
+| run | in-process samples (ms/request) | batch samples (ms/request) | medians (direct / batch) | batch/direct |
+|---|---|---|---|---:|
+| standalone candidate gate | 10.301685, 10.424986, 9.937419 | 9.033378, 9.323423, 9.201859 | 10.301685 / 9.201859 | 0.893238x |
+| final expanded gate | 5.313133, 5.244278, 5.221115 | 3.954146, 3.915655, 3.852051 | 5.244278 / 3.915655 | 0.746653x |
+
+P1's audited in-process median is 5.288240 ms and its exact 3× ceiling is
+15.864720 ms. The two observed batch medians were 1.740061× and 0.740446×
+that P1 median, leaving 6.662861 ms and 11.949065 ms below the ceiling.
+Against P1's isolated one-shot median of 154.984114 ms, they correspond to
+16.8427× and 39.5806× amortized speedups. These are contention-sensitive host
+observations, not portable performance or causal claims; the paired and
+absolute arithmetic both pass.
+
+## Residual uncertainty
+
+- A sink may accept a prefix and then fail. Those bytes cannot be retracted;
+  the correction propagates the error, performs no incomplete flush, and
+  never reports success. Host framing/reconnect policy still owns recovery.
+- Nonconforming custom sources can lie about `readline(size)` semantics. The
+  correction rejects wrong type and oversize returns but does not inspect for
+  an impossible embedded LF before the returned line terminator.
+- `tracemalloc` excludes native allocations and RSS. The procedural campaign
+  processed hundreds of megabytes without line-scaled Python allocation, but
+  it was not a multi-gigabyte exhaustion run.
+- The exact-cap in-bound path has an O(MAX) transient near twice the input cap;
+  only overlimit draining stays near one cap.
+- Deterministic fixtures and corpora are broad, not exhaustive. Timing remains
+  host- and contention-specific.
+
+Stop condition reached: the confirmed RO1 failures no longer reproduce on the
+correction, the role-specific falsifiers and full gate are green, and no real
+divergence or resource-bound break remains.
+
+Authored-By: sol-ro2 (gpt-5.6-sol)
