@@ -19,3 +19,4 @@ their own work. Timestamps are recorded in Pacific time on 2026-08-10.
 | P6 | Build synthetic proof corpus and regressions | 2026-08-10 11:24 PDT | — | RUNNING | `sol/w-p6` |
 | P7 | Draft proposed 0.5 core wire and audit rules | 2026-08-10 11:24 PDT | — | RUNNING | `sol/w-p7` |
 | P8 | Draft proposed 0.5 semantics and compact profile | 2026-08-10 11:25 PDT | — | RUNNING | `sol/w-p8` |
+| P9 | Audit documentary counts, paths, commands, and digests | 2026-08-10 11:28 PDT | — | RUNNING | `sol/w-p9` |
