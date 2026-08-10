@@ -1,0 +1,14 @@
+{"defect_types": [], "defective": false, "provenance": "synthetic", "record_id": "REC_86E175F5F7E61558"}
+{"defect_types": ["pin_hash_mismatch"], "defective": true, "provenance": "synthetic", "record_id": "REC_4FB81B1E91C5FDF3"}
+{"defect_types": ["missing_reference_target"], "defective": true, "provenance": "synthetic", "record_id": "REC_524EA1D72D4DDD19"}
+{"defect_types": ["stale_reference_path"], "defective": true, "provenance": "synthetic", "record_id": "REC_D4539958987FA058"}
+{"defect_types": [], "defective": false, "provenance": "synthetic", "record_id": "REC_F175F03BEE431C44"}
+{"defect_types": ["recorded_use_outside_declared_scope"], "defective": true, "provenance": "synthetic", "record_id": "REC_42AA8AF23D6EBED9"}
+{"defect_types": ["unknown_result_commit"], "defective": true, "provenance": "synthetic", "record_id": "REC_F27D49C2E512B186"}
+{"defect_types": [], "defective": false, "provenance": "synthetic", "record_id": "REC_9EA240209108AC16"}
+{"defect_types": [], "defective": false, "provenance": "synthetic", "record_id": "REC_30211ABD39E99191"}
+{"defect_types": ["reliance_on_superseded_version"], "defective": true, "provenance": "synthetic", "record_id": "REC_CAE6B4D8DC7AD10E"}
+{"defect_types": [], "defective": false, "provenance": "synthetic", "record_id": "REC_9CB116091544EA8F"}
+{"defect_types": [], "defective": false, "provenance": "synthetic", "record_id": "REC_1D6365F56FCFA741"}
+{"defect_types": ["lifecycle_order_violation"], "defective": true, "provenance": "synthetic", "record_id": "REC_8DF4843139BD3E4A"}
+{"defect_types": [], "defective": false, "provenance": "synthetic", "record_id": "REC_CFE6C9C2C83DF4F3"}
