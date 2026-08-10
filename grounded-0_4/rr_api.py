@@ -172,9 +172,6 @@ def _trace(node: dict[str, Any], doc: Any, out: list[dict[str, Any]]) -> bool:
     return fired
 
 
-_REFERENCE_KEY_MARKERS = ("record_id", "exact_reference")
-
-
 def derive_record_references(facts: Any, prefix: str = "") -> list[str]:
     """Deterministic extraction of record identifiers actually present in the
     fact profile: string leaves whose key names a record id (contains
@@ -193,7 +190,7 @@ def derive_record_references(facts: Any, prefix: str = "") -> list[str]:
                 for item in node:
                     walk(item, key)
         elif isinstance(node, str):
-            if any(marker in key for marker in _REFERENCE_KEY_MARKERS):
+            if "record_id" in key or key == "exact_reference":
                 found.add(node)
 
     walk(facts, "")
