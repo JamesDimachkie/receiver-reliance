@@ -1,0 +1,920 @@
+{
+  "format_version": "EH-B1-CAPABILITY-MATRIX-0.2",
+  "matrix_id": "B1_CAPABILITY_MATRIX_0_1",
+  "status": "FROZEN_AWAITING_EXTERNAL_ACCEPTANCE_0_2",
+  "blindness_boundary": "Only B1 and B1-ATTENTION configuration labels and their neutral parity contract are visible; no later-use identity, sequence, scoring, or comparison meaning is present.",
+  "freeze_semantics": {
+    "current_control_bytes": "FROZEN_AWAITING_EXTERNAL_ACCEPTANCE_0_2",
+    "historical_matrix_raw_sha256": "CF1B51388C88DB1E85451780375CFD35174C34375AD436A3400AB0EEA48D4EDD",
+    "wrapper_interface_semantics": "VERSIONED_BY_NEW_WRAPPER_INTERFACE_SEMANTIC_SHA256",
+    "external_acceptance_effect_on_control_bytes": "NONE_EXTERNAL_RECEIPT_DERIVES_ADMISSION_WITHOUT_CONTROL_MUTATION",
+    "fixture_authority_snapshot": {
+      "matrix_raw_sha256": "DFC6D8E97AA3C1F1AE0D0338778F5C1956ABF8859C90B3E3BADBEEEDF8CF7A1A",
+      "contract_raw_sha256": "B3783D0D18016D6858BF3B713B555A072C69991DB8676D9719DAB0025599F8D4",
+      "rule": "The independently authored 0.2 packs bind this pre-freeze semantic authority snapshot. This final matrix changes only pack bindings and external gate state; it does not replace that sealed authoring authority."
+    },
+    "snapshot_fields": "Implementation and external-acceptance states in rows record the pre-implementation snapshot only; they are not mutable gate fields.",
+    "derived_gate_authority": "Only exact independent wrapper-fixture and toolchain bindings followed by schema-valid external receipts evaluated against the final frozen raw bytes can derive later admission or acceptance."
+  },
+  "basis_pins": {
+    "sanitized_packet": {
+      "path": "../../access/SANITIZED_PRIMARY_BASELINE_IMPLEMENTER_PACKET_0_1.json",
+      "raw_sha256": "73A4FF4DD8ABA41D0F68414CB754EFCDF9807FAE73354F1959420B16C5F359F3",
+      "byte_length": 513384
+    },
+    "source_gap_resolution": {
+      "path": "../../research/SOURCE_GAP_RESOLUTION_S30_S31_0_1.json",
+      "raw_sha256": "0973517599D714B93A41D6592759BD745994C77DE8BA9AA4FBDD0FC378ACDF15",
+      "byte_length": 3312
+    },
+    "shared_schema_projection": {
+      "path": "../../access/A2_SHARED_DOMAIN_VOCABULARY_BASELINE_PROJECTION_0_1.schema.json",
+      "raw_sha256": "1449369AE3CC4458F3F904ADCF0F24B0685E86C65EAC2AE656F7A3E4AD946460",
+      "media_type": "application/schema+json"
+    },
+    "authority_components": [
+      {
+        "artifact_id": "FOUNDATION_0_4",
+        "canonical_lf_sha256": "CAFEA3889A9E0BB29117B79766C65BF96706A76A1B84C6484B14EE6ADA247138"
+      },
+      {
+        "artifact_id": "FOUNDATION_0_4_1",
+        "canonical_lf_sha256": "453AAD8C4D1864A5AA2974EEC0EA2B8D47D96DD44F1EB43473AFC5E06A5067A2"
+      },
+      {
+        "artifact_id": "FOUNDATION_0_4_2",
+        "canonical_lf_sha256": "966676E8055DCA531B327325E45813B8C6D315F2ACB38D8BD4E100E5D1DA1343"
+      },
+      {
+        "artifact_id": "A1_CAPABILITY_FLOOR_0_1",
+        "canonical_lf_sha256": "3C694ECBD17CCCF3F2E52D0C13F5B03EDBE400D443F1B63E0561A29EB39C7FCE"
+      },
+      {
+        "artifact_id": "A4_AUTHOR_ACCESS_BOUNDARY_0_1",
+        "canonical_lf_sha256": "80957486B6BF3A1AA2056F3B5F3098689F7B2C4C1190B73D1092FA9D951103A1"
+      },
+      {
+        "artifact_id": "A6_UNSEALED_CAPABILITIES_0_1",
+        "canonical_lf_sha256": "ECCD7F8518AAFE1824421E70F177642AABA64CC73C4A251796D4260B45970545"
+      },
+      {
+        "artifact_id": "RESEARCH_COLLISION_MAP_20260807",
+        "canonical_lf_sha256": "18EAEA765FC510AD27F42642739FBAE3BDB64E9CCAB215AD797EE99DF57BB902"
+      },
+      {
+        "artifact_id": "A2_SHARED_DOMAIN_VOCABULARY_BASELINE_PROJECTION_0_1",
+        "canonical_lf_sha256": "1449369AE3CC4458F3F904ADCF0F24B0685E86C65EAC2AE656F7A3E4AD946460"
+      }
+    ]
+  },
+  "resolved_source_component_pins": [
+    {
+      "component_id": "S30-PROVENANCE",
+      "title": "PROV-DM: The PROV Data Model",
+      "url": "https://www.w3.org/TR/2013/REC-prov-dm-20130430/",
+      "raw_sha256": "5C925C21BC96C285B25017C3B90D82CF74251D07713B71FCB81CA60F873C9E88",
+      "byte_length": 271572,
+      "role": "PROVENANCE_RELATION_SEMANTICS",
+      "transfer_limit": "PROV supplies provenance relations and optional validity constraints. It does not prove truth, support, authority, closed-world dependency closure, cascading repair, or policy satisfaction.",
+      "activation": "REQUIRED"
+    },
+    {
+      "component_id": "S30-PROVENANCE-CONSTRAINTS",
+      "title": "Constraints of the PROV Data Model",
+      "url": "https://www.w3.org/TR/2013/REC-prov-constraints-20130430/",
+      "raw_sha256": "0E65D02339347AF6F6E5744CB69A99CF56430E8FD9DD904AC476541634361287",
+      "byte_length": 285333,
+      "role": "PROVENANCE_VALIDITY_AND_NORMALIZATION",
+      "transfer_limit": "PROV supplies provenance relations and optional validity constraints. It does not prove truth, support, authority, closed-world dependency closure, cascading repair, or policy satisfaction.",
+      "activation": "ONLY_IF_VALIDITY_OR_NORMALIZATION_IS_CLAIMED"
+    },
+    {
+      "component_id": "S31-DIFF",
+      "title": "RFC 6902: JavaScript Object Notation (JSON) Patch",
+      "url": "https://www.rfc-editor.org/rfc/rfc6902.txt",
+      "raw_sha256": "DED8FA1754AB1566FD72611C9D5BCDE931CD2BDF8351889E2EF5B50EFDF1EED4",
+      "byte_length": 26405,
+      "role": "TYPED_JSON_PATCH_SEMANTICS",
+      "transfer_limit": "Do not introduce an OPA binary merely to close the source gap. A Python implementation may be used only when labeled LOCALLY_REIMPLEMENTED and tested against independent fixtures.",
+      "activation": "REQUIRED"
+    },
+    {
+      "component_id": "S31-VERSION",
+      "title": "Git User Manual 2.54.0",
+      "url": "https://raw.githubusercontent.com/git/git/v2.54.0/Documentation/user-manual.adoc",
+      "raw_sha256": "FCD8B50D10BB66525E1AC710C91CF4EE5664CF466EE5059C02497EBB48657424",
+      "byte_length": 174683,
+      "role": "VERSION_GRAPH_AND_HISTORY_SEMANTICS",
+      "transfer_limit": "Do not introduce an OPA binary merely to close the source gap. A Python implementation may be used only when labeled LOCALLY_REIMPLEMENTED and tested against independent fixtures.",
+      "activation": "REQUIRED"
+    },
+    {
+      "component_id": "S31-POLICY",
+      "title": "OPA Policy Language 1.19.0",
+      "url": "https://raw.githubusercontent.com/open-policy-agent/opa/v1.19.0/docs/docs/policy-language.md",
+      "raw_sha256": "DD7B17A2DF1E537975D8BDDB5A40EE043BF7FBE97F41CBB9E7DD5BDCADCB2293",
+      "byte_length": 117709,
+      "role": "DECLARATIVE_POLICY_LANGUAGE_SEMANTICS",
+      "transfer_limit": "Do not introduce an OPA binary merely to close the source gap. A Python implementation may be used only when labeled LOCALLY_REIMPLEMENTED and tested against independent fixtures.",
+      "activation": "REQUIRED"
+    }
+  ],
+  "source_transfer_rule": "A row may implement only its listed source-described behavior. Source citations do not supply truth, authority, policy acceptance, closure, or effect authorization beyond the stated transfer limit.",
+  "configuration_parity_contract": {
+    "wrapper_interface_semantic_sha256": "4381D2B0590928982887C0A5F8D835AB2E301F21A71995A4A64805D6A42383BA",
+    "configurations": [
+      "B1",
+      "B1-ATTENTION"
+    ],
+    "required_equalities": [
+      "implementation_tree_sha256",
+      "operation_registry_sha256",
+      "source_set_sha256",
+      "runtime_profile_sha256",
+      "semantic_request_raw_sha256",
+      "decision_input_sha256",
+      "budget",
+      "pause_state",
+      "clarification_state"
+    ],
+    "sole_permitted_delta": {
+      "configuration": "B1-ATTENTION",
+      "field": "attention_card",
+      "schema_ref": "B1_PRIMARY_IMPLEMENTER_CONTRACT_0_1.json#/$defs/AttentionCard"
+    },
+    "obligations": [
+      "All 28 operations are implemented by the same symbols and implementation-tree digest in both configurations.",
+      "No configuration may add, remove, rename, bypass, or weaken an obligation.",
+      "The attention card is a closed neutral input; it conveys no authority, policy decision, acceptance, or external-effect permission."
+    ]
+  },
+  "semantic_decision_profile": {
+    "contract_path": "B1_PRIMARY_IMPLEMENTER_CONTRACT_0_1.json",
+    "interface_id": "B1-SEMANTIC-DECISION-INTERFACE-0.2",
+    "outer_request_schema_ref": "B1_PRIMARY_IMPLEMENTER_CONTRACT_0_1.json#/schemas/request_schema",
+    "decision_input_schema_ref": "B1_PRIMARY_IMPLEMENTER_CONTRACT_0_1.json#/schemas/decision_input_schema",
+    "predicate_table_ref": "B1_PRIMARY_IMPLEMENTER_CONTRACT_0_1.json#/semantic_decision_contract/operation_decision_table",
+    "operation_variant_count": 28,
+    "class_predicate_count": 112,
+    "class_precedence": ["MALFORMED_OR_BOUNDARY", "BINDING_OR_CONFLICT", "OMISSION_OR_INCOMPLETE", "VALID"],
+    "inner_packet_request": "UNCHANGED_HASH_BOUND_NON_AUTHORITATIVE_FOR_CLASSIFICATION",
+    "forbidden_behavior_authority": ["fixture identity", "case token", "class label", "expected output", "producer or provenance label", "free prose"],
+    "wrapper_interface_semantic_sha256": "4381D2B0590928982887C0A5F8D835AB2E301F21A71995A4A64805D6A42383BA",
+    "dispatch_state": "BLOCKED_UNTIL_0_2_FIXTURES_AND_EXTERNAL_ACCEPTANCE"
+  },
+  "rows": [
+    {
+      "obligation_id": "OBL-01",
+      "component_id": "B1-CAP-01",
+      "operation_handle": "OPR_207429B87964D694CB8E3915",
+      "functional_obligation": "Pin shared, versioned vocabulary for records, edges, purpose, scope, context, use, lifecycle, and decisions.",
+      "source_basis": [
+        "S02",
+        "S03",
+        "S08",
+        "S17",
+        "S30-PROVENANCE",
+        "S31-DIFF",
+        "S31-VERSION",
+        "S31-POLICY",
+        "S37"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_01",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-02",
+      "component_id": "B1-CAP-02",
+      "operation_handle": "OPR_3A4599E3E3125ED732D36DE3",
+      "functional_obligation": "Give every record and material revision exact immutable identity; exact references never mean latest.",
+      "source_basis": [
+        "S08",
+        "S18",
+        "S21",
+        "S22",
+        "S30-PROVENANCE",
+        "S31-DIFF",
+        "S31-VERSION",
+        "S31-POLICY",
+        "S34",
+        "S35",
+        "S36",
+        "S38"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_02",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-03",
+      "component_id": "B1-CAP-03",
+      "operation_handle": "OPR_C6BC972C20B6DAFFF0B0B6C0",
+      "functional_obligation": "Represent declarations of adoption/intended use with generic records and context/use/transition edges.",
+      "source_basis": [
+        "S03",
+        "S07",
+        "S18",
+        "S30-PROVENANCE",
+        "S31-DIFF",
+        "S31-VERSION",
+        "S31-POLICY",
+        "S36",
+        "S38"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_03",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-04",
+      "component_id": "B1-CAP-04",
+      "operation_handle": "OPR_0386D601DC19E10308B3A859",
+      "functional_obligation": "Record origin, custody, transformation, agents, activities, and derivation separately from truth or authority.",
+      "source_basis": [
+        "S18",
+        "S20",
+        "S30-PROVENANCE",
+        "S31-DIFF",
+        "S31-VERSION",
+        "S31-POLICY"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_04",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-05",
+      "component_id": "B1-CAP-05",
+      "operation_handle": "OPR_BB18BB21EC270E87EF066379",
+      "functional_obligation": "Bind each exact proposition version to declared evidence items, spans, inference steps, and source versions.",
+      "source_basis": [
+        "S05",
+        "S19",
+        "S20",
+        "S26",
+        "S27",
+        "S30-PROVENANCE",
+        "S35"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_05",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-06",
+      "component_id": "B1-CAP-06",
+      "operation_handle": "OPR_EAE17ADAEB0A4F5E64603826",
+      "functional_obligation": "Evaluate relevance, credibility, convergence, redundancy, dependence, attack/defense, burden, standard, and unresolved status.",
+      "source_basis": [
+        "S05",
+        "S06",
+        "S17",
+        "S19",
+        "S27",
+        "S35"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_06",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-07",
+      "component_id": "B1-CAP-07",
+      "operation_handle": "OPR_F922CF465FDF9FC57CAE5BA9",
+      "functional_obligation": "Keep evidentiary support and use-specific action authorization as distinct records, edges, and results.",
+      "source_basis": [
+        "S18",
+        "S19",
+        "S20",
+        "S23",
+        "S26",
+        "S28",
+        "S33",
+        "S36",
+        "S38"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_07",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-08",
+      "component_id": "B1-CAP-08",
+      "operation_handle": "OPR_4AF8FFDF42FD4F466E4824D2",
+      "functional_obligation": "Define an exact action manifest over actor, capability, target, effect, inputs, resources, purpose, scope, externality, assumptions, and policy.",
+      "source_basis": [
+        "S20",
+        "S21",
+        "S22",
+        "S23",
+        "S24",
+        "S25",
+        "S28",
+        "S29",
+        "S33",
+        "S34"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_08",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-09",
+      "component_id": "B1-CAP-09",
+      "operation_handle": "OPR_B7CB00B77D5EDD57FCCCAC40",
+      "functional_obligation": "Evaluate permissions, prohibitions, duties, constraints, conditions, continuity, attributes, burdens, and conflicts under one policy version.",
+      "source_basis": [
+        "S01",
+        "S02",
+        "S06",
+        "S07",
+        "S17",
+        "S18",
+        "S23",
+        "S24",
+        "S31-DIFF",
+        "S31-VERSION",
+        "S31-POLICY",
+        "S34",
+        "S36",
+        "S37",
+        "S38"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_09",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-10",
+      "component_id": "B1-CAP-10",
+      "operation_handle": "OPR_38663FABE27CFF68828572D4",
+      "functional_obligation": "Enforce least authority and block independent-principal elevation across principal, class, capability, target, effect, subject, purpose, and scope.",
+      "source_basis": [
+        "S01",
+        "S02",
+        "S20",
+        "S21",
+        "S23",
+        "S28",
+        "S34"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_10",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-11",
+      "component_id": "B1-CAP-11",
+      "operation_handle": "OPR_CE6168CADBF41CD7623A7D43",
+      "functional_obligation": "Close and isolate each action's declared support, authority, policy, and influencing-resource basis.",
+      "source_basis": [
+        "S18",
+        "S20",
+        "S22",
+        "S23",
+        "S28",
+        "S31-DIFF",
+        "S31-VERSION",
+        "S31-POLICY",
+        "S33",
+        "S34",
+        "S35"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_11",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-12",
+      "component_id": "B1-CAP-12",
+      "operation_handle": "OPR_06537A7F14C0E290D443B932",
+      "functional_obligation": "Parameterize information flows by sender, recipient, subject, information type, transmission principle, context, purpose, and scope.",
+      "source_basis": [
+        "S03",
+        "S12",
+        "S13",
+        "S23",
+        "S36"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_12",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-13",
+      "component_id": "B1-CAP-13",
+      "operation_handle": "OPR_D1C1EB3894CFD1C0276E42AD",
+      "functional_obligation": "Stage memory changes and commit them transactionally with validation and atomic visibility.",
+      "source_basis": [
+        "S01",
+        "S18",
+        "S31-DIFF",
+        "S31-VERSION",
+        "S31-POLICY"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_13",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-14",
+      "component_id": "B1-CAP-14",
+      "operation_handle": "OPR_0902043F66B2F5BCCA98A143",
+      "functional_obligation": "Require declared parent and dependency closure for records, inferences, policies, actions, corrections, and handoff obligations.",
+      "source_basis": [
+        "S05",
+        "S18",
+        "S30-PROVENANCE",
+        "S31-DIFF",
+        "S31-VERSION",
+        "S31-POLICY"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_14",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-15",
+      "component_id": "B1-CAP-15",
+      "operation_handle": "OPR_6722DD0B8862978B685AF16B",
+      "functional_obligation": "Apply exact-version correction, invalidation, and typed cascading repair while preserving independent valid paths.",
+      "source_basis": [
+        "S05",
+        "S18",
+        "S30-PROVENANCE",
+        "S31-DIFF",
+        "S31-VERSION",
+        "S31-POLICY"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_15",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-16",
+      "component_id": "B1-CAP-16",
+      "operation_handle": "OPR_52216F51F258260213726033",
+      "functional_obligation": "Package versioned role-aware handoffs with exact artifacts, intended use, support/provenance, authority, obligations, assumptions, missing evidence, and decision ownership.",
+      "source_basis": [
+        "S07",
+        "S26",
+        "S27",
+        "S29"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_16",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-17",
+      "component_id": "B1-CAP-17",
+      "operation_handle": "OPR_2314EEF867905DC3E5230227",
+      "functional_obligation": "Track public commitments, duties, acknowledgement, discharge, expiry, violation, continuity, and closure as event-only lifecycle transitions.",
+      "source_basis": [
+        "S01",
+        "S07",
+        "S26",
+        "S27",
+        "S34",
+        "S36",
+        "S38"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_17",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-18",
+      "component_id": "B1-CAP-18",
+      "operation_handle": "OPR_1787A5B1A383A4CA5B87E649",
+      "functional_obligation": "Return unresolved/not-adjudicable whenever required authority, provenance, closure, dependency, standard, or world fact is absent or unknowable.",
+      "source_basis": [
+        "S06",
+        "S17",
+        "S18",
+        "S26",
+        "S27",
+        "S28",
+        "S30-PROVENANCE",
+        "S33",
+        "S35",
+        "S36",
+        "S38"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_18",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-19",
+      "component_id": "B1-CAP-19",
+      "operation_handle": "OPR_6D9FA44D4442950313EA8047",
+      "functional_obligation": "Emit tamper-evident receipts for evidence evaluation, authorization, gate decisions, workflow state, invocation, and observed effects.",
+      "source_basis": [
+        "S18",
+        "S21",
+        "S23",
+        "S24",
+        "S28",
+        "S29",
+        "S33",
+        "S34",
+        "S35",
+        "S36"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_19",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-20",
+      "component_id": "B1-CAP-20",
+      "operation_handle": "OPR_80083A7AF9FD2374306208D3",
+      "functional_obligation": "Mediate protected effects with a deterministic pre-effect gate that binds exact fields, effect, invocation authority, policy, and observed effect.",
+      "source_basis": [
+        "S18",
+        "S22",
+        "S23",
+        "S24",
+        "S25",
+        "S28",
+        "S34",
+        "S35"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_20",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-21",
+      "component_id": "B1-CAP-21",
+      "operation_handle": "OPR_EED2255144C2E1BD6DCC1EFF",
+      "functional_obligation": "Version and replay consumer expectations through one common matching suite.",
+      "source_basis": [
+        "S08",
+        "S11",
+        "S31-DIFF",
+        "S31-VERSION",
+        "S31-POLICY",
+        "S37"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_21",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-22",
+      "component_id": "B1-CAP-22",
+      "operation_handle": "OPR_6C9B73604E3164661F153E15",
+      "functional_obligation": "Treat retrieved content, tool output, metadata, bindings, and self-asserted trust as untrusted until validated for a declared role.",
+      "source_basis": [
+        "S12",
+        "S20",
+        "S23",
+        "S28",
+        "S30-PROVENANCE",
+        "S34",
+        "S35",
+        "S36",
+        "S38"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_22",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-23",
+      "component_id": "B1-CAP-23",
+      "operation_handle": "OPR_60F3672F648865577D64EC8F",
+      "functional_obligation": "Prevent permission, handoff, trusted-tool traversal, receipt, repetition, or successful execution from automatically promoting evidentiary support.",
+      "source_basis": [
+        "S09",
+        "S14",
+        "S19",
+        "S20",
+        "S23",
+        "S28",
+        "S33",
+        "S34",
+        "S36",
+        "S37",
+        "S38"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_23",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-24",
+      "component_id": "B1-CAP-24",
+      "operation_handle": "OPR_9EF6B3CECBD0B582232D3FC1",
+      "functional_obligation": "Maintain exactly four required fixture classes per obligation\u2014input/output, invariant, policy-permitted control, and failure\u2014and tag replay, adversarial, bounded-state, and human-validated coverage modalities across those classes where applicable. Modalities do not create extra fixture classes.",
+      "source_basis": [
+        "S10",
+        "S11",
+        "S12",
+        "S13",
+        "S15",
+        "S16",
+        "S18",
+        "S19",
+        "S31-DIFF",
+        "S31-VERSION",
+        "S31-POLICY",
+        "S33",
+        "S36"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_24",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-25",
+      "component_id": "B1-CAP-25",
+      "operation_handle": "OPR_165CED459B7901D4CA3E3B2A",
+      "functional_obligation": "Preserve non-malleable origin, principal, and action-class bindings across every authorization propagation; copying, transformation, or handoff cannot widen authority.",
+      "source_basis": [
+        "S20",
+        "S21",
+        "S28",
+        "S34"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_25",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-26",
+      "component_id": "B1-CAP-26",
+      "operation_handle": "OPR_2B12C8F8D4240FDA61CDA198",
+      "functional_obligation": "Enforce authorization continuously through expiry and revocation, atomically consume single-use grants, reject replay, and emit one effect-linked execution receipt.",
+      "source_basis": [
+        "S21",
+        "S24",
+        "S25",
+        "S28",
+        "S34"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_26",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-27",
+      "component_id": "B1-CAP-27",
+      "operation_handle": "OPR_0FBCA8E91BDEF7697BE4D088",
+      "functional_obligation": "Represent handoff acceptance as version-pinned proposed, accepted, committed, executed, shipped, and verified state transitions, each separate from and linked to its exact receipt, without collapsing recipient sufficiency, authority, decision ownership, or downstream obligations.",
+      "source_basis": [
+        "S26",
+        "S27",
+        "S29"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_27",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    },
+    {
+      "obligation_id": "OBL-28",
+      "component_id": "B1-CAP-28",
+      "operation_handle": "OPR_B7ED0CA795AED58CC3A107DB",
+      "functional_obligation": "Bind the exact trusted rendering bytes and fields presented for approval to the exact action manifest and executed effect; detect deceptive render/effect divergence and measure silent-pass and interaction-burden controls.",
+      "source_basis": [
+        "S25"
+      ],
+      "implementation_symbol": "b1_capabilities.obl_28",
+      "required_in_configurations": [
+        "B1",
+        "B1-ATTENTION"
+      ],
+      "implementation_state": "REQUIRES_NEW_SEMANTIC_IMPLEMENTATION_0_2",
+      "external_acceptance_state": "BLOCKED_EXTERNAL_RECEIPT_ABSENT_0_2"
+    }
+  ],
+  "historical_failed_snapshot": {
+    "status": "PRESERVED_READ_ONLY_FAILED_COMPETENCE_REVIEW",
+    "matrix_raw_sha256": "CF1B51388C88DB1E85451780375CFD35174C34375AD436A3400AB0EEA48D4EDD",
+    "contract_raw_sha256": "110AD69A7A7AC35D7C6F95AB98963E2CBE5865DAFD6B0667A7151C34D0BD6471",
+    "core_fixture_raw_sha256": "7AFBF42C2E0FBA2C52B03ABEFFEB6B79F7A2C1516CD23A1594BD736E2351B0C9",
+    "wrapper_fixture_raw_sha256": "792CF5A4F716311A3C82348CA70C73F9FA936BDD043311718EABEC8EC62E1E51",
+    "acceptance_receipt_raw_sha256": "D3236CCCE7AE53952874C07F4F5171C211932905902992FFFC5626540D996D03",
+    "implementation_root": "../implementation-output/",
+    "reuse_for_0_2_acceptance": "FORBIDDEN"
+  },
+  "independent_fixture_pack_reference": {
+    "path": "../fixtures/PRIMARY_BASELINE_SEMANTIC_FIXTURE_PACK_0_2.json",
+    "raw_sha256": "F27B93B3BE8BCBF5FBF7FF7789494621D17B426E16B38E958BB932899B0961B9",
+    "byte_length": 1360792,
+    "internal_semantic_seal_sha256": "4514F279F2000D1D6B7B70B10898E245AE2F1EF17C49FCC7ABB21F9C73434625",
+    "entry_count": 112,
+    "class_counts": {
+      "VALID": 28,
+      "MALFORMED_OR_BOUNDARY": 28,
+      "BINDING_OR_CONFLICT": 28,
+      "OMISSION_OR_INCOMPLETE": 28
+    },
+    "producer_role": "FIXTURE_TEST_AUTHOR",
+    "implementer_write_access": "DENIED",
+    "binding_state": "BOUND_EXACT_0_2",
+    "expected_external_acceptance_receipt": {
+      "path": "../receipts/PRIMARY_BASELINE_FIXTURE_ACCEPTANCE_RECEIPT_0_2.json",
+      "producer_role": "IMPLEMENTATION_REVIEWER",
+      "required_result": "PASS",
+      "schema_ref": "B1_PRIMARY_IMPLEMENTER_CONTRACT_0_1.json#/schemas/fixture_acceptance_receipt_schema"
+    }
+  },
+  "independent_wrapper_parity_fixture_pack_reference": {
+    "path": "../fixtures/B1_WRAPPER_PARITY_FIXTURE_PACK_0_2.json",
+    "raw_sha256": "22B9A2E8C08A63CF1A29AC3CD57FB0D30108245BC538DA2E4A959A24089195C1",
+    "byte_length": 2234050,
+    "internal_semantic_seal_sha256": "687E406D5DB04397A8A3DE68C9B0F661327FC6CAE1A575D07204CE82FBD2DA6A",
+    "wrapper_interface_semantic_sha256": "4381D2B0590928982887C0A5F8D835AB2E301F21A71995A4A64805D6A42383BA",
+    "pair_count": 112,
+    "arm_count": 224,
+    "negative_case_count": 10,
+    "metamorphic_case_count": 4,
+    "required_semantic_competence_rules": 5,
+    "producer_role": "FIXTURE_TEST_AUTHOR",
+    "primary_implementer_read_access": "READ_ONLY_AFTER_EXACT_BINDING",
+    "primary_implementer_write_access": "DENIED",
+    "binding_state": "BOUND_EXACT_0_2"
+  },
+  "toolchain_manifest_tree_reference": {
+    "manifest_path": "../toolchain/TOOLCHAIN_MANIFEST_0_1.json",
+    "manifest_raw_sha256": "A6A3A4ACD05610E60BABC0143CFCFCE8CD4614E204228BD02CD3C946BF2C9314",
+    "manifest_byte_length": 11562,
+    "tree_sha256": "E242457E4F8894E54315755967263E1B1FC73F5C8AC2A00B4F4F11AD54C273E9",
+    "regular_file_count": 35,
+    "executable_path": "../toolchain/python.exe",
+    "executable_raw_sha256": "FD5C46D73D29BA21B04C844BBAF9096066136526911230645A2A040D23FB612B",
+    "executable_byte_length": 103704,
+    "probe_sha256": "AC853141A15143FCFB32E4C071A14F053277F34668675D983F935151057DE499",
+    "expected_implementation": "CPython",
+    "expected_version": "3.12.4",
+    "primary_implementer_read_access": "READ_ONLY_AFTER_EXACT_BINDING",
+    "primary_implementer_write_access": "DENIED",
+    "binding_state": "BOUND_HASH_VERIFIED"
+  },
+  "seal_contract": {
+    "matrix_raw_sha256": "Computed over these exact LF-only UTF-8 bytes; the digest is external and is not stored in this file.",
+    "row_set_invariant": "Rows equal exactly OBL-01 through OBL-28 once; operation handles are unique and equal the frozen packet registry.",
+    "wrapper_parity_fixture_pack_gate": {
+      "required_reference": "independent_wrapper_parity_fixture_pack_reference",
+      "required_interface_sha256": "4381D2B0590928982887C0A5F8D835AB2E301F21A71995A4A64805D6A42383BA",
+      "initial_snapshot_result": "PASS_EXACT_PACK_BOUND",
+      "admission_at_snapshot": true
+    },
+    "toolchain_manifest_tree_gate": {
+      "required_reference": "toolchain_manifest_tree_reference",
+      "required_runtime": "CPython 3.12.4",
+      "initial_snapshot_result": "PASS",
+      "admission_at_snapshot": true
+    },
+    "implementation_admission_evaluator": {
+      "phase": "ENABLED_EXTERNAL_RECEIPT_REQUIRED",
+      "receipt_path": "../receipts/PRIMARY_BASELINE_FIXTURE_ACCEPTANCE_RECEIPT_0_2.json",
+      "receipt_schema_ref": "B1_PRIMARY_IMPLEMENTER_CONTRACT_0_1.json#/schemas/fixture_acceptance_receipt_schema",
+      "required_checks": [
+        "These frozen matrix/contract bytes bind exact independently authored 0.2 core and wrapper packs and the contract enables the external receipt schema.",
+        "Receipt is schema-valid and its producer_role and result are IMPLEMENTATION_REVIEWER and PASS.",
+        "Receipt matrix_raw_sha256 equals SHA-256 of these frozen bytes.",
+        "Receipt contract_raw_sha256 equals SHA-256 of the simultaneously reviewed frozen contract bytes.",
+        "Receipt binds both fixture-pack raw and internal seals, all five sources and their component-set seal, the source-resolution note, matrix, contract, packet, projection, wrapper-interface digest, and toolchain manifest, tree, executable, and probe digests to their frozen pins.",
+        "Receipt receipt_sha256 passes the contract's self-zero canonical hash rule."
+      ],
+      "current_result": "BLOCKED_EXTERNAL_RECEIPT_ABSENT",
+      "control_file_mutation_after_pass": "NONE_DERIVE_ADMISSION_FROM_EXTERNAL_RECEIPT_AGAINST_THESE_FROZEN_BYTES"
+    },
+    "experimental_use_evaluator": {
+      "phase": "BLOCKED_REQUIRES_NEW_IMPLEMENTATION_AND_EXTERNAL_RECEIPTS",
+      "required_external_results": [
+        "fixture_acceptance_receipt.result == PASS",
+        "parity_receipt.result == PASS",
+        "final_implementation_seal_receipt.result == PASS"
+      ],
+      "current_result": "BLOCKED_IMPLEMENTATION_ABSENT",
+      "control_file_mutation_after_pass": "NONE_DERIVE_EXPERIMENTAL_USE_FROM_EXTERNAL_RECEIPTS_AGAINST_THESE_FROZEN_BYTES"
+    }
+  },
+  "initial_snapshot": {
+    "core_semantic_fixture_pack_bound": true,
+    "wrapper_parity_fixture_pack_bound": true,
+    "toolchain_manifest_tree_bound": true,
+    "fixture_acceptance_receipt_present": false,
+    "implementation_authoring_admitted": false,
+    "experimental_use_accepted": false
+  },
+  "derived_gate_state": {
+    "implementation_authoring": "FALSE_UNTIL_SCHEMA_VALID_EXTERNAL_0_2_FIXTURE_ACCEPTANCE_RECEIPT",
+    "experimental_use": "FALSE_UNTIL_NEW_IMPLEMENTATION_PARITY_AND_FINAL_SEAL_RECEIPTS",
+    "control_file_edit_required": false
+  }
+}
