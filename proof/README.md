@@ -42,7 +42,7 @@ Both arms read `corpus.jsonl` and nothing else (same-information rule).
 | arm | detected | false holds | mean latency |
 |---|---|---|---|
 | baseline gate | 17/18 | 0 | 0.009 ms |
-| B1 strict adapter | 18/18 | 133 (32.6% of clean) | 3.0 ms (105 ms via stdio ABI) |
+| B1 strict adapter | 18/18 | 133/390 clean (34.1%) | 3.0 ms (105 ms via stdio ABI) |
 | B1 calibrated adapter | 18/18 | 0 | 2.0 ms |
 
 - The five REAL defects found in live records (task files whose result
