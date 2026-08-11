@@ -7,7 +7,7 @@ real `rr_batch.py` processes. It does not modify the accepted implementation.
 The normative command is:
 
 ```text
-python -B portability/concurrency/ladder.py --attempt 3 --receipt portability/concurrency/receipts/normative-correction-attempt3.json
+python -B portability/concurrency/ladder.py --attempt 3 --receipt portability/concurrency/receipts/normative-release-audit-head-8a525b1-attempt3.json
 ```
 
 It freezes the following bounds and refuses larger CLI values:
@@ -67,24 +67,24 @@ caller schedule. No accepted implementation repair is attempted.
 For a quick harness-only smoke check without changing normative bounds:
 
 ```text
-python -B portability/concurrency/ladder.py --levels 1,2 --requests 5 --skip-soak --no-free-threaded --attempt 3 --receipt portability/concurrency/receipts/smoke-correction-attempt3.json
+python -B portability/concurrency/ladder.py --levels 1,2 --requests 5 --skip-soak --no-free-threaded --attempt 3 --receipt portability/concurrency/receipts/smoke-release-audit-head-8a525b1-attempt3.json
 ```
 
 The smoke command lowers coverage and is not a normative ladder receipt.
-`smoke-correction-attempt3.json` is the admitted v3 smoke preflight;
-`normative-correction-attempt3.json` is the admitted v3 normative run.
+`smoke-release-audit-head-8a525b1-attempt3.json` is the current v3 smoke
+preflight; `normative-release-audit-head-8a525b1-attempt3.json` is the current
+v3 normative run. Both record clean source HEAD `8a525b1`.
 Historical v1 receipts are stale—specifically, historical `smoke.json` records
 `INVARIANT_FAILURE`, never PASS—and the stopped v2 receipt records the
 adjudicated semantic/transport layer mismatch. Exact receipt/source hashes,
 R-CONC-4's independent recomputation, and the outer-audit nonclaim are in
 `receipts/STATUS.md`.
 
-Both admitted v3 receipts record `git.clean=false` at baseline HEAD `4e788d2`
-and overlapped the compact model explorer. They are raw-source-bound but not
-clean-commit-bound or isolated-performance evidence. After the first
-authorized commit, a clean-source v3 smoke and normative rerun is recommended
-if charter time and resource headroom permit; this is a recommendation, not an
-automatic rerun.
+The earlier `*-correction-attempt3.json` receipts record `git.clean=false` at
+baseline HEAD `4e788d2` and overlapped the compact model explorer. They are
+retained as superseded history, not current evidence. Exact current and
+historical hashes, source bindings, and resource qualifications are in
+`receipts/STATUS.md`.
 
 This lane is treatment-exposed. It must never author the research program's
 future blinded worlds, oracle, gold, or renderer.

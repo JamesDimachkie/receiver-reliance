@@ -55,6 +55,6 @@
     "peak_working_bytes": 1366290432,
     "stdout_sha256": "AB53DCB62E8C60D9E6D9DD59A249174E34CA97CDBF199C810B72F36AAEBC985A",
     "stderr_sha256": "0BF3067D55683F6EB725E2790165D665735B86C13EFE95A8CBAC4E39D63FA601",
-    "note": "Post-F-MODEL-003 attempt 1 with durable file custody (receipts/N48-postF3-attempt1.*). Counts and hashes come from the captured receipt; the independent R-MODEL-3 full probe re-enumerated N=48 and reproduced the receipt byte-for-byte."
+    "note": "Post-F-MODEL-003 attempt 1 with durable file custody (receipts/N48-postF3-attempt1.*). Counts and hashes come from the captured receipt; the independent R-MODEL-3 full probe re-enumerated N=48 and reproduced the canonical JSON receipt body exactly."
   }
 }

@@ -2,7 +2,7 @@
 
 Date: 2026-08-10
 
-Status: **ADJUDICATION REQUIRED — NOT TERMINAL DONE**
+Status: **HISTORICAL FREEZE — ADJUDICATION WAS REQUIRED AT THAT TIME**
 
 Historical-scope note (2026-08-11): this status describes the 2026-08-10
 freeze and is not the branch's current disposition. The adjudication was

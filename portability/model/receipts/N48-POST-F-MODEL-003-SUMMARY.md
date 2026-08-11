@@ -15,7 +15,7 @@ PYTHONHASHSEED invariance across three seeds. Execution being blocked in
 the refuter's sandbox, its two condition-resolving probes were run
 verbatim by the custodian: the fast probe passed in full, and the full
 probe — a complete independent N=48 re-enumeration — reproduced the
-receipt byte-for-byte (`R_MODEL_3_FULL_PROBE ALL_PASS`,
+canonical receipt body exactly (`R_MODEL_3_FULL_PROBE ALL_PASS`,
 `inadmissible_alias_edges 16260520`, receipt `CD6210F8...732E`).
 Verdict: **NO-NEW-EVIDENCE**. `EXPECTED_COUNTS.json`, the model README,
 and the full-test constants now carry these adjudicated values; the

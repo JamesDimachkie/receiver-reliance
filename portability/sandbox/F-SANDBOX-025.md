@@ -15,3 +15,8 @@ requires exactly one well-formed `Ran 7 tests...` line, exactly one `OK` line,
 and no `FAILED` or `ERROR` summary. The regression fixture uses the real
 Windows-style `Ran 7 tests in ...\r\n\r\nOK\r\n` shape; duplicate and
 contradictory summary tests remain active.
+
+The successor clean-source receipt
+`../receipts/local-expanded-gate-release-audit.json` passes all 11 commands;
+raw SHA-256
+`4039ED94D885B9001C4B18B70C76BD7D70F6158A43946556C9062D66E7B361A3`.

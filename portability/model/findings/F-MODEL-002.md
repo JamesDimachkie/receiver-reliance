@@ -81,8 +81,9 @@ F-MODEL-2 attempt 2 completed with exit 0 under an attached 90-minute wrapper:
 The receipt retains the frozen domain wording. Non-embedded prose clarifies
 that the R=3 library comprises two fixed-serial and four seed-selected recipes;
 `R3_STRICT_ALTERNATION` is a historical identifier, not an every-step
-alternation invariant. The completed author evidence still requires a fresh
-R-MODEL refuter before custody can call the model lane clear.
+alternation invariant. At that rejected-receipt stage, the completed author
+evidence still required a fresh R-MODEL refuter before custody could call the
+model lane clear; the supersession below records what followed.
 
 ## Supersession
 

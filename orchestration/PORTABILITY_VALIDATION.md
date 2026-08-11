@@ -5,17 +5,23 @@ Date: 2026-08-11
 Branch: `sol/rr-portability-modelcheck-20260810` from baseline
 `4e788d21e882a30bdda2aec3f780537161f81644`
 
+Corrected clean source receipt HEAD:
+`8a525b167b95a3b6b512282938199eba09594a24`
+
 Authority: `MASTER_PROMPT_RR_PORTABILITY_20260810.md`
 (SHA-256 `154A9E5397D5D5B5422FD5D7053E7D1E6C6544C5D0152866598E6DC990F9C478`),
 executed to the adjudication freeze by Sol root, then finished under Fable
 custody at James's direction of 2026-08-11 ("take it from here"), with the
-adjudication handoff recorded in `PORTABILITY_FABLE_RETURN_20260810.md`.
+adjudication handoff recorded in `PORTABILITY_FABLE_RETURN_20260810.md`. Codex
+root then performed the 2026-08-11 corrective release audit documented below;
+that historical handoff file is not a current-state authority.
 
-Status: **LOCAL EVIDENCE COMPLETE.** The hosted matrix, hosted sandbox, and
-hosted expanded-gate receipts have not run because the first branch push —
-which triggers them — is gated on James's explicit authorization. Every
-category below is local evidence unless marked otherwise, and no category is
-ever merged into a single pass count.
+Status: **LOCAL EVIDENCE COMPLETE AFTER CORRECTIVE RELEASE AUDIT.** The hosted
+matrix, hosted sandbox, and hosted expanded-gate receipts have not run because
+no branch push has been authorized or performed. Pushes to the named branch
+and manual `workflow_dispatch` can start the workflow. Every category below
+is local evidence unless marked otherwise, and no category is ever merged
+into a single pass count.
 
 ## Adjudication and decision record (Fable)
 
@@ -27,34 +33,46 @@ ever merged into a single pass count.
   N=32 and retained-versus-streaming equivalence at every bound N=18..28 —
   before one post-F-MODEL-003 N=48 enumeration ran to exit 0 under durable
   file custody. Fresh refuter R-MODEL-3 attacked it across eight vectors;
-  its independent full re-enumeration reproduced the receipt byte-for-byte
-  and counted the alias-edge migration at exactly 16,260,520. Verdict
-  NO-NEW-EVIDENCE; receipt `CD6210F8...732E` admitted. This was receipt
+  its full re-enumeration reproduced the canonical receipt body exactly.
+  The historical pre/post receipt delta moved exactly 16,260,520 edges from
+  admitted transitions to the excluded frontier. Verdict NO-NEW-EVIDENCE;
+  receipt `CD6210F8...732E` admitted. This was receipt
   attempt three of a three-strike stand-down rule; a third rejection would
   have closed the lane as quarantined-unresolved.
-- **Live lane — F-LIVE-005 and F-LIVE-006 corrected and cleared.** The
+- **Live lane — F-LIVE-005 through F-LIVE-008 corrected and cleared.** The
   monitor's transport normalization is scoped to the physical read; every
   other loop-body exception is durably classified under the new
   `HarnessFaultError` (`HARNESS_FAULT`, replay exit 4). Four adversarial
   refutation rounds (R-LIVE-5) found three successively deeper renderer
   escapes and a two-axis stop-receipt evidence-overwrite defect
   (F-LIVE-006, also inherited by the frozen infrastructure writer); all
-  repaired and regression-pinned. Final verdict NO-NEW-EVIDENCE.
-- **Sandbox lane — F-SANDBOX-022 corrected and cleared.** Path dialect is
+  repaired and regression-pinned. The corrective audit then reproduced two
+  further defects: background-thread `BaseException` was lost and relabeled
+  as transport failure (F-LIVE-007), and an OS-dependent ordinary short-write
+  counter made otherwise identical replays disagree (F-LIVE-008). Both are
+  repaired and pinned; the suite is 29/29.
+- **Sandbox lane — F-SANDBOX-022 through F-SANDBOX-025 corrected and
+  cleared.** Path dialect is
   validated before rendering with component-level UNC anatomy (including
   the `\\?\UNC\` namespace), and the mount source fails closed on
   surrogate-escaped text, NUL, quotes, commas, line feeds, and edge
   whitespace matched to Docker's actual Go grammar rather than Python's
   broader whitespace policy. Five refutation rounds (R-SANDBOX-22),
-  including a proven CPython 3.12/3.14 `is_absolute()` divergence; all
-  repaired and regression-pinned. Final verdict NO-NEW-EVIDENCE.
+  including a proven CPython 3.12/3.14 `is_absolute()` divergence. The release
+  audit additionally found first-match duplicate-summary authorization
+  (F-SANDBOX-023), then stopped two clean local gate runs on real prefixed and
+  CRLF transcript shapes (F-SANDBOX-024/025). All are repaired and pinned;
+  the focused suite is 76/76 on both CPython 3.12.10 and 3.14.5.
 - **Concurrency — admitted with its standing qualification** (below).
 - **Oracle — admitted** within its fixture-closed scope (below).
-- **Author separation held throughout:** enumeration by one fresh agent,
+- **Author separation held for the adjudicated lanes:** enumeration by one fresh agent,
   collection by the custodian, refutation by fresh-context Codex sessions
   that never authored the artifacts they attacked; refuter-blocked
   executions were resolved by running the refuters' probe scripts verbatim
-  and reporting results back for their verdicts.
+  and reporting results back for their verdicts. The corrective release audit
+  was a separate root pass acting on four independent child reviews and then
+  on failures produced by the real clean gate; it is not represented as a new
+  author-separated adjudication cycle.
 
 ## 1. Frozen 0.2 parity
 
@@ -80,12 +98,27 @@ wrapper arms 24).
 - internal held-out synthetic proof: 7 tests pass
 - seeded fuzz smoke: 31/31 strategies (seed 0x000000000B10F042)
 - batch: 2,160 checks / 0 failures (perf on; peak 16,853,617 bytes;
-  median batch/in-process ratio 1.263)
+  median batch/in-process ratio 1.181 in the final receipt)
 - single-pass audit: 1,142 checks / 0 failures (benchmark mode)
 
-These eleven commands are the charter §1 expanded gate, re-run complete and
-green on the final integrated tree (2026-08-11). The identical gate was
-green at the pre-handoff freeze.
+These eleven commands are the charter §1 expanded gate. The final clean-source
+run is durably recorded at
+`portability/receipts/local-expanded-gate-release-audit.json`: status `PASS`,
+11/11 commands, clean source HEAD `8a525b1`, raw SHA-256
+`4039ED94D885B9001C4B18B70C76BD7D70F6158A43946556C9062D66E7B361A3`,
+and embedded receipt SHA-256
+`F50D05B07985D21F37F4A8B1ACBDCCDED4D7CEF370343C9039F0D90AF34F0309`.
+Every stdout/stderr transcript is retained in canonical base64 and bound to
+its byte count and SHA-256.
+
+Two earlier clean-source attempts are retained as rejected validator history,
+not gate failures: rejected1 stopped at command 3 on a valid prefixed count
+summary (raw SHA-256
+`31F9C49E8D7E808372A399C9E868D624533D2171D99FB4CBC37EDDDB2E42AA73`);
+rejected2 stopped at command 8 on a valid CRLF unittest PASS transcript (raw
+SHA-256
+`B82AF20209165F3EBBDAD61C42F5454266693109EA2AE3BE0343EB1E4ADCDE53`).
+Their findings are F-SANDBOX-024 and F-SANDBOX-025.
 
 ## 4. Raw JSON / UTF-8 / JCS finite exploration (independent oracle)
 
@@ -122,33 +155,48 @@ Receipt `CD6210F8706C7B37B6CD25A9EF67B53696207EAFED716284151D67B20444732E`
 - assumptions, symmetry reductions, and exclusions are published verbatim
   from `domain.py` inside the receipt; everything outside M is reported as
   outside M
+- durable independent traversal:
+  `portability/model/receipts/N48-independent-refuter-20260811.json`, raw
+  SHA-256 `3A8D4BF8FC862818A87F7B16B76D4565F32DBCF1507EB800490B193225BF9FF8`;
+  status `PASS`, 2,031.969 s, canonical receipt body identical, both embedded
+  receipt hashes `CD6210F8...732E`. It checked all 20,531,838 currently
+  rejected alias-label opportunities. That broader opportunity count includes
+  edges the old key-consumption rule already rejected and is distinct from
+  the 16,260,520 historical migration delta.
 
 ## 6. Live transport schedules
 
 - eight committed schedules replayed twice on both real pipe and
   socketpair transports, byte-identical PASS results; complete 812-partition
   W coverage with zero unplanned OS short writes
-- focused suite 29/29 after F-LIVE-005/F-LIVE-006
+- focused suite 29/29 after F-LIVE-005 through F-LIVE-008
 - stop classes: DIVERGENCE (exit 1), INFRASTRUCTURE_ERROR (exit 2),
   HARNESS_FAULT (exit 4) — a harness fault is never transport or
-  divergence evidence, and stop-receipt evidence directories bind schedule
-  bytes and completed-replay content so no stop can overwrite another's
-  evidence
+  divergence evidence. Stop-receipt identity is a full SHA-256 over schedule,
+  transport, replay number, and completed-replay content; overwriting another
+  stop would require a full-digest collision rather than the former 64-bit
+  prefix collision. Monitor `KeyboardInterrupt` and `SystemExit` are re-raised
+  exactly across the background-thread boundary after child cleanup.
 
 ## 7. Concurrency schedules
 
-- v3 receipt
-  `98786009478343F4A7D84FC594A67C7E09BE64483865123AC1C73E4144525699`;
-  focused suite 15/15
+- clean-source v3 normative receipt
+  `normative-release-audit-head-8a525b1-attempt3.json`, raw SHA-256
+  `B1782A43E4E4615569948953FFC45659BF0A820BEB67136F73FEDFDEAFE29998`;
+  clean-source smoke receipt
+  `smoke-release-audit-head-8a525b1-attempt3.json`, raw SHA-256
+  `8CBA926DFB61B2C729C5CEAB95FF89350B99AFAF03809CBDDEAF6B8AC7719030`;
+  both bind clean HEAD `8a525b1`; focused suite separately 15/15
 - P ∈ {1,2,4,8,16,32} at 200 requests per caller, paired identical-seed
   runs byte-matching; P=16,32 soaks at 1,000 requests per caller; library
   and process modes; 242,400 independently projected audited envelopes;
   fresh refuter independently recomputed every declared aggregate
-- **standing qualification:** the receipt records `git.clean=false` at its
-  baseline and coexecution resource observations; it is not
-  clean-commit-bound and not an isolated performance baseline, and the
+- the old dirty attempt-3 receipts remain historical only. The current
+  normative run was clean-source-bound and did not overlap another audit
+  workload; its resource fields are still local observations, not a universal
+  performance baseline. The
   semantic projection does not independently oracle every nested audit
-  metadata field (e.g. `engine_generation`)
+  metadata field (e.g. `engine_generation`).
 - CPython 3.14t free-threaded evidence is an honest local
   `INFRA_UNAVAILABLE` receipt; the hosted stress lane owns it
 
@@ -168,8 +216,9 @@ Receipt `CD6210F8706C7B37B6CD25A9EF67B53696207EAFED716284151D67B20444732E`
   oracle 35, live 29, concurrency 15, sandbox 76) — and the matrix suite
   passed twice consecutively with no new evidence after final settlement.
 - Hosted: **not run.** The workflow (`.github/workflows/portability.yml`,
-  read-only permissions, branch-limited triggers, SHA-pinned actions) fires
-  on the first authorized push. Normative CPython 3.12/3.13/3.14 across
+  read-only permissions, named-branch push trigger plus manual
+  `workflow_dispatch`, SHA-pinned actions) can run only after an authorized
+  remote action. Normative CPython 3.12/3.13/3.14 across
   ubuntu/macos/windows on x64 and arm64 remains PENDING with
   `INFRA_UNAVAILABLE` as the only admissible absence record.
 
@@ -180,13 +229,31 @@ dev-mode, pydebug, PyPy, GraalPy below the 3.12 floor) are defined and
 labeled in the plan; no local evidence exists and none is claimed. Hosted
 observations remain pending with the matrix.
 
+## 11. Hygiene and custody
+
+- `portability/verify_hygiene.py` reports `HYGIENE_PASS`: exactly 138
+  intentional CR-at-EOL diagnostics in four raw custody captures, all four
+  protected by exact file hashes, and zero unexpected diagnostics.
+- The corrective diff itself passes `git diff --check`. Raw baseline-to-HEAD
+  `git diff --check` remains nonzero only because `.gitattributes` intentionally
+  preserves those four captured byte streams; rewriting them would destroy
+  their published custody hashes.
+- The prior ledger's future-dated 12:44/12:55 entries are explicitly rejected,
+  not silently edited into plausibility. Current timestamps come from actual
+  commits and machine-readable receipts.
+- Current finding dispositions were swept for pending/refutation boilerplate;
+  no stale current-status match remains. Historical discovery prose remains
+  only where the file explicitly labels it as history.
+
 ## Findings inventory
 
 Every finding file under `portability/*/findings/` (and the sandbox lane's
-flat `F-SANDBOX-*.md`) carries its own disposition. Adjudicated in this
-finishing pass: F-MODEL-003 (resolved; receipt admitted), F-LIVE-005 and
-F-LIVE-006 (corrected; four-round refutation to no-new-evidence),
-F-SANDBOX-022 (corrected; five-round refutation to no-new-evidence). No
+flat `F-SANDBOX-*.md`) carries its own disposition. Adjudicated before the
+release audit: F-MODEL-003 (resolved; receipt admitted), F-LIVE-005/F-LIVE-006
+(corrected; four-round refutation to no-new-evidence), and F-SANDBOX-022
+(corrected; five-round refutation to no-new-evidence). Corrective release-audit
+findings F-LIVE-007, F-LIVE-008, F-MATRIX-012, and F-SANDBOX-023 through
+F-SANDBOX-025 are resolved locally and regression-pinned. No
 accepted-implementation divergence was established anywhere in the
 portability effort: every finding is a defect in a model, oracle, harness,
 workflow, receipt validator, or sandbox validator. Local Docker remains an
@@ -195,7 +262,7 @@ pending the hosted Linux daemon.
 
 ## Open items (all James-gated or downstream of his gate)
 
-1. First push of this branch — triggers the hosted matrix; requires
+1. First push of this branch — can trigger the hosted matrix; requires
    explicit current-turn authorization.
 2. Collection and reconciliation of hosted normative, stress,
    expanded-gate, and Linux sandbox receipts into this report.
