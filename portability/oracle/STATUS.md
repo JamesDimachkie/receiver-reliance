@@ -77,9 +77,9 @@ case count.
 
 No efficacy, novelty, security, fuzzing-completeness, external-standard,
 or universal-portability claim. The proof tier stays `internal held-out`.
-The defensible local success statement is narrower: independent bounded-state,
-transport-scheduling, fixture, and hostile-boundary validation found no
-divergence within the locally executed environments and stated bounds.
+The defensible oracle-local statement is narrower: independent fixture-closed
+and bounded hostile-boundary validation found no divergence within the locally
+executed environment and stated bounds.
 Cross-platform, cross-architecture, and hosted cross-runtime validation remains
-contingent on hosted receipts, with everything outside the model reported as
-outside the model.
+contingent on hosted receipts, with anything outside the oracle's declared
+bounds reported as outside scope.

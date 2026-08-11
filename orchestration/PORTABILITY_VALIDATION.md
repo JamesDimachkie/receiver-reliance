@@ -36,9 +36,10 @@ into a single pass count.
   its full re-enumeration reproduced the canonical receipt body exactly.
   The historical pre/post receipt delta moved exactly 16,260,520 edges from
   admitted transitions to the excluded frontier. Verdict NO-NEW-EVIDENCE;
-  receipt `CD6210F8...732E` admitted. This was receipt
-  attempt three of a three-strike stand-down rule; a third rejection would
-  have closed the lane as quarantined-unresolved.
+  receipt `CD6210F8...732E` admitted. This was the third complete N=48 receipt
+  overall—and the first post-F-MODEL-003 attempt—under a three-strike
+  stand-down rule; a third rejection would have closed the lane as
+  quarantined-unresolved.
 - **Live lane — F-LIVE-005 through F-LIVE-008 corrected and cleared.** The
   monitor's transport normalization is scoped to the physical read; every
   other loop-body exception is durably classified under the new
@@ -252,11 +253,19 @@ complete and ready to publish. The audit did not accept that assertion. It
 used the same adversarial practices required of the portability lanes against
 the harness, validators, receipts, documentation, and task-control record.
 The release audit and this catalog's own falsification produced six new stable
-finding IDs, a material strengthening of one earlier finding, and nine
-evidence, custody, or documentation catches. The source corrections are
+finding IDs, a strengthening of one earlier finding, and nine
+evidence, custody, or documentation catches in the corrective release audit.
+The final publication-prose pass added six editorial corrections, recorded
+separately below. The source corrections are
 `a6c60d4`, `7f81dc7`, and `8a525b1`; machine-readable evidence closeout is
 `4ea69dc`, followed by this documentation-only catalog. No
 accepted-implementation source was changed.
+
+Product boundary: none of the DG entries is a product defect or evidence that
+the accepted implementation's runtime behavior changed. DG-001 through DG-016
+concern the portability validation harness, validators, evidence, custody, or
+claims. DG-017 through DG-022 are six additional editorial-only publication
+corrections.
 
 This is the consolidated dogfooding record. A "propagation stopped" entry
 describes the false downstream conclusion that remained possible at
@@ -282,20 +291,39 @@ this branch.
 | DG-015 | The authoritative external task claim still described `e42c635` as the current validated state after corrective source and evidence commits existed. | The control-plane record could direct later work to superseded evidence or imply terminal completion. | The claim now binds the corrective source/evidence state, remains `in_progress` and `needs_user=true`, and lists hosted reconciliation and closeout as pending. |
 | DG-016 | Catalog falsification found that this report claimed every finding file carried its own current disposition, but ten Oracle files deliberately preserve discovery-time state and defer current disposition to the lane status index. | A reader could mistake historical Oracle correction instructions for unresolved current work or trust an inaccurate completeness claim. | The report now identifies [Oracle status](../portability/oracle/STATUS.md) as the authoritative disposition index and states accurately that each finding has a witness while final disposition may live in the record or its lane index. |
 
+### Publication prose corrections (editorial only)
+
+These six entries improve the publication record. They did not change
+executable behavior, model counts, receipts, or the accepted product and must
+not be cited as product defects or product-outcome improvements.
+
+| ID | Editorial catch | Misreading prevented | Correction |
+|---|---|---|---|
+| DG-017 | [F-CONC-003](../portability/concurrency/findings/F-CONC-003.md) said only `adjudicated harness defect` and gave a path ambiguous from its directory, without identifying the current v3 evidence. | The stopped v2 receipt could be mistaken for unresolved current state, and readers lacked a direct authority path. | The finding now says `RESOLVED locally`, distinguishes the stopped v2 receipt from clean v3 evidence, and links the receipt and authoritative status index. |
+| DG-018 | [F-LIVE-004](../portability/live/findings/F-LIVE-004.md) described its older `BaseException` boundary as the current correction, contradicting F-LIVE-005 and F-LIVE-007. | A maintainer could restore or document superseded exception classification. | The correction now states the current three-way boundary: expected physical-read `OSError` and closed-stream `ValueError` become transport evidence, ordinary loop-body `Exception` values become harness faults, and `KeyboardInterrupt`/`SystemExit` are re-raised in the caller. |
+| DG-019 | [F-ORACLE-006](../portability/oracle/findings/F-ORACLE-006.md) and [F-ORACLE-008](../portability/oracle/findings/F-ORACLE-008.md) had resolved headers but live `must add` and `remain unexecuted` instructions. | Historical stop instructions could be propagated as unfinished current work. | Both records now state the implemented correction, place the stopped closures in discovery-time past tense, and link the completed clean refutations in Oracle status. |
+| DG-020 | [F-SANDBOX-003](../portability/sandbox/F-SANDBOX-003.md) described its pre-correction evidence-free PASS path in present tense beneath a resolved status. | A reader could conclude that the current sandbox still accepted an evidence-free PASS. | The witness is now explicitly scoped as pre-correction, and the required correction is in past tense; the following paragraph remains the current corrected behavior. |
+| DG-021 | The admitted N=48 run was called `attempt three` while its receipt summary called it `attempt 1`. | Two valid numbering schemes looked like contradictory custody records. | The report now states that it was the third complete N=48 receipt overall and the first post-F-MODEL-003 attempt. |
+| DG-022 | Oracle status imported `bounded-state` and `transport-scheduling` success from other lanes into its Oracle-local conclusion. | A lane-local status could be cited for evidence that it did not own. | The statement is narrowed to independent fixture-closed and bounded hostile-boundary Oracle validation; hosted portability remains contingent. |
+
 The six new finding IDs map to DG-001, DG-002, DG-004, DG-005, DG-013, and
 DG-014. DG-003 strengthened F-LIVE-006. DG-006 through DG-012 plus DG-015 are
 the original eight evidence, custody, or documentation catches; DG-016 is the
-ninth, found while falsifying this catalog. These are audit-record categories,
-not a severity ranking or a claim that every entry is the same kind of defect.
+ninth, found while falsifying this catalog. Those 16 entries form the earlier
+validation audit catalog, spanning harness and validator defects plus evidence,
+custody, and claim corrections. DG-017 through DG-022 are six additional
+publication-only editorial records. The combined 22-row audit log is not a
+severity ranking or a count of product defects.
 
-### Complete stable-finding surface
+### Tracked finding inventory
 
-The portability corpus contains 60 stable `F-*` records. This count is an
-inventory, not a claim of 60 accepted-implementation bugs: records include
-model, oracle, harness, workflow, validator, evidence, refinement, and rejected
-hypothesis findings. Each record retains its own witness. Current disposition
-is recorded either in that file or in an authoritative lane index; notably,
-`portability/oracle/STATUS.md` indexes the 13 discovery-time Oracle records.
+The portability corpus currently contains 60 stable `F-*` records. This count
+is an inventory, not a claim of 60 accepted-implementation bugs: the records
+cover defects or invalid evidence in models, oracles, harnesses, workflows,
+validators, and custody. Each record retains its own witness. Current
+disposition is recorded either in that file or in an authoritative lane index;
+notably, `portability/oracle/STATUS.md` indexes the 13 discovery-time Oracle
+records.
 
 | Lane | Stable records | Count |
 |---|---:|---:|
@@ -309,8 +337,8 @@ is recorded either in that file or in an authoritative lane index; notably,
 
 ### What the dogfood result establishes
 
-The useful result is causal, not rhetorical: a candidate labeled ready was
-rejected; minimized witnesses were retained; code-level defects became
+The observed sequence was concrete: a candidate labeled ready was rejected;
+minimized witnesses were retained; code-level defects became
 regressions; evidence gaps became source-bound receipts; invalid receipts were
 quarantined rather than rewritten; and a fresh final falsifier found no
 remaining local publication blocker. Executable regressions now stop
@@ -335,9 +363,9 @@ before the release audit: F-MODEL-003 (resolved; receipt admitted), F-LIVE-005/F
 findings F-LIVE-007, F-LIVE-008, F-MATRIX-012, and F-SANDBOX-023 through
 F-SANDBOX-025 are resolved locally and regression-pinned. No
 accepted-implementation divergence was established anywhere in the
-portability effort: every finding is a defect in a model, oracle, harness,
-workflow, receipt validator, or sandbox validator. Local Docker remains an
-honest `INFRA_UNAVAILABLE`; the sandbox correction rests on static checks
+portability effort; each finding concerns a model, oracle, harness, workflow,
+validator, sandbox, or evidence-custody defect. Local Docker remains an honest
+`INFRA_UNAVAILABLE`; the sandbox correction rests on static checks
 pending the hosted Linux daemon.
 
 ## Open items (all James-gated or downstream of his gate)

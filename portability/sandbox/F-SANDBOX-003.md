@@ -2,22 +2,23 @@
 
 Status: **RESOLVED locally.** Correction retained; final focused suite green.
 
-The exact host flow accepts container exit 0 plus inner stdout:
+Before correction, the exact host flow accepted container exit 0 plus inner
+stdout:
 
 ```json
 {"status":"PASS"}
 ```
 
-and emits host `PASS`/exit 0. It does not require the inner receipt schema,
+and emitted host `PASS`/exit 0. It did not require the inner receipt schema,
 treatment-exposed flag, effective-boundary proof, all eleven gate
 commands/counts, or a recomputable deterministic projection. Thus a malformed,
-truncated, or dishonest inner process can promote an evidence-free PASS.
+truncated, or dishonest inner process could promote an evidence-free PASS.
 
-The local daemon-unavailable path remains honestly bound and classified. The
-defect is in parsing a future live container result. A fresh author must make
-PASS fail closed unless the complete inner receipt validates; negative tests
-must cover missing fields, wrong counts/commands, boundary failure, wrong
-projection, and nonzero exit.
+The local daemon-unavailable path was already honestly bound and classified.
+The defect was in parsing a future live container result. The required
+correction was to make PASS fail closed unless the complete inner receipt
+validated, with negative coverage for missing fields, wrong counts/commands,
+boundary failure, wrong projection, and nonzero exit.
 
 The correction validates one canonical JSON record against exact nested keys
 and types, requires the treatment flag and effective boundary values, matches

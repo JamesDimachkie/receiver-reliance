@@ -46,7 +46,8 @@ The first unminimized frozen witness was a 200,004-byte root array that must
 select root `ERR_SCHEMA` before item/resource limit. The 2-byte scalar proves
 the underlying missing routing law without the resource dimension.
 
-A fresh correction author must add only independently specified schema routing
-needed by the declared finite model—at minimum non-object root to
-`ERR_SCHEMA` with the empty pointer—without claiming full schema evaluation.
-R-ORACLE-5A stopped before closures 32–57.
+The correction adds only the independently specified routing required by the
+declared finite model: non-object roots select `ERR_SCHEMA` at the empty
+pointer, without claiming full schema evaluation. R-ORACLE-5A stopped before
+closures 32–57; the later clean refutations completed the required
+post-correction coverage, as indexed in [`../STATUS.md`](../STATUS.md).

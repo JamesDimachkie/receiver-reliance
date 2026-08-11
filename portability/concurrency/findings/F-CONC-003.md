@@ -1,10 +1,15 @@
 # F-CONC-003 — semantic/physical comparator layer mismatch
 
-Status: adjudicated harness defect; not an accepted-code divergence.
+Status: **RESOLVED locally.** The v2 comparator defect is corrected in the
+current v3 harness and clean-source receipts; it was not an
+accepted-implementation divergence. Current receipt hashes and the R-CONC-4
+refutation are indexed in
+[`../receipts/STATUS.md`](../receipts/STATUS.md).
 
 R-CONC-3 stopped `RR-CONCURRENCY-LADDER-2` at library mode, `P=1`, request
 index 0. The preserved receipt is
-`receipts/normative-clean-oracle-attempt2.json` (raw SHA-256
+[`normative-clean-oracle-attempt2.json`](../receipts/normative-clean-oracle-attempt2.json)
+(raw SHA-256
 `1DEB0148450A0F430DAB8668CB11FC9F3AD4FF56CC5D809AF2348CC20DBE9797`).
 Its minimized request SHA-256 is
 `50DE63075B898F16D5C733F6FF3726B3029E22ACF4E41040784D6971873CE04A`.

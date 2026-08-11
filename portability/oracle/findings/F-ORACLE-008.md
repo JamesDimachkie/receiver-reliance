@@ -21,8 +21,9 @@ The oracle raises outside-fixture and emits no stdout.
 Deleting any one byte yields an input where oracle and both accepted
 generations agree on `ERR_JSON`, proving deletion minimality.
 
-F-ORACLE-006 added only non-object root routing. This correction must add the
-independently specified O(1) object-dispatch rule needed by the finite model:
-a canonical object whose `format_version` is absent or undeclared selects
-`ERR_SCHEMA` at `/format_version`. It must not imply full member-schema
-evaluation. Closures 33–57 remain unexecuted under the stop rule.
+The correction adds the independently specified O(1) object-dispatch rule
+needed by the finite model: a canonical object whose `format_version` is
+absent or undeclared selects `ERR_SCHEMA` at `/format_version`. It does not
+imply full member-schema evaluation. Closures 33–57 were unexecuted in this
+discovery run; the later clean refutations completed the required
+post-correction coverage, as indexed in [`../STATUS.md`](../STATUS.md).

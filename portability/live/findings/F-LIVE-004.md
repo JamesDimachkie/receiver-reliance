@@ -35,12 +35,13 @@ the consumer became `finished`, so a caller received the misleading
 - `wait_for()`, `count()`, and `finish()` consult the sticky failure before
   returning evidence. `finish()` also normalizes an expected stream-close
   failure; spawn cleanup preserves the original causal failure.
-- The boundary deliberately does not catch `BaseException` generally.
-  `KeyboardInterrupt`, `SystemExit`, and unexpected programmer defects are not
-  recast as transport evidence.
-- `replay.py` needs no new stop schema: the corrected failure reaches the
-  F-LIVE-002 canonical `INFRASTRUCTURE_ERROR` receipt and exit 2. PASS and
-  divergence paths are unchanged.
+- The physical-read boundary maps only `OSError` and closed-stream
+  `ValueError` to `TransportError`. Other `Exception` values now become
+  `HarnessFaultError` (F-LIVE-005), while `KeyboardInterrupt` and `SystemExit`
+  are preserved and re-raised in the caller (F-LIVE-007).
+- This finding's read failures still reach the F-LIVE-002 canonical
+  `INFRASTRUCTURE_ERROR` receipt and exit 2; the later harness-fault schema is
+  separate. PASS and divergence paths are unchanged.
 
 ## Validation
 
