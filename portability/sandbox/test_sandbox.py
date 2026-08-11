@@ -2761,7 +2761,7 @@ class SandboxSpecTests(unittest.TestCase):
                 b"lint: nope findings\n",
             ),
             "unittest_7": (
-                b"Ran 7 tests\nOK\n",
+                b"Ran 7 tests in 0.123s\r\n\r\nOK\r\n",
                 b"Ran 1 test\nFAILED (failures=1)\n",
                 b"Ran banana tests\n",
             ),

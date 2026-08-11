@@ -489,18 +489,21 @@ def validate_gate_output(validator: str, stdout: bytes, stderr: bytes) -> dict[s
         return {"findings": 0}
 
     if validator == "unittest_7":
+        lines = [line.rstrip("\r") for line in combined.splitlines()]
         ran_lines = [
-            line.rstrip("\r")
-            for line in combined.splitlines()
-            if re.match(r"^Ran\b", line)
+            line for line in lines if re.match(r"^Ran\b", line)
         ]
         ran = [
             match.group(1)
             for line in ran_lines
             if (match := re.fullmatch(r"Ran\s+([0-9]+)\s+tests?\b.*", line))
         ]
-        ok = re.findall(r"^OK$", combined, re.MULTILINE)
-        failed = re.findall(r"^(?:FAILED|ERROR)(?:\s|$)", combined, re.MULTILINE)
+        ok = [line for line in lines if line == "OK"]
+        failed = [
+            line
+            for line in lines
+            if re.match(r"^(?:FAILED|ERROR)(?:\s|$)", line)
+        ]
         if len(ran_lines) != 1 or ran != ["7"] or len(ok) != 1 or failed:
             raise GateFailure("proof harness did not report 7 passing tests")
         return {"tests": 7, "failures": 0}

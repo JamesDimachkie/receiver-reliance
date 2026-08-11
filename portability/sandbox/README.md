@@ -200,6 +200,8 @@ string. Transcript, count, and digest are one checked evidence surface.
 Grounded count summaries may retain their gate-specific human prefix, but the
 validator requires one and only one `checks=`/`failures=` summary across both
 streams and rejects duplicate fields even when they share one line.
+Unittest summaries are normalized line-by-line for LF or CRLF before the
+single `Ran 7 tests` / single `OK` / no-failure decision.
 
 The host treats container output as untrusted. Host `PASS` requires container
 exit 0 and one canonical JSON record conforming exactly to the inner-receipt
