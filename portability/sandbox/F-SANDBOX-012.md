@@ -1,6 +1,6 @@
 # F-SANDBOX-012 — forced cleanup exception suppresses the host receipt
 
-Status: corrected by fresh F-SANDBOX-12; awaiting fresh refutation.
+Status: **RESOLVED locally.** Correction retained; final focused suite green.
 
 The exact mocked host flow reached a valid primary `PASS`, assigned the
 lowercase container identifier `a` repeated 64 times, and then entered forced

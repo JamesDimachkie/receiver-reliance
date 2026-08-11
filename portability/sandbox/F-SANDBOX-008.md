@@ -1,6 +1,6 @@
 # F-SANDBOX-008 — effective entrypoint was recorded but not enforced
 
-Status: corrected by fresh F-SANDBOX-8; awaiting fresh refutation.
+Status: **RESOLVED locally.** Correction retained; final focused suite green.
 
 An otherwise valid selected Docker config replaced the image entrypoint with
 `["/bin/sh","-c","emit-forged-pass"]`. The host recorded that value but

@@ -1391,18 +1391,18 @@ def _environment_binding_error(
     return None
 
 
-def _executed_git_binding_error(value: Any) -> str | None:
+def _runnable_git_binding_error(value: Any) -> str | None:
     if not isinstance(value, dict):
-        return "executed receipt lacks git evidence"
+        return "runnable receipt lacks git evidence"
     if value.get("github_sha") is None:
-        return "executed receipt lacks GITHUB_SHA binding"
+        return "runnable receipt lacks GITHUB_SHA binding"
     if value.get("github_sha") != value.get("sha"):
-        return "executed receipt git sha does not match GITHUB_SHA"
+        return "runnable receipt git sha does not match GITHUB_SHA"
     if value.get("clean") is not True or value.get("status_line_count") != 0:
-        return "executed receipt was not captured from a clean checkout"
+        return "runnable receipt was not captured from a clean checkout"
     workflow_sha = os.environ.get("GITHUB_SHA")
     if workflow_sha is not None and value.get("sha") != workflow_sha:
-        return "executed receipt sha does not match the summary workflow GITHUB_SHA"
+        return "runnable receipt sha does not match the summary workflow GITHUB_SHA"
     return None
 
 
@@ -1751,10 +1751,14 @@ def _receipt_validation_error(
         environment_error = _environment_validation_error(row.get("environment"), entry)
         if environment_error:
             return environment_error
+        # Every artifact produced by a scheduled row, including an explicit
+        # runtime/setup absence, must belong to the workflow SHA and a clean
+        # checkout.  Otherwise a stale or locally forged INFRA_UNAVAILABLE
+        # receipt can suppress a normative row without executing it.
+        git_binding_error = _runnable_git_binding_error(row.get("git"))
+        if git_binding_error:
+            return git_binding_error
         if outcome in {"PASS", "DIVERGENCE", "OBSERVED_DIVERGENCE"}:
-            git_binding_error = _executed_git_binding_error(row.get("git"))
-            if git_binding_error:
-                return git_binding_error
             environment_binding_error = _environment_binding_error(
                 row.get("environment"),
                 entry,

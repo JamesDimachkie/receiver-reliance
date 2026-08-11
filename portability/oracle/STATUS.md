@@ -77,7 +77,9 @@ case count.
 
 No efficacy, novelty, security, fuzzing-completeness, external-standard,
 or universal-portability claim. The proof tier stays `internal held-out`.
-The only defensible success statement: independent cross-platform,
-cross-architecture, cross-runtime, bounded-state, and transport-scheduling
-validation found no divergence within the stated environments and bounds —
-with everything outside the model reported as outside the model.
+The defensible local success statement is narrower: independent bounded-state,
+transport-scheduling, fixture, and hostile-boundary validation found no
+divergence within the locally executed environments and stated bounds.
+Cross-platform, cross-architecture, and hosted cross-runtime validation remains
+contingent on hosted receipts, with everything outside the model reported as
+outside the model.

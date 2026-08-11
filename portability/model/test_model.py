@@ -27,6 +27,7 @@ from portability.model.parser_model import (
 )
 from portability.model.parser_model import explore_parser
 from portability.model.reference_checker import explore_parser_retained
+from portability.model.receipts.independent_full_refuter import independent_parser
 from portability.model.transport_model import (
     RECORD_SHAPES,
     explore_scheduler,
@@ -215,6 +216,25 @@ class ModelStructureTests(unittest.TestCase):
                     asdict(explore_parser(bound)),
                     asdict(explore_parser_retained(bound)),
                 )
+        independent, alias_edges = independent_parser(16)
+        streaming = asdict(explore_parser(16))
+        self.assertEqual(
+            independent,
+            {
+                "quotient_states": streaming["states"],
+                "quotient_transitions": streaming["transitions"],
+                "terminal_transitions": streaming["terminal_transitions"],
+                "symbolic_terminal_traces": streaming["symbolic_terminal_traces"],
+                "excluded_frontier_edges": streaming["excluded_edges"],
+                "excluded_trace_prefixes": streaming["excluded_trace_prefixes"],
+                "terminal_classes": streaming["terminal_classes"],
+                "representative_hex": streaming["representative_hex"],
+                "quotient_material_sha256": streaming[
+                    "quotient_material_sha256"
+                ],
+            },
+        )
+        self.assertGreater(alias_edges, 1000)
 
     def test_packed_state_is_lossless_over_reachable_prefixes(self) -> None:
         seen = {INITIAL_STATE}

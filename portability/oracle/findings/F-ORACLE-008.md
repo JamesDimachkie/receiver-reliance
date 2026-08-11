@@ -1,7 +1,8 @@
 # F-ORACLE-008 — canonical object schema routing is missing
 
-Status: credible independent-oracle coverage defect found by R-ORACLE-7A at
-frozen closure 32/57. Accepted implementation unchanged.
+Status: **RESOLVED in the current oracle.** This was a credible independent-
+oracle coverage defect found by R-ORACLE-7A at frozen closure 32/57. The
+accepted implementation was unchanged.
 
 ## Deletion-minimal replay
 

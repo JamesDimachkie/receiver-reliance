@@ -1,6 +1,6 @@
 # F-SANDBOX-007 — zero-byte stream digest is internally inconsistent
 
-Status: corrected by fresh F-SANDBOX-7; awaiting fresh refutation.
+Status: **RESOLVED locally.** Correction retained; final focused suite green.
 
 An otherwise complete canonical synthetic PASS set
 `commands[0].stdout_bytes=0` while retaining a nonempty digest spelling of

@@ -1,6 +1,7 @@
 # F-LIVE-003 — decoded non-object control records escaped the stop protocol
 
-Status: **corrected; fresh refutation pending**. This was a live-harness
+Status: **RESOLVED locally.** Correction retained in the terminal 29/29
+focused suite. This was a live-harness
 control-boundary and evidence-durability defect, not an
 accepted-implementation divergence. Found by fresh R-LIVE-3 on 2026-08-10.
 
@@ -65,7 +66,7 @@ It records `classification=INFRASTRUCTURE`,
 `status=INFRASTRUCTURE_ERROR`, `error.type=TransportError`, and the exact
 deterministic reason above.
 
-The focused suite passes 21/21. It covers the minimized monitor witness, the
+The focused suite passes 29/29. It covers the minimized monitor witness, the
 hostile adjacent record classes, every accepted event schema, and canonical
 CLI evidence. F-LIVE-004 adds the adjacent monitor-stream exception boundary.
 The class setup also replays all eight committed schedules twice on both real

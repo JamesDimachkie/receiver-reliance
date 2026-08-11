@@ -1,7 +1,8 @@
 # F-ORACLE-006 — root-scalar schema closure is unroutable
 
-Status: credible independent-oracle coverage defect; accepted implementation
-unchanged. Found by R-ORACLE-5A at frozen closure 31/57 on 2026-08-10.
+Status: **RESOLVED in the current oracle.** This was a credible independent-
+oracle coverage defect; the accepted implementation was unchanged. Found by
+R-ORACLE-5A at frozen closure 31/57 on 2026-08-10.
 
 ## Deletion-minimized replay
 

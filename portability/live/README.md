@@ -43,7 +43,10 @@ transport labeling. `replay.py` exits 4 with `status=HARNESS_FAULT` and
 `receiver-reliance-live-harness-fault-v1` receipt under
 `portability/live/harness-faults/`. A harness fault is never infrastructure,
 divergence, or pass evidence; it invalidates the run and demands a controller
-correction. `KeyboardInterrupt` and `SystemExit` still propagate unrecorded.
+correction. `KeyboardInterrupt` and `SystemExit` are stored verbatim at the
+monitor thread boundary and re-raised from the caller's next consultation;
+they remain unrecorded and are never relabeled as harness or transport
+evidence (F-LIVE-007).
 
 The child control channel is a separate, bounded protocol boundary. A control
 record is at most 4,096 bytes including LF, must decode to an exact JSON object
@@ -91,7 +94,11 @@ its receipt has `backpressure_observed: false` and separate
 `write_resume_ack_count` fields. `os_short_write_count` must remain zero in W,
 which proves no unplanned third segment expanded a declared two-write case.
 The three adversarial bulk-output schedules continue to require and report
-genuine nonblocking OS backpressure.
+genuine nonblocking OS backpressure. In those ordinary bulk schedules, EAGAIN
+and a nonblocking partial write both acknowledge that barrier; the adapter then
+finishes the current call in blocking mode. This keeps incidental kernel
+syscall partition counts out of the declared replay transcript while the W
+path remains the only deliberate short-return surface (F-LIVE-008).
 
 ## Schedule inventory
 
@@ -115,8 +122,9 @@ The focused lane suite currently passes 29/29 tests. In addition to replaying
 all eight committed schedules twice on both real transports, it directly
 forces the watchdog, premature control EOF, and mismatched-control-event error
 paths and verifies their deterministic CLI receipts and exit classification,
-plus the F-LIVE-005 harness-fault classification witnesses and the F-LIVE-006
-evidence-identity distinctness of both stop-receipt writers.
+plus the F-LIVE-005 harness-fault classification witnesses, F-LIVE-006
+full-digest evidence-identity distinctness, F-LIVE-007 exact cross-thread
+`BaseException` propagation, and F-LIVE-008 stable bulk-write replay boundary.
 It also pins the exact non-object witness; forces read failure both before and
 after a valid event; checks first-failure stickiness and close failure; and
 rejects duplicate-member, non-finite, malformed, deeply nested, oversized,

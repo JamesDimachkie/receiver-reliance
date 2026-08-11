@@ -1,6 +1,6 @@
 # F-SANDBOX-004 — overflow JSON number escapes receipt classification
 
-Status: corrected by fresh F-SANDBOX-4; awaiting fresh refutation.
+Status: **RESOLVED locally.** Correction retained; final focused suite green.
 
 The exact host flow was given container exit 0 and this 28-byte stdout record:
 

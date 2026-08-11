@@ -29,5 +29,5 @@ token table has been audited for raw-expansion aliases, and `"a"` is its only
 alias group.
 
 Focused regression and bounded exhaustive reachable-state collision checks
-are part of `test_model.py`. Full counts and capture hashes will be recorded
+are part of `test_model.py`. Full counts and capture hashes are recorded
 only after one fresh terminal-exit-0 N<=48 enumeration.

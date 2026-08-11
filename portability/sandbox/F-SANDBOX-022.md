@@ -1,8 +1,8 @@
 # F-SANDBOX-022 — a foreign Windows UNC path was accepted as a POSIX source
 
-Status: corrected by fresh F-SANDBOX-22; first correction REFUTED by fresh
-refuter R-SANDBOX-22 on two axes, both repaired; re-refutation of the
-repaired state required.
+Status: **RESOLVED locally.** Fresh R-SANDBOX-22 refuted intermediate states
+on five adversarial rounds; every identified axis was repaired and pinned,
+and the terminal focused suite was green on CPython 3.12 and 3.14.
 
 `_repository_source_for_host` validated the rendered string instead of the path
 dialect. On `Linux` and `Darwin` it rendered `resolved.as_posix()` and required

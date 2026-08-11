@@ -1,7 +1,7 @@
 # F-MATRIX-007 — oversized JSON numbers could crash receipt validation
 
-Status: corrected locally by fresh F-MATRIX-7 before the first authorized
-push; awaiting author-separated refutation. No hosted run has occurred.
+Status: **RESOLVED locally.** Correction retained and covered by two
+consecutive 44/44 focused passes. No hosted run has occurred.
 
 ## Minimized evidence
 

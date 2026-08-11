@@ -56,5 +56,5 @@ envelope.
 This correction author did not read, import, or execute the accepted
 implementation, conformance/grounded/proof runners or outputs, or any of the
 five forbidden implementation files. The accepted-result tuple above is
-adjudicated finding evidence supplied by the fresh refuter. Acceptance still
-requires a new fresh refuter.
+adjudicated finding evidence supplied by the fresh refuter. The subsequently
+completed fresh refutation satisfies that discovery-time acceptance condition.

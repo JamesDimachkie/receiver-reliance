@@ -1,6 +1,6 @@
 # F-SANDBOX-006 — non-finite Docker metadata prevents receipt emission
 
-Status: corrected by fresh F-SANDBOX-6; awaiting fresh refutation.
+Status: **RESOLVED locally.** Correction retained; final focused suite green.
 
 The mocked `docker version --format '{{json .}}'` probe exited 0 with empty
 stderr and this exact 50-byte stdout value:

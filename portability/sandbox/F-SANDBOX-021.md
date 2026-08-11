@@ -1,6 +1,6 @@
 # F-SANDBOX-021 — active mount semantics were coupled to a Windows custody hash
 
-Status: corrected by fresh F-SANDBOX-21; awaiting fresh refutation.
+Status: **RESOLVED locally.** Correction retained; final focused suite green.
 
 The F-SANDBOX-017 through F-SANDBOX-020 regression block mixed two different
 obligations: custody of historical canonical witnesses produced in the

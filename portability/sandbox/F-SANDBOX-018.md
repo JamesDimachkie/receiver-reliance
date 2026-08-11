@@ -1,6 +1,6 @@
 # F-SANDBOX-018 — effective repository mount was not retained
 
-Status: corrected by fresh F-SANDBOX-18; awaiting fresh refutation.
+Status: **RESOLVED locally.** Correction retained; final focused suite green.
 
 The request-side `HostConfig.Mounts` entry exactly matched the intended
 read-only repository bind, but Docker inspect's independent root `Mounts`

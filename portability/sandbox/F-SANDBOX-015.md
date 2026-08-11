@@ -1,6 +1,6 @@
 # F-SANDBOX-015 — configured hostname was not retained or enforced
 
-Status: corrected by fresh F-SANDBOX-15; awaiting fresh refutation.
+Status: **RESOLVED locally.** Correction retained; final focused suite green.
 
 The create plan already supplied both `--hostname rr-sandbox` and
 `HOSTNAME=rr-sandbox`, but the selected container-inspect projection discarded

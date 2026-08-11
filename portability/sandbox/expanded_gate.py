@@ -341,10 +341,53 @@ def verify_boundary() -> dict[str, Any]:
     }
 
 
+def _unique_summary_line(
+    candidate_pattern: str,
+    pattern: str,
+    text: str,
+    description: str,
+) -> re.Match[str]:
+    candidates = [
+        line.rstrip("\r")
+        for line in text.splitlines()
+        if re.match(candidate_pattern, line)
+    ]
+    if len(candidates) != 1:
+        raise GateFailure(
+            f"expected exactly one {description}; observed {len(candidates)}"
+        )
+    match = re.fullmatch(pattern, candidates[0])
+    if match is None:
+        raise GateFailure(f"malformed {description}")
+    return match
+
+
+def _count_object(raw: str, description: str) -> dict[str, int]:
+    try:
+        value = json.loads(raw)
+    except (json.JSONDecodeError, ValueError) as error:
+        raise GateFailure(f"{description} counts are not valid JSON") from error
+    if (
+        not isinstance(value, dict)
+        or not value
+        or not all(
+            isinstance(key, str)
+            and type(member) is int
+            and member >= 0
+            for key, member in value.items()
+        )
+    ):
+        raise GateFailure(f"{description} counts are outside the finite schema")
+    return value
+
+
 def _extract_counts(pattern: str, text: str, expected: int) -> dict[str, int]:
-    match = re.search(pattern, text, flags=re.MULTILINE)
-    if not match:
-        raise GateFailure(f"missing expected summary matching {pattern!r}")
+    match = _unique_summary_line(
+        r"^checks=",
+        pattern.removeprefix("^").removesuffix(r"\r?$"),
+        text,
+        "checks/failures summary",
+    )
     checks = int(match.group("checks"))
     failures = int(match.group("failures"))
     if checks != expected or failures != 0:
@@ -355,19 +398,21 @@ def _extract_counts(pattern: str, text: str, expected: int) -> dict[str, int]:
 
 
 def validate_gate_output(validator: str, stdout: bytes, stderr: bytes) -> dict[str, Any]:
-    out = stdout.decode("utf-8", errors="strict")
-    err = stderr.decode("utf-8", errors="strict")
+    try:
+        out = stdout.decode("utf-8", errors="strict")
+        err = stderr.decode("utf-8", errors="strict")
+    except UnicodeDecodeError as error:
+        raise GateFailure("gate output is not strict UTF-8") from error
     combined = out + "\n" + err
 
     if validator == "core_800":
-        match = re.search(
-            r"^mode=in-process counts=(?P<counts>\{[^\r\n]+\}) failures=(?P<failures>[0-9]+)\r?$",
-            out,
-            flags=re.MULTILINE,
+        match = _unique_summary_line(
+            r"^mode=in-process\b",
+            r"mode=in-process counts=(?P<counts>\{[^\r\n]+\}) failures=(?P<failures>[0-9]+)",
+            combined,
+            "frozen 0.2 in-process summary",
         )
-        if not match:
-            raise GateFailure("missing frozen 0.2 in-process summary")
-        counts = json.loads(match.group("counts"))
+        counts = _count_object(match.group("counts"), "frozen 0.2")
         failures = int(match.group("failures"))
         if sum(counts.values()) != 800 or failures != 0:
             raise GateFailure(
@@ -376,20 +421,29 @@ def validate_gate_output(validator: str, stdout: bytes, stderr: bytes) -> dict[s
         return {"total": 800, "failures": 0, "counts": counts}
 
     if validator == "composed_800_107":
+        composed_lines = [
+            line
+            for line in combined.splitlines()
+            if re.match(r"^mode=in-process\s+suite=", line)
+        ]
+        if len(composed_lines) != 2:
+            raise GateFailure(
+                "composed gate requires exactly two suite summaries; "
+                f"observed {len(composed_lines)}"
+            )
         observed: dict[str, dict[str, int]] = {}
         for suite, expected in (("0.2", 800), ("0.3", 107)):
-            match = re.search(
-                rf"^mode=in-process suite={re.escape(suite)} "
+            match = _unique_summary_line(
+                rf"^mode=in-process\s+suite={re.escape(suite)}\b",
+                rf"mode=in-process suite={re.escape(suite)} "
                 rf"counts=(?P<counts>\{{[^\r\n]+\}}) "
-                rf"total=(?P<total>[0-9]+) failures=(?P<failures>[0-9]+)\r?$",
-                out,
-                flags=re.MULTILINE,
+                rf"total=(?P<total>[0-9]+) failures=(?P<failures>[0-9]+)",
+                combined,
+                f"composed {suite} summary",
             )
-            if not match:
-                raise GateFailure(f"missing composed 0.3 {suite} summary")
             total = int(match.group("total"))
             failures = int(match.group("failures"))
-            counts = json.loads(match.group("counts"))
+            counts = _count_object(match.group("counts"), f"composed {suite}")
             if total != expected or sum(counts.values()) != expected or failures != 0:
                 raise GateFailure(
                     f"{suite} observed total={total} sum={sum(counts.values())} "
@@ -414,22 +468,47 @@ def validate_gate_output(validator: str, stdout: bytes, stderr: bytes) -> dict[s
         )
 
     if validator == "lint_zero":
-        if "lint: 0 findings" not in out:
-            raise GateFailure("contract lint did not report exactly zero findings")
+        lines = [
+            line.rstrip("\r")
+            for line in combined.splitlines()
+            if line.startswith("lint:")
+        ]
+        if lines != ["lint: 0 findings"]:
+            raise GateFailure(
+                "contract lint requires one zero-finding summary; "
+                f"observed {lines!r}"
+            )
         return {"findings": 0}
 
     if validator == "unittest_7":
-        if not re.search(r"Ran 7 tests", combined) or not re.search(
-            r"^OK$", combined, flags=re.MULTILINE
-        ):
+        ran_lines = [
+            line.rstrip("\r")
+            for line in combined.splitlines()
+            if re.match(r"^Ran\b", line)
+        ]
+        ran = [
+            match.group(1)
+            for line in ran_lines
+            if (match := re.fullmatch(r"Ran\s+([0-9]+)\s+tests?\b.*", line))
+        ]
+        ok = re.findall(r"^OK$", combined, re.MULTILINE)
+        failed = re.findall(r"^(?:FAILED|ERROR)(?:\s|$)", combined, re.MULTILINE)
+        if len(ran_lines) != 1 or ran != ["7"] or len(ok) != 1 or failed:
             raise GateFailure("proof harness did not report 7 passing tests")
         return {"tests": 7, "failures": 0}
 
     if validator == "fuzz_31":
-        match = re.search(
+        summaries = re.findall(
+            r"^rr-fuzz: verdict=[^\r\n]+\r?$", combined, re.MULTILINE
+        )
+        if len(summaries) != 1:
+            raise GateFailure(
+                f"fuzz smoke requires exactly one summary; observed {len(summaries)}"
+            )
+        match = re.fullmatch(
             r"rr-fuzz: verdict=PASS cases=(?P<done>[0-9]+)/(?P<total>[0-9]+) "
-            r"[^\r\n]*failures=(?P<failures>[0-9]+) budget_exhausted=false",
-            out,
+            r"[^\r\n]*failures=(?P<failures>[0-9]+) budget_exhausted=false\r?",
+            summaries[0],
         )
         if not match:
             raise GateFailure("fuzz smoke did not report a passing 31/31 summary")
@@ -504,14 +583,12 @@ def run_gate(spec: GateSpec) -> dict[str, Any]:
         "stdout_bytes": len(stdout),
         "stderr_sha256": _sha256(stderr),
         "stderr_bytes": len(stderr),
+        "stdout_b64": base64.b64encode(stdout).decode("ascii"),
+        "stderr_b64": base64.b64encode(stderr).decode("ascii"),
         "elapsed_ms": elapsed_ms,
         "resources": _resource_delta(before, after),
     }
     if timed_out or returncode != 0:
-        result["failure_evidence"] = {
-            "stdout_b64": base64.b64encode(stdout).decode("ascii"),
-            "stderr_b64": base64.b64encode(stderr).decode("ascii"),
-        }
         reason = "timed out" if timed_out else f"exited {returncode}"
         raise GateFailure(json.dumps({"reason": reason, "result": result}, sort_keys=True))
 

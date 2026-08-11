@@ -4,6 +4,11 @@ Date: 2026-08-10
 
 Status: **ADJUDICATION REQUIRED — NOT TERMINAL DONE**
 
+Historical-scope note (2026-08-11): this status describes the 2026-08-10
+freeze and is not the branch's current disposition. The adjudication was
+subsequently executed; `PORTABILITY_VALIDATION.md` is the authoritative current
+report, and `LEDGER.md` records the corrective release audit.
+
 Custodian at freeze: Sol root
 
 Authority: `planning/epistemic-handoff/MASTER_PROMPT_RR_PORTABILITY_20260810.md`

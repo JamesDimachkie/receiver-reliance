@@ -1,6 +1,6 @@
 # F-SANDBOX-014 — effective environment was recorded but not enforced
 
-Status: corrected by fresh F-SANDBOX-14; awaiting fresh refutation.
+Status: **RESOLVED locally.** Correction retained; final focused suite green.
 
 The exact mocked container inspect replaced `Config.Env` with
 `["SECRET_TOKEN=forged"]`. `_selected_inspect` retained only the selected name,

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import hashlib
 import json
 import locale
@@ -178,6 +179,8 @@ COMMAND_KEYS = {
     "stdout_bytes",
     "stderr_sha256",
     "stderr_bytes",
+    "stdout_b64",
+    "stderr_b64",
     "elapsed_ms",
     "resources",
     "observed",
@@ -478,13 +481,27 @@ def _validate_command(value: Any, index: int, spec: expanded_gate.GateSpec) -> N
     for key in ("stdout_bytes", "stderr_bytes", "elapsed_ms"):
         _require_int(command[key], f"{path}.{key}", minimum=0)
     for stream in ("stdout", "stderr"):
-        if (
-            command[f"{stream}_bytes"] == 0
-            and command[f"{stream}_sha256"] != EMPTY_SHA256
-        ):
+        encoded = command[f"{stream}_b64"]
+        if not isinstance(encoded, str):
+            raise _receipt_error(f"{path}.{stream}_b64", "must be a string")
+        try:
+            raw = base64.b64decode(encoded.encode("ascii"), validate=True)
+        except (UnicodeEncodeError, ValueError) as error:
+            raise _receipt_error(
+                f"{path}.{stream}_b64", "must be strict canonical base64"
+            ) from error
+        if base64.b64encode(raw).decode("ascii") != encoded:
+            raise _receipt_error(
+                f"{path}.{stream}_b64", "must be strict canonical base64"
+            )
+        if len(raw) != command[f"{stream}_bytes"]:
+            raise _receipt_error(
+                f"{path}.{stream}_bytes", "does not match retained transcript"
+            )
+        if sha256(raw) != command[f"{stream}_sha256"]:
             raise _receipt_error(
                 f"{path}.{stream}_sha256",
-                f"must equal SHA-256(empty) when {stream}_bytes is zero",
+                "does not match retained transcript",
             )
 
     resources = _require_object(command["resources"], f"{path}.resources")

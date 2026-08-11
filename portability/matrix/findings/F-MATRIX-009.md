@@ -1,8 +1,7 @@
 # F-MATRIX-009 — deeply nested receipt JSON escaped the fail-closed summary
 
-Status: corrected locally on attempt 1/3 by fresh F-MATRIX-9 before the first
-authorized push; awaiting author-separated refutation. No hosted run has
-occurred.
+Status: **RESOLVED locally.** Correction retained and covered by two
+consecutive 44/44 focused passes. No hosted run has occurred.
 
 ## Minimized boundary evidence
 

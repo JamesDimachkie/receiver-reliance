@@ -1,6 +1,7 @@
 # F-LIVE-005 — monitor body defects were laundered as transport evidence
 
-Status: **corrected; re-refutation of the repaired state required**. This was
+Status: **RESOLVED locally after F-LIVE-007.** The terminal 29/29 suite binds
+both ordinary exceptions and cross-thread `BaseException` propagation. This was
 a live-harness failure-classification defect, not an accepted-implementation
 divergence. Found by fresh refutation of the F-LIVE-004 author state on
 2026-08-10; corrected by a fresh author after the Fable adjudication of the
@@ -38,11 +39,12 @@ as transport evidence therefore held only for exception types outside
   `stream.readline(MAX_CONTROL_RECORD_BYTES + 1)` and maps `OSError` and
   the deterministic closed-stream `ValueError` to the sticky
   `TransportError`, with the same normalized reason text as before.
-- Every other exception the loop body raises is recorded as a sticky
+- Every other `Exception` the loop body raises is recorded as a sticky
   `HarnessFaultError` (`status=HARNESS_FAULT`), a new class distinct from
-  both divergence and infrastructure. `BaseException` still propagates:
+  both divergence and infrastructure. `BaseException` is stored verbatim at
+  the thread boundary and re-raised from the caller's next consultation:
   `KeyboardInterrupt` and `SystemExit` are neither transport nor harness
-  evidence.
+  evidence (F-LIVE-007).
 - The fault detail is rendered before the condition lock is taken behind
   layered guards whose last resort is a constant that formats no foreign
   object: a failing type-`__name__` lookup renders as
@@ -81,7 +83,10 @@ harness-fault receipt. For `half_close.ndjson`, pipe transport,
 replay 1, the canonical harness-fault receipt has SHA-256
 `FA63452507E8C7F6D7CD2DE3F9C3E3F2CBF5F99ED5DDAE860185D8F91D790614`
 and records `classification=HARNESS`, `status=HARNESS_FAULT`,
-`error.type=HarnessFaultError`. Receipt bytes exclude the evidence
+`error.type=HarnessFaultError`. Cross-thread regressions inject the exact
+`KeyboardInterrupt` and `SystemExit` objects and require `wait_for`, `count`,
+and `finish` to re-raise those same objects without a thread-exception hook or
+transport/harness classification. Receipt bytes exclude the evidence
 directory name, so the F-LIVE-006 identity widening does not move this
 hash.
 

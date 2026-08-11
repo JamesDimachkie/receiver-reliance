@@ -312,14 +312,28 @@ class SummaryTests(unittest.TestCase):
     def _write_explicit_setup_unavailable(
         self, root: pathlib.Path, entry: dict[str, object]
     ) -> None:
+        path = root / f"receipt-{entry['id']}.json"
         receipt.unavailable_entry(
             self.plan,
             entry,
-            root / f"receipt-{entry['id']}.json",
+            path,
             "actions/setup-python could not provide the requested build",
             "runtime_setup_unavailable",
             "steps.setup.outcome=failure",
         )
+        # Summary tests synthesize hosted artifacts even when the development
+        # worktree is dirty and GITHUB_SHA is absent.  Rebind that fixture to
+        # one internally consistent clean workflow SHA before validation.
+        row = json.loads(path.read_text(encoding="utf-8"))
+        sha = os.environ.get("GITHUB_SHA", "a" * 40)
+        row["git"] = {
+            "sha": sha,
+            "github_sha": sha,
+            "clean": True,
+            "status_sha256": hashlib.sha256(b"").hexdigest(),
+            "status_line_count": 0,
+        }
+        path.write_text(json.dumps(row), encoding="utf-8")
 
     def _write_all_runnable_normative(
         self, root: pathlib.Path, omit: str | None = None
@@ -551,6 +565,38 @@ class SummaryTests(unittest.TestCase):
         ]
         self.assertTrue(all(row["outcome"] == "INFRA_UNAVAILABLE" for row in normative))
         self.assertTrue(all(row["infra_proof"]["evidence"] for row in normative))
+
+        target = next(
+            entry
+            for entry in receipt._normative_entries(self.plan)
+            if entry.get("runnable", True)
+        )
+        mutations = {
+            "missing_github_sha": lambda row: row["git"].__setitem__(
+                "github_sha", None
+            ),
+            "dirty_checkout": lambda row: (
+                row["git"].__setitem__("clean", False),
+                row["git"].__setitem__("status_line_count", 1),
+                row["git"].__setitem__("status_sha256", "b" * 64),
+            ),
+            "wrong_workflow_sha": lambda row: row["git"].__setitem__(
+                "github_sha", "b" * 40
+            ),
+        }
+        for name, mutate in mutations.items():
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as directory:
+                root = pathlib.Path(directory)
+                self._write_all_runnable_normative(root)
+                path = root / f"receipt-{target['id']}.json"
+                row = json.loads(path.read_text(encoding="utf-8"))
+                mutate(row)
+                path.write_text(json.dumps(row), encoding="utf-8")
+                output = root / "summary.json"
+                exit_code = receipt.summarize(self.plan, root, output)
+                summary = json.loads(output.read_text(encoding="utf-8"))
+                self.assertEqual(exit_code, 1)
+                self.assertIn(target["id"], summary["normative_failures"])
 
     def test_single_lost_artifact_fails_closed(self) -> None:
         missing = next(

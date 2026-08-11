@@ -1,8 +1,8 @@
 # F-MATRIX-010 — focused matrix commands were dead or needlessly exhaustive
 
-Status: corrected locally on attempt 1/3 by fresh F-MATRIX-10 before the first
-authorized push; awaiting author-separated refutation. No hosted run has
-occurred. This lane is treatment-exposed.
+Status: **RESOLVED locally.** Correction retained and covered by two
+consecutive 44/44 focused passes. No hosted run has occurred. This lane is
+treatment-exposed.
 
 ## Minimized executable witnesses
 
@@ -23,11 +23,11 @@ python -B portability/concurrency/ladder.py ... \
 
 The model command had a second defect: after correcting only its import mode,
 it would run the complete N=48 enumeration in every focused row. That complete
-enumeration belongs to the separate local model lane and takes minutes;
-whether it is admitted remains pending its terminal receipt and fresh refuter.
-Running it on all fifteen scheduled normative rows plus every stress row would
-turn hosted portability checks into redundant full enumerations rather than
-independent portability coverage.
+enumeration belongs to the separate local model lane and takes minutes. It is
+now admitted from its terminal local receipt and fresh refuter, separately
+from the matrix. Running it on all fifteen scheduled normative rows plus every
+stress row would turn hosted portability checks into redundant full
+enumerations rather than independent portability coverage.
 
 The prose also said missing or invalid receipts kept the workflow red without
 distinguishing the gating normative/expanded evidence from stress jobs marked
@@ -47,10 +47,9 @@ remain visible without silently acquiring normative gating authority.
 
 - The model row now runs
   `python -B portability/model/test_model.py`, the bounded focused suite. Its
-  expected count remains deliberately unbound while the fresh F-MODEL-003
-  author/refuter cycle can still change the suite. The full explorer is not a
-  hosted-row command, and the matrix never treats provisional full-model
-  evidence as admitted.
+  expected count is bound to the settled 17 tests. The full explorer is not a
+  hosted-row command, and the matrix never treats its separately admitted
+  full-model evidence as a hosted result.
 - The concurrency regression now runs
   `python -B -m portability.concurrency.test_ladder`, with the settled
   format-version-3 API and an expected count of 15 tests. The existing
@@ -63,7 +62,7 @@ remain visible without silently acquiring normative gating authority.
   separately scheduled commands without running the focused suites twice
   inside every matrix row. Tests also pin IDs, module forms, expected counts,
   and the v3 receipt path. The exact model and concurrency focused commands
-  were separately executed locally and produced 14/14 and 15/15 respectively.
+  were separately executed locally and produced 17/17 and 15/15 respectively.
   The v3 concurrency package command was subsequently freshly refuted with no
   defect; its semantic projection still does not oracle every nested
   outer-audit metadata field.
@@ -71,9 +70,8 @@ remain visible without silently acquiring normative gating authority.
   Invalid known stress/off-contract receipts remain durable observation errors
   and yield a missing observation row, but only normative/expanded failures or
   unclassified artifact-integrity errors make the summary exit nonzero.
-- The README now states the same gating boundary and explicitly keeps the
-  separate full-model result pending rather than admitting it through the
-  hosted focused profile.
+- The README states the same gating boundary and keeps the admitted full-model
+  result separate rather than admitting it through the hosted focused profile.
 
 ## Evidence boundary
 
@@ -83,4 +81,5 @@ the current focused counts and the plan binds v3 receipt custody. Hosted
 execution is still required for the actual controller smoke and platform
 evidence.
 The focused model suite verifies historical closures and bounded structures;
-it does not replace, enlarge, or admit the still-pending N=48 enumeration.
+it does not replace, enlarge, or admit the separately adjudicated N=48
+enumeration.

@@ -1,6 +1,6 @@
 # F-SANDBOX-003 — evidence-free inner PASS is accepted
 
-Status: corrected by fresh F-SANDBOX-3; awaiting fresh refutation.
+Status: **RESOLVED locally.** Correction retained; final focused suite green.
 
 The exact host flow accepts container exit 0 plus inner stdout:
 

@@ -59,9 +59,9 @@ def _write_transport_error(
                 "transport": transport,
             }
         )
-    ).hexdigest()[:16]
+    ).hexdigest()
     target = INFRASTRUCTURE_ERROR_ROOT / (
-        f"{schedule.stem}-{transport}-replay{replay_number}-{identity}"
+        f"{transport}-replay{replay_number}-{identity}"
     )
     target.mkdir(parents=True, exist_ok=True)
     (target / "schedule.ndjson").write_bytes(schedule_bytes)
@@ -167,9 +167,9 @@ def _write_harness_fault(
                 "transport": transport,
             }
         )
-    ).hexdigest()[:16]
+    ).hexdigest()
     target = HARNESS_FAULT_ROOT / (
-        f"{schedule.stem}-{transport}-replay{replay_number}-{identity}"
+        f"{transport}-replay{replay_number}-{identity}"
     )
     target.mkdir(parents=True, exist_ok=True)
     (target / "schedule.ndjson").write_bytes(schedule_bytes)

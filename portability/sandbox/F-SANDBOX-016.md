@@ -1,6 +1,6 @@
 # F-SANDBOX-016 — process `HOSTNAME` value was not observed
 
-Status: corrected by fresh F-SANDBOX-16; awaiting fresh refutation.
+Status: **RESOLVED locally.** Correction retained; final focused suite green.
 
 The expanded gate required kernel `os.uname().nodename="rr-sandbox"` but
 recorded only process environment names. With the actual process environment

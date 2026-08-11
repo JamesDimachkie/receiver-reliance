@@ -1,6 +1,6 @@
 # F-SANDBOX-019 — requested bind propagation was discarded
 
-Status: corrected by fresh F-SANDBOX-19; awaiting fresh refutation.
+Status: **RESOLVED locally.** Correction retained; final focused suite green.
 
 The request-side `HostConfig.Mounts[0].BindOptions` declared
 `Propagation="rshared"`, while Docker's independent root `Mounts[0]` still

@@ -1,6 +1,6 @@
 # F-SANDBOX-009 — configured entrypoint can disagree with actual process
 
-Status: corrected by fresh F-SANDBOX-9; awaiting fresh refutation.
+Status: **RESOLVED locally.** Correction retained; final focused suite green.
 
 The exact mocked container inspect retained the expected
 `Config.Entrypoint` and `Config.Cmd=[]`, but supplied these root execution

@@ -330,6 +330,7 @@ class _ControlMonitor:
         self.finished = False
         self.transport_error: TransportError | None = None
         self.harness_fault: HarnessFaultError | None = None
+        self.control_abort: BaseException | None = None
         self.condition = threading.Condition()
         self.thread = threading.Thread(target=self._consume, name="rr-live-control", daemon=True)
         self.thread.start()
@@ -396,10 +397,16 @@ class _ControlMonitor:
             # Anything the loop body itself raises is a programmer defect in
             # this harness, never transport evidence: record it durably under
             # its own class instead of relabeling it INFRASTRUCTURE_ERROR or
-            # letting the thread die silently (F-LIVE-005).  BaseException
-            # still propagates: KeyboardInterrupt and SystemExit are neither
-            # transport nor harness evidence.
+            # letting the thread die silently (F-LIVE-005).
             self._fail_harness(error)
+        except BaseException as error:
+            # A BaseException cannot propagate across a thread boundary by
+            # itself.  Preserve it verbatim and re-raise it from the caller's
+            # next monitor consultation; otherwise a silent monitor exit is
+            # later laundered into ``child exited`` transport evidence.
+            # KeyboardInterrupt and SystemExit remain neither transport nor
+            # harness evidence.
+            self._fail_control_abort(error)
         finally:
             with self.condition:
                 self.finished = True
@@ -450,7 +457,16 @@ class _ControlMonitor:
                 self.harness_fault.__cause__ = error
             self.condition.notify_all()
 
+    def _fail_control_abort(self, error: BaseException) -> None:
+        with self.condition:
+            if self.control_abort is None:
+                self.control_abort = error
+            self.condition.notify_all()
+
     def _raise_transport_error(self) -> None:
+        abort = getattr(self, "control_abort", None)
+        if abort is not None:
+            raise abort
         # A recorded harness fault outranks transport labeling: once the
         # monitor itself is defective, its transport claims are unreliable.
         fault = getattr(self, "harness_fault", None)
@@ -586,10 +602,12 @@ class _Connection:
 def _await_ready(connection: _Connection) -> _Connection:
     try:
         connection.monitor.wait_for("ready")
-    except (TransportError, HarnessFaultError):
-        # A protocol failure can precede the ready event.  At that point the
-        # caller has no returned connection whose normal finally block could
-        # reap the child, so cleanup belongs to this spawn boundary.
+    except BaseException:
+        # Any failure can precede the ready event.  At that point the caller
+        # has no returned connection whose normal finally block could reap the
+        # child, so cleanup belongs to this spawn boundary.  In particular,
+        # preserve and re-raise a monitor BaseException after cleanup rather
+        # than either leaking the child or relabeling the abort as evidence.
         if connection.process.poll() is None:
             connection.process.kill()
         connection.close_full()

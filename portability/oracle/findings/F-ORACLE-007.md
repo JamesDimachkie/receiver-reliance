@@ -1,8 +1,8 @@
 # F-ORACLE-007 — noncanonical escape loses to NFC error
 
-Status: credible independent-oracle precedence defect; accepted implementation
-unchanged. Found by the parallel adjacent-domain refuter R-ORACLE-5B on
-2026-08-10. Correction is serialized behind the active F-ORACLE-006 writer.
+Status: **RESOLVED in the current oracle.** This was a credible independent-
+oracle precedence defect; the accepted implementation was unchanged. Found by
+the parallel adjacent-domain refuter R-ORACLE-5B on 2026-08-10.
 
 ## Deletion-minimized replay
 
@@ -50,5 +50,5 @@ independent canonical spelling/order before NFC while preserving `ERR_NFC` for
 a canonically spelled non-NFC scalar.
 
 R-ORACLE-5B used seed `0x52524F3542` over 496 unique declared adjacent cases
-and stopped at ordered mismatch 32 after 31 matches. No later candidate was
-adjudicated. A fresh author and fresh refuter are required.
+and stopped at ordered mismatch 32 after 31 matches. Those sentences describe
+the discovery state; the correction and subsequent refutation are complete.

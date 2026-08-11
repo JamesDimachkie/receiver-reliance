@@ -21,11 +21,10 @@ acknowledgements. Its final acknowledgement transcript has SHA-256
 `80B4FA40EC2BEA9EC4EECCC88827C79361CE6E1469A5BCB89164DFC36B2B219A`.
 The focused live suite originally closed this finding at 11/11 tests, and
 fresh R-LIVE-2 returned no defect. Therefore no live correction or custody
-transfer remains open for F-LIVE-001. The suite now passes 21/21 after the
-distinct F-LIVE-002 infrastructure-error durability correction, F-LIVE-003
-control-record boundary correction, and F-LIVE-004 monitor-exception
-correction; none of the later corrections changes this finding's W-domain
-adjudication or hashes.
+transfer remains open for F-LIVE-001. The terminal suite is 29/29 after the
+distinct F-LIVE-002 through F-LIVE-008 corrections.
+None of those later corrections changes this finding's W-domain adjudication
+or hashes.
 
 The minimized replay and hashes below are retained as discovery-time evidence;
 they do not describe the current schedule.

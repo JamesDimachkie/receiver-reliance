@@ -1,6 +1,6 @@
 # F-SANDBOX-017 — repository bind source was discarded
 
-Status: corrected by fresh F-SANDBOX-17; awaiting fresh refutation.
+Status: **RESOLVED locally.** Correction retained; final focused suite green.
 
 The exact mocked container inspect replaced the repository bind source with
 `C:\arbitrary\forged-repository` while retaining the expected read-only bind

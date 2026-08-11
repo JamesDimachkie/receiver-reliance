@@ -1,6 +1,6 @@
 # F-SANDBOX-005 — non-object Docker version probe escapes receipt emission
 
-Status: corrected by fresh F-SANDBOX-5; awaiting fresh refutation.
+Status: **RESOLVED locally.** Correction retained; final focused suite green.
 
 The mocked `docker version --format '{{json .}}'` probe exited 0 with stdout
 `[]`, SHA-256

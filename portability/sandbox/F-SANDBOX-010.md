@@ -1,6 +1,6 @@
 # F-SANDBOX-010 — inspected container identity was not bound to create
 
-Status: corrected by fresh F-SANDBOX-10; awaiting fresh refutation.
+Status: **RESOLVED locally.** Correction retained; final focused suite green.
 
 The exact mocked host flow let `docker create` return the lowercase container
 identifier `a` repeated 64 times while container inspect returned an otherwise

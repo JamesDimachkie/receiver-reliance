@@ -1,6 +1,8 @@
 # F-MODEL-001 — KEY_B variant identity was unsound
 
-Status: corrected by F-MODEL-1; full receipt regeneration required.
+Status: **RESOLVED and superseded.** F-MODEL-1 corrected the quotient; the
+post-F-MODEL-003 N=48 enumeration regenerated the full receipt and is the
+admitted current evidence. The pre-correction receipt remains quarantined.
 
 ## Minimized divergence
 

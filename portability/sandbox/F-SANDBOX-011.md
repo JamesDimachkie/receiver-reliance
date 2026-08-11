@@ -1,6 +1,6 @@
 # F-SANDBOX-011 — container image identity was not bound to the build
 
-Status: corrected by fresh F-SANDBOX-11; awaiting fresh refutation.
+Status: **RESOLVED locally.** Correction retained; final focused suite green.
 
 The exact mocked host flow let image inspect identify the freshly built image
 as `sha256:` plus 64 lowercase `c` characters, while the otherwise hardened

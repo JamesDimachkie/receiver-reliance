@@ -1,6 +1,7 @@
 # F-LIVE-004 — monitor read failures escaped after valid control events
 
-Status: **corrected; fresh refutation required**. This was a live-harness
+Status: **RESOLVED locally.** Correction retained in the terminal 29/29
+focused suite. This was a live-harness
 failure-classification and evidence-durability defect, not an
 accepted-implementation divergence. Found by fresh R-LIVE-4 on 2026-08-10.
 
@@ -54,7 +55,7 @@ and records `classification=INFRASTRUCTURE`,
 `status=INFRASTRUCTURE_ERROR`, `error.type=TransportError`, and
 `error.message="control-channel read failure: OSError"`.
 
-The focused suite passes 21/21. Its setup still replays all eight schedules
+The focused suite passes 29/29. Its setup still replays all eight schedules
 twice on both real pipe and socketpair transports, retains byte-identical PASS
 results, and retains the complete 812-partition W assertions. This correction
 does not claim arbitrary hostile-stream containment, timing independence

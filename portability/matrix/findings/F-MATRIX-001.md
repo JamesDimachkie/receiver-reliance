@@ -1,7 +1,7 @@
 # F-MATRIX-001 — missing normative receipts fail open as infrastructure
 
-Status: corrected locally by fresh F-MATRIX-1 before the first authorized
-push; awaiting author-separated refutation. No hosted run has occurred.
+Status: **RESOLVED locally.** Correction retained and covered by two
+consecutive 44/44 focused passes. No hosted run has occurred.
 
 ## Reachable path
 

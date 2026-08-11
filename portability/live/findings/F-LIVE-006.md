@@ -1,6 +1,7 @@
 # F-LIVE-006 — stop-receipt identity allowed completed-evidence overwrite
 
-Status: **corrected; fresh refutation required**. This was an
+Status: **RESOLVED locally.** Correction retained in the terminal 29/29
+focused suite, and the directory identity now uses the full SHA-256. This was an
 evidence-durability defect in both replay stop-receipt writers, not an
 accepted-implementation divergence. Found by fresh refuter R-LIVE-5 on
 2026-08-10 while attacking the first F-LIVE-005 author state.
@@ -36,9 +37,14 @@ The canonical identity input for both writers now includes the full
 declared evidence: `completed_stable_sha256` (the ordered list of
 completed-replay `RunResult.stable_bytes()` SHA-256 hashes) and
 `schedule_sha256` (the SHA-256 of the schedule bytes, which the receipt
-already recorded). Stops that differ in any completed-replay content or
-schedule content land in distinct directories; fully identical stops
-still deduplicate to one deterministic path. Receipt bytes are
+already recorded). Stops that differ in completed-replay or schedule content
+therefore have different canonical identity inputs; a target collision now
+requires a full SHA-256 collision. Fully identical stops still deduplicate to
+one deterministic path. The complete 64-hex SHA-256 is
+used in the directory name rather than a truncated 64-bit prefix, so the
+no-overwrite claim does not depend on a shortened identity. The human-readable
+prefix is limited to transport and replay number; schedule identity remains in
+the digest and receipt without consuming avoidable path length. Receipt bytes are
 unchanged — the identity feeds only the directory name — so previously
 recorded receipt hashes (F-LIVE-004's `85714A2F...`, F-LIVE-005's
 `FA634525...`) remain valid.

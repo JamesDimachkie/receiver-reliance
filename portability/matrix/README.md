@@ -21,9 +21,9 @@ and package-mode concurrency regression, then a small `P = 1, 2`
 controller smoke against the format-version-3 concurrency API. The complete
 N=48 model enumeration is deliberately not repeated across the hosted matrix:
 hosted rows verify only the bounded focused closures. Full-model evidence
-remains `PENDING` until its separate local run has a terminal receipt and fresh
-refuter verdict; the matrix neither admits nor substitutes provisional
-full-model evidence. This keeps the matrix executable without turning one
+is `ADMITTED` from its separate local N=48 run and fresh refuter verdict; the
+matrix neither admits nor substitutes that separately scoped full-model
+evidence. This keeps the matrix executable without turning one
 finite enumeration into fifteen redundant long-running jobs.
 Concurrency v3 keeps its proof layers separate: concurrent physical bytes are
 compared with isolated grounded transport bytes, while each inner
@@ -54,8 +54,10 @@ Outcomes are intentionally separate:
   normative row this is a closed failure because runner/job failure, a killed
   receipt writer, and upload/download loss cannot be distinguished safely.
 
-Every executed receipt records the SHA and clean status; OS, release, kernel,
-architecture and emulation probe; implementation, full version, build flags,
+Every runnable receipt, including explicit setup/runtime absence, binds the
+workflow SHA and a clean checkout. Executed receipts additionally record OS,
+release, kernel, architecture and emulation probe; implementation, full
+version, build flags,
 GIL state, word size, byte order, locale and filesystem encodings; exact
 commands; suite counts; stream hashes; exits; elapsed time; and bounded host
 and child-process resource observations. The final summary preserves the three

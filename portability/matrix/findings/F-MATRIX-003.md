@@ -1,8 +1,7 @@
 # F-MATRIX-003 — canonical command IDs can carry forged execution evidence
 
-Status: corrected locally by fresh F-MATRIX-3-RESUME before the first
-authorized push; awaiting author-separated refutation. No hosted run has
-occurred.
+Status: **RESOLVED locally.** Correction retained and covered by two
+consecutive 44/44 focused passes. No hosted run has occurred.
 
 ## Minimized evidence
 

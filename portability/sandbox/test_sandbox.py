@@ -3,7 +3,9 @@
 
 from __future__ import annotations
 
+import base64
 import copy
+import hashlib
 import json
 from pathlib import Path, PurePosixPath, PureWindowsPath
 import sys
@@ -65,6 +67,7 @@ def synthetic_pass_receipt() -> dict[str, object]:
     }
     commands: list[dict[str, object]] = []
     for index, spec in enumerate(expanded_gate.GATES):
+        stdout = bytes([index + 1])
         commands.append(
             {
                 "gate_id": spec.gate_id,
@@ -73,10 +76,12 @@ def synthetic_pass_receipt() -> dict[str, object]:
                 "exit_code": 0,
                 "timed_out": False,
                 "timeout_seconds": expanded_gate.COMMAND_TIMEOUT_SECONDS,
-                "stdout_sha256": f"{index + 1:064x}",
-                "stdout_bytes": index + 1,
+                "stdout_sha256": hashlib.sha256(stdout).hexdigest(),
+                "stdout_bytes": len(stdout),
                 "stderr_sha256": run_sandbox.EMPTY_SHA256,
                 "stderr_bytes": 0,
+                "stdout_b64": base64.b64encode(stdout).decode("ascii"),
+                "stderr_b64": "",
                 "elapsed_ms": index,
                 "resources": {
                     "user_cpu_us": index,
@@ -137,6 +142,14 @@ def historical_pass_receipt_before_f015() -> dict[str, object]:
     commands = receipt["commands"]
     if not isinstance(boundary, dict) or not isinstance(commands, list):
         raise AssertionError("synthetic receipt fixture lost expected shape")
+    for index, command in enumerate(commands):
+        # Preserve the exact discovery-time receipt bytes. Transcript custody
+        # fields were added later by F-SANDBOX-023 and are deliberately absent
+        # from these historical witnesses.
+        command.pop("stdout_b64")
+        command.pop("stderr_b64")
+        command["stdout_sha256"] = f"{index + 1:064x}"
+        command["stdout_bytes"] = index + 1
     projection = expanded_gate._stable_projection(boundary, commands)
     projected_boundary = projection["boundary"]
     if not isinstance(projected_boundary, dict):
@@ -2729,10 +2742,73 @@ class SandboxSpecTests(unittest.TestCase):
         observed = expanded_gate.validate_gate_output("core_800", output, b"")
         self.assertEqual(observed["total"], 800)
 
-    def test_core_validator_rejects_wrong_total(self) -> None:
-        output = b'mode=in-process counts={"semantic":799} failures=0\n'
-        with self.assertRaises(expanded_gate.GateFailure):
-            expanded_gate.validate_gate_output("core_800", output, b"")
+    def test_gate_validators_reject_wrong_or_contradictory_summaries(self) -> None:
+        cases = {
+            "core_800": (
+                b'mode=in-process counts={"all":800} failures=0\n',
+                b'mode=in-process counts={"all":799} failures=1\n',
+                b"mode=in-process counts=not-json failures=nope\n",
+            ),
+            "composed_800_107": (
+                b'mode=in-process suite=0.2 counts={"all":800} total=800 failures=0\n'
+                b'mode=in-process suite=0.3 counts={"all":107} total=107 failures=0\n',
+                b'mode=in-process suite=0.3 counts={"all":106} total=106 failures=1\n',
+                b"mode=in-process suite=0.3 counts={} total=banana failures=0\n",
+            ),
+            "lint_zero": (
+                b"lint: 0 findings\n",
+                b"lint: 1 findings\n",
+                b"lint: nope findings\n",
+            ),
+            "unittest_7": (
+                b"Ran 7 tests\nOK\n",
+                b"Ran 1 test\nFAILED (failures=1)\n",
+                b"Ran banana tests\n",
+            ),
+            "fuzz_31": (
+                b"rr-fuzz: verdict=PASS cases=31/31 seed=fixture source=generated "
+                b"failures=0 budget_exhausted=false\n",
+                b"rr-fuzz: verdict=FAIL cases=30/31 seed=fixture source=generated "
+                b"failures=1 budget_exhausted=false\n",
+                b"rr-fuzz: verdict=BANANA\n",
+            ),
+        }
+        for validator, expected in (
+            ("checks_504", 504),
+            ("checks_7", 7),
+            ("checks_2296", 2296),
+            ("checks_6497", 6497),
+            ("checks_2160", 2160),
+            ("checks_1142", 1142),
+        ):
+            cases[validator] = (
+                f"checks={expected} failures=0\n".encode(),
+                b"checks=0 failures=1\n",
+                b"checks=banana failures=nope\n",
+            )
+
+        for validator, (valid, invalid, malformed) in cases.items():
+            with self.subTest(validator=validator, shape="invalid-only"):
+                with self.assertRaises(expanded_gate.GateFailure):
+                    expanded_gate.validate_gate_output(validator, invalid, b"")
+            for shape, payload in (
+                ("valid-then-invalid", valid + invalid),
+                ("invalid-then-valid", invalid + valid),
+            ):
+                with self.subTest(validator=validator, shape=shape):
+                    with self.assertRaises(expanded_gate.GateFailure):
+                        expanded_gate.validate_gate_output(validator, payload, b"")
+            with self.subTest(validator=validator, shape="valid-then-malformed"):
+                with self.assertRaises(expanded_gate.GateFailure):
+                    expanded_gate.validate_gate_output(
+                        validator, valid + malformed, b""
+                    )
+            with self.subTest(validator=validator, shape="contradiction-on-stderr"):
+                with self.assertRaises(expanded_gate.GateFailure):
+                    expanded_gate.validate_gate_output(validator, valid, invalid)
+
+        with self.assertRaisesRegex(expanded_gate.GateFailure, "strict UTF-8"):
+            expanded_gate.validate_gate_output("checks_504", b"\xff", b"")
 
     def test_composed_validator_requires_both_suites(self) -> None:
         output = (
@@ -3085,7 +3161,7 @@ class SandboxSpecTests(unittest.TestCase):
                     run_sandbox.validate_inner_receipt(encoded_receipt(receipt))
 
     def test_missing_hash_resource_and_wrong_projection_fail_closed(self) -> None:
-        cases = ("hash", "resource", "projection")
+        cases = ("hash", "transcript", "resource", "projection")
         for name in cases:
             with self.subTest(name=name):
                 receipt = synthetic_pass_receipt()
@@ -3093,6 +3169,8 @@ class SandboxSpecTests(unittest.TestCase):
                 self.assertIsInstance(commands, list)
                 if name == "hash":
                     del commands[0]["stdout_sha256"]
+                elif name == "transcript":
+                    commands[0]["stdout_b64"] = "AA=="
                 elif name == "resource":
                     del commands[0]["resources"]["children_max_rss_kib"]
                 else:
@@ -3112,7 +3190,7 @@ class SandboxSpecTests(unittest.TestCase):
 
                 with self.assertRaisesRegex(
                     run_sandbox.InnerReceiptError,
-                    rf"commands\[0\]\.{stream}_sha256.*SHA-256\(empty\)",
+                    rf"commands\[0\]\.{stream}_(?:bytes|sha256).*(?:transcript)",
                 ):
                     run_sandbox.validate_inner_receipt(payload)
 
@@ -3121,8 +3199,9 @@ class SandboxSpecTests(unittest.TestCase):
                 self.assertEqual(
                     host_receipt["status"], "INVALID_CONTAINER_RECEIPT"
                 )
-                self.assertIn(
-                    f"commands[0].{stream}_sha256", host_receipt["detail"]
+                self.assertRegex(
+                    host_receipt["detail"],
+                    rf"commands\[0\]\.{stream}_(?:bytes|sha256)",
                 )
 
     def test_f_sandbox_007_exact_witness_is_rejected(self) -> None:
@@ -3150,7 +3229,8 @@ class SandboxSpecTests(unittest.TestCase):
                 commands = receipt["commands"]
                 self.assertIsInstance(commands, list)
                 commands[0][f"{stream}_bytes"] = 1
-                commands[0][f"{stream}_sha256"] = "1" * 64
+                commands[0][f"{stream}_b64"] = "AQ=="
+                commands[0][f"{stream}_sha256"] = hashlib.sha256(b"\x01").hexdigest()
                 payload = encoded_receipt(receipt)
 
                 self.assertEqual(

@@ -1,7 +1,7 @@
 # F-MATRIX-002 — receipt-supplied command manifest can self-authorize PASS
 
-Status: corrected locally by fresh F-MATRIX-2 before the first authorized
-push; awaiting author-separated refutation. No hosted run has occurred.
+Status: **RESOLVED locally.** Correction retained and covered by two
+consecutive 44/44 focused passes. No hosted run has occurred.
 
 ## Minimized evidence
 

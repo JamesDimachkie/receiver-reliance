@@ -149,6 +149,7 @@ class LiveTransportTests(unittest.TestCase):
             with self.subTest(transport=transport):
                 self.assertEqual(expected, result.stdout)
                 self.assertEqual(response_count, result.flush_count)
+                self.assertEqual(0, result.os_short_write_count)
                 self.assertEqual(0, result.returncode)
 
     def test_complete_w_domain_forces_and_acknowledges_real_write_boundaries(self) -> None:
@@ -453,7 +454,7 @@ class LiveTransportTests(unittest.TestCase):
                         operation()
             exception_hook.assert_not_called()
 
-    def test_monitor_body_typeerror_is_recorded_not_silent_thread_death(self) -> None:
+    def test_monitor_faults_cross_the_background_thread_boundary_exactly(self) -> None:
         # Before F-LIVE-005 a non-(OSError, ValueError) defect escaped the
         # monitor entirely: the thread died through threading.excepthook and
         # later waits surfaced a misleading transport classification.
@@ -474,6 +475,49 @@ class LiveTransportTests(unittest.TestCase):
             ):
                 monitor.wait_for("ready")
             exception_hook.assert_not_called()
+
+        # BaseException is deliberately not harness evidence, but simply
+        # allowing it to leave a background thread does not propagate it to
+        # the caller.  The monitor must retain and re-raise the exact object
+        # before a later wait can relabel the silent exit as infrastructure.
+        for abort_type in (KeyboardInterrupt, SystemExit):
+            with self.subTest(abort_type=abort_type.__name__):
+                abort = abort_type("injected control abort")
+                with mock.patch.object(threading, "excepthook") as exception_hook:
+                    with mock.patch.object(
+                        controller,
+                        "_decode_control_record",
+                        side_effect=abort,
+                    ):
+                        monitor = controller._ControlMonitor(io.BytesIO(ready))
+                        monitor.thread.join(1)
+                    self.assertFalse(monitor.thread.is_alive())
+                    self.assertIsNone(monitor.transport_error)
+                    self.assertIsNone(monitor.harness_fault)
+                    for operation in (
+                        lambda: monitor.wait_for("ready"),
+                        lambda: monitor.count("ready"),
+                        monitor.finish,
+                    ):
+                        with self.subTest(operation=operation):
+                            with self.assertRaises(abort_type) as caught:
+                                operation()
+                            self.assertIs(caught.exception, abort)
+                    exception_hook.assert_not_called()
+
+                cleanup_monitor = controller._ControlMonitor(io.BytesIO(ready))
+                cleanup_abort = abort_type("abort before ready")
+                cleanup_monitor.thread.join(1)
+                cleanup_monitor.control_abort = cleanup_abort
+                connection = mock.Mock()
+                connection.monitor = cleanup_monitor
+                connection.process.poll.return_value = None
+                with self.assertRaises(abort_type) as caught:
+                    controller._await_ready(connection)
+                self.assertIs(caught.exception, cleanup_abort)
+                connection.process.kill.assert_called_once_with()
+                connection.process.wait.assert_called_once()
+                connection.close_full.assert_called_once_with()
 
     def test_closed_stream_read_remains_transport_normalized(self) -> None:
         # The physical readline stays the one transport-normalization site:
@@ -672,6 +716,8 @@ class LiveTransportTests(unittest.TestCase):
                         )
                     self.assertNotEqual(first_target, second_target)
                     self.assertNotEqual(first_receipt, second_receipt)
+                    self.assertEqual(len(first_target.name.rsplit("-", 1)[1]), 64)
+                    self.assertEqual(len(second_target.name.rsplit("-", 1)[1]), 64)
                     self.assertEqual(
                         first_receipt,
                         (first_target / "receipt.json").read_bytes(),
@@ -706,6 +752,8 @@ class LiveTransportTests(unittest.TestCase):
                         )
                     self.assertNotEqual(first_target, second_target)
                     self.assertNotEqual(first_receipt, second_receipt)
+                    self.assertEqual(len(first_target.name.rsplit("-", 1)[1]), 64)
+                    self.assertEqual(len(second_target.name.rsplit("-", 1)[1]), 64)
                     self.assertEqual(
                         first_receipt,
                         (first_target / "receipt.json").read_bytes(),

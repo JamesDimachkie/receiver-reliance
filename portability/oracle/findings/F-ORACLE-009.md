@@ -40,4 +40,5 @@ with stdout SHA-256
 The clean-room classifier parses legal leading/trailing JSON whitespace for
 request-ID extraction, then independently applies physical framing and
 canonical-byte equality. This preserves the parse result without weakening the
-`ERR_JSON` result. Acceptance still requires a fresh refuter.
+`ERR_JSON` result. The subsequently completed fresh refutation satisfies that
+discovery-time acceptance condition.

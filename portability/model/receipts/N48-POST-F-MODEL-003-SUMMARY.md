@@ -21,6 +21,16 @@ Verdict: **NO-NEW-EVIDENCE**. `EXPECTED_COUNTS.json`, the model README,
 and the full-test constants now carry these adjudicated values; the
 F-MODEL-002 values remain quarantined as rejected history.
 
+Corrective release-audit addendum (2026-08-11): a durable separate traversal
+was committed as `independent_full_refuter.py`, with full-run result
+`N48-independent-refuter-20260811.json` (raw SHA-256
+`3A8D4BF8FC862818A87F7B16B76D4565F32DBCF1507EB800490B193225BF9FF8`).
+It independently reconstructed the admitted canonical receipt body exactly in
+2,031.969 seconds. It checked `20,531,838` current rejected alias-label
+opportunities. That broader total includes edges already excluded by the old
+key-consumption rule; it is not the `16,260,520` pre/post transition and
+frontier-edge migration delta reported above and derived below.
+
 ## Custody
 
 - Branch `sol/rr-portability-modelcheck-20260810`, HEAD

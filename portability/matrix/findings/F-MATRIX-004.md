@@ -1,7 +1,7 @@
 # F-MATRIX-004 — execution environment metadata was not plan-bound
 
-Status: corrected locally by fresh F-MATRIX-4 before the first authorized
-push; awaiting author-separated refutation. No hosted run has occurred.
+Status: **RESOLVED locally.** Correction retained and covered by two
+consecutive 44/44 focused passes. No hosted run has occurred.
 
 ## Minimized evidence
 

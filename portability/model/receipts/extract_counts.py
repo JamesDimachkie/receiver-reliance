@@ -2,8 +2,8 @@
 
 Authored additively for the post-F-MODEL-003 N=48 enumeration.  Read-only: it
 parses one captured stdout file and prints what it found.  It deliberately does
-not compare anything against EXPECTED_COUNTS.json, whose F-MODEL-002 values are
-rejected.
+not compare anything against EXPECTED_COUNTS.json. It is an independent count
+extractor; admission remains bound to the complete receipt and custody record.
 
 Run from the repository root:
     python -B portability/model/receipts/extract_counts.py <captured-stdout.json>

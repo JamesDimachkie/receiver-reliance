@@ -62,4 +62,3 @@ zeroes, fractions, exponents, nested and escaped-key pointers, surrounding
 noncanonical JSON, and multiple temporary `sys.set_int_max_str_digits()`
 settings. Allocation remains proportional to the already bounded physical
 record; no accepted implementation or forbidden source was read or executed.
-

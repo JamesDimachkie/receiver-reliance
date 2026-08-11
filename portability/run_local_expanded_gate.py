@@ -1,0 +1,166 @@
+"""Run the exact eleven-command charter gate and emit one durable receipt."""
+from __future__ import annotations
+
+import argparse
+import base64
+from datetime import datetime, timezone
+import hashlib
+import json
+import os
+import pathlib
+import platform
+import subprocess
+import sys
+import time
+from typing import Any
+
+REPO = pathlib.Path(__file__).resolve().parents[1]
+RECEIPT_ROOT = REPO / "portability" / "receipts"
+SANDBOX = REPO / "portability" / "sandbox"
+if str(SANDBOX) not in sys.path:
+    sys.path.insert(0, str(SANDBOX))
+
+import expanded_gate  # noqa: E402
+
+
+def _canonical(value: Any) -> bytes:
+    return json.dumps(value, sort_keys=True, separators=(",", ":")).encode("ascii")
+
+
+def _sha256(value: bytes) -> str:
+    return hashlib.sha256(value).hexdigest().upper()
+
+
+def _git(command: list[str]) -> bytes:
+    return subprocess.run(
+        ["git", *command],
+        cwd=REPO,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=True,
+    ).stdout
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--receipt", required=True, type=pathlib.Path)
+    args = parser.parse_args(argv)
+    receipt_path = args.receipt.resolve()
+    try:
+        receipt_path.relative_to(RECEIPT_ROOT.resolve())
+    except ValueError as error:
+        raise SystemExit("--receipt must remain under portability/receipts") from error
+    if receipt_path.exists():
+        raise SystemExit("refusing to overwrite an existing gate receipt")
+
+    started = datetime.now(timezone.utc)
+    status_bytes = _git(["status", "--porcelain=v1", "--untracked-files=all"])
+    receipt: dict[str, Any] = {
+        "schema": "receiver-reliance/local-expanded-gate-receipt-1",
+        "status": "STARTED",
+        "started_utc": started.isoformat(),
+        "authority_commands": 11,
+        "receipt_path": receipt_path.relative_to(REPO).as_posix(),
+        "git": {
+            "head": _git(["rev-parse", "HEAD"]).decode("ascii").strip(),
+            "clean": status_bytes == b"",
+            "status_bytes": len(status_bytes),
+            "status_sha256": _sha256(status_bytes),
+        },
+        "runtime": {
+            "implementation": platform.python_implementation(),
+            "version": platform.python_version(),
+            "machine": platform.machine(),
+            "platform": platform.platform(),
+            "executable": sys.executable,
+        },
+        "commands": [],
+    }
+    environment = dict(os.environ)
+    environment.update(
+        {
+            "PYTHONDONTWRITEBYTECODE": "1",
+            "PYTHONHASHSEED": "0",
+            "PYTHONIOENCODING": "utf-8",
+            "PYTHONUTF8": "1",
+            "TZ": "UTC",
+        }
+    )
+    exit_code = 0
+    for spec in expanded_gate.GATES:
+        cwd = REPO / pathlib.PurePosixPath(spec.cwd).relative_to("/repo")
+        executed = [sys.executable, *spec.argv[1:]]
+        before = time.monotonic_ns()
+        timed_out = False
+        try:
+            completed = subprocess.run(
+                executed,
+                cwd=cwd,
+                env=environment,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                timeout=expanded_gate.COMMAND_TIMEOUT_SECONDS,
+                check=False,
+            )
+            command_exit = completed.returncode
+            stdout = completed.stdout
+            stderr = completed.stderr
+        except subprocess.TimeoutExpired as error:
+            timed_out = True
+            command_exit = 124
+            stdout = error.stdout or b""
+            stderr = error.stderr or b""
+        result: dict[str, Any] = {
+            "gate_id": spec.gate_id,
+            "cwd": spec.cwd,
+            "declared_argv": list(spec.argv),
+            "executed_argv": executed,
+            "exit_code": command_exit,
+            "timed_out": timed_out,
+            "elapsed_ms": round((time.monotonic_ns() - before) / 1_000_000),
+            "stdout_bytes": len(stdout),
+            "stdout_sha256": _sha256(stdout),
+            "stdout_b64": base64.b64encode(stdout).decode("ascii"),
+            "stderr_bytes": len(stderr),
+            "stderr_sha256": _sha256(stderr),
+            "stderr_b64": base64.b64encode(stderr).decode("ascii"),
+        }
+        try:
+            if timed_out or command_exit != 0:
+                raise expanded_gate.GateFailure(
+                    "timed out" if timed_out else f"exited {command_exit}"
+                )
+            result["observed"] = expanded_gate.validate_gate_output(
+                spec.validator, stdout, stderr
+            )
+            result["status"] = "PASS"
+        except (expanded_gate.GateFailure, UnicodeError, ValueError) as error:
+            result["status"] = "FAIL"
+            result["failure"] = {"type": type(error).__name__, "message": str(error)}
+            exit_code = 1
+        receipt["commands"].append(result)
+        if exit_code:
+            break
+
+    receipt["finished_utc"] = datetime.now(timezone.utc).isoformat()
+    receipt["status"] = (
+        "PASS"
+        if exit_code == 0
+        and receipt["git"]["clean"] is True
+        and len(receipt["commands"]) == len(expanded_gate.GATES)
+        else "FAIL"
+    )
+    if receipt["status"] != "PASS":
+        exit_code = 1
+    receipt["receipt_sha256"] = _sha256(_canonical(receipt))
+    payload = _canonical(receipt) + b"\n"
+    receipt_path.parent.mkdir(parents=True, exist_ok=True)
+    receipt_path.write_bytes(payload)
+    print(payload.decode("ascii"), end="")
+    return exit_code
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

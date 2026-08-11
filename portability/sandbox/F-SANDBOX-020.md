@@ -1,6 +1,6 @@
 # F-SANDBOX-020 — native omitted consistency was rejected
 
-Status: corrected by fresh F-SANDBOX-20; awaiting fresh refutation.
+Status: **RESOLVED locally.** Correction retained; final focused suite green.
 
 The request-side mount validator required a `Consistency` member even though
 the pinned Moby `mount.Mount` representation tags that member `omitempty` and

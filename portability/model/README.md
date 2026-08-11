@@ -18,8 +18,8 @@ The first command emits the deterministic JSON receipt. The ordinary focused
 test takes about a second and includes the accepted RI1-RI4 raw closures, every
 positive short-write index of the first RO1 response, and an actual-cap
 16,777,217-byte RO1/RO2 oversize-drain alignment replay. `--full` repeats the
-entire N=48 enumeration. The corrected compact-state run took about 46 minutes
-on the authoring machine.
+entire N=48 enumeration. The corrected compact-state run took 2,153 seconds
+(35 minutes 53 seconds) on the authoring machine.
 
 ## Frozen domain and enumeration
 
@@ -55,6 +55,17 @@ captured with custody evidence under `receipts/` and admitted after the
 R-MODEL-3 fresh refutation (`receipts/N48-POST-F-MODEL-003-SUMMARY.md`).
 Exact terminal-class counts, partition totals, scheduler counts, R=3 action
 hashes, and the run environment are published in `EXPECTED_COUNTS.json`.
+
+The corrective release audit also retained an executable, separate traversal
+(`receipts/independent_full_refuter.py`) and its full N=48 receipt
+(`receipts/N48-independent-refuter-20260811.json`, raw SHA-256
+`3A8D4BF8FC862818A87F7B16B76D4565F32DBCF1507EB800490B193225BF9FF8`).
+It completed in 2,031.969 seconds and reconstructed a canonical receipt body
+identical to the admitted capture, including embedded receipt SHA-256
+`CD6210F8...732E`. Its `20,531,838` count is every current rejected alias-label
+opportunity within N=48. That broader count is distinct from the historical
+`16,260,520` migration signature below, which is the exact pre/post-F-MODEL-003
+delta in admitted transitions and excluded frontier edges.
 
 Two earlier complete receipts are REJECTED history and support no claim:
 the pre-F-MODEL-001 receipt `081180E9...2B14` (unsound key quotient) and

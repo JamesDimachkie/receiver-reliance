@@ -146,14 +146,25 @@ class NonBlockingSink:
         try:
             written = self._write_once(view)
         except (BlockingIOError, InterruptedError):
+            written = 0
+        if written < len(view):
+            # A nonblocking partial write and EAGAIN are both genuine OS
+            # backpressure.  Publish one scheduled barrier, then finish this
+            # adapter call in blocking mode.  Returning the transient partial
+            # count to rr_batch made the number of ordinary bulk-write calls
+            # host-scheduling-dependent, so two otherwise identical replays
+            # could disagree only in os_short_write_count (F-LIVE-008).  The W
+            # branch above remains the sole deliberate short-return surface.
             _control("backpressure", offered=len(view))
             self._set_blocking(True)
             try:
-                written = self._write_once(view)
+                while written < len(view):
+                    advanced = self._write_once(view[written:])
+                    if advanced <= 0:
+                        raise OSError("blocking output write made no progress")
+                    written += advanced
             finally:
                 self._set_blocking(False)
-        if written < len(view):
-            _control("short_write", offered=len(view), written=written)
         return written
 
     def flush(self) -> None:

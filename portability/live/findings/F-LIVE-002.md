@@ -1,6 +1,7 @@
 # F-LIVE-002 — transport failures escaped without durable stop evidence
 
-Status: **corrected; fresh refutation pending**. This was a live-harness
+Status: **RESOLVED locally.** Correction retained in the terminal 29/29
+focused suite. This was a live-harness
 evidence-durability defect, not an accepted-implementation divergence.
 
 ## Minimized evidence
@@ -36,7 +37,7 @@ durable infrastructure classification.
 - The success/divergence path is unchanged. Invalid schedule syntax is still a
   caller input error and cannot be misclassified as transport evidence.
 
-The focused suite now passes 21/21 tests. Direct and CLI regressions cover the
+The focused suite now passes 29/29 tests. Direct and CLI regressions cover the
 mocked watchdog, premature control EOF, and mismatched W acknowledgement, plus
 failure on replay two with the first replay's bytes and stable hash retained.
 All eight schedules still replay twice on both real pipes and socketpairs, and
@@ -46,5 +47,4 @@ I/O exceptions at the same trust boundary. Both use this finding's existing
 canonical infrastructure receipt path rather than introducing another stop
 class.
 
-Fresh author-separated refutation is still required before this finding can be
-closed.
+The current local disposition is closed; hosted execution remains separate.

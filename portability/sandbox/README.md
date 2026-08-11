@@ -193,22 +193,23 @@ JSON uses sorted keys and compact separators. The inner receipt also carries a
 exits, and count evidence. Raw benchmark timings, resource measurements, and
 stream hashes remain in the receipt but are excluded from that replay-stable
 projection because the two performance gates intentionally print timings.
-For a stream claiming zero bytes, the host also requires the digest to equal
-SHA-256 of the empty byte string. Nonzero stream digests remain structural,
-self-reported evidence: the PASS receipt does not carry successful-command
-transcripts, so the host cannot independently recompute those hashes.
+Every successful-command stdout and stderr transcript is retained as canonical
+base64. The host decodes it strictly and recomputes both the byte count and
+SHA-256; a zero-byte stream therefore also binds SHA-256 of the empty byte
+string. Transcript, count, and digest are one checked evidence surface.
 
 The host treats container output as untrusted. Host `PASS` requires container
 exit 0 and one canonical JSON record conforming exactly to the inner-receipt
 schema: the treatment-exposed flag; Linux environment; effective identity,
 mount, tmpfs, network, capability, no-new-privileges, secret-name, and cgroup
 proof; the eleven ordered command identities; zero exits and timeouts; exact
-declared counts; stream hashes and byte counts; resource observations; and a
-host-recomputed deterministic projection hash. Missing, extra, malformed, or
-inconsistent evidence produces `INVALID_CONTAINER_RECEIPT` and host exit 1.
+declared counts; retained stream transcripts, hashes, and byte counts;
+resource observations; and a host-recomputed deterministic projection hash.
+Missing, extra, malformed, or inconsistent evidence produces
+`INVALID_CONTAINER_RECEIPT` and host exit 1.
 
-Execution stops at the first nonzero exit, timeout, or count mismatch. For that
-command only, stdout and stderr bytes are embedded as base64 in the receipt so
-the smallest available evidence survives without a retry or an attempted fix.
+Execution stops at the first nonzero exit, timeout, or count mismatch. Every
+executed command retains stdout and stderr as base64, so the decision transcript
+survives without a retry or an attempted fix.
 This is bounded negative evidence only: it is not a security, completeness,
 efficacy, novelty, external-standard, or universal-portability claim.

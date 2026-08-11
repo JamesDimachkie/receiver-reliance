@@ -1,6 +1,6 @@
 # F-SANDBOX-013 — string `false` promoted to read-only mount evidence
 
-Status: corrected by fresh F-SANDBOX-13; awaiting fresh refutation.
+Status: **RESOLVED locally.** Correction retained; final focused suite green.
 
 The exact mocked container inspect supplied the repository mount's untrusted
 JSON `ReadOnly` member as the string `"false"`. `_selected_inspect` applied

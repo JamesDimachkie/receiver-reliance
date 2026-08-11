@@ -1,8 +1,8 @@
 # F-MATRIX-011 — new workflow pinned actions to the deprecated Node20 runtime
 
-Status: corrected locally on attempt 2/3 by F-MATRIX-10 before the first
-authorized push; awaiting author-separated refutation. No hosted run has
-occurred. This lane is treatment-exposed.
+Status: **RESOLVED locally.** Correction retained and covered by two
+consecutive 44/44 focused passes. No hosted run has occurred. This lane is
+treatment-exposed.
 
 ## Evidence
 
