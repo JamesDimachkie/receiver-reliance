@@ -382,12 +382,20 @@ def _count_object(raw: str, description: str) -> dict[str, int]:
 
 
 def _extract_counts(pattern: str, text: str, expected: int) -> dict[str, int]:
-    match = _unique_summary_line(
-        r"^checks=",
-        pattern.removeprefix("^").removesuffix(r"\r?$"),
-        text,
-        "checks/failures summary",
-    )
+    candidates = [
+        line.rstrip("\r") for line in text.splitlines() if "checks=" in line
+    ]
+    if len(candidates) != 1:
+        raise GateFailure(
+            "expected exactly one checks/failures summary; "
+            f"observed {len(candidates)}"
+        )
+    candidate = candidates[0]
+    if candidate.count("checks=") != 1 or candidate.count("failures=") != 1:
+        raise GateFailure("malformed checks/failures summary")
+    match = re.search(pattern, candidate)
+    if match is None:
+        raise GateFailure("malformed checks/failures summary")
     checks = int(match.group("checks"))
     failures = int(match.group("failures"))
     if checks != expected or failures != 0:

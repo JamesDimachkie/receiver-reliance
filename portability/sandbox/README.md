@@ -197,6 +197,9 @@ Every successful-command stdout and stderr transcript is retained as canonical
 base64. The host decodes it strictly and recomputes both the byte count and
 SHA-256; a zero-byte stream therefore also binds SHA-256 of the empty byte
 string. Transcript, count, and digest are one checked evidence surface.
+Grounded count summaries may retain their gate-specific human prefix, but the
+validator requires one and only one `checks=`/`failures=` summary across both
+streams and rejects duplicate fields even when they share one line.
 
 The host treats container output as untrusted. Host `PASS` requires container
 exit 0 and one canonical JSON record conforming exactly to the inner-receipt

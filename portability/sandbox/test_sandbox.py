@@ -2782,7 +2782,7 @@ class SandboxSpecTests(unittest.TestCase):
             ("checks_1142", 1142),
         ):
             cases[validator] = (
-                f"checks={expected} failures=0\n".encode(),
+                f"gate-specific prefix: checks={expected} failures=0\n".encode(),
                 b"checks=0 failures=1\n",
                 b"checks=banana failures=nope\n",
             )
@@ -2806,6 +2806,15 @@ class SandboxSpecTests(unittest.TestCase):
             with self.subTest(validator=validator, shape="contradiction-on-stderr"):
                 with self.assertRaises(expanded_gate.GateFailure):
                     expanded_gate.validate_gate_output(validator, valid, invalid)
+
+            if validator.startswith("checks_"):
+                with self.subTest(validator=validator, shape="same-line-duplicate"):
+                    with self.assertRaises(expanded_gate.GateFailure):
+                        expanded_gate.validate_gate_output(
+                            validator,
+                            valid.rstrip(b"\n") + b" checks=0 failures=1\n",
+                            b"",
+                        )
 
         with self.assertRaisesRegex(expanded_gate.GateFailure, "strict UTF-8"):
             expanded_gate.validate_gate_output("checks_504", b"\xff", b"")
