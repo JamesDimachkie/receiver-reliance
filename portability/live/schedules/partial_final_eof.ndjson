@@ -1,0 +1,3 @@
+{"step":0,"action":"write","bytes_b64":"ew==","barrier":"partial-final-written"}
+{"step":1,"action":"close_half","barrier":"eof-delivered"}
+{"step":2,"action":"read","range":[0,812],"barrier":"eof-response-read"}

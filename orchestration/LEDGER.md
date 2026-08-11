@@ -48,3 +48,25 @@ their own work. Timestamps are recorded in Pacific time on 2026-08-10.
 | O3 | Fold audited classification into one traced pass | 2026-08-10 12:08 PDT | 2026-08-10 12:49 PDT | PASS | implementation merged as `a1548e5`; 1,142 parity checks and exact 116/1,060 predicate-call reduction |
 | RO3 | Refute O3 semantic parity and work claims | 2026-08-10 12:28 PDT | 2026-08-10 12:49 PDT | NO-DEFECT-FOUND | report merged as `1b4897c`; 11,000 generated differentials plus concurrency and forged-class probes; timing neutral |
 | O4 | Measure and optimize grounded authority load cost | — | — | STAND DOWN — NOT REACHED | lower priority under the handoff budget rule; P1's measured 10.824 ms cache-cold authority load remains the recorded baseline |
+
+## Portability, model-checking, and transport validation (`sol/rr-portability-modelcheck-20260810`)
+
+Authority: `MASTER_PROMPT_RR_PORTABILITY_20260810.md`. Sol root orchestrated
+the build to the 2026-08-10 adjudication freeze
+(`PORTABILITY_FABLE_RETURN_20260810.md`); James then moved finishing custody
+to Fable, with fresh-agent authorship and fresh-context Codex refutation
+preserving author separation. Full evidence:
+`PORTABILITY_VALIDATION.md`.
+
+| Actor | Objective | Start | End | Verdict | Record |
+|---|---|---|---|---|---|
+| Fable | Adjudicate the return packet: verify custody, hashes, witnesses, and all six suite counts against the real artifacts | 2026-08-10 20:05 PDT | 2026-08-10 21:15 PDT | ADJUDICATED | packet claims verified in full; N=48 rerun authorized under the eight preconditions with a three-strike stand-down |
+| M-RUN (fresh agent) | Preconditions + post-F-MODEL-003 complete N=48 enumeration under durable custody | 2026-08-10 22:05 PDT | 2026-08-10 22:52 PDT | EXIT 0 | alias exclusivity exhaustive to N=32; retained-vs-streaming identical N=18..28; receipt `CD6210F8...732E`; peak 1,366,290,432 bytes; 2,153 s |
+| F-LIVE-5/6 (Fable author) | Scope transport normalization to the physical read; durable `HARNESS_FAULT` class; evidence-identity binding for both stop-receipt writers | 2026-08-10 21:20 PDT | 2026-08-10 23:05 PDT | CORRECTED | live suite 21 -> 29; findings F-LIVE-005 + F-LIVE-006 |
+| R-LIVE-5 (fresh Codex) | Refute the live corrections | 2026-08-10 21:40 PDT | 2026-08-10 23:05 PDT | NO-NEW-EVIDENCE after 4 rounds | three renderer escapes + two-axis receipt overwrite found, repaired, pinned |
+| F-SANDBOX-22 (fresh agent + Fable) | Dialect-validated mount rendering; UNC anatomy; mount-grammar fail-closed set | 2026-08-10 21:25 PDT | 2026-08-10 23:55 PDT | CORRECTED | sandbox suite 73 -> 76 on CPython 3.12.10 and 3.14.5 |
+| R-SANDBOX-22 (fresh Codex) | Refute the sandbox corrections | 2026-08-10 22:35 PDT | 2026-08-10 23:55 PDT | NO-NEW-EVIDENCE after 5 rounds | extended-UNC bypass, 3.12/3.14 `is_absolute` divergence, NUL, two over-rejections, surrogate encodability found, repaired, pinned |
+| R-MODEL-3 (fresh Codex) | Refute the admitted-candidate N=48 receipt | 2026-08-11 11:45 PDT | 2026-08-11 12:25 PDT | NO-NEW-EVIDENCE | independent reimplementation matched to N=28; custodian ran both probe scripts verbatim; full independent re-enumeration reproduced the receipt byte-for-byte; alias migration exactly 16,260,520 |
+| Fable | Integrate admitted counts; settle every matrix binding; two no-new-evidence matrix passes | 2026-08-11 12:26 PDT | 2026-08-11 12:33 PDT | PASS | model 17, oracle 35, live 29, concurrency 15, sandbox 76, matrix 44/44 twice |
+| Fable | Final expanded gate on the integrated tree | 2026-08-11 12:33 PDT | 2026-08-11 12:44 PDT | GREEN | all eleven charter commands at exact expected counts |
+| Fable | Hygiene sweep, separated-evidence report, first scoped commit | 2026-08-11 12:44 PDT | 2026-08-11 12:55 PDT | DONE | `PORTABILITY_VALIDATION.md`; push + hosted receipts remain James-gated |

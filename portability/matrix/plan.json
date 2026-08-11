@@ -1,0 +1,371 @@
+{
+  "schema": "rr.portability.matrix-plan.v1",
+  "environment_requirements": {
+    "word_size_bits": 64,
+    "byte_order": "little",
+    "preferred_encoding": "utf-8",
+    "filesystem_encoding": "utf-8",
+    "default_encoding": "utf-8",
+    "stream_encoding": "utf-8"
+  },
+  "normative": {
+    "classification": "normative",
+    "claim_scope": "supported_cpython",
+    "role": "normative_matrix",
+    "python_versions": ["3.12", "3.13", "3.14"],
+    "platforms": [
+      {
+        "runner": "ubuntu-latest",
+        "os_family": "Linux",
+        "architecture": "x64",
+        "setup_architecture": "x64",
+        "runnable": true
+      },
+      {
+        "runner": "ubuntu-24.04-arm",
+        "os_family": "Linux",
+        "architecture": "arm64",
+        "setup_architecture": "arm64",
+        "runnable": true,
+        "runner_status": "public_preview"
+      },
+      {
+        "runner": "macos-latest",
+        "os_family": "Darwin",
+        "architecture": "arm64",
+        "setup_architecture": "arm64",
+        "runnable": true
+      },
+      {
+        "runner": "macos-13",
+        "os_family": "Darwin",
+        "architecture": "x64",
+        "setup_architecture": "x64",
+        "runnable": false,
+        "infra_reason": "The requested macos-13 standard runner label is absent from the current GitHub-hosted runner table; scheduling it could remain queued for 24 hours.",
+        "infra_evidence": "https://docs.github.com/en/actions/reference/runners/github-hosted-runners",
+        "evidence_checked": "2026-08-10"
+      },
+      {
+        "runner": "windows-latest",
+        "os_family": "Windows",
+        "architecture": "x64",
+        "setup_architecture": "x64",
+        "runnable": true
+      },
+      {
+        "runner": "windows-11-arm",
+        "os_family": "Windows",
+        "architecture": "arm64",
+        "setup_architecture": "arm64",
+        "runnable": true,
+        "runner_status": "public_preview"
+      }
+    ]
+  },
+  "stress": [
+    {
+      "id": "stress-cpython-3-14t-ubuntu-latest-x64",
+      "classification": "stress",
+      "claim_scope": "free_threaded_observation",
+      "role": "stress_matrix",
+      "runner": "ubuntu-latest",
+      "os_family": "Linux",
+      "architecture": "x64",
+      "setup_architecture": "x64",
+      "runtime": "CPython",
+      "implementation": "CPython",
+      "python_version": "3.14t",
+      "required_capability": "free_threaded",
+      "profile": "free_threaded",
+      "runnable": true
+    },
+    {
+      "id": "stress-cpython-3-14-dev-mode-ubuntu-latest-x64",
+      "classification": "stress",
+      "claim_scope": "python_development_mode_observation",
+      "role": "stress_matrix",
+      "runner": "ubuntu-latest",
+      "os_family": "Linux",
+      "architecture": "x64",
+      "setup_architecture": "x64",
+      "runtime": "CPython",
+      "implementation": "CPython",
+      "python_version": "3.14",
+      "required_capability": "dev_mode",
+      "python_dev_mode": true,
+      "profile": "focused",
+      "runnable": true
+    },
+    {
+      "id": "stress-cpython-3-14-pydebug-ubuntu-latest-x64",
+      "classification": "stress",
+      "claim_scope": "pydebug_build_observation",
+      "role": "stress_matrix",
+      "runner": "ubuntu-latest",
+      "os_family": "Linux",
+      "architecture": "x64",
+      "setup_architecture": "x64",
+      "runtime": "CPython",
+      "implementation": "CPython",
+      "python_version": "3.14",
+      "required_capability": "pydebug",
+      "profile": "focused",
+      "runnable": true
+    },
+    {
+      "id": "off-contract-pypy-3-12-ubuntu-latest-x64",
+      "classification": "off_contract",
+      "claim_scope": "alternative_runtime_observation",
+      "role": "stress_matrix",
+      "runner": "ubuntu-latest",
+      "os_family": "Linux",
+      "architecture": "x64",
+      "setup_architecture": "x64",
+      "runtime": "PyPy",
+      "implementation": "PyPy",
+      "python_version": "pypy3.12",
+      "language_floor": "3.12",
+      "profile": "focused",
+      "runnable": true
+    },
+    {
+      "id": "off-contract-pypy-3-11-ubuntu-latest-x64",
+      "classification": "off_contract",
+      "claim_scope": "alternative_runtime_below_language_floor",
+      "role": "stress_matrix",
+      "runner": "ubuntu-latest",
+      "os_family": "Linux",
+      "architecture": "x64",
+      "setup_architecture": "x64",
+      "runtime": "PyPy",
+      "implementation": "PyPy",
+      "python_version": "pypy3.11",
+      "language_floor": "3.12",
+      "profile": "focused",
+      "runnable": true
+    },
+    {
+      "id": "off-contract-graalpy-24-0-ubuntu-latest-x64",
+      "classification": "off_contract",
+      "claim_scope": "alternative_runtime_observation",
+      "role": "stress_matrix",
+      "runner": "ubuntu-latest",
+      "os_family": "Linux",
+      "architecture": "x64",
+      "setup_architecture": "x64",
+      "runtime": "GraalPy",
+      "implementation": "GraalVM",
+      "python_version": "graalpy-24.0",
+      "distribution_release": "24.0",
+      "python_language_version": "3.10",
+      "language_floor": "3.12",
+      "profile": "focused",
+      "runnable": true
+    },
+    {
+      "id": "stress-non-substitute-cpython-3-12-macos-15-intel-x64",
+      "classification": "stress",
+      "claim_scope": "current_intel_macos_non_substitute_observation",
+      "role": "stress_matrix",
+      "runner": "macos-15-intel",
+      "os_family": "Darwin",
+      "architecture": "x64",
+      "setup_architecture": "x64",
+      "runtime": "CPython",
+      "implementation": "CPython",
+      "python_version": "3.12",
+      "non_substitute_for": "macos-13",
+      "profile": "focused",
+      "runnable": true
+    },
+    {
+      "id": "stress-non-substitute-cpython-3-13-macos-15-intel-x64",
+      "classification": "stress",
+      "claim_scope": "current_intel_macos_non_substitute_observation",
+      "role": "stress_matrix",
+      "runner": "macos-15-intel",
+      "os_family": "Darwin",
+      "architecture": "x64",
+      "setup_architecture": "x64",
+      "runtime": "CPython",
+      "implementation": "CPython",
+      "python_version": "3.13",
+      "non_substitute_for": "macos-13",
+      "profile": "focused",
+      "runnable": true
+    },
+    {
+      "id": "stress-non-substitute-cpython-3-14-macos-15-intel-x64",
+      "classification": "stress",
+      "claim_scope": "current_intel_macos_non_substitute_observation",
+      "role": "stress_matrix",
+      "runner": "macos-15-intel",
+      "os_family": "Darwin",
+      "architecture": "x64",
+      "setup_architecture": "x64",
+      "runtime": "CPython",
+      "implementation": "CPython",
+      "python_version": "3.14",
+      "non_substitute_for": "macos-13",
+      "profile": "focused",
+      "runnable": true
+    }
+  ],
+  "expanded_gate": {
+    "id": "expanded-gate-cpython-3-12-ubuntu-latest-x64",
+    "classification": "normative",
+    "claim_scope": "expanded_gate",
+    "role": "expanded_gate",
+    "runner": "ubuntu-latest",
+    "os_family": "Linux",
+    "architecture": "x64",
+    "setup_architecture": "x64",
+    "runtime": "CPython",
+    "implementation": "CPython",
+    "python_version": "3.12",
+    "profile": "expanded",
+    "runnable": true
+  },
+  "profiles": {
+    "portability_checks": [
+      {
+        "id": "matrix-receipt-tests",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "portability/matrix/test_receipt.py"],
+        "timeout_seconds": 900,
+        "expected": {"tests": [44]}
+      },
+      {
+        "id": "finite-model-focused-tests",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "portability/model/test_model.py"],
+        "timeout_seconds": 300,
+        "expected": {"tests": [17]}
+      },
+      {
+        "id": "independent-oracle-tests",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "portability/oracle/test_oracle.py"],
+        "timeout_seconds": 900,
+        "expected": {"tests": [35]}
+      },
+      {
+        "id": "live-transport-tests",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "portability/live/test_live.py"],
+        "timeout_seconds": 900,
+        "expected": {"tests": [29]}
+      },
+      {
+        "id": "concurrency-tests",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "-m", "portability.concurrency.test_ladder"],
+        "timeout_seconds": 300,
+        "expected": {"tests": [15]}
+      },
+      {
+        "id": "concurrency-focused-smoke",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "portability/concurrency/ladder.py", "--levels", "1,2", "--requests", "5", "--skip-soak", "--no-free-threaded", "--runtime-label", "matrix-focused", "--receipt", "portability/concurrency/receipts/matrix-focused-{entry_id}.json"],
+        "timeout_seconds": 900
+      },
+      {
+        "id": "sandbox-spec-tests",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "portability/sandbox/test_sandbox.py"],
+        "timeout_seconds": 900,
+        "expected": {"tests": [76]}
+      }
+    ],
+    "baseline_nonperformance": [
+      {
+        "id": "accepted-0.2",
+        "cwd": "baseline-run",
+        "argv": ["{python}", "-B", "implementation-output-0.2/run_conformance_0_2.py"],
+        "timeout_seconds": 900,
+        "expected": {"count_totals": [800], "failures": [0]}
+      },
+      {
+        "id": "composed-0.3-all",
+        "cwd": "baseline-run",
+        "argv": ["{python}", "-B", "implementation-output-0.3/run_conformance_0_3.py", "--suite", "all"],
+        "timeout_seconds": 900,
+        "expected": {"count_totals": [800, 107], "failures": [0, 0]}
+      },
+      {
+        "id": "grounded-0.4-regression",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "grounded-0_4/test_grounded_0_4.py"],
+        "timeout_seconds": 900,
+        "expected": {"checks": [504], "failures": [0]}
+      },
+      {
+        "id": "contract-lint",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "grounded-0_4/lint_contract.py", "--gate"],
+        "timeout_seconds": 900,
+        "expected": {"findings": [0]}
+      },
+      {
+        "id": "lint-gate-meta",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "grounded-0_4/test_lint_gate.py"],
+        "timeout_seconds": 900,
+        "expected": {"checks": [7], "failures": [0]}
+      },
+      {
+        "id": "grounded-properties",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "grounded-0_4/test_properties.py"],
+        "timeout_seconds": 900,
+        "expected": {"checks": [2296], "failures": [0]}
+      },
+      {
+        "id": "audit-adversarial",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "grounded-0_4/test_audit_adversarial.py"],
+        "timeout_seconds": 900,
+        "expected": {"checks": [6497], "failures": [0]}
+      },
+      {
+        "id": "synthetic-proof-harness",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "proof/test_proof_harness.py"],
+        "timeout_seconds": 900,
+        "expected": {"tests": [7]}
+      },
+      {
+        "id": "seeded-fuzz-smoke",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "fuzz/fuzz.py", "--ci-smoke"],
+        "timeout_seconds": 900,
+        "expected": {"case_progress": [[31, 31]], "failures": [0]}
+      }
+    ],
+    "expanded_extra": [
+      {
+        "id": "batch-performance-gate",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "grounded-0_4/test_batch.py", "--perf"],
+        "timeout_seconds": 1200,
+        "expected": {"checks": [2160], "failures": [0]}
+      },
+      {
+        "id": "single-pass-benchmark",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "grounded-0_4/test_single_pass_audit.py", "--benchmark"],
+        "timeout_seconds": 1200,
+        "expected": {"checks": [1142], "failures": [0]}
+      }
+    ],
+    "free_threaded_extra": [
+      {
+        "id": "free-threaded-concurrency-p-le-8",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "portability/concurrency/ladder.py", "--levels", "1,2,4,8", "--requests", "200", "--skip-soak", "--no-free-threaded", "--runtime-label", "cpython-3.14t", "--receipt", "portability/concurrency/receipts/matrix-free-threaded-{entry_id}.json"],
+        "timeout_seconds": 1200
+      }
+    ]
+  }
+}

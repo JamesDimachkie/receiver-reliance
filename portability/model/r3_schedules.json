@@ -1,0 +1,51 @@
+{
+  "format_version": "RR-PORTABILITY-M-R3-SCHEDULES-1",
+  "seed": "0x5252334D",
+  "scope": "Recorded adversarial schedules only; R=3 is not a complete scheduler enumeration.",
+  "schedules": [
+    {
+      "id": "R3_SERIAL_0_THEN_1",
+      "callers": 2,
+      "records": [["OVERSIZE_DRAIN", "ERR_JSON", "VALID_CORE"], ["VALID_CORE", "OVERSIZE_DRAIN", "ERR_JSON"]],
+      "policy": "complete caller 0, then complete caller 1; pause before each flush",
+      "serial_order": [0, 1],
+      "pause_sites": ["pause:before_flush"]
+    },
+    {
+      "id": "R3_SERIAL_1_THEN_0",
+      "callers": 2,
+      "records": [["VALID_CORE", "ERR_JSON", "OVERSIZE_DRAIN"], ["OVERSIZE_DRAIN", "VALID_CORE", "ERR_JSON"]],
+      "policy": "complete caller 1, then complete caller 0; pause after each read",
+      "serial_order": [1, 0],
+      "pause_sites": ["pause:after_read"]
+    },
+    {
+      "id": "R3_STRICT_ALTERNATION",
+      "callers": 2,
+      "records": [["ERR_JSON", "OVERSIZE_DRAIN", "VALID_CORE"], ["OVERSIZE_DRAIN", "ERR_JSON", "VALID_CORE"]],
+      "policy": "seeded caller alternation pressure; all three pause sites taken",
+      "pause_sites": ["pause:after_read", "pause:before_write", "pause:before_flush"]
+    },
+    {
+      "id": "R3_CROSS_AT_OVERSIZE_DRAIN",
+      "callers": 2,
+      "records": [["OVERSIZE_DRAIN", "VALID_CORE", "ERR_JSON"], ["ERR_JSON", "OVERSIZE_DRAIN", "VALID_CORE"]],
+      "policy": "seeded cross-caller priority with read pauses around the two oversize records",
+      "pause_sites": ["pause:after_read"]
+    },
+    {
+      "id": "R3_CROSS_AT_SHORT_WRITE",
+      "callers": 2,
+      "records": [["VALID_CORE", "ERR_JSON", "OVERSIZE_DRAIN"], ["VALID_CORE", "OVERSIZE_DRAIN", "ERR_JSON"]],
+      "policy": "seeded cross-caller priority with pauses before write and flush",
+      "pause_sites": ["pause:before_write", "pause:before_flush"]
+    },
+    {
+      "id": "R3_SEEDED_PRIORITY_5252334D",
+      "callers": 2,
+      "records": [["ERR_JSON", "VALID_CORE", "OVERSIZE_DRAIN"], ["OVERSIZE_DRAIN", "VALID_CORE", "ERR_JSON"]],
+      "policy": "at each branch choose caller from SHA-256(seed,id,step,state); take all pause sites; mandatory resume preserves fairness",
+      "pause_sites": ["pause:after_read", "pause:before_write", "pause:before_flush"]
+    }
+  ]
+}

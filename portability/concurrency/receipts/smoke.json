@@ -1,0 +1,655 @@
+{
+  "attempt": 3,
+  "bounds": {
+    "identical_seed_runs_per_level": 2,
+    "levels": [
+      1,
+      2
+    ],
+    "modes": [
+      "library",
+      "process"
+    ],
+    "requests_per_caller": 5,
+    "seed": 23171517194915395,
+    "soak_highest_passing_levels": 2,
+    "soak_requests_per_caller": 1000,
+    "timeout_seconds_per_mode_level_including_two_runs_and_cancellation": 120.0
+  },
+  "ceiling_stopped": false,
+  "completed_normative_levels": [],
+  "elapsed_seconds": 3.1089999999967404,
+  "format_version": "RR-CONCURRENCY-LADDER-1",
+  "free_threaded_3_14t": {
+    "status": "NOT_REQUESTED_BY_CONTROLLER"
+  },
+  "git": {
+    "clean": false,
+    "head": "4e788d21e882a30bdda2aec3f780537161f81644",
+    "head_exit": 0,
+    "status_exit": 0,
+    "status_sha256": "8856C46D5BD842C37EC7CC788B2C46BD0B7F8B834218E645854B3AF8B4608A02"
+  },
+  "highest_passing_level": null,
+  "levels": [
+    {
+      "modes": [
+        {
+          "aggregate_framed_output_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+          "byte_match": true,
+          "elapsed_seconds": 1.125,
+          "identical_seed_runs": 2,
+          "mode": "library",
+          "participants": 1,
+          "requests_per_caller": 5,
+          "runs": [
+            {
+              "aggregate_framed_output_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+              "caller_receipts": [
+                {
+                  "caller_id": 0,
+                  "output_bytes": 4322,
+                  "output_order_sha256": "A79EBDFF308C46ED0317BF66409928B20A14E4B6F4027DD9DD63F84CE7F6B70F",
+                  "request_count": 5,
+                  "request_order_sha256": "58E99E12C8FE440113E2B3F099A1A09EEB3362848875BFCE811964799B8DD705",
+                  "response_count": 5
+                }
+              ],
+              "cancellation": null,
+              "elapsed_seconds": 0.26600000000325963,
+              "format_version": "RR-CONCURRENCY-WORKER-1",
+              "mode": "library",
+              "oracle_relation": {
+                "actual_sha256": "FAAA977668C5828D9E6F32CA8217139F804D01A6E6795D4ED49D5047E3448D53",
+                "detail": "callers=1",
+                "expected_sha256": "FAAA977668C5828D9E6F32CA8217139F804D01A6E6795D4ED49D5047E3448D53",
+                "name": "concurrency-vs-isolated-equality",
+                "ok": true
+              },
+              "participants": 1,
+              "repeat": 1,
+              "requests_per_caller": 5,
+              "resources": {
+                "after": {
+                  "handle_or_fd_count": 192,
+                  "method": "win32-ctypes",
+                  "per_pid": {
+                    "28620": {
+                      "handle_or_fd_count": 192,
+                      "peak_rss_bytes": 37326848,
+                      "rss_bytes": 35995648,
+                      "thread_count": 7
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 35995648,
+                  "sampled_process_count": 1,
+                  "thread_count": 7,
+                  "unavailable_pids": []
+                },
+                "before": {
+                  "handle_or_fd_count": 185,
+                  "method": "win32-ctypes",
+                  "per_pid": {
+                    "28620": {
+                      "handle_or_fd_count": 185,
+                      "peak_rss_bytes": 37326848,
+                      "rss_bytes": 35848192,
+                      "thread_count": 7
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 35848192,
+                  "sampled_process_count": 1,
+                  "thread_count": 7,
+                  "unavailable_pids": []
+                },
+                "peak": {
+                  "handle_or_fd_count": 192,
+                  "method": "win32-ctypes",
+                  "requested_process_count": 1,
+                  "rss_bytes": 35987456,
+                  "thread_count": 7
+                },
+                "sample_count": 1,
+                "sampling_interval_seconds": 0.01,
+                "scheduling_nonclaim": "sampling observes resources; it is not an execution schedule"
+              },
+              "runtime": {
+                "byte_order": "little",
+                "executable": "C:\\Users\\james\\AppData\\Local\\Python\\pythoncore-3.12-64\\python.exe",
+                "filesystem_encoding": "utf-8",
+                "gil_receipt": {
+                  "sys._is_gil_enabled": null,
+                  "sys._is_gil_enabled_available": false
+                },
+                "implementation": "CPython",
+                "machine": "AMD64",
+                "platform": "Windows-11-10.0.26200-SP0",
+                "preferred_encoding": "cp1252",
+                "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+                "release": "11",
+                "system": "Windows",
+                "version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+                "version_info": [
+                  3,
+                  12,
+                  10,
+                  "final",
+                  0
+                ],
+                "word_size_bits": 64
+              },
+              "schedule": {
+                "caller_order": [
+                  0
+                ],
+                "input_generation": "valid-every-50; otherwise seeded malformed selection",
+                "os_interleaving": "uncontrolled stress dimension",
+                "start_barrier": "all-callers-ready"
+              },
+              "seed": 23171517194915395,
+              "status": "PASS",
+              "valid_fixture_inputs": [
+                {
+                  "behavior_class": "VALID",
+                  "entry_id": "SEMFX-OBL-22-IO-291939EAD3C56032",
+                  "request_sha256": "50DE63075B898F16D5C733F6FF3726B3029E22ACF4E41040784D6971873CE04A"
+                },
+                {
+                  "behavior_class": "MALFORMED_OR_BOUNDARY",
+                  "entry_id": "SEMFX-OBL-22-INV-7B6C57EA427965C7",
+                  "request_sha256": "5FC6BEA25A274674CF4FD86738CF525C1984A83EC04815BC7F344ED21D1B8FB4"
+                },
+                {
+                  "behavior_class": "BINDING_OR_CONFLICT",
+                  "entry_id": "SEMFX-OBL-22-CTRL-E0B52A921327B33D",
+                  "request_sha256": "9E2E14ED997D10B94D79DB86216E88E7EE0AFB2F016F414CA3BCB2EECCF5D7EB"
+                },
+                {
+                  "behavior_class": "OMISSION_OR_INCOMPLETE",
+                  "entry_id": "SEMFX-OBL-22-FAIL-A1CA45D53BC99336",
+                  "request_sha256": "8FDDD752E6E73FB92A2C56632973D81F64BCF840B8A347F9E3B69837E1ACE1E5"
+                }
+              ],
+              "worker_process_exit": 0,
+              "worker_stderr_bytes": 0,
+              "worker_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+            },
+            {
+              "aggregate_framed_output_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+              "caller_receipts": [
+                {
+                  "caller_id": 0,
+                  "output_bytes": 4322,
+                  "output_order_sha256": "A79EBDFF308C46ED0317BF66409928B20A14E4B6F4027DD9DD63F84CE7F6B70F",
+                  "request_count": 5,
+                  "request_order_sha256": "58E99E12C8FE440113E2B3F099A1A09EEB3362848875BFCE811964799B8DD705",
+                  "response_count": 5
+                }
+              ],
+              "cancellation": {
+                "after": {
+                  "handle_or_fd_count": 184,
+                  "method": "win32-ctypes",
+                  "per_pid": {
+                    "1852": {
+                      "handle_or_fd_count": 184,
+                      "peak_rss_bytes": 37507072,
+                      "rss_bytes": 36270080,
+                      "thread_count": 7
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 36270080,
+                  "sampled_process_count": 1,
+                  "thread_count": 7,
+                  "unavailable_pids": []
+                },
+                "alive_threads_after": [],
+                "barriers": [
+                  "all-callers-started",
+                  "one-response-acknowledged"
+                ],
+                "before": {
+                  "handle_or_fd_count": 183,
+                  "method": "win32-ctypes",
+                  "per_pid": {
+                    "1852": {
+                      "handle_or_fd_count": 183,
+                      "peak_rss_bytes": 37507072,
+                      "rss_bytes": 36261888,
+                      "thread_count": 7
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 36261888,
+                  "sampled_process_count": 1,
+                  "thread_count": 7,
+                  "unavailable_pids": []
+                },
+                "cancellation_action": "threading.Event.set",
+                "during": {
+                  "handle_or_fd_count": 189,
+                  "method": "win32-ctypes",
+                  "per_pid": {
+                    "1852": {
+                      "handle_or_fd_count": 189,
+                      "peak_rss_bytes": 37507072,
+                      "rss_bytes": 36294656,
+                      "thread_count": 8
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 36294656,
+                  "sampled_process_count": 1,
+                  "thread_count": 8,
+                  "unavailable_pids": []
+                },
+                "pass": true,
+                "processed_max": 1,
+                "processed_min": 1,
+                "resource_cleanup": {
+                  "handle_or_fd_count": {
+                    "after": 184,
+                    "allowance": 2,
+                    "before": 183,
+                    "pass": true
+                  },
+                  "pass": true,
+                  "thread_count": {
+                    "after": 7,
+                    "allowance": 0,
+                    "before": 7,
+                    "pass": true
+                  }
+                }
+              },
+              "elapsed_seconds": 0.40599999998812564,
+              "format_version": "RR-CONCURRENCY-WORKER-1",
+              "mode": "library",
+              "oracle_relation": {
+                "actual_sha256": "FAAA977668C5828D9E6F32CA8217139F804D01A6E6795D4ED49D5047E3448D53",
+                "detail": "callers=1",
+                "expected_sha256": "FAAA977668C5828D9E6F32CA8217139F804D01A6E6795D4ED49D5047E3448D53",
+                "name": "concurrency-vs-isolated-equality",
+                "ok": true
+              },
+              "participants": 1,
+              "repeat": 2,
+              "requests_per_caller": 5,
+              "resources": {
+                "after": {
+                  "handle_or_fd_count": 192,
+                  "method": "win32-ctypes",
+                  "per_pid": {
+                    "1852": {
+                      "handle_or_fd_count": 192,
+                      "peak_rss_bytes": 37507072,
+                      "rss_bytes": 36245504,
+                      "thread_count": 7
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 36245504,
+                  "sampled_process_count": 1,
+                  "thread_count": 7,
+                  "unavailable_pids": []
+                },
+                "before": {
+                  "handle_or_fd_count": 185,
+                  "method": "win32-ctypes",
+                  "per_pid": {
+                    "1852": {
+                      "handle_or_fd_count": 185,
+                      "peak_rss_bytes": 37507072,
+                      "rss_bytes": 36016128,
+                      "thread_count": 7
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 36016128,
+                  "sampled_process_count": 1,
+                  "thread_count": 7,
+                  "unavailable_pids": []
+                },
+                "peak": {
+                  "handle_or_fd_count": 192,
+                  "method": "win32-ctypes",
+                  "requested_process_count": 1,
+                  "rss_bytes": 36245504,
+                  "thread_count": 7
+                },
+                "sample_count": 1,
+                "sampling_interval_seconds": 0.01,
+                "scheduling_nonclaim": "sampling observes resources; it is not an execution schedule"
+              },
+              "runtime": {
+                "byte_order": "little",
+                "executable": "C:\\Users\\james\\AppData\\Local\\Python\\pythoncore-3.12-64\\python.exe",
+                "filesystem_encoding": "utf-8",
+                "gil_receipt": {
+                  "sys._is_gil_enabled": null,
+                  "sys._is_gil_enabled_available": false
+                },
+                "implementation": "CPython",
+                "machine": "AMD64",
+                "platform": "Windows-11-10.0.26200-SP0",
+                "preferred_encoding": "cp1252",
+                "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+                "release": "11",
+                "system": "Windows",
+                "version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+                "version_info": [
+                  3,
+                  12,
+                  10,
+                  "final",
+                  0
+                ],
+                "word_size_bits": 64
+              },
+              "schedule": {
+                "caller_order": [
+                  0
+                ],
+                "input_generation": "valid-every-50; otherwise seeded malformed selection",
+                "os_interleaving": "uncontrolled stress dimension",
+                "start_barrier": "all-callers-ready"
+              },
+              "seed": 23171517194915395,
+              "status": "PASS",
+              "valid_fixture_inputs": [
+                {
+                  "behavior_class": "VALID",
+                  "entry_id": "SEMFX-OBL-22-IO-291939EAD3C56032",
+                  "request_sha256": "50DE63075B898F16D5C733F6FF3726B3029E22ACF4E41040784D6971873CE04A"
+                },
+                {
+                  "behavior_class": "MALFORMED_OR_BOUNDARY",
+                  "entry_id": "SEMFX-OBL-22-INV-7B6C57EA427965C7",
+                  "request_sha256": "5FC6BEA25A274674CF4FD86738CF525C1984A83EC04815BC7F344ED21D1B8FB4"
+                },
+                {
+                  "behavior_class": "BINDING_OR_CONFLICT",
+                  "entry_id": "SEMFX-OBL-22-CTRL-E0B52A921327B33D",
+                  "request_sha256": "9E2E14ED997D10B94D79DB86216E88E7EE0AFB2F016F414CA3BCB2EECCF5D7EB"
+                },
+                {
+                  "behavior_class": "OMISSION_OR_INCOMPLETE",
+                  "entry_id": "SEMFX-OBL-22-FAIL-A1CA45D53BC99336",
+                  "request_sha256": "8FDDD752E6E73FB92A2C56632973D81F64BCF840B8A347F9E3B69837E1ACE1E5"
+                }
+              ],
+              "worker_process_exit": 0,
+              "worker_stderr_bytes": 0,
+              "worker_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+            }
+          ],
+          "status": "PASS",
+          "timeout_seconds": 120.0,
+          "total_requests_per_repeat": 5
+        },
+        {
+          "elapsed_seconds": 1.7029999999940628,
+          "mode": "process",
+          "participants": 1,
+          "requests_per_caller": 5,
+          "runs": [
+            {
+              "aggregate_framed_output_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+              "caller_receipts": [
+                {
+                  "caller_id": 0,
+                  "output_bytes": 4322,
+                  "output_order_sha256": "A79EBDFF308C46ED0317BF66409928B20A14E4B6F4027DD9DD63F84CE7F6B70F",
+                  "request_count": 5,
+                  "request_order_sha256": "58E99E12C8FE440113E2B3F099A1A09EEB3362848875BFCE811964799B8DD705",
+                  "response_count": 5
+                }
+              ],
+              "cancellation": null,
+              "elapsed_seconds": 0.48399999999674037,
+              "format_version": "RR-CONCURRENCY-WORKER-1",
+              "mode": "process",
+              "oracle_relation": {
+                "actual_sha256": "FAAA977668C5828D9E6F32CA8217139F804D01A6E6795D4ED49D5047E3448D53",
+                "detail": "callers=1",
+                "expected_sha256": "FAAA977668C5828D9E6F32CA8217139F804D01A6E6795D4ED49D5047E3448D53",
+                "name": "concurrency-vs-isolated-equality",
+                "ok": true
+              },
+              "participants": 1,
+              "repeat": 1,
+              "requests_per_caller": 5,
+              "resources": {
+                "after": {
+                  "handle_or_fd_count": 194,
+                  "method": "win32-ctypes",
+                  "per_pid": {
+                    "31328": {
+                      "handle_or_fd_count": 194,
+                      "peak_rss_bytes": 37003264,
+                      "rss_bytes": 36040704,
+                      "thread_count": 7
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 36040704,
+                  "sampled_process_count": 1,
+                  "thread_count": 7,
+                  "unavailable_pids": []
+                },
+                "before": {
+                  "handle_or_fd_count": 185,
+                  "method": "win32-ctypes",
+                  "per_pid": {
+                    "31328": {
+                      "handle_or_fd_count": 185,
+                      "peak_rss_bytes": 36896768,
+                      "rss_bytes": 35790848,
+                      "thread_count": 7
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 35790848,
+                  "sampled_process_count": 1,
+                  "thread_count": 7,
+                  "unavailable_pids": []
+                },
+                "peak": {
+                  "handle_or_fd_count": 316,
+                  "method": "win32-ctypes",
+                  "requested_process_count": 2,
+                  "rss_bytes": 58118144,
+                  "thread_count": 15
+                },
+                "sample_count": 4,
+                "sampling_interval_seconds": 0.01,
+                "scheduling_nonclaim": "sampling observes resources; it is not an execution schedule"
+              },
+              "runtime": {
+                "byte_order": "little",
+                "executable": "C:\\Users\\james\\AppData\\Local\\Python\\pythoncore-3.12-64\\python.exe",
+                "filesystem_encoding": "utf-8",
+                "gil_receipt": {
+                  "sys._is_gil_enabled": null,
+                  "sys._is_gil_enabled_available": false
+                },
+                "implementation": "CPython",
+                "machine": "AMD64",
+                "platform": "Windows-11-10.0.26200-SP0",
+                "preferred_encoding": "cp1252",
+                "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+                "release": "11",
+                "system": "Windows",
+                "version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+                "version_info": [
+                  3,
+                  12,
+                  10,
+                  "final",
+                  0
+                ],
+                "word_size_bits": 64
+              },
+              "schedule": {
+                "caller_order": [
+                  0
+                ],
+                "input_generation": "valid-every-50; otherwise seeded malformed selection",
+                "os_interleaving": "uncontrolled stress dimension",
+                "start_barrier": "all-callers-ready"
+              },
+              "seed": 23171517194915395,
+              "status": "PASS",
+              "valid_fixture_inputs": [
+                {
+                  "behavior_class": "VALID",
+                  "entry_id": "SEMFX-OBL-22-IO-291939EAD3C56032",
+                  "request_sha256": "50DE63075B898F16D5C733F6FF3726B3029E22ACF4E41040784D6971873CE04A"
+                },
+                {
+                  "behavior_class": "MALFORMED_OR_BOUNDARY",
+                  "entry_id": "SEMFX-OBL-22-INV-7B6C57EA427965C7",
+                  "request_sha256": "5FC6BEA25A274674CF4FD86738CF525C1984A83EC04815BC7F344ED21D1B8FB4"
+                },
+                {
+                  "behavior_class": "BINDING_OR_CONFLICT",
+                  "entry_id": "SEMFX-OBL-22-CTRL-E0B52A921327B33D",
+                  "request_sha256": "9E2E14ED997D10B94D79DB86216E88E7EE0AFB2F016F414CA3BCB2EECCF5D7EB"
+                },
+                {
+                  "behavior_class": "OMISSION_OR_INCOMPLETE",
+                  "entry_id": "SEMFX-OBL-22-FAIL-A1CA45D53BC99336",
+                  "request_sha256": "8FDDD752E6E73FB92A2C56632973D81F64BCF840B8A347F9E3B69837E1ACE1E5"
+                }
+              ],
+              "worker_process_exit": 0,
+              "worker_stderr_bytes": 0,
+              "worker_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+            },
+            {
+              "elapsed_seconds": 0.7340000000112923,
+              "format_version": "RR-CONCURRENCY-WORKER-1",
+              "mode": "process",
+              "participants": 1,
+              "repeat": 2,
+              "requests_per_caller": 5,
+              "runtime": {
+                "byte_order": "little",
+                "executable": "C:\\Users\\james\\AppData\\Local\\Python\\pythoncore-3.12-64\\python.exe",
+                "filesystem_encoding": "utf-8",
+                "gil_receipt": {
+                  "sys._is_gil_enabled": null,
+                  "sys._is_gil_enabled_available": false
+                },
+                "implementation": "CPython",
+                "machine": "AMD64",
+                "platform": "Windows-11-10.0.26200-SP0",
+                "preferred_encoding": "cp1252",
+                "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+                "release": "11",
+                "system": "Windows",
+                "version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+                "version_info": [
+                  3,
+                  12,
+                  10,
+                  "final",
+                  0
+                ],
+                "word_size_bits": 64
+              },
+              "schedule": {
+                "caller_order": [
+                  0
+                ],
+                "input_generation": "valid-every-50; otherwise seeded malformed selection",
+                "os_interleaving": "uncontrolled stress dimension",
+                "start_barrier": "all-callers-ready"
+              },
+              "seed": 23171517194915395,
+              "status": "INVARIANT_FAILURE",
+              "stop": {
+                "divergence": {
+                  "kind": "cancellation_cleanup",
+                  "lingering_pids": [
+                    35620
+                  ],
+                  "resource_cleanup": {
+                    "handle_or_fd_count": {
+                      "after": 188,
+                      "allowance": 2,
+                      "before": 183,
+                      "pass": false
+                    },
+                    "pass": false,
+                    "thread_count": {
+                      "after": 7,
+                      "allowance": 0,
+                      "before": 7,
+                      "pass": true
+                    }
+                  }
+                },
+                "exception_type": "InvariantFailure",
+                "kind": "invariant_failure",
+                "message": "process cancellation cleanup failed",
+                "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\james\\New folder\\receiver-reliance-worktrees\\portability\\portability\\concurrency\\ladder.py\", line 934, in _worker_run\n    cancellation = _process_cancellation_probe(args.worker_participants, deadline)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\james\\New folder\\receiver-reliance-worktrees\\portability\\portability\\concurrency\\ladder.py\", line 849, in _process_cancellation_probe\n    raise InvariantFailure(\nInvariantFailure: process cancellation cleanup failed\n"
+              },
+              "worker_process_exit": 1,
+              "worker_stderr_bytes": 0,
+              "worker_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+            }
+          ],
+          "status": "INVARIANT_FAILURE",
+          "timeout_seconds": 120.0
+        }
+      ],
+      "participants": 1,
+      "status": "INVARIANT_FAILURE"
+    }
+  ],
+  "nonclaims": [
+    "No efficacy, novelty, security, fuzzing-completeness, external-standard, or universal-portability claim.",
+    "OS thread/process interleavings are sampled stress, not exhaustively enumerated schedules.",
+    "The serial isolated expected bytes use the accepted implementation; independent semantic correctness belongs to O-ORACLE."
+  ],
+  "runtime": {
+    "byte_order": "little",
+    "executable": "C:\\Users\\james\\AppData\\Local\\Python\\pythoncore-3.12-64\\python.exe",
+    "filesystem_encoding": "utf-8",
+    "gil_receipt": {
+      "sys._is_gil_enabled": null,
+      "sys._is_gil_enabled_available": false
+    },
+    "implementation": "CPython",
+    "machine": "AMD64",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "preferred_encoding": "cp1252",
+    "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+    "release": "11",
+    "system": "Windows",
+    "version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "version_info": [
+      3,
+      12,
+      10,
+      "final",
+      0
+    ],
+    "word_size_bits": 64
+  },
+  "runtime_label": "normative-host",
+  "soaks": [],
+  "status": "INVARIANT_FAILURE",
+  "stop": {
+    "mode": "process",
+    "participants": 1,
+    "phase": "normative",
+    "status": "INVARIANT_FAILURE"
+  },
+  "treatment_exposed": true,
+  "treatment_notice": "This lane must never author future blinded worlds, oracle, gold, or renderer."
+}

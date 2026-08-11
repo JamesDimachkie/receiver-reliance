@@ -1,0 +1,268 @@
+name: portability
+
+on:
+  push:
+    branches:
+      - sol/rr-portability-modelcheck-20260810
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONDONTWRITEBYTECODE: "1"
+  PYTHONHASHSEED: "0"
+  PYTHONIOENCODING: utf-8
+  PYTHONUTF8: "1"
+  TZ: UTC
+
+jobs:
+  inventory:
+    name: deterministic matrix inventory
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      normative: ${{ steps.matrix.outputs.normative }}
+      stress: ${{ steps.matrix.outputs.stress }}
+    steps:
+      - name: Check out the pushed SHA
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Select inventory interpreter
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+          architecture: x64
+      - name: Emit checked-in matrices
+        id: matrix
+        shell: bash
+        run: |
+          normative="$(python -B portability/matrix/receipt.py emit-matrix --role normative_matrix)"
+          stress="$(python -B portability/matrix/receipt.py emit-matrix --role stress_matrix)"
+          echo "normative=${normative}" >> "${GITHUB_OUTPUT}"
+          echo "stress=${stress}" >> "${GITHUB_OUTPUT}"
+
+  normative:
+    name: normative • ${{ matrix.python_version }} • ${{ matrix.runner }} • ${{ matrix.architecture }}
+    needs: inventory
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    # Setup absence is green only after its explicit receipt uploads. Harness,
+    # receipt-writer, and artifact failures retain a failed job conclusion.
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.inventory.outputs.normative) }}
+    steps:
+      - name: Check out the pushed SHA
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Select requested CPython build
+        id: setup
+        continue-on-error: true
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: ${{ matrix.python_version }}
+          architecture: ${{ matrix.setup_architecture }}
+      - name: Record unavailable runtime build
+        if: steps.setup.outcome == 'failure'
+        run: >-
+          python -B portability/matrix/receipt.py infra-unavailable
+          --entry "${{ matrix.id }}"
+          --output-name "receipt-${{ matrix.id }}.json"
+          --proof-kind "runtime_setup_unavailable"
+          --evidence "steps.setup.outcome=failure"
+          --reason "actions/setup-python could not provide the requested runtime/architecture build"
+      - name: Run focused portability profile
+        if: steps.setup.outcome == 'success'
+        run: >-
+          python -B portability/matrix/receipt.py run
+          --entry "${{ matrix.id }}"
+          --output-name "receipt-${{ matrix.id }}.json"
+      - name: Upload normative receipt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rr-portability-${{ matrix.id }}
+          path: |
+            ${{ runner.temp }}/receipt-${{ matrix.id }}.json
+            portability/concurrency/receipts/matrix-*-${{ matrix.id }}.json
+          if-no-files-found: error
+          retention-days: 14
+
+  stress:
+    name: ${{ matrix.classification }} • ${{ matrix.python_version }} • ${{ matrix.runner }} • ${{ matrix.architecture }}
+    needs: inventory
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.inventory.outputs.stress) }}
+    steps:
+      - name: Check out the pushed SHA
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Select requested stress runtime
+        id: setup
+        continue-on-error: true
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: ${{ matrix.python_version }}
+          architecture: ${{ matrix.setup_architecture }}
+      - name: Record unavailable runtime build
+        if: steps.setup.outcome == 'failure'
+        run: >-
+          python -B portability/matrix/receipt.py infra-unavailable
+          --entry "${{ matrix.id }}"
+          --output-name "receipt-${{ matrix.id }}.json"
+          --proof-kind "runtime_setup_unavailable"
+          --evidence "steps.setup.outcome=failure"
+          --reason "actions/setup-python could not provide the requested stress/off-contract build"
+      - name: Run focused stress profile
+        if: steps.setup.outcome == 'success' && matrix.python_dev_mode == false
+        env:
+          RR_SETUP_PYTHON_VERSION: ${{ steps.setup.outputs.python-version }}
+        run: >-
+          python -B portability/matrix/receipt.py run
+          --entry "${{ matrix.id }}"
+          --output-name "receipt-${{ matrix.id }}.json"
+      - name: Run focused profile in Python Development Mode
+        if: steps.setup.outcome == 'success' && matrix.python_dev_mode == true
+        env:
+          RR_SETUP_PYTHON_VERSION: ${{ steps.setup.outputs.python-version }}
+        run: >-
+          python -X dev -B portability/matrix/receipt.py run
+          --entry "${{ matrix.id }}"
+          --output-name "receipt-${{ matrix.id }}.json"
+      - name: Upload stress or off-contract receipt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rr-portability-${{ matrix.id }}
+          path: |
+            ${{ runner.temp }}/receipt-${{ matrix.id }}.json
+            portability/concurrency/receipts/matrix-*-${{ matrix.id }}.json
+          if-no-files-found: error
+          retention-days: 14
+
+  expanded_gate:
+    name: expanded gate • CPython 3.12 • ubuntu-latest • x64
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    # Preserve the same receipt-driven distinction as the native matrix.
+    steps:
+      - name: Check out the pushed SHA
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Select canonical gate interpreter
+        id: setup
+        continue-on-error: true
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+          architecture: x64
+      - name: Record unavailable canonical build
+        if: steps.setup.outcome == 'failure'
+        run: >-
+          python -B portability/matrix/receipt.py infra-unavailable
+          --entry "expanded-gate-cpython-3-12-ubuntu-latest-x64"
+          --output-name "receipt-expanded-gate-cpython-3-12-ubuntu-latest-x64.json"
+          --proof-kind "runtime_setup_unavailable"
+          --evidence "steps.setup.outcome=failure"
+          --reason "actions/setup-python could not provide canonical CPython 3.12 x64"
+      - name: Run expanded gate
+        if: steps.setup.outcome == 'success'
+        run: >-
+          python -B portability/matrix/receipt.py run
+          --entry "expanded-gate-cpython-3-12-ubuntu-latest-x64"
+          --output-name "receipt-expanded-gate-cpython-3-12-ubuntu-latest-x64.json"
+      - name: Upload expanded-gate receipt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rr-portability-expanded-gate-cpython-3-12-ubuntu-latest-x64
+          path: ${{ runner.temp }}/receipt-expanded-gate-cpython-3-12-ubuntu-latest-x64.json
+          if-no-files-found: error
+          retention-days: 14
+
+  sandbox:
+    name: hardened Linux sandbox • expanded gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Check out the pushed SHA
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Select sandbox controller interpreter
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+          architecture: x64
+      - name: Run no-network read-only sandbox gate
+        shell: bash
+        run: |
+          set +e
+          python -B portability/sandbox/run_sandbox.py \
+            --receipt "${RUNNER_TEMP}/sandbox-receipt.json"
+          sandbox_exit="$?"
+          set -e
+          if [ "${sandbox_exit}" -eq 2 ]; then
+            echo "Sandbox infrastructure unavailable; the receipt preserves that classification."
+            exit 0
+          fi
+          exit "${sandbox_exit}"
+      - name: Upload sandbox receipt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rr-portability-sandbox-expanded-gate
+          path: ${{ runner.temp }}/sandbox-receipt.json
+          if-no-files-found: error
+          retention-days: 14
+
+  summarize:
+    name: matrix receipt summary
+    if: always()
+    needs:
+      - normative
+      - stress
+      - expanded_gate
+      - sandbox
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out the pushed SHA
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Select summary interpreter
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+          architecture: x64
+      - name: Download available receipts
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: rr-portability-*
+          path: ${{ runner.temp }}/rr-portability-receipts
+          merge-multiple: true
+      - name: Separate outcomes and verify receipts
+        run: >-
+          python -B portability/matrix/receipt.py summarize
+          --receipts-dir "${{ runner.temp }}/rr-portability-receipts"
+          --output-name "matrix-summary.json"
+          --normative-job-result "${{ needs.normative.result }}"
+          --expanded-gate-job-result "${{ needs.expanded_gate.result }}"
+      - name: Upload complete matrix summary
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rr-portability-matrix-summary
+          path: ${{ runner.temp }}/matrix-summary.json
+          if-no-files-found: error
+          retention-days: 14

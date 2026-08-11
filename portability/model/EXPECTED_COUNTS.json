@@ -1,0 +1,60 @@
+{
+  "format_version": "RR-PORTABILITY-M-EXPECTED-COUNTS-1",
+  "final_receipt_sha256": "CD6210F8706C7B37B6CD25A9EF67B53696207EAFED716284151D67B20444732E",
+  "adjudication": {
+    "status": "admitted",
+    "date": "2026-08-11",
+    "basis": "Post-F-MODEL-003 attempt-1 enumeration, fresh R-MODEL-3 refutation NO-NEW-EVIDENCE; custody and probe record in receipts/N48-POST-F-MODEL-003-SUMMARY.md",
+    "rejected_receipts": [
+      {"receipt_sha256": "081180E9941C04044F203BB4F7B948D091E4F19DA666DD7ECBDF03C03EDE2B14", "reason": "pre-F-MODEL-001 unsound key quotient"},
+      {"receipt_sha256": "C27DEB152C1FDD720EB0FAAE8AD32A06B6DF5DED45763E9E14012F93524D69E9", "reason": "F-MODEL-002 symbolic alias double-counting, falsified by the F-MODEL-003 witness"}
+    ]
+  },
+  "parser": {
+    "quotient_states": 37432306,
+    "quotient_transitions": 294190481,
+    "terminal_transitions": 68157505,
+    "symbolic_terminal_traces": 34269567869926335890219352245333204780922262,
+    "excluded_frontier_edges": 192429497,
+    "excluded_trace_prefixes": 365700154247143020084708553153258324529440021,
+    "quotient_material_sha256": "2C233FBF0DD68F1BA3C73BFB9F344473B9EA265CF43D770934A76D586329DD2A",
+    "terminal_classes": {
+      "ERR_DUPLICATE_KEY": {"quotient_terminals": 42834308, "symbolic_traces": 675566583720040912468381243260334},
+      "ERR_EMPTY_INPUT": {"quotient_terminals": 1, "symbolic_traces": 1},
+      "ERR_JSON": {"quotient_terminals": 25322938, "symbolic_traces": 63807811495662732114712055391876178185844},
+      "ERR_NFC": {"quotient_terminals": 41, "symbolic_traces": 1155471776161497},
+      "ERR_UTF8": {"quotient_terminals": 170, "symbolic_traces": 34205760057755106574384599270371782039028553},
+      "PARSE_OK": {"quotient_terminals": 47, "symbolic_traces": 5945693544286033}
+    }
+  },
+  "complete_scheduler_products": {
+    "P1_R1": {"states": 14, "transitions": 16, "terminal_states": 1, "schedule_traces": 8, "sequence_schedule_cases": 24},
+    "P1_R2": {"states": 27, "transitions": 32, "terminal_states": 1, "schedule_traces": 64, "sequence_schedule_cases": 576},
+    "P2_R1": {"states": 196, "transitions": 448, "terminal_states": 1, "schedule_traces": 38589788, "sequence_schedule_cases": 347308092},
+    "P2_R2": {"states": 729, "transitions": 1728, "terminal_states": 1, "schedule_traces": 7021875387712248, "sequence_schedule_cases": 568771906404692088}
+  },
+  "partition_totals": {
+    "request_C": {"VALID_CORE": 32781510, "ERR_JSON": 42, "OVERSIZE_DRAIN": 155},
+    "response_W": {"VALID_CORE": 584822, "ERR_JSON": 329267, "OVERSIZE_DRAIN": 352381}
+  },
+  "r3_recorded_replays": {
+    "R3_SERIAL_0_THEN_1": {"steps": 54, "action_sha256": "FE6002AA0E2AA342210DC82EFB1D40CFF2E8AAE47AEC02B3E1387BDF6B337747"},
+    "R3_SERIAL_1_THEN_0": {"steps": 54, "action_sha256": "85B3EAC582A4A6D7831006431654C89AE8C0AF2CEB9761D05570EEF4DA92A5E0"},
+    "R3_STRICT_ALTERNATION": {"steps": 78, "action_sha256": "B2EA6E09E84F2F179156D77A7F5052C87C0A5B07C3E62DEEE7171E781AE830A6"},
+    "R3_CROSS_AT_OVERSIZE_DRAIN": {"steps": 54, "action_sha256": "9BD096359AEF27E1D61478BBB31BE6A0D7E5CBD5E961DA3A432809C8D6FF1984"},
+    "R3_CROSS_AT_SHORT_WRITE": {"steps": 66, "action_sha256": "DCEC09EE70299CC725FE3B515A9264333864CC3A60DE88767DDD9ECE475F35C8"},
+    "R3_SEEDED_PRIORITY_5252334D": {"steps": 78, "action_sha256": "E8E01CFBEE5C833A53361EC3D9DED54770B42E59800B2FE7AD09729CC55CF48A"}
+  },
+  "r3_recipe_policy_note": "Two recipes use fixed serial_order; four use seed-selected enabled actions. R3_STRICT_ALTERNATION is a historical identifier, not an every-adjacent-step alternation invariant.",
+  "full_run": {
+    "command": "python -B -m portability.model.explorer --compact --progress",
+    "exit": 0,
+    "parser_elapsed_seconds": 2153.484,
+    "wrapper_elapsed_whole_seconds": 2153,
+    "environment": "CPython 3.12.10, Windows authoring worktree, PYTHONHASHSEED=0",
+    "peak_working_bytes": 1366290432,
+    "stdout_sha256": "AB53DCB62E8C60D9E6D9DD59A249174E34CA97CDBF199C810B72F36AAEBC985A",
+    "stderr_sha256": "0BF3067D55683F6EB725E2790165D665735B86C13EFE95A8CBAC4E39D63FA601",
+    "note": "Post-F-MODEL-003 attempt 1 with durable file custody (receipts/N48-postF3-attempt1.*). Counts and hashes come from the captured receipt; the independent R-MODEL-3 full probe re-enumerated N=48 and reproduced the receipt byte-for-byte."
+  }
+}

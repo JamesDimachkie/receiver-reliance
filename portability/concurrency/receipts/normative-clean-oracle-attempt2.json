@@ -1,0 +1,159 @@
+{
+  "attempt": 2,
+  "bounds": {
+    "identical_seed_runs_per_level": 2,
+    "levels": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      32
+    ],
+    "modes": [
+      "library",
+      "process"
+    ],
+    "requests_per_caller": 200,
+    "seed": 23171517194915395,
+    "soak_highest_passing_levels": 2,
+    "soak_requests_per_caller": 1000,
+    "timeout_seconds_per_mode_level_including_two_runs_and_cancellation": 120.0
+  },
+  "ceiling_stopped": false,
+  "completed_normative_levels": [],
+  "elapsed_seconds": 2.0,
+  "format_version": "RR-CONCURRENCY-LADDER-2",
+  "git": {
+    "clean": false,
+    "head": "4e788d21e882a30bdda2aec3f780537161f81644",
+    "head_exit": 0,
+    "status_exit": 0,
+    "status_sha256": "E6D23A3B367797E04721ACEDFDBA745A432BDF36608015AFECDD00E61BA11615"
+  },
+  "highest_passing_level": null,
+  "levels": [
+    {
+      "modes": [
+        {
+          "elapsed_seconds": 1.8589999999994689,
+          "mode": "library",
+          "participants": 1,
+          "requests_per_caller": 200,
+          "runs": [
+            {
+              "elapsed_seconds": 1.7029999999995198,
+              "format_version": "RR-CONCURRENCY-WORKER-2",
+              "mode": "library",
+              "participants": 1,
+              "repeat": 1,
+              "requests_per_caller": 200,
+              "runtime": {
+                "byte_order": "little",
+                "executable": "C:\\Users\\james\\AppData\\Local\\Python\\pythoncore-3.12-64\\python.exe",
+                "filesystem_encoding": "utf-8",
+                "gil_receipt": {
+                  "sys._is_gil_enabled": null,
+                  "sys._is_gil_enabled_available": false
+                },
+                "implementation": "CPython",
+                "machine": "AMD64",
+                "platform": "Windows-11-10.0.26200-SP0",
+                "preferred_encoding": "cp1252",
+                "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+                "release": "11",
+                "system": "Windows",
+                "version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+                "version_info": [
+                  3,
+                  12,
+                  10,
+                  "final",
+                  0
+                ],
+                "word_size_bits": 64
+              },
+              "schedule": {
+                "caller_order": [
+                  0
+                ],
+                "input_generation": "valid-every-50; otherwise seeded malformed selection",
+                "os_interleaving": "uncontrolled stress dimension",
+                "start_barrier": "all-callers-ready"
+              },
+              "seed": 23171517194915395,
+              "status": "INVARIANT_FAILURE",
+              "stop": {
+                "divergence": {
+                  "actual_b64": "eyJhdWRpdCI6eyJjbG9zdXJlX2ZpbmRpbmdzIjpbXSwiZGVjaXNpb25faW5wdXRfc2hhMjU2IjoiN0U3OTA5RkE0NDY4OTExRjk3RUREQjE5QzY0NjNEQjlCQjYyNkFGNDgyM0Q1NjlGMDgxQjYyMDQ3NTlERkE1RSIsImVuZ2luZV9nZW5lcmF0aW9uIjoiY29tcG9zZWQtMC4zLWZyb3plbiIsImZpcnN0X21hdGNoX3ByZWRpY2F0ZXMiOnsiQklORElOR19PUl9DT05GTElDVCI6ZmFsc2UsIk1BTEZPUk1FRF9PUl9CT1VOREFSWSI6ZmFsc2UsIk9NSVNTSU9OX09SX0lOQ09NUExFVEUiOmZhbHNlfSwibWF0Y2hlZF9jbGFzc193aXRuZXNzIjpbXSwicmVjb3JkX3JlZmVyZW5jZXMiOltdLCJyZXF1ZXN0X3Jhd19zaGEyNTYiOiI1MERFNjMwNzVCODk4RjE2RDVDNzMzRjZGRjM3MjZCMzAyOUUyMkFDRjRFNDEwNDA3ODRENjk3MTg3M0NFMDRBIn0sImF1ZGl0X3NoYTI1NiI6IkEwODIwNDYwRkY0RjlGRTkyNDg0RDdBQjhERjQxOTkwQzVCNkYyQkZEMERFRjg1OUQ2QTlDNEE2QTYyRThBMjIiLCJhdWRpdGVkX2JlaGF2aW9yX2NsYXNzIjoiVkFMSUQiLCJleGl0X2NvZGUiOjAsImZvcm1hdF92ZXJzaW9uIjoiQjEtQVVESVRFRC1ERUNJU0lPTi0wLjQiLCJzZWFsZWRfcmVzcG9uc2UiOnsiZXJyb3JzIjpbXSwiZXhpdF9jb2RlIjowLCJmb3JtYXRfdmVyc2lvbiI6IlBDQi1SVU5ORVItUkVTUE9OU0UtMC4yIiwib2siOnRydWUsIm91dHB1dCI6eyJlZmZlY3RfcmVjZWlwdF9zaGEyNTYiOm51bGwsIm9ibGlnYXRpb25faWQiOiJPQkwtMjIiLCJvcGVyYXRpb25faGFuZGxlIjoiT1BSXzZDOUI3MzYwNEUzMTY0NjYxRjE1M0UxNSIsInJlY29yZF9yZWZlcmVuY2VzIjpbXSwicmVzdWx0X29iamVjdCI6eyJiZWhhdmlvcl9jbGFzcyI6IlZBTElEIiwiY29uY2x1c2lvbiI6IlNBVElTRklFRCJ9LCJzdGF0dXMiOiJQQVNTIiwidW5yZXNvbHZlZF9yZWFzb25zIjpbXX0sInJlY2VpcHRfc2hhMjU2IjoiM0FDMDFERjc3QTg3NDEwNUQ5QTJCNjUxODM0RjhCNTMzM0JDMjg3OUNCNEExQTg1REMxQTUyRkZCQzk2QTY5OCIsInJlcXVlc3RfaWQiOiJSVU5fNjg3ODg4MzcwQUU2RDdERTU0OTczNEM4IiwicmVzdWx0IjoiUEFTUyJ9fQo=",
+                  "actual_response_count": 200,
+                  "actual_sha256": "57DC76AFCF4F3C97150BABAAE525D94F0C624B978A59C13E53DAA7F17B023D06",
+                  "caller_id": 0,
+                  "expected_b64": "eyJlcnJvcnMiOltdLCJleGl0X2NvZGUiOjAsImZvcm1hdF92ZXJzaW9uIjoiUENCLVJVTk5FUi1SRVNQT05TRS0wLjIiLCJvayI6dHJ1ZSwib3V0cHV0Ijp7ImVmZmVjdF9yZWNlaXB0X3NoYTI1NiI6bnVsbCwib2JsaWdhdGlvbl9pZCI6Ik9CTC0yMiIsIm9wZXJhdGlvbl9oYW5kbGUiOiJPUFJfNkM5QjczNjA0RTMxNjQ2NjFGMTUzRTE1IiwicmVjb3JkX3JlZmVyZW5jZXMiOltdLCJyZXN1bHRfb2JqZWN0Ijp7ImJlaGF2aW9yX2NsYXNzIjoiVkFMSUQiLCJjb25jbHVzaW9uIjoiU0FUSVNGSUVEIn0sInN0YXR1cyI6IlBBU1MiLCJ1bnJlc29sdmVkX3JlYXNvbnMiOltdfSwicmVjZWlwdF9zaGEyNTYiOiIzQUMwMURGNzdBODc0MTA1RDlBMkI2NTE4MzRGOEI1MzMzQkMyODc5Q0I0QTFBODVEQzFBNTJGRkJDOTZBNjk4IiwicmVxdWVzdF9pZCI6IlJVTl82ODc4ODgzNzBBRTZEN0RFNTQ5NzM0QzgiLCJyZXN1bHQiOiJQQVNTIn0K",
+                  "expected_response_count": 200,
+                  "expected_sha256": "9580542F7FB69CCADFA63B4EA34A5D5363C4D5EC35FDA88E46135DEC9EA85780",
+                  "kind": "output_byte_divergence",
+                  "raw_input_b64": "eyJkZWNpc2lvbl9pbnB1dCI6eyJmYWN0cyI6eyJiaW5kaW5nX3NoYTI1NnMiOlsiQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCOCJdLCJtZXRhZGF0YV9zaGEyNTZzIjpbIkFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQTkiXSwicmV0cmlldmVkX2NvbnRlbnRfc2hhMjU2cyI6WyJFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUUxIiwiRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFMiJdLCJzZWxmX2Fzc2VydGVkX3RydXN0X3NoYTI1NnMiOlsiQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDNyJdLCJ0b29sX291dHB1dF9zaGEyNTZzIjpbIkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRjEiXSwidHJ1c3RlZF9mb3Jfcm9sZSI6dHJ1ZSwidmFsaWRhdGlvbl9yZXN1bHQiOiJQQVNTIiwidmFsaWRhdGlvbl9yb2xlX2lkIjoiUk9MRV9BIn0sImZvcm1hdF92ZXJzaW9uIjoiQjEtU0VNQU5USUMtRkFDVFMtMC4yIiwib2JsaWdhdGlvbl9pZCI6Ik9CTC0yMiIsIm9wZXJhdGlvbl9oYW5kbGUiOiJPUFJfNkM5QjczNjA0RTMxNjQ2NjFGMTUzRTE1In0sImZvcm1hdF92ZXJzaW9uIjoiQjEtU0VNQU5USUMtREVDSVNJT04tUkVRVUVTVC0wLjIiLCJpbm5lcl9pbnB1dF9zaGEyNTYiOiIwOTk5MkFDMEIyRTFCOUZCOTk4REQzOEU0MEY3NkMxNjhDNjczRDNEMkZEOTE0MDBBQzkxNTEwMzk4NzhEQjNBIiwiaW5uZXJfcmVxdWVzdCI6eyJjb25maWd1cmF0aW9uX2hhbmRsZSI6IkNGR19CMDZCQ0FBQjBGNTcxM0I3NUFDMEYxMjYiLCJmb3JtYXRfdmVyc2lvbiI6IlBDQi1SVU5ORVItUkVRVUVTVC0wLjIiLCJpbnB1dCI6eyJidW5kbGVfaWQiOiJCVU5ETEVfQkFTRUxJTkVfMF8yIiwiY2FwYWJpbGl0aWVzIjpbXSwiY2xhaW1fdmVyc2lvbnMiOltdLCJjbG9zdXJlX2F0dGVzdGF0aW9ucyI6W3siY2xvc2VkX3JlY29yZF9jbGFzc2VzIjpbXSwiY2xvc2VkX3Rocm91Z2giOiIyMDI2LTA4LTA4VDAwOjAwOjAwWiIsImNsb3N1cmVfYXR0ZXN0YXRpb25faWQiOiJDTE9TVVJFXzAwMSIsImNvbW1pdHRlZF9mcm9udGllciI6MCwibGVkZ2VyX2lkIjoiTEVER0VSXzAwMSIsInNvdXJjZV9leHRlbnQiOltdLCJ2ZXJpZmljYXRpb25fbWV0aG9kX3JlZiI6IlNZTlRIRVRJQyJ9XSwiZGVjbGFyYXRpb25fcmVjb3JkcyI6W10sImRvbWFpbl9tYW5kYXRlX3JlY29yZHMiOltdLCJkb21haW5fdm9jYWJ1bGFyeSI6eyJjYW5vbmljYWxpemF0aW9uX21ldGhvZF9yZWYiOiJSRkM4Nzg1IiwiZG9tYWluX2lkIjoiRE9NQUlOX0JBU0VMSU5FIiwicHVycG9zZV9lbnRyaWVzIjpbeyJkZXNjcmlwdGlvbiI6IlN5bnRoZXRpYyBwdXJwb3NlIiwiaWQiOiJQVVJQT1NFX0EifV0sInNjb3BlX2VudHJpZXMiOlt7ImRlc2NyaXB0aW9uIjoiU3ludGhldGljIHNjb3BlIiwiaWQiOiJTQ09QRV9BIn1dLCJzZWxlY3Rvcl9sYW5ndWFnZV9pZCI6IkVILVNFTEVDVE9SLUNPUkUtMF8xIiwidm9jYWJ1bGFyeV9pZCI6IlZPQ0FCVUxBUllfQkFTRUxJTkUiLCJ2b2NhYnVsYXJ5X3ZlcnNpb24iOiIwLjIifSwiZXBpc29kZXMiOltdLCJmb3JtYXRfdmVyc2lvbiI6IkVILUcwLUEyLVNIQVJFRC0wLjEiLCJsZWRnZXJfb2JzZXJ2YXRpb25zIjpbeyJhY3Rpb25fb3JfZGVjaXNpb25fcmVmIjoiQUNUSU9OXzAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMSIsImNhcHR1cmVkX2F0IjoiMjAyNi0wOC0wOFQwMDowMDowMFoiLCJjb21taXR0ZWRfZnJvbnRpZXIiOjAsImRlY2lzaW9uX2NvbnRleHRfcmVmIjoiREVDSVNJT05fQ09OVEVYVF8wMDEiLCJpbmNsdWRlZF9yZWNvcmRfcmVmcyI6W10sImxlZGdlcl9pZCI6IkxFREdFUl8wMDEiLCJub25jZSI6Ik5PTkNFXzAwMSJ9XSwib2JzZXJ2YWJsZV9leHRlcm5hbF9mYWN0cyI6W3siZXh0ZXJuYWxfZmFjdF9pZCI6IkZBQ1RfMDAxIiwiZmFjdCI6ImZpeHR1cmVfY2FzZT1QQ0ItRlgtT0JMLTIyLUlPLTI5MTkzOUVBRDNDNTYwMzIiLCJvYnNlcnZlZF9hdCI6IjIwMjYtMDgtMDhUMDA6MDA6MDBaIn1dLCJyZWNvcmRlZF9hY3Rpb25fZ3JhbnRzIjpbXSwicmVjb3JkZWRfc3VwcG9ydF9hc3Nlc3NtZW50cyI6W10sInNvdXJjZV9yZWNvcmRzIjpbXSwidXNlX3JlY29yZHMiOlt7ImFjdGlvbl9vcl9kZWNpc2lvbl9yZWYiOiJBQ1RJT05fMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAxIiwiZGVjaXNpb25fY29udGV4dF9yZWYiOiJERUNJU0lPTl9DT05URVhUXzAwMSIsImRlY2xhcmVkX2Jhc2lzX3JlZnMiOltdLCJlcGlzb2RlX2lkIjoiRVBJU09ERV8wMDEiLCJleGFjdF9jbGFpbV92ZXJzaW9uX2lkIjoiQ0xBSU1fVkVSU0lPTl8wMDEiLCJvY2N1cnJlZF9hdCI6IjIwMjYtMDgtMDhUMDA6MDA6MDBaIiwicHVycG9zZV9pZCI6IlBVUlBPU0VfQSIsInJlY2VpdmVyX2NhcGFiaWxpdHlfaWQiOiJSRUNFSVZFUl8wMDEiLCJzY29wZV9pZCI6IlNDT1BFX0EiLCJ1c2VfaWQiOiJVU0VfUkVDT1JEXzAwMSJ9XX0sIm9wZXJhdGlvbl9oYW5kbGUiOiJPUFJfNkM5QjczNjA0RTMxNjQ2NjFGMTUzRTE1IiwicmVxdWVzdF9pZCI6IlJVTl82ODc4ODgzNzBBRTZEN0RFNTQ5NzM0QzgifSwiaW5uZXJfcmVxdWVzdF9yYXdfc2hhMjU2IjoiMDc3NTI5MzM0QUExOEIxNDEyQkQwQUQwMTE5QURFRDIwNkIwQjE1RDg5Njg3RDBGQTk3RDVDMkFDQUYyNUU1QyIsIm9ibGlnYXRpb25faWQiOiJPQkwtMjIiLCJvcGVyYXRpb25faGFuZGxlIjoiT1BSXzZDOUI3MzYwNEUzMTY0NjYxRjE1M0UxNSIsInJlcXVlc3RfaWQiOiJSVU5fNjg3ODg4MzcwQUU2RDdERTU0OTczNEM4In0K",
+                  "raw_input_sha256": "50DE63075B898F16D5C733F6FF3726B3029E22ACF4E41040784D6971873CE04A",
+                  "request_index": 0
+                },
+                "exception_type": "InvariantFailure",
+                "kind": "invariant_failure",
+                "message": "library caller diverged from isolated bytes",
+                "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\james\\New folder\\receiver-reliance-worktrees\\portability\\portability\\concurrency\\ladder.py\", line 939, in _worker_run\n    outputs, resources = _run_library_callers(inputs, expected, deadline)\n                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\james\\New folder\\receiver-reliance-worktrees\\portability\\portability\\concurrency\\ladder.py\", line 628, in _run_library_callers\n    raise InvariantFailure(\nInvariantFailure: library caller diverged from isolated bytes\n"
+              },
+              "worker_process_exit": 1,
+              "worker_stderr_bytes": 0,
+              "worker_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+            }
+          ],
+          "status": "INVARIANT_FAILURE",
+          "timeout_seconds": 120.0
+        }
+      ],
+      "participants": 1,
+      "status": "INVARIANT_FAILURE"
+    }
+  ],
+  "nonclaims": [
+    "No efficacy, novelty, security, fuzzing-completeness, external-standard, or universal-portability claim.",
+    "OS thread/process interleavings are sampled stress, not exhaustively enumerated schedules.",
+    "Expected response bytes come from the independent public FixtureOracle API; the accepted implementation is exercised only as the system under test."
+  ],
+  "runtime": {
+    "byte_order": "little",
+    "executable": "C:\\Users\\james\\AppData\\Local\\Python\\pythoncore-3.12-64\\python.exe",
+    "filesystem_encoding": "utf-8",
+    "gil_receipt": {
+      "sys._is_gil_enabled": null,
+      "sys._is_gil_enabled_available": false
+    },
+    "implementation": "CPython",
+    "machine": "AMD64",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "preferred_encoding": "cp1252",
+    "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+    "release": "11",
+    "system": "Windows",
+    "version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "version_info": [
+      3,
+      12,
+      10,
+      "final",
+      0
+    ],
+    "word_size_bits": 64
+  },
+  "runtime_label": "normative-host",
+  "soaks": [],
+  "status": "INVARIANT_FAILURE",
+  "stop": {
+    "mode": "library",
+    "participants": 1,
+    "phase": "normative",
+    "status": "INVARIANT_FAILURE"
+  },
+  "treatment_exposed": true,
+  "treatment_notice": "This lane must never author future blinded worlds, oracle, gold, or renderer."
+}
