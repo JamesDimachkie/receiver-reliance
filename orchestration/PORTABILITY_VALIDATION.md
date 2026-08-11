@@ -245,11 +245,91 @@ observations remain pending with the matrix.
   no stale current-status match remains. Historical discovery prose remains
   only where the file explicitly labels it as history.
 
+## Dogfooding audit: the validation system tested itself
+
+The input to the 2026-08-11 release audit was commit `e42c635`, presented as
+complete and ready to publish. The audit did not accept that assertion. It
+used the same adversarial practices required of the portability lanes against
+the harness, validators, receipts, documentation, and task-control record.
+The release audit and this catalog's own falsification produced six new stable
+finding IDs, a material strengthening of one earlier finding, and nine
+evidence, custody, or documentation catches. The source corrections are
+`a6c60d4`, `7f81dc7`, and `8a525b1`; machine-readable evidence closeout is
+`4ea69dc`, followed by this documentation-only catalog. No
+accepted-implementation source was changed.
+
+This is the consolidated dogfooding record. A "propagation stopped" entry
+describes the false downstream conclusion that remained possible at
+`e42c635`; it is not a claim that the false conclusion had already escaped
+this branch.
+
+| ID | Catch and minimal witness | Propagation stopped | Correction and durable proof |
+|---|---|---|---|
+| DG-001 | [F-LIVE-007](../portability/live/findings/F-LIVE-007.md): injected `SystemExit` or `KeyboardInterrupt` died in the monitor thread and resurfaced as `TransportError`. | A harness abort could be published and debugged as infrastructure evidence. | Preserve and re-raise the identical `BaseException` after child cleanup; pinned in the 29/29 live suite. |
+| DG-002 | [F-LIVE-008](../portability/live/findings/F-LIVE-008.md): identical 106,372-byte pipe replays varied only in `os_short_write_count` (including 10/5 and 5/30). | Host scheduling could create a false transport divergence or flaky receipt. | Ordinary writes now cross one declared backpressure boundary and complete without exposing incidental syscall partitions; paired replay regression requires a stable zero count. |
+| DG-003 | [F-LIVE-006](../portability/live/findings/F-LIVE-006.md) strengthening: the corrected evidence identity still used only 16 digest hex characters while prose made a categorical no-overwrite claim. | Different stops retained a 64-bit collision surface inconsistent with the evidence-durability claim. | Directory identity now uses the complete SHA-256 over schedule, transport, replay, and completed-replay evidence; both overwrite axes remain regression-pinned. |
+| DG-004 | [F-SANDBOX-023](../portability/sandbox/F-SANDBOX-023.md): a zero-exit command could print a valid summary and a contradictory summary and pass because validators used the first match. | Contradictory command evidence could self-authorize a green expanded gate. | Every validator now requires one unambiguous summary, strict UTF-8 and exact integer counts; admitted transcripts are retained in canonical base64 with byte counts and hashes. |
+| DG-005 | [F-MATRIX-012](../portability/matrix/findings/F-MATRIX-012.md): a runnable target could report `INFRA_UNAVAILABLE` from a stale or dirty checkout without a matching workflow SHA. | Missing platform execution could be attributed to the wrong source revision and still satisfy the matrix summary. | Every runnable outcome, including absence, must bind a clean checkout and exact expected SHA; missing, dirty, and wrong-SHA mutations fail. |
+| DG-006 | [Concurrency status](../portability/concurrency/receipts/STATUS.md): the published `test_ladder.py` hash did not match the current file, while the then-current receipts recorded a dirty baseline despite prose calling them admitted current evidence. | Superseded concurrency evidence could be reused after its own source-binding rule invalidated it. | Clean-source smoke and normative receipts bind `8a525b1`, the current four source hashes, 32 worker runs, and 242,400 projections; the dirty receipts are explicitly historical. |
+| DG-007 | Model custody and count semantics: the claimed independent N=48 replay had no committed machine-readable result, and prose blurred the 16,260,520 historical migration delta with 20,531,838 current rejected alias opportunities. | A correct bounded result could be repeated with an incorrect interpretation or without inspectable independent custody. | [Independent receipt](../portability/model/receipts/N48-independent-refuter-20260811.json) preserves the full traversal and exact canonical-body comparison; the report now separates both counts. Raw SHA-256 `3A8D4BF8FC862818A87F7B16B76D4565F32DBCF1507EB800490B193225BF9FF8`. |
+| DG-008 | Gate custody: the prior final-gate assertion existed only in report and ledger prose; no committed machine-readable local gate receipt retained what each validator consumed. | A later reviewer could not independently reconstruct the claimed 11/11 decision. | [Final gate receipt](../portability/receipts/local-expanded-gate-release-audit.json) retains all 22 streams and their bindings. Raw SHA-256 `4039ED94D885B9001C4B18B70C76BD7D70F6158A43946556C9062D66E7B361A3`; embedded self-hash `F50D05B07985D21F37F4A8B1ACBDCCDED4D7CEF370343C9039F0D90AF34F0309`. |
+| DG-009 | Current-state prose was internally contradictory: 36 finding status lines still said refutation was pending, matrix prose still called N=48 pending, and model prose gave the wrong runtime. | Readers or automation could propagate stale disposition and count state despite the terminal report. | Every finding now has a resolved or explicitly historical current disposition in its record or authoritative lane index; stale-status, placeholder, and broken-local-link sweeps pass. |
+| DG-010 | Oracle status stated cross-platform, cross-architecture, and cross-runtime success even though hosted execution had not occurred. | Local evidence could be promoted into an unsupported universal portability claim. | Oracle and terminal report now state that those clauses remain contingent on hosted receipts. |
+| DG-011 | Ledger completion times of 12:44 and 12:55 appeared inside a 12:37 commit whose files were written earlier. | Impossible chronology could be treated as a valid custody timeline. | The two entries are preserved as `REJECTED AS CUSTODY TIMELINE`; the corrective interval ends at 14:40 before the 14:41 evidence commit. |
+| DG-012 | The claimed raw `git diff --check` hygiene gate was red: 138 intentional CR-at-EOL diagnostics in four byte-custody captures plus one unexpected blank-at-EOF diagnostic. | A blanket hygiene-PASS statement could conceal both protected raw bytes and a real unrelated defect. | The unexpected diagnostic was removed. `verify_hygiene.py` hash-binds and permits exactly the 138 custody bytes and fails on anything else; current result is 138 allowed, zero unexpected, 4/4 hashes. |
+| DG-013 | [F-SANDBOX-024](../portability/sandbox/F-SANDBOX-024.md): the first duplicate-summary correction rejected all six real human-prefixed grounded summaries. | A fail-closed hardening change could block valid releases and be mistaken for a product failure. | Prefix-aware exact parsing is regression-pinned; rejected attempt 1 remains quarantined at raw SHA-256 `31F9C49E8D7E808372A399C9E868D624533D2171D99FB4CBC37EDDDB2E42AA73`. |
+| DG-014 | [F-SANDBOX-025](../portability/sandbox/F-SANDBOX-025.md): the hardened unittest validator accepted LF but rejected the real Windows `OK\r\n` transcript. | Platform-specific line endings could create a false negative in the portability gate. | Normalize lines once, then require exactly one `Ran 7 tests` and one `OK`; rejected attempt 2 remains quarantined at raw SHA-256 `B82AF20209165F3EBBDAD61C42F5454266693109EA2AE3BE0343EB1E4ADCDE53`. |
+| DG-015 | The authoritative external task claim still described `e42c635` as the current validated state after corrective source and evidence commits existed. | The control-plane record could direct later work to superseded evidence or imply terminal completion. | The claim now binds the corrective source/evidence state, remains `in_progress` and `needs_user=true`, and lists hosted reconciliation and closeout as pending. |
+| DG-016 | Catalog falsification found that this report claimed every finding file carried its own current disposition, but ten Oracle files deliberately preserve discovery-time state and defer current disposition to the lane status index. | A reader could mistake historical Oracle correction instructions for unresolved current work or trust an inaccurate completeness claim. | The report now identifies [Oracle status](../portability/oracle/STATUS.md) as the authoritative disposition index and states accurately that each finding has a witness while final disposition may live in the record or its lane index. |
+
+The six new finding IDs map to DG-001, DG-002, DG-004, DG-005, DG-013, and
+DG-014. DG-003 strengthened F-LIVE-006. DG-006 through DG-012 plus DG-015 are
+the original eight evidence, custody, or documentation catches; DG-016 is the
+ninth, found while falsifying this catalog. These are audit-record categories,
+not a severity ranking or a claim that every entry is the same kind of defect.
+
+### Complete stable-finding surface
+
+The portability corpus contains 60 stable `F-*` records. This count is an
+inventory, not a claim of 60 accepted-implementation bugs: records include
+model, oracle, harness, workflow, validator, evidence, refinement, and rejected
+hypothesis findings. Each record retains its own witness. Current disposition
+is recorded either in that file or in an authoritative lane index; notably,
+`portability/oracle/STATUS.md` indexes the 13 discovery-time Oracle records.
+
+| Lane | Stable records | Count |
+|---|---:|---:|
+| Model | F-MODEL-001 through F-MODEL-003 | 3 |
+| Oracle | F-ORACLE-001 through F-ORACLE-013 | 13 |
+| Live | F-LIVE-001 through F-LIVE-008 | 8 |
+| Concurrency | F-CONC-003 | 1 |
+| Matrix | F-MATRIX-001 through F-MATRIX-012 | 12 |
+| Sandbox | F-SANDBOX-003 through F-SANDBOX-025 | 23 |
+| **Total** |  | **60** |
+
+### What the dogfood result establishes
+
+The useful result is causal, not rhetorical: a candidate labeled ready was
+rejected; minimized witnesses were retained; code-level defects became
+regressions; evidence gaps became source-bound receipts; invalid receipts were
+quarantined rather than rewritten; and a fresh final falsifier found no
+remaining local publication blocker. Executable regressions now stop
+recurrences of the code-level classes when the required gates run. Chronology,
+scope wording, and external task-record consistency remain explicit review
+obligations rather than falsely claimed automated protections.
+
+This does not prove the absence of unknown defects, validate anything outside
+the declared finite model, or substitute for the pending hosted platforms and
+Linux daemon. It improves the reliability of release decisions and future
+changes; it does not claim that the accepted implementation itself changed.
+
 ## Findings inventory
 
-Every finding file under `portability/*/findings/` (and the sandbox lane's
-flat `F-SANDBOX-*.md`) carries its own disposition. Adjudicated before the
-release audit: F-MODEL-003 (resolved; receipt admitted), F-LIVE-005/F-LIVE-006
+Every finding under `portability/*/findings/` (and the sandbox lane's flat
+`F-SANDBOX-*.md`) has a current disposition in its own file or an authoritative
+lane index. The Oracle discovery records intentionally remain historical;
+`portability/oracle/STATUS.md` carries their current dispositions. Adjudicated
+before the release audit: F-MODEL-003 (resolved; receipt admitted), F-LIVE-005/F-LIVE-006
 (corrected; four-round refutation to no-new-evidence), and F-SANDBOX-022
 (corrected; five-round refutation to no-new-evidence). Corrective release-audit
 findings F-LIVE-007, F-LIVE-008, F-MATRIX-012, and F-SANDBOX-023 through
