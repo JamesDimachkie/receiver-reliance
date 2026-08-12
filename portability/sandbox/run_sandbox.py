@@ -958,6 +958,11 @@ def docker_create_args(
         "docker",
         "create",
         "--read-only",
+        # F-SANDBOX-027 review correction: the CLI leaves HostConfig.Init nil
+        # to delegate to the daemon-wide default, so a null inspect value
+        # proves delegation, not falseness.  Request the value explicitly and
+        # demand exact false back.
+        "--init=false",
         "--network",
         "none",
         "--cap-drop",
@@ -1322,21 +1327,21 @@ def _assert_inspect(
         "privileged": False,
     }
     # F-SANDBOX-027: the first real hosted daemon (Docker Engine on
-    # ubuntu-latest) serializes unset Config.Cmd, Config.NetworkDisabled, and
-    # HostConfig.Init as null, and reports the read-only bind's cosmetic Mode
-    # as "" while RW stays false.  The mock-derived fixtures pinned the
-    # explicit-default spellings.  Null-versus-default is an API serialization
-    # difference, not a containment difference, so normalize exactly these
-    # shapes before comparison.  Receipts retain the raw inspected values, and
-    # a writable mount cannot hide behind the Mode normalization because it
-    # applies only while RW is false.
+    # ubuntu-latest) serializes unset Config.Cmd and Config.NetworkDisabled as
+    # null, and reports the read-only bind's cosmetic Mode as "" while RW
+    # stays false.  The mock-derived fixtures pinned the explicit-default
+    # spellings.  Null-versus-default is an API serialization difference for
+    # exactly these fields, not a containment difference, so normalize them
+    # before comparison.  Receipts retain the raw inspected values, and a
+    # writable mount cannot hide behind the Mode normalization because it
+    # applies only while RW is false.  HostConfig.Init is deliberately NOT
+    # normalized: the CLI leaves it nil to delegate to a daemon-wide default,
+    # so create requests --init=false and inspection demands exact false.
     spec = dict(spec)
     if spec.get("command") is None:
         spec["command"] = []
     if spec.get("network_disabled") is None:
         spec["network_disabled"] = False
-    if spec.get("init_process") is None:
-        spec["init_process"] = False
     raw_effective = spec.get("effective_mounts")
     if isinstance(raw_effective, list):
         spec["effective_mounts"] = [

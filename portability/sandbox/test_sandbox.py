@@ -812,11 +812,9 @@ class SandboxSpecTests(unittest.TestCase):
                 if variant == "null":
                     raw["Config"]["Cmd"] = None
                     raw["Config"]["NetworkDisabled"] = None
-                    raw["HostConfig"]["Init"] = None
                 else:
                     raw["Config"].pop("Cmd")
                     raw["Config"].pop("NetworkDisabled")
-                    raw["HostConfig"].pop("Init")
                 raw["Mounts"][0]["Mode"] = ""
                 selected = run_sandbox._selected_inspect(raw)
                 run_sandbox._assert_inspect(
@@ -824,8 +822,21 @@ class SandboxSpecTests(unittest.TestCase):
                 )
                 self.assertIsNone(selected["command"])
                 self.assertIsNone(selected["network_disabled"])
-                self.assertIsNone(selected["init_process"])
                 self.assertEqual(selected["effective_mounts"][0]["mode"], "")
+
+        # HostConfig.Init is never normalized: create passes --init=false, so
+        # a nil inspect value means daemon delegation and must fail.
+        self.assertIn("--init=false", run_sandbox.docker_create_args("fixture:image", source))
+        delegated = valid_docker_inspect(source)
+        delegated["HostConfig"]["Init"] = None
+        with self.assertRaisesRegex(RuntimeError, "init_process"):
+            run_sandbox._assert_inspect(
+                run_sandbox._selected_inspect(delegated),
+                "a" * 64,
+                FIXTURE_IMAGE_ID,
+                expected_image_tag(),
+                source,
+            )
 
         # Writability can never hide behind the Mode normalization.
         writable = copy.deepcopy(selected)
@@ -1930,12 +1941,13 @@ class SandboxSpecTests(unittest.TestCase):
                 "integer_one": 1,
                 "opposite_boolean": not expected,
             }
-            if field in {"network_disabled", "init"}:
-                # F-SANDBOX-027: real daemons serialize these unset
-                # false-default legacy bits as null or absent; acceptance is
-                # pinned by
+            if field == "network_disabled":
+                # F-SANDBOX-027: real daemons serialize this unset legacy
+                # false-default bit as null or absent; acceptance is pinned by
                 # test_daemon_null_default_serializations_are_containment_equal,
-                # and every non-null wrong value below still fails.
+                # and every non-null wrong value below still fails.  Init is
+                # NOT exempted: create requests --init=false explicitly, so
+                # null means daemon delegation and stays a failure.
                 del invalid_values["missing"]
                 del invalid_values["null"]
             for mutation_name, invalid in invalid_values.items():

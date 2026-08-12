@@ -24,19 +24,25 @@ containment differences: writability is bound by `RW`, network isolation by
 `NetworkMode: "none"`, and the process contract by the strictly pinned
 entrypoint.
 
-Correction: `_assert_inspect` normalizes exactly these shapes before
-comparison — `null`/absent `Cmd` ≡ `[]`, `null`/absent
-`NetworkDisabled`/`Init` ≡ `false`, and mount `Mode ""` ≡ `"ro"` only while
-`read_write` is `false`. Receipts retain the raw inspected values, every
-other comparison stays strict, and a writable mount cannot hide behind the
-Mode normalization.
+Correction (as hardened by the author-separated review): `_assert_inspect`
+normalizes exactly the shapes whose null form provably equals the declared
+expectation — `null`/absent `Cmd` ≡ `[]`, `null`/absent `NetworkDisabled` ≡
+`false`, and mount `Mode ""` ≡ `"ro"` only while `read_write` is `false`.
+`HostConfig.Init` is deliberately NOT normalized: the Docker CLI leaves it
+nil to delegate to a daemon-wide `default-init` setting, so a nil inspect
+value proves delegation rather than falseness. `docker create` now passes
+`--init=false` explicitly and inspection demands exact `false`. Receipts
+retain the raw inspected values, every other comparison stays strict, and a
+writable mount cannot hide behind the Mode normalization.
 
 Regression pins: `sandbox/test_sandbox.py`
-`test_daemon_null_default_serializations_are_containment_equal` accepts both
-the null and absent serializations, rejects Mode `""` with `RW true`, and
-rejects a null where the expectation is not the daemon default
-(`readonly_rootfs`); the prior mutation tests keep every non-null wrong
-value failing. The suite is 77/77.
+`test_daemon_null_default_serializations_are_containment_equal` accepts the
+null and absent `Cmd`/`NetworkDisabled` serializations with Mode `""`,
+requires `--init=false` in the create plan, rejects a delegated
+(`null`) `Init`, rejects Mode `""` with `RW true`, and rejects a null where
+the expectation is not the daemon default (`readonly_rootfs`); the prior
+mutation tests keep every non-null wrong value failing, including all six
+`init` mutations. The suite is 77/77.
 
 The witness receipt is preserved in the run-31549925307 sandbox artifact;
 the container had already been force-removed by the harness cleanup before

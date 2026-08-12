@@ -20,19 +20,26 @@ worker's stderr placed a kernel-race artifact inside replay identity. This is
 the same doctrine as F-LIVE-008, which removed incidental
 `os_short_write_count` partitions from replay identity.
 
-Correction: the worker wraps the accepted server with a peer-close abort
-boundary catching exactly `BrokenPipeError`, `ConnectionResetError`, and
-`ConnectionAbortedError`. It emits one deliberately field-free
-`transport_abort` control event and exits with the fixed code 5, so both
-replays produce identical deterministic evidence. Every other exception —
-including any other `OSError` — propagates unchanged: a harness defect is
-never laundered into transport-abort evidence (F-LIVE-005/F-LIVE-007
-doctrine). The controller validates the new event as field-free.
+Correction (as hardened by the author-separated review): exactly
+`BrokenPipeError`, `ConnectionResetError`, and `ConnectionAbortedError` are
+translated into an internal `_PeerCloseAbort` sentinel ONLY at the physical
+data endpoints — the data sink's OS write and the data source's OS read —
+because exception class alone cannot establish which endpoint raised. The
+worker's serve boundary catches only the sentinel, emits one deliberately
+field-free `transport_abort` control event, and exits with the fixed code 5,
+so both replays produce identical deterministic evidence. A raw
+connection-abort class arriving from anywhere else (boundary-control,
+stderr-control, harness code), and every other exception including plain
+`OSError`, propagates unchanged: a harness defect is never laundered into
+transport-abort evidence (F-LIVE-005/F-LIVE-007 doctrine). The controller
+validates the new event as field-free.
 
-Regression pin: `live/test_live.py`
+Regression pins: `live/test_live.py`
 `WorkerPeerCloseAbortTests.test_peer_close_abort_is_deterministic_and_never_launders_faults`
-covers all three abort classes, the fixed exit code, the bare control event,
-and non-laundering for `ValueError` and plain `OSError`. The suite is 30/30.
+(sentinel exit path; propagation of all three raw abort classes plus
+`ValueError` and plain `OSError`) and
+`test_only_physical_data_endpoints_translate_peer_close` (sink-write and
+source-read translation). The suite is 31/31.
 
 The accepted implementation is unchanged; the defect was in the harness's
 replay-identity projection.

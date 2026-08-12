@@ -997,28 +997,36 @@ class WorkerPeerCloseAbortTests(unittest.TestCase):
         # differed only in which accepted-server syscall first observed the
         # peer close, so the embedded traceback broke byte-identical replay.
         # The abort boundary emits one bare control event and a fixed exit
-        # code; the raising frame and exception subclass are excluded from
-        # replay identity as kernel-race artifacts.
-        for abort in (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
-            with self.subTest(abort=abort.__name__):
-                events: list[tuple[str, dict[str, object]]] = []
-                with (
-                    mock.patch.object(
-                        worker.rr_batch, "serve", side_effect=abort("peer closed")
-                    ),
-                    mock.patch.object(
-                        worker,
-                        "_control",
-                        lambda event, **fields: events.append((event, fields)),
-                    ),
-                ):
-                    exit_code = worker._serve(None, None)
-                self.assertEqual(exit_code, worker.PEER_CLOSE_EXIT)
-                self.assertEqual(events, [("transport_abort", {})])
+        # code.  Review correction: exception class alone cannot establish
+        # which endpoint raised, so translation to the internal sentinel
+        # happens only at the physical data endpoints; a raw connection-abort
+        # class reaching _serve from anywhere else propagates unchanged.
+        events: list[tuple[str, dict[str, object]]] = []
+        with (
+            mock.patch.object(
+                worker.rr_batch,
+                "serve",
+                side_effect=worker._PeerCloseAbort("data sink peer close"),
+            ),
+            mock.patch.object(
+                worker,
+                "_control",
+                lambda event, **fields: events.append((event, fields)),
+            ),
+        ):
+            exit_code = worker._serve(None, None)
+        self.assertEqual(exit_code, worker.PEER_CLOSE_EXIT)
+        self.assertEqual(events, [("transport_abort", {})])
 
-        # Any other exception propagates unchanged: no harness fault or
-        # non-abort OSError is laundered into transport-abort evidence.
-        for defect in (ValueError("harness defect"), OSError("other os error")):
+        # Raw abort classes, harness faults, and other OS errors all
+        # propagate: nothing outside the data endpoints is laundered.
+        for defect in (
+            BrokenPipeError("control channel"),
+            ConnectionResetError("control channel"),
+            ConnectionAbortedError("control channel"),
+            ValueError("harness defect"),
+            OSError("other os error"),
+        ):
             with self.subTest(defect=type(defect).__name__):
                 with (
                     mock.patch.object(
@@ -1029,6 +1037,45 @@ class WorkerPeerCloseAbortTests(unittest.TestCase):
                     with self.assertRaises(type(defect)):
                         worker._serve(None, None)
                 control.assert_not_called()
+
+    def test_only_physical_data_endpoints_translate_peer_close(self) -> None:
+        class _AbortingSocket:
+            def setblocking(self, value: bool) -> None:
+                pass
+
+            def send(self, data: object) -> int:
+                raise ConnectionResetError("peer closed data endpoint")
+
+            def makefile(self, mode: str, buffering: int) -> object:
+                outer = self
+
+                class _Raw:
+                    def readline(self, size: int = -1) -> bytes:
+                        raise BrokenPipeError("peer closed data endpoint")
+
+                    def close(self) -> None:
+                        pass
+
+                return _Raw()
+
+        endpoint = _AbortingSocket()
+        with mock.patch.object(worker, "socket") as socket_module:
+            socket_module.socket = _AbortingSocket
+            sink = worker.NonBlockingSink.__new__(worker.NonBlockingSink)
+            sink.endpoint = endpoint
+            sink._is_socket = True
+            sink.boundary_control = None
+            sink._control_reader = None
+            sink._response_index = 0
+            sink._boundary_complete = False
+            with self.assertRaises(worker._PeerCloseAbort):
+                sink._write_once(memoryview(b"x"))
+
+        source = worker.BlockingSocketSource.__new__(worker.BlockingSocketSource)
+        source.endpoint = endpoint
+        source.raw = endpoint.makefile("rb", 0)
+        with self.assertRaises(worker._PeerCloseAbort):
+            source.readline()
 
 
 if __name__ == "__main__":

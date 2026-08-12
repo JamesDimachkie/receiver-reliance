@@ -28,17 +28,25 @@ CONTROL_PREFIX = b"RRCTL "
 # F-LIVE-009: exactly the peer-initiated connection-abort classes.  Which
 # accepted-server syscall first observes a peer close is kernel-scheduled, not
 # schedule-determined, so the raising frame and exception subclass are
-# incidental race artifacts that must not enter replay identity.  Any other
-# exception still propagates: a harness defect is never laundered into
-# transport-abort evidence (F-LIVE-005/F-LIVE-007 doctrine).
+# incidental race artifacts that must not enter replay identity.  The classes
+# are translated into the internal sentinel ONLY at the physical data
+# endpoints (the data sink's OS write and the data source's OS read):
+# exception class alone cannot establish which endpoint raised, so a
+# boundary-control or stderr-control failure keeps its own classification and
+# is never laundered into transport-abort evidence (F-LIVE-005/F-LIVE-007
+# doctrine).
 PEER_CLOSE_ABORTS = (BrokenPipeError, ConnectionResetError, ConnectionAbortedError)
 PEER_CLOSE_EXIT = 5
+
+
+class _PeerCloseAbort(Exception):
+    """Sentinel: a peer-initiated close observed at a physical data endpoint."""
 
 
 def _serve(source: Any, sink: Any) -> int:
     try:
         return rr_batch.serve(source, sink)
-    except PEER_CLOSE_ABORTS:
+    except _PeerCloseAbort:
         _control("transport_abort")
         return PEER_CLOSE_EXIT
 
@@ -85,11 +93,14 @@ class NonBlockingSink:
             os.set_blocking(self.endpoint, value)
 
     def _write_once(self, data: memoryview) -> int:
-        if self._is_socket:
-            assert isinstance(self.endpoint, socket.socket)
-            return self.endpoint.send(data)
-        assert isinstance(self.endpoint, int)
-        return os.write(self.endpoint, data)
+        try:
+            if self._is_socket:
+                assert isinstance(self.endpoint, socket.socket)
+                return self.endpoint.send(data)
+            assert isinstance(self.endpoint, int)
+            return os.write(self.endpoint, data)
+        except PEER_CLOSE_ABORTS as error:
+            raise _PeerCloseAbort("data sink peer close") from error
 
     def _receive_command(self, expected: str) -> dict[str, Any]:
         assert self._control_reader is not None
@@ -205,8 +216,11 @@ class BlockingSocketSource:
         self.raw = endpoint.makefile("rb", buffering=0)
 
     def readline(self, size: int = -1) -> bytes:
-        self.endpoint.setblocking(True)
-        return self.raw.readline(size)
+        try:
+            self.endpoint.setblocking(True)
+            return self.raw.readline(size)
+        except PEER_CLOSE_ABORTS as error:
+            raise _PeerCloseAbort("data source peer close") from error
 
     def close(self) -> None:
         self.raw.close()

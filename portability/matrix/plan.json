@@ -255,7 +255,7 @@
         "cwd": ".",
         "argv": ["{python}", "-B", "portability/live/test_live.py"],
         "timeout_seconds": 900,
-        "expected": {"tests": [30]}
+        "expected": {"tests": [31]}
       },
       {
         "id": "concurrency-tests",
@@ -282,7 +282,7 @@
         "cwd": ".",
         "argv": ["{python}", "-B", "portability/verify_receipts.py"],
         "timeout_seconds": 300,
-        "expected": {"checks": [61], "failures": [0]}
+        "expected": {"checks": [62], "failures": [0]}
       }
     ],
     "baseline_nonperformance": [

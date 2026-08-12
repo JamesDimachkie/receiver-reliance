@@ -60,6 +60,9 @@ REJECTED_1_RAW_SHA256 = "31F9C49E8D7E808372A399C9E868D624533D2171D99FB4CBC37EDDD
 REJECTED_2_RAW_SHA256 = "B82AF20209165F3EBBDAD61C42F5454266693109EA2AE3BE0343EB1E4ADCDE53"
 REFUTER_RAW_SHA256 = "3A8D4BF8FC862818A87F7B16B76D4565F32DBCF1507EB800490B193225BF9FF8"
 MODEL_RECEIPT_SHA256 = "CD6210F8706C7B37B6CD25A9EF67B53696207EAFED716284151D67B20444732E"
+EXPECTED_COUNTS_RAW_SHA256 = (
+    "05DA6CC670CA3F3553B1B7B2807EC312E70ABAFF10D3E8FCE458DA5CC3C2282C"
+)
 CURRENT_REJECTED_ALIAS_EDGES = 20531838
 CONC_NORMATIVE_RAW_SHA256 = "B1782A43E4E4615569948953FFC45659BF0A820BEB67136F73FEDFDEAFE29998"
 CONC_SMOKE_RAW_SHA256 = "8CBA926DFB61B2C729C5CEAB95FF89350B99AFAF03809CBDDEAF6B8AC7719030"
@@ -186,7 +189,15 @@ def _verify_model_receipts(v: _Verifier) -> None:
         "model.capture_self_zeroed_hash",
         _sha256_upper(_canonical(body)) == embedded == MODEL_RECEIPT_SHA256,
     )
-    expected_counts = json.loads(EXPECTED_COUNTS.read_text(encoding="utf-8"))
+    counts_raw = EXPECTED_COUNTS.read_bytes()
+    # Review correction: bind the full raw bytes, not only the embedded
+    # receipt hash — every other field of EXPECTED_COUNTS.json is equally
+    # load-bearing published state.
+    v.check(
+        "model.expected_counts_raw_sha256",
+        _sha256_upper(counts_raw) == EXPECTED_COUNTS_RAW_SHA256,
+    )
+    expected_counts = json.loads(counts_raw)
     v.check(
         "model.expected_counts_binding",
         expected_counts.get("final_receipt_sha256") == MODEL_RECEIPT_SHA256,

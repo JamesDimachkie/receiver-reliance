@@ -71,6 +71,17 @@ def receipt_path_error(
     )
 
 
+def receipt_path_label(
+    receipt_path: pathlib.Path, repo: pathlib.Path = REPO
+) -> str:
+    """Receipt self-description for both permitted destination shapes."""
+    resolved = receipt_path.resolve()
+    try:
+        return resolved.relative_to(repo.resolve()).as_posix()
+    except ValueError:
+        return resolved.as_posix()
+
+
 def receipt_status(
     exit_code: int,
     git_start: dict[str, Any],
@@ -109,7 +120,7 @@ def main(argv: list[str] | None = None) -> int:
         "status": "STARTED",
         "started_utc": started.isoformat(),
         "authority_commands": 11,
-        "receipt_path": receipt_path.relative_to(REPO).as_posix(),
+        "receipt_path": receipt_path_label(receipt_path),
         "git": {
             "head": _git(["rev-parse", "HEAD"]).decode("ascii").strip(),
             "clean": status_bytes == b"",
@@ -208,7 +219,11 @@ def main(argv: list[str] | None = None) -> int:
     receipt["receipt_sha256"] = _sha256(_canonical(receipt))
     payload = _canonical(receipt) + b"\n"
     receipt_path.parent.mkdir(parents=True, exist_ok=True)
-    receipt_path.write_bytes(payload)
+    try:
+        with open(receipt_path, "xb") as stream:
+            stream.write(payload)
+    except FileExistsError as error:
+        raise SystemExit("refusing to overwrite an existing gate receipt") from error
     print(payload.decode("ascii"), end="")
     return exit_code
 
