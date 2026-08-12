@@ -1562,7 +1562,7 @@ class WorkflowDefinitionTests(unittest.TestCase):
         self.assertIn("permissions:\n  contents: read\n", self.text)
         self.assertRegex(
             self.text,
-            r"(?m)^on:\n  push:\n    branches:\n      - sol/rr-portability-modelcheck-20260810\n  workflow_dispatch:\n",
+            r"(?m)^on:\n  push:\n    branches:\n      - main\n  workflow_dispatch:\n",
         )
         for forbidden in (
             "pull_request:",
