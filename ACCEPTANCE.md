@@ -193,6 +193,34 @@ review rejected a first, narrower fix for missing the deep-object classes, which
 produced the parse-layer design recorded here. The reviewer's identity and final
 disposition are recorded with this release.
 
+## v1.2 — validation layers, hosted evidence, public consolidation (2026-08-11)
+
+Everything between v1.1 and v1.2 is additive: zero bytes changed under the
+sealed 0.2/0.3 fixture packs, control surfaces, or accepted reference
+implementations. What landed, each with its own evidence record:
+
+- the grounded 0.4 layer answering the external review — library and
+  audited APIs, tighten-only closures, the CI-gated authority register and
+  lint, and the native-records usefulness proof (internal held-out tier);
+- the deterministic seeded fuzz campaign (100,000 case identities, zero
+  findings) and the recorded second-implementation attempt, rejected four
+  times by fresh-context refuters (`orchestration/refuters/`);
+- the portability program: finite model with admitted N=48 enumeration,
+  independent oracle, deterministic live-transport replay, bounded
+  concurrency ladder, hosted CPython 3.12/3.13/3.14 matrix across six
+  OS/architecture rows, and a hardened daemon-real Linux container gate,
+  with all hosted receipts committed under `portability/receipts/hosted/`
+  and bound by the 193-check `verify_receipts.py`
+  (`orchestration/PORTABILITY_VALIDATION.md`);
+- the blind completeness review's published input bundle (`evidence/`);
+- repository consolidation to a single public `main`, with the first
+  public run's authority-pin failure adjudicated as F-MATRIX-014 rather
+  than amended away.
+
+Provenance: multi-lane authorship under the recorded role-separation
+protocol throughout; the orchestration ledger carries the per-actor
+chronology, including the four red hosted runs and their pinned findings.
+
 ## How to reproduce
 
 From `baseline-run/`, with any CPython 3.12:

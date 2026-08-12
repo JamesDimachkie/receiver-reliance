@@ -1,6 +1,6 @@
 # Receiver-reliance baseline — conformance suite and reference implementation
 
-Release 1.1, composed generation. License: Apache-2.0 (see `LICENSE`;
+Release 1.2, composed generation. License: Apache-2.0 (see `LICENSE`;
 Copyright 2026 James Dimachkie).
 
 ## What this is, and where it comes from
