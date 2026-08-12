@@ -282,3 +282,49 @@ order:
 
 The research program's blinded outcome-value experiment remains explicitly
 out of scope and unchanged.
+
+## Intake 9 — machine-local success does not establish a transferable integration
+
+Source/date: James, 2026-08-12, after the first robustness cycles exposed
+machine- and runtime-coupled failures in WP1, WP4, and WP5. The accompanying
+GitHub traffic screenshot (raw SHA-256
+`931B96CE0B4FB62D0552E0F98FF05E9C6327B9898CDA7501E688F3301A606AD8`)
+shows 179 clones and 34 unique cloners in the displayed 14-day window. That
+is an attention signal only: it is not adoption, efficacy, readiness, or
+demand evidence and creates no public claim.
+
+**Classification: ADDRESSABLE-ADDITIVE. Admitted after independent blocker
+reproduction.**
+
+The failures share one premise: an implicit local boundary was treated as a
+portable contract. WP1 collapsed invalid native evidence and unavailable
+native semantics into one `REFUSED` result and attempted to generalize host
+truth that only an integration can observe. WP4 inherited CPython recursion
+and integer-conversion behavior and loaded content-addressed authorities
+without enforcing their pins. WP5 inferred request/response identity from
+pipe timing instead of a response envelope bound to the request. Current-byte
+CPython 3.13 and non-Windows evidence was also absent. Each witness was
+reproduced against the recorded bytes; passing ordinary fixtures did not
+contradict any witness.
+
+**Promised response:** resolve the boundaries, not just the witnesses:
+
+1. WP1 stands down from a universal raw-record adapter after its three-strike
+   condition. Its fallback becomes a portable preflight/calibration surface
+   with distinct `READY`, `REJECTED_INVALID`, and
+   `INSUFFICIENT_EVIDENCE` outcomes. Invalid evidence remains detection;
+   unavailable host semantics remains abstention; neither becomes a pass.
+2. WP4 must implement a total wire machine with bounded iterative parsing,
+   lexical number handling independent of host integer limits, and verified
+   byte-length/SHA-256 authority pins before resolution.
+3. WP5 must correlate every response to a completed request through a
+   versioned transport envelope containing an exact sequence and request-byte
+   digest. Queue timing or a line count can never establish identity.
+4. One additive portable-bundle manifest and offline gate will bind the exact
+   shipped sources and authorities. Those same bytes, not regenerated local
+   substitutes, must run on Windows, Linux, and macOS across CPython
+   3.12–3.14 before any transferable-support claim is proposed.
+
+The response remains inside the existing WP1/WP4/WP5 and portability claimed
+paths. No workflow edit, README claim, remote write, or generation adoption is
+authorized by this intake; each retains its existing James gate.
