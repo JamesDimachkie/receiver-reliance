@@ -299,14 +299,26 @@ frozen fixture plus the review's probes as regressions.
 
 ## Contributing / re-verification
 
-The highest-value additions are adversarial: a coverage-guided fuzzing
-campaign against the reference runner, and an independent second
-implementation cross-tested against the same fixture packs. Both are
-welcome; neither exists yet. To re-verify what is here, run the conformance
-suite (both modes), then re-derive every seal per the RUNBOOK, then, from the
-repository root, run `python -B grounded-0_4/test_grounded_0_4.py`,
+The highest-value additions are adversarial, and both invited classes now
+have recorded first attempts. A deterministic seeded campaign (100,000
+case identities, 67,599 unique raw byte strings, zero findings) ran on
+2026-08-10 (`fuzz/`, `orchestration/FUZZ_CAMPAIGN.md`); a coverage-guided
+campaign remains open. An independent second implementation was attempted
+under author separation and REJECTED four times by fresh-context refuters
+— four distinct minimized raw-ABI divergences (RFC 8785 UTF-16 member
+ordering, lone-surrogate handling, missing-LF duplicate-key precedence,
+duplicate-key pointer selection; reports in `orchestration/refuters/`).
+That is negative evidence about reimplementation sensitivity, not
+independent confirmation: a conforming second implementation still does
+not exist and remains the single most valuable outside contribution. To
+re-verify what is here, run the conformance suite (both modes), then
+re-derive every seal per the RUNBOOK, then, from the repository root, run
+`python -B grounded-0_4/test_grounded_0_4.py`,
 `python -B grounded-0_4/lint_contract.py --gate`, and
-`python -B grounded-0_4/test_lint_gate.py`.
+`python -B grounded-0_4/test_lint_gate.py`. What is deliberately not
+published, and why, is ledgered in [WITHHELD.md](WITHHELD.md); the blind
+completeness review's input bundle is published and verifiable under
+[evidence/](evidence/README.md).
 
 ## Provenance and exclusions
 
