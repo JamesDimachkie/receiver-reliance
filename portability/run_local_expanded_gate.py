@@ -42,22 +42,70 @@ def _git(command: list[str]) -> bytes:
     ).stdout
 
 
+def receipt_path_error(
+    receipt_path: pathlib.Path,
+    repo: pathlib.Path = REPO,
+    receipt_root: pathlib.Path = RECEIPT_ROOT,
+) -> str | None:
+    """Return the policy violation for a receipt destination, if any.
+
+    Allowed destinations are the durable custody directory
+    ``portability/receipts`` and any path entirely outside the repository
+    (so a verification rerun can execute against a clean worktree without
+    creating repository state).  Any other in-repository destination is
+    rejected.
+    """
+    resolved = receipt_path.resolve()
+    try:
+        resolved.relative_to(receipt_root.resolve())
+        return None
+    except ValueError:
+        pass
+    try:
+        resolved.relative_to(repo.resolve())
+    except ValueError:
+        return None
+    return (
+        "--receipt must stay under portability/receipts or entirely "
+        "outside the repository"
+    )
+
+
+def receipt_status(
+    exit_code: int,
+    git_start: dict[str, Any],
+    git_end: dict[str, Any],
+    command_count: int,
+) -> str:
+    """PASS only for a full clean-to-clean run of every authority command."""
+    return (
+        "PASS"
+        if (
+            exit_code == 0
+            and git_start.get("clean") is True
+            and git_end.get("clean") is True
+            and git_end.get("head") == git_start.get("head")
+            and command_count == len(expanded_gate.GATES)
+        )
+        else "FAIL"
+    )
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--receipt", required=True, type=pathlib.Path)
     args = parser.parse_args(argv)
     receipt_path = args.receipt.resolve()
-    try:
-        receipt_path.relative_to(RECEIPT_ROOT.resolve())
-    except ValueError as error:
-        raise SystemExit("--receipt must remain under portability/receipts") from error
+    path_error = receipt_path_error(receipt_path)
+    if path_error is not None:
+        raise SystemExit(path_error)
     if receipt_path.exists():
         raise SystemExit("refusing to overwrite an existing gate receipt")
 
     started = datetime.now(timezone.utc)
     status_bytes = _git(["status", "--porcelain=v1", "--untracked-files=all"])
     receipt: dict[str, Any] = {
-        "schema": "receiver-reliance/local-expanded-gate-receipt-1",
+        "schema": "receiver-reliance/local-expanded-gate-receipt-2",
         "status": "STARTED",
         "started_utc": started.isoformat(),
         "authority_commands": 11,
@@ -144,13 +192,16 @@ def main(argv: list[str] | None = None) -> int:
         if exit_code:
             break
 
+    end_status_bytes = _git(["status", "--porcelain=v1", "--untracked-files=all"])
+    receipt["git_end"] = {
+        "head": _git(["rev-parse", "HEAD"]).decode("ascii").strip(),
+        "clean": end_status_bytes == b"",
+        "status_bytes": len(end_status_bytes),
+        "status_sha256": _sha256(end_status_bytes),
+    }
     receipt["finished_utc"] = datetime.now(timezone.utc).isoformat()
-    receipt["status"] = (
-        "PASS"
-        if exit_code == 0
-        and receipt["git"]["clean"] is True
-        and len(receipt["commands"]) == len(expanded_gate.GATES)
-        else "FAIL"
+    receipt["status"] = receipt_status(
+        exit_code, receipt["git"], receipt["git_end"], len(receipt["commands"])
     )
     if receipt["status"] != "PASS":
         exit_code = 1

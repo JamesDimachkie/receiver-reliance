@@ -198,6 +198,10 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          # F-SANDBOX-026: the host preflight verifies baseline ancestry with
+          # `git merge-base --is-ancestor`; a shallow default checkout lacks
+          # the baseline commit and fails that check closed.
+          fetch-depth: 0
       - name: Select sandbox controller interpreter
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:

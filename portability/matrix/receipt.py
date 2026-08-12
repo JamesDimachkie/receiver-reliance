@@ -1503,8 +1503,15 @@ def _environment_validation_error(value: Any, entry: dict[str, Any]) -> str | No
     }:
         return "environment runtime evidence has an invalid schema"
     for field in ("implementation", "full_version", "executable", "compiler"):
-        if not isinstance(runtime.get(field), str) or not runtime[field]:
-            return f"environment runtime {field} must be nonempty"
+        if not isinstance(runtime.get(field), str):
+            return f"environment runtime {field} must be a string"
+        if not runtime[field]:
+            # F-MATRIX-013: alternative runtimes (GraalPy, PyPy) legitimately
+            # report an empty `platform.python_compiler()`; the empty string is
+            # the honest recorded value for observation receipts.  Normative
+            # receipts keep the nonempty requirement.
+            if field != "compiler" or entry.get("classification") == "normative":
+                return f"environment runtime {field} must be nonempty"
     if runtime.get("setup_python_version") is not None and not isinstance(
         runtime["setup_python_version"], str
     ):

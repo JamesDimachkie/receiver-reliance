@@ -234,7 +234,7 @@
         "cwd": ".",
         "argv": ["{python}", "-B", "portability/matrix/test_receipt.py"],
         "timeout_seconds": 900,
-        "expected": {"tests": [44]}
+        "expected": {"tests": [48]}
       },
       {
         "id": "finite-model-focused-tests",
@@ -276,6 +276,13 @@
         "argv": ["{python}", "-B", "portability/sandbox/test_sandbox.py"],
         "timeout_seconds": 900,
         "expected": {"tests": [76]}
+      },
+      {
+        "id": "verify-committed-receipts",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "portability/verify_receipts.py"],
+        "timeout_seconds": 300,
+        "expected": {"checks": [61], "failures": [0]}
       }
     ],
     "baseline_nonperformance": [

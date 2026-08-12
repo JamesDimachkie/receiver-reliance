@@ -48,7 +48,7 @@ class MatrixPlanTests(unittest.TestCase):
     def test_expanded_profile_adds_only_two_performance_commands(self) -> None:
         focused = receipt.profile_commands(self.plan, "focused")
         expanded = receipt.profile_commands(self.plan, "expanded")
-        self.assertEqual(len(focused), 16)
+        self.assertEqual(len(focused), 17)
         self.assertEqual(len(expanded), 11)
         self.assertEqual(expanded[0]["id"], "accepted-0.2")
         self.assertEqual(
@@ -56,7 +56,7 @@ class MatrixPlanTests(unittest.TestCase):
             ["batch-performance-gate", "single-pass-benchmark"],
         )
         free_threaded = receipt.profile_commands(self.plan, "free_threaded")
-        self.assertEqual(len(free_threaded), 17)
+        self.assertEqual(len(free_threaded), 18)
         self.assertEqual(free_threaded[-1]["id"], "free-threaded-concurrency-p-le-8")
 
     def test_focused_profile_uses_bounded_entrypoints(self) -> None:
@@ -65,7 +65,7 @@ class MatrixPlanTests(unittest.TestCase):
             for item in receipt.profile_commands(self.plan, "focused")
         }
         deterministic_test_counts = {
-            "matrix-receipt-tests": 44,
+            "matrix-receipt-tests": 48,
             "independent-oracle-tests": 35,
             "concurrency-tests": 15,
         }
@@ -309,6 +309,34 @@ class SummaryTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.plan = receipt._json_load(receipt.DEFAULT_PLAN)
 
+    def test_off_contract_compiler_may_be_empty_normative_must_not(self) -> None:
+        # F-MATRIX-013: GraalPy and PyPy legitimately report an empty
+        # `platform.python_compiler()`; requiring a nonempty compiler string
+        # invalidated honest off-contract observation receipts, which the
+        # summarizer then downgraded to RECEIPT_MISSING.  The empty string is
+        # the honest recorded value for observations; normative receipts keep
+        # the nonempty requirement.
+        entry = next(
+            item
+            for item in self.plan["stress"]
+            if item["classification"] == "off_contract"
+        )
+        row = self._successful_pass_row(entry, [])
+        environment = row["environment"]
+        self.assertIsNone(receipt._environment_validation_error(environment, entry))
+        environment["runtime"]["compiler"] = ""
+        self.assertIsNone(receipt._environment_validation_error(environment, entry))
+        normative_entry = dict(entry, classification="normative")
+        self.assertEqual(
+            receipt._environment_validation_error(environment, normative_entry),
+            "environment runtime compiler must be nonempty",
+        )
+        environment["runtime"]["compiler"] = None
+        self.assertEqual(
+            receipt._environment_validation_error(environment, entry),
+            "environment runtime compiler must be a string",
+        )
+
     def _write_explicit_setup_unavailable(
         self, root: pathlib.Path, entry: dict[str, object]
     ) -> None:
@@ -497,7 +525,7 @@ class SummaryTests(unittest.TestCase):
             )
         )
         self.assertTrue(all(row["infra_evidence"] for row in macos_13))
-        self.assertTrue(all(len(row["commands_planned"]) == 16 for row in macos_13))
+        self.assertTrue(all(len(row["commands_planned"]) == 17 for row in macos_13))
 
     def test_exact_deep_hostile_receipt_cli_persists_deterministic_red_summary(self) -> None:
         target = next(
@@ -1488,7 +1516,7 @@ class SummaryTests(unittest.TestCase):
             row = json.loads(output.read_text(encoding="utf-8"))
         self.assertEqual(exit_code, 0)
         self.assertEqual(row["outcome"], "INFRA_UNAVAILABLE")
-        self.assertEqual(len(row["commands_planned"]), 16)
+        self.assertEqual(len(row["commands_planned"]), 17)
         for field in (
             "git",
             "environment",
@@ -1615,6 +1643,64 @@ class WorkflowDefinitionTests(unittest.TestCase):
             "external-standard, or universal-portability claim.",
             normalized,
         )
+
+    def test_sandbox_checkout_fetches_full_history(self) -> None:
+        # F-SANDBOX-026: the sandbox host preflight verifies baseline
+        # ancestry with `git merge-base --is-ancestor`, which exits 128 in a
+        # shallow default checkout because the baseline commit is absent.
+        # The sandbox job must therefore check out full history.
+        sandbox = self.text.split("\n  sandbox:\n", 1)[1].split(
+            "\n  summarize:\n", 1
+        )[0]
+        self.assertRegex(
+            sandbox,
+            r"actions/checkout@[0-9a-f]{40}[^\n]*\n"
+            r"        with:\n"
+            r"(?:          [^\n]*\n)*?"
+            r"          fetch-depth: 0\n",
+        )
+
+
+class LocalGateRunnerTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        if str(receipt.REPO_ROOT) not in sys.path:
+            sys.path.insert(0, str(receipt.REPO_ROOT))
+        import importlib
+
+        cls.runner = importlib.import_module("portability.run_local_expanded_gate")
+
+    def test_receipt_destination_policy(self) -> None:
+        runner = self.runner
+        self.assertIsNone(
+            runner.receipt_path_error(runner.RECEIPT_ROOT / "fresh-receipt.json")
+        )
+        outside = pathlib.Path(tempfile.gettempdir()) / "rr-gate-receipt.json"
+        self.assertIsNone(runner.receipt_path_error(outside))
+        inside = runner.REPO / "portability" / "model" / "receipt.json"
+        self.assertIsNotNone(runner.receipt_path_error(inside))
+        self.assertIsNotNone(runner.receipt_path_error(runner.REPO / "receipt.json"))
+
+    def test_pass_requires_clean_to_clean_full_run(self) -> None:
+        runner = self.runner
+        gates = len(runner.expanded_gate.GATES)
+        start = {"clean": True, "head": "a" * 40}
+        end = {"clean": True, "head": "a" * 40}
+        self.assertEqual(runner.receipt_status(0, start, end, gates), "PASS")
+        self.assertEqual(runner.receipt_status(1, start, end, gates), "FAIL")
+        self.assertEqual(
+            runner.receipt_status(0, start, {"clean": False, "head": "a" * 40}, gates),
+            "FAIL",
+        )
+        self.assertEqual(
+            runner.receipt_status(0, start, {"clean": True, "head": "b" * 40}, gates),
+            "FAIL",
+        )
+        self.assertEqual(
+            runner.receipt_status(0, {"clean": False, "head": "a" * 40}, end, gates),
+            "FAIL",
+        )
+        self.assertEqual(runner.receipt_status(0, start, end, gates - 1), "FAIL")
 
 
 if __name__ == "__main__":
