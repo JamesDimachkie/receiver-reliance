@@ -42,6 +42,7 @@ if str(SANDBOX) not in sys.path:
 import expanded_gate  # noqa: E402
 
 GATE_RECEIPT = REPO / "portability" / "receipts" / "local-expanded-gate-release-audit.json"
+CLOSE_GATE_RECEIPT = REPO / "portability" / "receipts" / "local-expanded-gate-close.json"
 REJECTED_1 = REPO / "portability" / "receipts" / "local-expanded-gate-release-audit-rejected1.json"
 REJECTED_2 = REPO / "portability" / "receipts" / "local-expanded-gate-release-audit-rejected2.json"
 REFUTER_RECEIPT = REPO / "portability" / "model" / "receipts" / "N48-independent-refuter-20260811.json"
@@ -74,6 +75,15 @@ CONC_NORMATIVE_RAW_SHA256 = "B1782A43E4E4615569948953FFC45659BF0A820BEB67136F73F
 CONC_SMOKE_RAW_SHA256 = "8CBA926DFB61B2C729C5CEAB95FF89350B99AFAF03809CBDDEAF6B8AC7719030"
 CONC_WORKER_RUNS = 32
 CONC_AUDITED_ENVELOPES = 242400
+
+# Close evidence: the clean-tree expanded gate at the reconciliation commit.
+CLOSE_SOURCE_HEAD = "8104874a9e4081fca62c1cc142f68988e87751eb"
+CLOSE_GATE_RAW_SHA256 = (
+    "0A9B28FF9F255752309E3CD9F2EE0C8381122BB35B064F4C8367AD4D4DA8D81C"
+)
+CLOSE_GATE_EMBEDDED_SHA256 = (
+    "AE20E36517C11E701371C50362BCA0E7343BC189D9616ABC3A6E5D85AC5C5FFF"
+)
 
 # Hosted receipt custody (green run 31562391384 on the pushed head).
 HOSTED_DIR = REPO / "portability" / "receipts" / "hosted"
@@ -158,27 +168,34 @@ class _Verifier:
             print(f"FAIL {name} {detail}".rstrip(), file=sys.stderr)
 
 
-def _verify_gate_receipt(v: _Verifier) -> None:
-    raw = GATE_RECEIPT.read_bytes()
-    v.check("gate.raw_sha256", _sha256_upper(raw) == GATE_RAW_SHA256)
+def _verify_clean_gate_receipt(
+    v: _Verifier,
+    prefix: str,
+    path: pathlib.Path,
+    raw_sha: str,
+    embedded_sha: str,
+    source_head: str,
+) -> None:
+    raw = path.read_bytes()
+    v.check(f"{prefix}.raw_sha256", _sha256_upper(raw) == raw_sha)
     doc = json.loads(raw)
     embedded = doc.pop("receipt_sha256")
     v.check(
-        "gate.self_zeroed_hash",
-        _sha256_upper(_canonical(doc)) == embedded == GATE_EMBEDDED_SHA256,
+        f"{prefix}.self_zeroed_hash",
+        _sha256_upper(_canonical(doc)) == embedded == embedded_sha,
     )
     doc["receipt_sha256"] = embedded
-    v.check("gate.canonical_byte_identity", _canonical(doc) + b"\n" == raw)
-    v.check("gate.status", doc["status"] == "PASS")
+    v.check(f"{prefix}.canonical_byte_identity", _canonical(doc) + b"\n" == raw)
+    v.check(f"{prefix}.status", doc["status"] == "PASS")
     v.check(
-        "gate.source_binding",
-        doc["git"]["head"] == CLEAN_SOURCE_HEAD
+        f"{prefix}.source_binding",
+        doc["git"]["head"] == source_head
         and doc["git"]["clean"] is True
         and doc["git"]["status_bytes"] == 0,
     )
     commands = doc["commands"]
     v.check(
-        "gate.manifest_order",
+        f"{prefix}.manifest_order",
         [item["gate_id"] for item in commands]
         == [spec.gate_id for spec in expanded_gate.GATES],
     )
@@ -186,11 +203,14 @@ def _verify_gate_receipt(v: _Verifier) -> None:
     for item in commands:
         gate_id = item["gate_id"]
         spec = specs[gate_id]
-        v.check(f"gate.{gate_id}.exit", item["exit_code"] == 0 and item["timed_out"] is False)
+        v.check(
+            f"{prefix}.{gate_id}.exit",
+            item["exit_code"] == 0 and item["timed_out"] is False,
+        )
         stdout = base64.b64decode(item["stdout_b64"], validate=True)
         stderr = base64.b64decode(item["stderr_b64"], validate=True)
         v.check(
-            f"gate.{gate_id}.stream_binding",
+            f"{prefix}.{gate_id}.stream_binding",
             len(stdout) == item["stdout_bytes"]
             and _sha256_upper(stdout) == item["stdout_sha256"]
             and len(stderr) == item["stderr_bytes"]
@@ -198,9 +218,28 @@ def _verify_gate_receipt(v: _Verifier) -> None:
         )
         try:
             observed = expanded_gate.validate_gate_output(spec.validator, stdout, stderr)
-            v.check(f"gate.{gate_id}.validator_rerun", observed == item.get("observed"))
+            v.check(f"{prefix}.{gate_id}.validator_rerun", observed == item.get("observed"))
         except (expanded_gate.GateFailure, UnicodeError, ValueError) as error:
-            v.check(f"gate.{gate_id}.validator_rerun", False, str(error))
+            v.check(f"{prefix}.{gate_id}.validator_rerun", False, str(error))
+
+
+def _verify_gate_receipt(v: _Verifier) -> None:
+    _verify_clean_gate_receipt(
+        v,
+        "gate",
+        GATE_RECEIPT,
+        GATE_RAW_SHA256,
+        GATE_EMBEDDED_SHA256,
+        CLEAN_SOURCE_HEAD,
+    )
+    _verify_clean_gate_receipt(
+        v,
+        "close_gate",
+        CLOSE_GATE_RECEIPT,
+        CLOSE_GATE_RAW_SHA256,
+        CLOSE_GATE_EMBEDDED_SHA256,
+        CLOSE_SOURCE_HEAD,
+    )
 
 
 def _verify_rejected(v: _Verifier) -> None:
