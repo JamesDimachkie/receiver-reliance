@@ -233,10 +233,50 @@ this sequence:
    No public claim changes, workflow edits, pushes, tags, releases, settings
    changes, or new-generation adoption bypass their James gate.
 
+## Intake 8 — dual-use predicate fields are under-classified by the authority ledger
+
+Source/date: fresh-context WP2 refutation, 2026-08-12, against robustness
+worktree base `9bbf687398aeea60c5bbe65c77d51b1c43197b28` plus the uncommitted WP2
+authority surface. A second selector-collision finding belongs to the same WP2
+repair cycle but does not change this criticism's factual premise.
+
+**Classification: ADDRESSABLE-ADDITIVE. Admitted after independent
+reproduction.**
+
+The base linter accumulates every predicate reference in one set and every
+presence-operator reference in another, then defines value authority as
+`refs - presence`. A fact path used by both `PRESENT`/`ABSENT` and a
+value-comparing predicate is therefore removed from semantic authority. A
+fresh atomic-node traversal of the pinned contract tables reproduced 30
+required fields whose register status is `presence_only` even though at least
+one predicate compares their values. Examples include OBL-02
+`exact_reference`, OBL-08 `manifest_effect_sha256`, and OBL-29
+`affordable_covering_query_id`. The affected base evidence is already pinned
+above: `grounded-0_4/lint_contract.py` raw SHA-256
+`1B5A14E38A1BD3060B192F185493DEDE9C1F93C9D895640D4B3AD31A7D2249FA`
+and `authority_register_0_4.json` raw SHA-256
+`35BCE854A0F502B04E74FCAB6F1AD3159DA5BDFA014C8ABCB4709022C25098E3`.
+
+Counterevidence sought: the launch lint still reports zero findings and the
+register/table byte-match is exact, but both derive from or reproduce the same
+registered classifications; they do not independently distinguish a path used
+only for presence from one also used for value comparison. The accepted
+engine bytes are not implicated and remain untouched.
+
+**Promised response:** WP2 attempt 2 will separate per-atomic-node presence
+and value uses, correct the 30 register rows and their rationales, add mutation
+tests that fail on dual-use under-classification, regenerate the public table,
+and record both this defect and the selector-namespace collision as finding
+files. The programmatic API, table, corrected register, and corrected lint must
+agree exactly before a fresh refuter pass. No sealed byte or existing receipt
+changes.
+
 ## Phase 0 disposition and order
 
-All seven pre-adjudications are confirmed after normalization to one class per
-entry. None is `INVALID`. Work remains in the charter order:
+All seven seeded pre-adjudications are confirmed after normalization to one
+class per entry. None is `INVALID`. Intake 8 is the first post-launch
+criticism admitted through the standing protocol. Work remains in the charter
+order:
 
 `WP1 → WP2 → WP5 → WP4 → WP3`.
 
