@@ -53,7 +53,8 @@ attention card, so experiment arms can control for ceremony.
 
 ## Quickstart
 
-Requires any CPython 3.12. From `baseline-run/`:
+Requires CPython 3.12 or newer; 3.12, 3.13, and 3.14 are validated on the
+hosted matrix (see "Cross-platform validation" below). From `baseline-run/`:
 
 ```bash
 python -B implementation-output-0.2/run_conformance_0_2.py
@@ -297,6 +298,51 @@ sealed 0.2/0.3 bytes changed:
 `grounded-0_4/test_grounded_0_4.py` (504 checks) pins parity with every
 frozen fixture plus the review's probes as regressions.
 
+## Cross-platform validation: the portability program
+
+The composed engine and its harnesses were then validated as a
+portability target under the same evidence discipline. `portability/`
+holds five lanes plus the verifiers that bind their receipts:
+
+- a finite behavioral model of the reliance decision flow, its complete
+  N=48 enumeration admitted after an independent fresh-context refuter
+  reproduced the canonical receipt byte-for-byte (`portability/model/`);
+- an independent oracle (35 tests) authored under a no-read rule against
+  the implementation sources, with the exposure ledger in
+  `portability/oracle/PROVENANCE.md`;
+- deterministic live-transport schedules over pipes and socketpairs,
+  barrier-timed, each replayed twice byte-identically
+  (`portability/live/`);
+- a bounded concurrency ladder at `P = 1, 2, 4, 8` with independent
+  audited-envelope accounting (`portability/concurrency/`);
+- a hosted matrix and a hardened Linux container sandbox
+  (`.github/workflows/portability.yml`): CPython 3.12/3.13/3.14 across
+  Ubuntu x64/arm64, macOS arm64, and Windows x64/arm64. All 15 runnable
+  normative rows passed at plan-bound counts; the three predeclared
+  `macos-13` rows are recorded as evidenced `INFRA_UNAVAILABLE`; PyPy and
+  GraalPy run as off-contract observations, never as normative
+  substitutes.
+
+Hosted receipts are committed under `portability/receipts/hosted/` with a
+hash-bound manifest. Two stdlib-only verifiers re-derive the custody chain
+from bytes:
+
+```bash
+python -B portability/verify_receipts.py
+```
+
+```bash
+python -B portability/verify_hygiene.py
+```
+
+Expected: `verify-receipts: checks=193 failures=0`, then `HYGIENE_PASS`.
+The separated-evidence report is
+[orchestration/PORTABILITY_VALIDATION.md](orchestration/PORTABILITY_VALIDATION.md).
+It records the full hosted chronology — four red runs, each adjudicated
+into a pinned harness finding, before the green one — and the exact claim
+scope: validation holds within the executed environments and declared
+finite bounds, and nowhere else.
+
 ## Contributing / re-verification
 
 The highest-value additions are adversarial, and both invited classes now
@@ -314,8 +360,9 @@ not exist and remains the single most valuable outside contribution. To
 re-verify what is here, run the conformance suite (both modes), then
 re-derive every seal per the RUNBOOK, then, from the repository root, run
 `python -B grounded-0_4/test_grounded_0_4.py`,
-`python -B grounded-0_4/lint_contract.py --gate`, and
-`python -B grounded-0_4/test_lint_gate.py`. What is deliberately not
+`python -B grounded-0_4/lint_contract.py --gate`,
+`python -B grounded-0_4/test_lint_gate.py`, and the two custody verifiers
+in "Cross-platform validation" above. What is deliberately not
 published, and why, is ledgered in [WITHHELD.md](WITHHELD.md); the blind
 completeness review's input bundle is published and verifiable under
 [evidence/](evidence/README.md).

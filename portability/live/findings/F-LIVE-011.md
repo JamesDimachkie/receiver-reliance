@@ -1,7 +1,10 @@
 # F-LIVE-011 — controller data-plane calls lacked the watchdog bound
 
-Status: **RESOLVED locally (liveness bound); the hosted deadlock partner is
-not yet established. Hosted rerun pending at the corrective SHA.**
+Status: **RESOLVED (liveness bound); confirmed by the green hosted runs** —
+portability run 31562391384 (`7facfa3`) and the close-push run 31564942933
+(`55297bb`) passed every live-suite job. The original deadlock partner was
+never reproduced after the bound landed; the watchdog bound is the pinned
+defense either way.
 
 In hosted run 31552953993 (SHA `baa7b20`), the normative
 `cpython-3.13-macos-latest-arm64` job's live suite produced no output for

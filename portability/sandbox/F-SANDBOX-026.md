@@ -1,6 +1,8 @@
 # F-SANDBOX-026 — sandbox host preflight fails closed on shallow hosted checkouts
 
-Status: **RESOLVED locally; hosted rerun pending at the corrective SHA.**
+Status: **RESOLVED; confirmed by the green hosted runs** — portability
+run 31562391384 (`7facfa3`) and the close-push run 31564942933
+(`55297bb`) passed every job containing this regression.
 
 The first authorized hosted run (workflow run 31548278804, pushed SHA
 `4c9250a75e29e46275aa0d99902d49023e97ef15`) failed the

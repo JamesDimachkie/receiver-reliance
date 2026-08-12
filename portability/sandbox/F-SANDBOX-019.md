@@ -29,8 +29,11 @@ This shape follows Docker's official `--mount type=bind` interface and Engine
 mount type: `bind-propagation` is supported for bind mounts, `rprivate` is the
 documented default, and the optional recursion and source-creation booleans are
 omitted when false. The explicit form is the one scheduled for the normative
-native hosted Linux job; actual daemon acceptance remains pending that hosted
-receipt. The local host reports `INFRA_UNAVAILABLE` because its Docker daemon
+native hosted Linux job. Daemon acceptance was then confirmed: the hosted
+sandbox job ran daemon-real (Docker 28.0.4) and passed in runs 31562391384
+and 31564942933, with the mount rendered in exactly this form
+(`sandbox-receipt.json`, `effective_mounts`). The local host reports
+`INFRA_UNAVAILABLE` because its Docker daemon
 is absent. Docker Desktop remains non-normative and may stop at setup as
 already documented.
 

@@ -1,6 +1,8 @@
 # F-MATRIX-013 — honest empty compiler invalidated off-contract observation receipts
 
-Status: **RESOLVED locally; hosted rerun pending at the corrective SHA.**
+Status: **RESOLVED; confirmed by the green hosted runs** — portability
+run 31562391384 (`7facfa3`) and the close-push run 31564942933
+(`55297bb`) passed every job containing this regression.
 
 In hosted run 31548278804 (pushed SHA
 `4c9250a75e29e46275aa0d99902d49023e97ef15`), the off-contract jobs for

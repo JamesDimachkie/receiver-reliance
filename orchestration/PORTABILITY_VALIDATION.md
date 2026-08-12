@@ -3,7 +3,8 @@
 Date: 2026-08-11
 
 Branch: `sol/rr-portability-modelcheck-20260810` from baseline
-`4e788d21e882a30bdda2aec3f780537161f81644`
+`4e788d21e882a30bdda2aec3f780537161f81644` (since merged to `main` at
+`f76cade`; the branch ref is retired)
 
 Corrected clean source receipt HEAD:
 `8a525b167b95a3b6b512282938199eba09594a24`
@@ -20,12 +21,15 @@ Hosted evidence HEAD: `7facfa34bb7b841fd0a7d911f15b4da71efde95b`
 (green run `31562391384`; receipts committed under
 `portability/receipts/hosted/`)
 
-Status: **LOCAL AND HOSTED EVIDENCE COMPLETE; CLOSE PUSH PENDING.** James
-authorized and performed the first branch push on 2026-08-11/12. Four hosted
-runs failed and drove harness repairs (F-MATRIX-013, F-SANDBOX-026/027,
-F-LIVE-009/010/011 — all harness/validator defects, no
-accepted-implementation divergence); the fifth run, on
-`7facfa3`, passed every job. Section 12 records the hosted reconciliation.
+Status: **TERMINAL — LOCAL AND HOSTED EVIDENCE COMPLETE, PUSHED, AND
+CONSOLIDATED.** James authorized and performed both branch pushes on
+2026-08-11/12. Four hosted runs failed and drove harness repairs
+(F-MATRIX-013, F-SANDBOX-026/027, F-LIVE-009/010/011 — all
+harness/validator defects, no accepted-implementation divergence); the
+fifth run, on `7facfa3`, passed every job, and the close-push run
+31564942933 (`55297bb`) passed every job again. Section 12 records the
+hosted reconciliation. The branch was then merged to `main` (`f76cade`)
+with the continuation evidence bundle, and the external task claim closed.
 Every category below is local evidence unless marked otherwise, and no
 category is ever merged into a single pass count. The prose of sections 1–11
 describes the corrective-release-audit state (`8a525b1`/`4c9250a`) and is
@@ -440,8 +444,9 @@ scope wording, and external task-record consistency remain explicit review
 obligations rather than falsely claimed automated protections.
 
 This does not prove the absence of unknown defects, validate anything outside
-the declared finite model, or substitute for the pending hosted platforms and
-Linux daemon. It improves the reliability of release decisions and future
+the declared finite model, or substitute for the hosted platforms and Linux
+daemon (pending at the time of the audit; since completed and green — see
+section 12). It improves the reliability of release decisions and future
 changes; it does not claim that the accepted implementation itself changed.
 
 ## Findings inventory
@@ -471,9 +476,12 @@ additionally confirmed by the daemon-real hosted Linux container run
 2. ~~Collection and reconciliation of hosted receipts~~ — done: committed
    under `portability/receipts/hosted/`, bound by the extended
    `verify_receipts.py`, recorded in section 12.
-3. Second (close) push of the reconciliation and close-evidence commits —
-   staged; requires James's explicit current-turn authorization.
-4. Task-claim closure after the close push is verified on the remote.
+3. ~~Second (close) push~~ — done: James performed it; remote head
+   `55297bb` verified, and the triggered portability run 31564942933 and
+   conformance run 31564942869 both passed.
+4. ~~Task-claim closure~~ — done: the external claim closed 2026-08-11
+   after remote verification. No open items remain; later repository
+   consolidation is recorded in the ledger.
 
 ## Nonclaims
 

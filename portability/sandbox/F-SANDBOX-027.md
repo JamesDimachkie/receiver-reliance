@@ -1,6 +1,8 @@
 # F-SANDBOX-027 — mock-derived comparator rejected real daemon serializations
 
-Status: **RESOLVED locally; hosted rerun pending at the corrective SHA.**
+Status: **RESOLVED; confirmed by the green hosted runs** — portability
+run 31562391384 (`7facfa3`) and the close-push run 31564942933
+(`55297bb`) passed every job containing this regression.
 
 After F-SANDBOX-026 restored full history, hosted run 31549925307 (SHA
 `00479e6`) reached the first real Docker daemon this spec has ever executed

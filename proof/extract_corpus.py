@@ -1,6 +1,6 @@
 """Native-record corpus extraction for the receiver-reliance usefulness proof.
 
-Walks REAL recorded agent-handoff artifacts in James's workspace (no
+Walks REAL recorded agent-handoff artifacts in the operator workspace (no
 precomputed verdicts): hash-pinned research handoffs, structured task-claim
 files, version-superseded foundation documents, and task lifecycle history
 from git. Emits:
@@ -19,17 +19,26 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import pathlib
 import re
 import subprocess
 import sys
 
-WORKSPACE = pathlib.Path(r"C:/Users/james/New folder")
+# Extraction runs only on the operator workstation that holds the source
+# workspace. The emitted synthetic corpus ships; the workspace does not.
+_SOURCE = os.environ.get("RR_SOURCE_WORKSPACE")
+if _SOURCE is None:
+    sys.exit(
+        "extract_corpus: set RR_SOURCE_WORKSPACE to the source workspace root. "
+        "Extraction is operator-only; the shipped corpus.synthetic.jsonl and "
+        "truth.synthetic.jsonl are its committed, regenerable output."
+    )
+WORKSPACE = pathlib.Path(_SOURCE)
 EPI = WORKSPACE / "planning" / "epistemic-handoff"
 TASKS = WORKSPACE / ".agent-tasks"
 HANDOFFS = WORKSPACE / ".claude" / "handoffs"
 OUT_DIR = pathlib.Path(__file__).resolve().parent
-CATCHWRIGHT = pathlib.Path(r"C:/Users/james/catchwright")
 
 HEX64 = re.compile(r"\b[A-F0-9]{64}\b")
 # `NAME.md`, SHA-256 `HASH`  (the epistemic-handoff citation convention)

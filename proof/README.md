@@ -72,7 +72,10 @@ A preregistered, author-separated, multi-domain run is the next tier.
 python -B extract_corpus.py && python -B arm_baseline.py && python -B arm_b1.py && python -B arm_b1.py --calibrated && python -B score.py
 ```
 
-`corpus.jsonl`, `truth.jsonl`, verdicts, and request logs are
-workspace-derived and stay untracked (see `.gitignore`); the committed
-artifacts are the protocol (this file, the four scripts) and the results
-snapshot (`RESULTS.md`, `results.json`).
+Extraction is operator-only: `extract_corpus.py` requires
+`RR_SOURCE_WORKSPACE` to point at the source workspace and exits with an
+explanation otherwise. `corpus.jsonl`, `truth.jsonl`, verdicts, and request
+logs are workspace-derived and stay untracked (see `.gitignore`); the
+committed artifacts are the protocol (this file, the four scripts), the
+deterministic synthetic corpus pair, and the results snapshot
+(`RESULTS.md`, `results.json`).
