@@ -169,6 +169,12 @@ def _validate_control_event(value: Any) -> dict[str, Any]:
         _require_control_fields(value, {"event", "response_index", "split"})
         _control_integer(value, "response_index")
         _control_integer(value, "split", minimum=1)
+    elif event_name == "transport_abort":
+        # F-LIVE-009: a peer-initiated connection abort inside the accepted
+        # server.  Deliberately field-free: which syscall observed the close
+        # (and therefore the exception subclass and raising frame) is a
+        # kernel-race artifact excluded from replay identity.
+        _require_control_fields(value, {"event"})
     else:
         raise _ControlRecordError("unsupported event")
     return value

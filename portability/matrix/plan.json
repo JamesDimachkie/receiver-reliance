@@ -255,7 +255,7 @@
         "cwd": ".",
         "argv": ["{python}", "-B", "portability/live/test_live.py"],
         "timeout_seconds": 900,
-        "expected": {"tests": [29]}
+        "expected": {"tests": [30]}
       },
       {
         "id": "concurrency-tests",
@@ -275,7 +275,7 @@
         "cwd": ".",
         "argv": ["{python}", "-B", "portability/sandbox/test_sandbox.py"],
         "timeout_seconds": 900,
-        "expected": {"tests": [76]}
+        "expected": {"tests": [77]}
       },
       {
         "id": "verify-committed-receipts",

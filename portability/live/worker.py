@@ -25,6 +25,23 @@ import rr_batch  # noqa: E402
 
 CONTROL_PREFIX = b"RRCTL "
 
+# F-LIVE-009: exactly the peer-initiated connection-abort classes.  Which
+# accepted-server syscall first observes a peer close is kernel-scheduled, not
+# schedule-determined, so the raising frame and exception subclass are
+# incidental race artifacts that must not enter replay identity.  Any other
+# exception still propagates: a harness defect is never laundered into
+# transport-abort evidence (F-LIVE-005/F-LIVE-007 doctrine).
+PEER_CLOSE_ABORTS = (BrokenPipeError, ConnectionResetError, ConnectionAbortedError)
+PEER_CLOSE_EXIT = 5
+
+
+def _serve(source: Any, sink: Any) -> int:
+    try:
+        return rr_batch.serve(source, sink)
+    except PEER_CLOSE_ABORTS:
+        _control("transport_abort")
+        return PEER_CLOSE_EXIT
+
 
 def _control(event: str, **fields: Any) -> None:
     payload = json.dumps(
@@ -232,7 +249,7 @@ def main() -> int:
         sink = NonBlockingSink(sys.stdout.fileno(), boundary_control)
         _control("ready", transport="pipe")
         try:
-            return rr_batch.serve(source, sink)
+            return _serve(source, sink)
         finally:
             if boundary_control is not None:
                 boundary_control.close()
@@ -249,7 +266,7 @@ def main() -> int:
         send_buffer=endpoint.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF),
     )
     try:
-        return rr_batch.serve(source, sink)
+        return _serve(source, sink)
     finally:
         source.close()
         endpoint.close()

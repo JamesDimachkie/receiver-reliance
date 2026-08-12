@@ -19,6 +19,7 @@ if str(HERE) not in sys.path:
 
 import controller  # noqa: E402
 import replay  # noqa: E402
+import worker  # noqa: E402
 
 
 EXPECTED_SCHEDULES = {
@@ -988,6 +989,46 @@ class LiveTransportTests(unittest.TestCase):
             self.assertEqual(
                 first.stdout, (target / "completed-replay-1.stdout.bin").read_bytes()
             )
+
+
+class WorkerPeerCloseAbortTests(unittest.TestCase):
+    def test_peer_close_abort_is_deterministic_and_never_launders_faults(self) -> None:
+        # F-LIVE-009: two hosted replays of broken_pipe.ndjson on socketpair
+        # differed only in which accepted-server syscall first observed the
+        # peer close, so the embedded traceback broke byte-identical replay.
+        # The abort boundary emits one bare control event and a fixed exit
+        # code; the raising frame and exception subclass are excluded from
+        # replay identity as kernel-race artifacts.
+        for abort in (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+            with self.subTest(abort=abort.__name__):
+                events: list[tuple[str, dict[str, object]]] = []
+                with (
+                    mock.patch.object(
+                        worker.rr_batch, "serve", side_effect=abort("peer closed")
+                    ),
+                    mock.patch.object(
+                        worker,
+                        "_control",
+                        lambda event, **fields: events.append((event, fields)),
+                    ),
+                ):
+                    exit_code = worker._serve(None, None)
+                self.assertEqual(exit_code, worker.PEER_CLOSE_EXIT)
+                self.assertEqual(events, [("transport_abort", {})])
+
+        # Any other exception propagates unchanged: no harness fault or
+        # non-abort OSError is laundered into transport-abort evidence.
+        for defect in (ValueError("harness defect"), OSError("other os error")):
+            with self.subTest(defect=type(defect).__name__):
+                with (
+                    mock.patch.object(
+                        worker.rr_batch, "serve", side_effect=defect
+                    ),
+                    mock.patch.object(worker, "_control") as control,
+                ):
+                    with self.assertRaises(type(defect)):
+                        worker._serve(None, None)
+                control.assert_not_called()
 
 
 if __name__ == "__main__":

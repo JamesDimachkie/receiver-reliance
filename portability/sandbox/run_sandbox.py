@@ -1321,6 +1321,34 @@ def _assert_inspect(
         "publish_all_ports": False,
         "privileged": False,
     }
+    # F-SANDBOX-027: the first real hosted daemon (Docker Engine on
+    # ubuntu-latest) serializes unset Config.Cmd, Config.NetworkDisabled, and
+    # HostConfig.Init as null, and reports the read-only bind's cosmetic Mode
+    # as "" while RW stays false.  The mock-derived fixtures pinned the
+    # explicit-default spellings.  Null-versus-default is an API serialization
+    # difference, not a containment difference, so normalize exactly these
+    # shapes before comparison.  Receipts retain the raw inspected values, and
+    # a writable mount cannot hide behind the Mode normalization because it
+    # applies only while RW is false.
+    spec = dict(spec)
+    if spec.get("command") is None:
+        spec["command"] = []
+    if spec.get("network_disabled") is None:
+        spec["network_disabled"] = False
+    if spec.get("init_process") is None:
+        spec["init_process"] = False
+    raw_effective = spec.get("effective_mounts")
+    if isinstance(raw_effective, list):
+        spec["effective_mounts"] = [
+            dict(mount, mode=EXPECTED_EFFECTIVE_MOUNT_MODE)
+            if (
+                isinstance(mount, dict)
+                and mount.get("mode") == ""
+                and mount.get("read_write") is False
+            )
+            else mount
+            for mount in raw_effective
+        ]
     mismatches = {
         key: {"expected": value, "actual": spec.get(key)}
         for key, value in expected.items()

@@ -798,6 +798,53 @@ class SandboxSpecTests(unittest.TestCase):
                     preserved,
                 )
 
+    def test_daemon_null_default_serializations_are_containment_equal(self) -> None:
+        # F-SANDBOX-027: the first real hosted daemon serialized unset
+        # Config.Cmd, Config.NetworkDisabled, and HostConfig.Init as null and
+        # the read-only bind's cosmetic Mode as "" while RW stayed false.
+        # These are API serialization differences, not containment
+        # differences; the comparator accepts exactly these shapes while the
+        # receipt keeps the raw inspected values.
+        source = run_sandbox.intended_repository_source()
+        for variant in ("null", "absent"):
+            with self.subTest(variant=variant):
+                raw = valid_docker_inspect(source)
+                if variant == "null":
+                    raw["Config"]["Cmd"] = None
+                    raw["Config"]["NetworkDisabled"] = None
+                    raw["HostConfig"]["Init"] = None
+                else:
+                    raw["Config"].pop("Cmd")
+                    raw["Config"].pop("NetworkDisabled")
+                    raw["HostConfig"].pop("Init")
+                raw["Mounts"][0]["Mode"] = ""
+                selected = run_sandbox._selected_inspect(raw)
+                run_sandbox._assert_inspect(
+                    selected, "a" * 64, FIXTURE_IMAGE_ID, expected_image_tag(), source
+                )
+                self.assertIsNone(selected["command"])
+                self.assertIsNone(selected["network_disabled"])
+                self.assertIsNone(selected["init_process"])
+                self.assertEqual(selected["effective_mounts"][0]["mode"], "")
+
+        # Writability can never hide behind the Mode normalization.
+        writable = copy.deepcopy(selected)
+        writable["effective_mounts"][0]["mode"] = ""
+        writable["effective_mounts"][0]["read_write"] = True
+        with self.assertRaisesRegex(RuntimeError, "effective_mounts"):
+            run_sandbox._assert_inspect(
+                writable, "a" * 64, FIXTURE_IMAGE_ID, expected_image_tag(), source
+            )
+
+        # Null is accepted only where the daemon's default is the declared
+        # expectation; a genuinely wrong value still fails.
+        wrong = copy.deepcopy(selected)
+        wrong["readonly_rootfs"] = None
+        with self.assertRaisesRegex(RuntimeError, "readonly_rootfs"):
+            run_sandbox._assert_inspect(
+                wrong, "a" * 64, FIXTURE_IMAGE_ID, expected_image_tag(), source
+            )
+
     def test_active_source_binding_is_platform_independent(self) -> None:
         cases = (
             ("Windows", FROZEN_WINDOWS_REPOSITORY_SOURCE),
@@ -1305,7 +1352,10 @@ class SandboxSpecTests(unittest.TestCase):
             "destination_trailing_slash": ("Destination", "/repo/"),
             "mode_missing": ("Mode", missing),
             "mode_null": ("Mode", None),
-            "mode_empty": ("Mode", ""),
+            # F-SANDBOX-027: "mode_empty" with RW false is a real-daemon
+            # serialization of the same read-only bind and is accepted; see
+            # test_daemon_null_default_serializations_are_containment_equal,
+            # which also pins that Mode "" with RW true still fails.
             "mode_rw": ("Mode", "rw"),
             "rw_missing": ("RW", missing),
             "rw_null": ("RW", None),
@@ -1880,6 +1930,14 @@ class SandboxSpecTests(unittest.TestCase):
                 "integer_one": 1,
                 "opposite_boolean": not expected,
             }
+            if field in {"network_disabled", "init"}:
+                # F-SANDBOX-027: real daemons serialize these unset
+                # false-default legacy bits as null or absent; acceptance is
+                # pinned by
+                # test_daemon_null_default_serializations_are_containment_equal,
+                # and every non-null wrong value below still fails.
+                del invalid_values["missing"]
+                del invalid_values["null"]
             for mutation_name, invalid in invalid_values.items():
                 with self.subTest(field=field, mutation=mutation_name):
                     raw = valid_docker_inspect()
@@ -2608,7 +2666,10 @@ class SandboxSpecTests(unittest.TestCase):
             "command_inherited": ("Cmd", ["python3"], False),
             "command_string": ("Cmd", "python3", False),
             "command_extra": ("Cmd", ["unexpected"], False),
-            "command_missing": ("Cmd", None, True),
+            # F-SANDBOX-027: an absent or null Cmd is the real-daemon
+            # serialization of "no command override" and equals the declared
+            # empty command; acceptance is pinned by
+            # test_daemon_null_default_serializations_are_containment_equal.
             "command_wrong_type": ("Cmd", {"argv": []}, False),
         }
         payload = encoded_receipt(synthetic_pass_receipt())
