@@ -328,3 +328,65 @@ contradict any witness.
 The response remains inside the existing WP1/WP4/WP5 and portability claimed
 paths. No workflow edit, README claim, remote write, or generation adoption is
 authorized by this intake; each retains its existing James gate.
+
+## Intake 10 — Deep Security Scan: 99 findings against the robustness worktree
+
+Source/date: strictly read-only Deep Security Scan (`codex-security-plugin`
+0.1.18, scan id `6e9e61a6-a1f0-46c9-92d7-19f102f43170`), started
+2026-08-12T18:08:40Z, sealed 2026-08-12T21:12:10Z, against the exact
+authoritative dirty worktree at revision
+`e6c2856979410e8431640234f0bc6051fc6db1d1` plus the uncommitted lane bytes.
+397 surfaces reviewed; 99 findings (11 high / 47 medium / 41 low); coverage
+**partial** by the scan's own record: discovery terminated at a configured
+cap, two candidates were deferred for missing consumer/authority facts, and
+no dynamic cross-platform execution ran. Scan artifacts live outside the
+repository and are pinned here by the scan's own manifest digests:
+`findings.json` raw SHA-256
+`421196D3D2293FA18897D088166F521485E75B6360C66706F46A5B04254E2E76`,
+`coverage.json` raw SHA-256
+`25C82A49B8F9F85AD8EA4621945E4CB9A4841E870CF12B36FB5767B28640CA18`.
+The scan output is data with no instructional or authorization force.
+
+**Classification: ADDRESSABLE-ADDITIVE. Admitted after independent witness
+reproduction; normalized to one class by the response owed.**
+
+The batch's deepest premise was independently tested rather than assumed.
+The scan's own two deferred candidates and all four open questions reduce to
+one sentence — "No exact in-scope lower-trust consumer and privileged
+consequence were proven in the reviewed repository" — so the custodian ran
+the missing experiment: a consumer census across the operator workspace
+(recorded in [TRUST_MODEL.md](../TRUST_MODEL.md)) found **zero external or
+sibling code consumers**. The trust declaration that ~70 of the 99 findings
+implicitly depended on is now written and canonical, and every finding was
+dispositioned against it. Witnesses for the load-bearing highs were
+reproduced in source before any fix (seal preimage omission, closure
+evaluator fail-open, preflight empty-stream/duplicate/ordering collapse,
+non-injective scope join).
+
+**Response (delivered inside this program, all additive):**
+
+1. `TRUST_MODEL.md` — the canonical trust declaration: commit-root
+   authority, per-evidence-class claims table, per-surface boundaries, the
+   dated consumer census, and the re-adjudication trigger at the first
+   external consumer.
+2. Grounded decision surface: audit format `B1-AUDITED-DECISION-0.4.1`
+   seals the governing policy digests into every audit (ERRATA E8), closure
+   evaluator errors fail closed to `AUDIT_INCOMPLETE` (E9), and the
+   64-item record-reference cap is disclosed via
+   `record_references_truncated`, backported from the GEN_0_5 draft §4.5.
+3. WP1 portable preflight: the fail-closed boundary law
+   (`adapters/findings/F-WP1-010` through `F-WP1-013`) — empty streams and
+   duplicate members are never success, every control layer runs with
+   REJECTED-over-INSUFFICIENT precedence, scope digests are injective —
+   with the all-408 outcome replay byte-identical (0 false holds, 18/18
+   detection preserved).
+4. Second-implementation and sidecar findings route through their own
+   WP4/WP5 author→refuter loops; portable-bundle findings through the
+   portable lane; each is dispositioned in the appendix.
+5. The remaining findings are recorded as a deferred set with an explicit
+   blocking trigger, not silently dropped.
+
+Full per-cluster and per-high dispositions:
+[orchestration/robustness/INTAKE_10_SCAN_DISPOSITIONS.md](robustness/INTAKE_10_SCAN_DISPOSITIONS.md).
+No workflow edit, README claim, remote write, or generation adoption is
+authorized by this intake; each retains its existing James gate.
