@@ -151,5 +151,91 @@ check(
     str(clean["audit"]["record_references"]),
 )
 
+# 5. GOVERNANCE - audited decisions identify the exact policy bytes that
+#    governed them (ERRATA E8), and an errored closure evaluator can never
+#    silently certify VALID (ERRATA E9).
+gov = clean["audit"]["governing_authorities"]
+check(
+    "governance:closed-key-set",
+    set(gov)
+    == {
+        "closure_policy_sha256",
+        "authority_register_sha256",
+        "engine_capabilities_sha256",
+        "engine_runner_sha256",
+    },
+    str(sorted(gov)),
+)
+for gov_key, gov_path in (
+    ("closure_policy_sha256", HERE / "closures_0_4.json"),
+    ("authority_register_sha256", HERE / "authority_register_0_4.json"),
+    (
+        "engine_capabilities_sha256",
+        REPO / "baseline-run" / "implementation-output-0.3" / "b1_capabilities.py",
+    ),
+    (
+        "engine_runner_sha256",
+        REPO / "baseline-run" / "implementation-output-0.3" / "pcb_runner.py",
+    ),
+):
+    check(
+        f"governance:{gov_key}-matches-disk",
+        gov[gov_key] == b1.sha256_upper(gov_path.read_bytes()),
+        gov[gov_key],
+    )
+check("governance:format-bumped", clean["format_version"] == "B1-AUDITED-DECISION-0.4.1")
+gov_mut = copy.deepcopy(clean)
+gov_mut["audit"]["governing_authorities"]["closure_policy_sha256"] = "0" * 64
+check(
+    "governance:seal-covers-governing-digests",
+    b1.self_zero_sha256(gov_mut, "audit_sha256") != clean["audit_sha256"],
+)
+_obl30_rows = rr_api._CLOSURES.get("OBL-30", [])
+_broken_row = {
+    "closure_id": "TEST-BROKEN-EVALUATOR",
+    "predicate": {"op": "NO_SUCH_OPERATOR"},
+    "tightens_to": "BINDING_OR_CONFLICT",
+    "statement": "forced evaluator error for the E9 regression",
+}
+_obl30_rows.append(_broken_row)
+try:
+    incomplete = rr_api.decide_audited(r30)
+finally:
+    _obl30_rows.remove(_broken_row)
+check(
+    "governance:evaluator-error-fails-closed",
+    incomplete["audited_behavior_class"] == "AUDIT_INCOMPLETE",
+    incomplete["audited_behavior_class"],
+)
+check(
+    "governance:evaluator-error-recorded",
+    any(
+        "evaluator_error" in finding
+        for finding in incomplete["audit"]["closure_findings"]
+    ),
+)
+check(
+    "governance:clean-baseline-unaffected",
+    rr_api.decide_audited(r30)["audited_behavior_class"] == "VALID",
+)
+check(
+    "governance:reference-truncation-disclosed-false",
+    clean["audit"]["record_references_truncated"] is False,
+)
+_many = {"pool_record_ids": [f"REC_{i:04d}" for i in range(70)]}
+_refs_capped, _refs_flag = rr_api._derive_record_references_full(_many)
+check(
+    "governance:reference-truncation-caps-at-64-and-flags",
+    len(_refs_capped) == 64 and _refs_flag is True,
+    f"{len(_refs_capped)} {_refs_flag}",
+)
+_exact = {"pool_record_ids": [f"REC_{i:04d}" for i in range(64)]}
+_refs_capped, _refs_flag = rr_api._derive_record_references_full(_exact)
+check(
+    "governance:reference-exact-64-not-flagged",
+    len(_refs_capped) == 64 and _refs_flag is False,
+    f"{len(_refs_capped)} {_refs_flag}",
+)
+
 print(f"grounded-0.4 regression: checks={checks} failures={failures}")
 sys.exit(1 if failures else 0)

@@ -77,6 +77,37 @@ host-side calibration is specified in `HOST_OBLIGATIONS.md` H4 and measured
 in `proof/`; next sealed generation should admit an explicit
 INAPPLICABLE declaration with its own fixture class.
 
+## E8 — Audited decisions did not identify their governing policy bytes
+
+Found by the 2026-08-12 Deep Security Scan (Intake 10; findings
+`csf_e5e9b8cdec13c18cf70c88eb`, `csf_2e9e3a58b7bde4789bf783ba`). The 0.4
+audit seal bound the request bytes and the decision-input digest, but
+nothing identifying WHICH closure policy, authority register, or engine
+sources governed the final class; `closures_0_4.json` loaded from the
+adjacent path unpinned. Two checkouts differing only in closure policy
+produced indistinguishable audit shapes. *Status:* fixed additively — audit
+format `B1-AUDITED-DECISION-0.4.1` seals `governing_authorities` (closure
+policy, authority register, and both engine-source digests) into every
+audit object, on the error path included. 0.4 objects remain verifiable by
+self-zero recomputation under their recorded format string. The repository
+commit remains the root that authenticates the digests themselves
+([TRUST_MODEL.md](TRUST_MODEL.md)). *Enforcement:* the GOVERNANCE section
+of `grounded-0_4/test_grounded_0_4.py` pins each digest to the bytes on
+disk and proves the seal covers them.
+
+## E9 — Closure evaluator errors failed open to VALID
+
+Same source (finding `csf_2e9e3a58b7bde4789bf783ba`). `closure_findings`
+recorded an evaluator error as `fired: false`, so an errored tighten-only
+closure contributed nothing and a VALID class stood, with the error visible
+only inside `closure_findings` — a consumer reading
+`audited_behavior_class` alone saw an authoritative-looking VALID.
+*Status:* fixed — on 0.4.1, any closure evaluator error on a VALID decision
+yields `AUDIT_INCOMPLETE` (an errored closure might have tightened it);
+sealed defect classes stand, because closures only tighten. *Enforcement:*
+`governance:evaluator-error-fails-closed` regression in
+`grounded-0_4/test_grounded_0_4.py`.
+
 ## Authority census (context for E5)
 
 Of 199 schema-required fact fields across the 30 operations: 141 are

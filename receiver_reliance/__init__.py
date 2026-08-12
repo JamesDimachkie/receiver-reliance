@@ -9,8 +9,15 @@ this package is the stable import surface:
 
 `decide(request)` returns the frozen engine's (response, exit_code),
 byte-faithful to the stdio runner. `decide_audited(request)` returns the
-grounded 0.4 audited decision (input-bound seal, witness trace, closure
-findings). See HOST_OBLIGATIONS.md for what remains the host's job.
+grounded audited decision (input-bound seal, governing-policy digests,
+witness trace, closure findings, truncation-disclosed record references).
+
+The two surfaces are tiers, not peers: `decide` is the SEALED CONFORMANCE
+surface — it binds no decision facts (ERRATA E2) and applies no 0.4 closure
+(E5), so a bare sealed receipt proves only that a decision of that class
+was sealed under that request id. Any host that needs auditable evidence of
+WHAT was decided must use `decide_audited` or record full transcripts
+(HOST_OBLIGATIONS.md H5). See TRUST_MODEL.md for what each seal proves.
 """
 from __future__ import annotations
 

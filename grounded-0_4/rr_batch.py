@@ -49,6 +49,7 @@ def _overlimit_response_bytes(request_raw_sha256: str) -> bytes:
         "audit": {
             "request_raw_sha256": request_raw_sha256,
             "engine_generation": "composed-0.3-frozen",
+            "governing_authorities": dict(rr_api.GOVERNING_AUTHORITIES),
             "decision_input_sha256": None,
             "errors": sealed_response.get("errors"),
         },

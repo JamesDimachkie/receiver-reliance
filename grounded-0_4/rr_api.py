@@ -22,6 +22,15 @@ confirmed defect classes:
 The frozen engine remains the single classification authority for the 0.2/0.3
 surface: the sealed response embedded in every audited result is byte-identical
 to what the frozen runner emits.
+
+The 0.4.1 audit format additionally binds the governing policy bytes: every
+audited decision carries ``governing_authorities`` (closure-policy, authority-
+register, and engine-source digests) inside the sealed audit, so decisions
+produced under different policies are distinguishable by seal (ERRATA E8).
+A closure evaluator error on a VALID decision yields ``AUDIT_INCOMPLETE``
+instead of silently certifying VALID (ERRATA E9); sealed defect classes
+stand, because closures only tighten. 0.4 audit objects remain verifiable
+by self-zero recomputation under their own recorded format string.
 """
 from __future__ import annotations
 
@@ -41,10 +50,26 @@ from authority_surface import authority_for_operation  # noqa: E402,F401
 import b1_capabilities as b1  # noqa: E402
 import pcb_runner  # noqa: E402
 
-AUDIT_FORMAT = "B1-AUDITED-DECISION-0.4"
+AUDIT_FORMAT = "B1-AUDITED-DECISION-0.4.1"
 
 with open(_HERE / "closures_0_4.json", encoding="utf-8") as _fh:
     _CLOSURES: dict[str, list[dict]] = json.load(_fh)["closures_by_obligation"]
+
+# The exact bytes that govern every audited decision this process produces.
+# Sealing these digests into each audit makes decisions produced under
+# different closure policies, authority registers, or engine sources
+# distinguishable by seal (ERRATA E8); the repository commit remains the
+# trust root that authenticates the digests themselves (TRUST_MODEL.md).
+GOVERNING_AUTHORITIES: dict[str, str] = {
+    "closure_policy_sha256": b1.sha256_upper((_HERE / "closures_0_4.json").read_bytes()),
+    "authority_register_sha256": b1.sha256_upper(
+        (_HERE / "authority_register_0_4.json").read_bytes()
+    ),
+    "engine_capabilities_sha256": b1.sha256_upper(
+        (_IMPL3 / "b1_capabilities.py").read_bytes()
+    ),
+    "engine_runner_sha256": b1.sha256_upper((_IMPL3 / "pcb_runner.py").read_bytes()),
+}
 
 _CLASS_ORDER = ("MALFORMED_OR_BOUNDARY", "BINDING_OR_CONFLICT", "OMISSION_OR_INCOMPLETE")
 
@@ -211,6 +236,37 @@ def _classify_traced(
     return matched or "VALID", first_match, witness
 
 
+def _derive_record_references_full(facts: Any) -> tuple[list[str], bool]:
+    """Return (capped references, truncated?) — GEN_0_5 §4.5 semantics.
+
+    ``truncated`` is True exactly when the derived candidate set exceeded the
+    64-item output cap, so the cap is disclosed instead of silent (Intake 10
+    finding; the 0.5 continuation spec already pins this flag)."""
+    refs = derive_record_references(facts)
+    return refs, len(refs) == 64 and len(_collect_record_references(facts)) > 64
+
+
+def _collect_record_references(facts: Any) -> set[str]:
+    found: set[str] = set()
+
+    def walk(node: Any, key: str) -> None:
+        if isinstance(node, dict):
+            for child_key, child in node.items():
+                walk(child, child_key)
+        elif isinstance(node, list):
+            if key.endswith("_record_ids") or key == "pool_record_ids":
+                found.update(x for x in node if isinstance(x, str))
+            else:
+                for item in node:
+                    walk(item, key)
+        elif isinstance(node, str):
+            if "record_id" in key or key == "exact_reference":
+                found.add(node)
+
+    walk(facts, "")
+    return found
+
+
 def derive_record_references(facts: Any, prefix: str = "") -> list[str]:
     """Deterministic extraction of record identifiers actually present in the
     fact profile: string leaves whose key names a record id (contains
@@ -251,6 +307,7 @@ def decide_audited(request: dict[str, Any] | bytes) -> dict[str, Any]:
     audit: dict[str, Any] = {
         "request_raw_sha256": b1.sha256_upper(raw),
         "engine_generation": "composed-0.3-frozen",
+        "governing_authorities": dict(GOVERNING_AUTHORITIES),
     }
     if response.get("ok"):
         parsed = json.loads(raw.decode("utf-8"))
@@ -271,11 +328,18 @@ def decide_audited(request: dict[str, Any] | bytes) -> dict[str, Any]:
             raise RuntimeError("trace classification diverged from sealed response")
         audit["first_match_predicates"] = fired_map
         audit["matched_class_witness"] = witness
-        audit["record_references"] = derive_record_references(decision_input.get("facts"))
+        refs, refs_truncated = _derive_record_references_full(decision_input.get("facts"))
+        audit["record_references"] = refs
+        audit["record_references_truncated"] = refs_truncated
         findings = closure_findings(obligation_id, decision_input)
         audit["closure_findings"] = findings
         tightened = [f["tightens_to"] for f in findings if f.get("fired")]
-        if behavior == "VALID" and tightened:
+        if behavior == "VALID" and any("evaluator_error" in f for f in findings):
+            # A VALID class cannot be certified by an incomplete closure
+            # pass: an errored closure might have tightened it (ERRATA E9).
+            # Sealed defect classes stand — closures only tighten.
+            final = "AUDIT_INCOMPLETE"
+        elif behavior == "VALID" and tightened:
             final = min(tightened, key=_CLASS_ORDER.index)
         else:
             final = behavior

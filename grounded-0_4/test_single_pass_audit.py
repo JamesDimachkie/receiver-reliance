@@ -103,6 +103,7 @@ def legacy_decide_audited(request: dict[str, Any] | bytes) -> dict[str, Any]:
     audit: dict[str, Any] = {
         "request_raw_sha256": b1.sha256_upper(raw),
         "engine_generation": "composed-0.3-frozen",
+        "governing_authorities": dict(rr_api.GOVERNING_AUTHORITIES),
     }
     if response.get("ok"):
         parsed = json.loads(raw.decode("utf-8"))
@@ -126,13 +127,19 @@ def legacy_decide_audited(request: dict[str, Any] | bytes) -> dict[str, Any]:
             )
         audit["first_match_predicates"] = fired_map
         audit["matched_class_witness"] = witness
-        audit["record_references"] = rr_api.derive_record_references(
+        legacy_refs, legacy_truncated = rr_api._derive_record_references_full(
             decision_input.get("facts")
         )
+        audit["record_references"] = legacy_refs
+        audit["record_references_truncated"] = legacy_truncated
         findings = rr_api.closure_findings(obligation_id, decision_input)
         audit["closure_findings"] = findings
         tightened = [finding["tightens_to"] for finding in findings if finding.get("fired")]
-        if behavior == "VALID" and tightened:
+        if behavior == "VALID" and any(
+            "evaluator_error" in finding for finding in findings
+        ):
+            final = "AUDIT_INCOMPLETE"
+        elif behavior == "VALID" and tightened:
             final = min(tightened, key=rr_api._CLASS_ORDER.index)
         else:
             final = behavior
