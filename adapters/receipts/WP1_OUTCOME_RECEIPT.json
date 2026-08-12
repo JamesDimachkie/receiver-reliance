@@ -1,0 +1,122 @@
+{
+  "charter_assessment": {
+    "delivery_mode": "FALLBACK_CALIBRATION_PLUS_PORTABLE_PREFLIGHT",
+    "fallback_surface_delivered": true,
+    "measured_current_detection": "18/18",
+    "outcome_bar_met": true,
+    "package_complete": false,
+    "package_status": "FALLBACK_DELIVERED_CPYTHON_3_13_PENDING",
+    "reason": "paired all-408 measure is met; CPython 3.13 evidence for these bytes is still absent",
+    "required_current_detection": "18/18",
+    "runtime_evidence_bar_met": false
+  },
+  "format_version": "RR-WP1-OUTCOME-RECEIPT-3",
+  "historical_forced_reexecution": {
+    "classification": "current re-execution of the raw-SHA-pinned historical forced arm",
+    "counts": {
+      "clean_false_hold": 133,
+      "clean_pass": 257,
+      "defect_detected": 18,
+      "defect_missed": 0,
+      "protocol_error": 0
+    },
+    "detection": "18/18",
+    "engine_behavior_counts": {
+      "MALFORMED_OR_BOUNDARY": 136,
+      "OMISSION_OR_INCOMPLETE": 15,
+      "VALID": 257
+    },
+    "false_hold_rate_clean": "34.1%"
+  },
+  "measurement_boundary": {
+    "claimable_as_fallback_capability": false,
+    "exported_from_adapters": false,
+    "mutable_runner_status": "NON_SHIPPING_MEASUREMENT_ONLY",
+    "scope": "READY-row replay in this raw-SHA-pinned all-408 receipt only"
+  },
+  "pins": {
+    "fixture_extract_raw_sha256": "01B8E0ED320D15D5B7A7F69FDA0D46A84E119033DF90AB6A4B3B1A0C61EEFD0A",
+    "hosted_manifest_raw_sha256": "9DC261CA316C4F8E83342FE6AD24EBF15C3A21F3FD38AE6565EE28651569D5E6",
+    "outcome_runner_raw_sha256": "A6A4FEB4DE5D519EC770DCDE8D7F5916A9AB6332FD899746040384691973F2E5",
+    "parent_corpus_raw_sha256": "09B4B05FE26CF46F063EC637C1A4D27B4D5190961756888099F96254C49B334E",
+    "parent_truth_raw_sha256": "4FEEF9BE65DD7523849CEE71B5A43EA6F7667710745E71D79C0EE5B054E3E2C7",
+    "portable_preflight_raw_sha256": "806A52283FC73EE2CD6373D203DE93476A7060F37773DCBA4F77D9D2A11ABCA8",
+    "source_proof_adapter_raw_sha256": "978BEE0A3F278BAE083B390A36153C08C1CDF4ABB0F9581A4EAE8860957BE12E",
+    "source_proof_results_raw_sha256": "3883F504C349D8884701586DB0B8B29744D094EBB6B7C6A5DB69456FAEC9C032"
+  },
+  "portable_fallback_reexecution": {
+    "classification": "portable native-evidence preflight followed by measurement-only engine replay for READY rows",
+    "counts": {
+      "insufficient_evidence_clean": 208,
+      "insufficient_evidence_defect": 0,
+      "protocol_error": 0,
+      "ready_clean_false_hold": 0,
+      "ready_clean_pass": 182,
+      "ready_defect_detected": 10,
+      "ready_defect_missed": 0,
+      "rejected_invalid_clean": 0,
+      "rejected_invalid_defect_detected": 8
+    },
+    "detection": "18/18",
+    "detection_components": {
+      "ready_engine_detection": "10/18",
+      "rejected_invalid_before_applicability": "8/18"
+    },
+    "false_hold_rate_clean": "0.0%",
+    "family_status_counts": {
+      "LIFECYCLE:INSUFFICIENT_EVIDENCE": 208,
+      "LIFECYCLE:REJECTED_INVALID": 3,
+      "REF:READY": 15,
+      "REF:REJECTED_INVALID": 5,
+      "SCOPE:READY": 173,
+      "SUPERSEDE:READY": 4
+    },
+    "insufficient_evidence_counted_as_pass": false,
+    "insufficient_evidence_is_abstention": true,
+    "issue_counts": {
+      "PREFLIGHT_LIFECYCLE_NONINCREASING": 3,
+      "PREFLIGHT_LIFECYCLE_UNTYPED": 208,
+      "PREFLIGHT_REF_ALIAS_CONTRADICTION": 5
+    },
+    "ready_engine_behavior_counts": {
+      "OMISSION_OR_INCOMPLETE": 10,
+      "VALID": 182
+    },
+    "rejected_invalid_counted_as_pass": false,
+    "rejected_invalid_is_detection": true,
+    "result_format_version": "RR-PORTABLE-PREFLIGHT-1",
+    "runtime_truth_labels_used_by_preflight": false,
+    "status_counts": {
+      "INSUFFICIENT_EVIDENCE": 208,
+      "READY": 192,
+      "REJECTED_INVALID": 8
+    }
+  },
+  "producer": "adapters/outcome_receipt.py",
+  "provenance": {
+    "e7_rows": 211,
+    "parent_rows": 408,
+    "pins": {
+      "e7_corpus_raw_sha256": "2F4AB230A1B66852C3D95F21648F0D549261268FE41992C98CC53C6F6811FC8F",
+      "e7_truth_raw_sha256": "6790C2268BB95B1559C06A3CBFFE1CF4BF9843C7D3284058EA848C8CE0D73366",
+      "parent_corpus_raw_sha256": "09B4B05FE26CF46F063EC637C1A4D27B4D5190961756888099F96254C49B334E",
+      "parent_truth_raw_sha256": "4FEEF9BE65DD7523849CEE71B5A43EA6F7667710745E71D79C0EE5B054E3E2C7"
+    },
+    "row_bindings_sha256": "27B7837AFF5595C111C2622C1A2258548BF62424B5B184E3C471C47A1BE07DFA"
+  },
+  "receipt_sha256": "7E3E228F1878B29F12B4199A6BA28B30CE3D6B5E6A76511A8EB6A088E2177F7D",
+  "runtime_evidence": {
+    "cpython_3_12": "local suite evidence recorded separately for these bytes",
+    "cpython_3_13": "PENDING: no local or hosted run exercised these bytes",
+    "cpython_3_14": "local suite evidence recorded separately for these bytes",
+    "evidence_bar_met": false,
+    "hosted_evidence_inspection": {
+      "conclusion": "existing hosted rows do not exercise current WP1 fallback bytes",
+      "current_portable_preflight_sha_present": false,
+      "current_wp1_command_present": false,
+      "hosted_head_sha": "7facfa34bb7b841fd0a7d911f15b4da71efde95b",
+      "manifest_raw_sha256": "9DC261CA316C4F8E83342FE6AD24EBF15C3A21F3FD38AE6565EE28651569D5E6"
+    }
+  },
+  "scope": "all 408 raw-SHA-pinned native proof records"
+}
