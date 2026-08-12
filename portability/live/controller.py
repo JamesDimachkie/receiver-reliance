@@ -11,6 +11,7 @@ import hashlib
 import json
 import os
 import pathlib
+import select
 import socket
 import subprocess
 import sys
@@ -221,15 +222,15 @@ class RunResult:
     forced_short_write_count: int
     os_short_write_count: int
     write_resume_ack_count: int
+    fault_schedule: bool = False
 
     def stable_bytes(self) -> bytes:
         metadata = {
             "schedule": self.schedule,
             "transport": self.transport,
-            "returncode": self.returncode,
+            "fault_schedule": self.fault_schedule,
             "acknowledgments": self.acknowledgments,
             "backpressure_observed": self.backpressure_observed,
-            "flush_count": self.flush_count,
             "w_partition_count": self.w_partition_count,
             "pause_count": self.pause_count,
             "resume_count": self.resume_count,
@@ -238,8 +239,20 @@ class RunResult:
             "os_short_write_count": self.os_short_write_count,
             "write_resume_ack_count": self.write_resume_ack_count,
             "stdout_b64": base64.b64encode(self.stdout).decode("ascii"),
-            "stderr_b64": base64.b64encode(self.stderr).decode("ascii"),
         }
+        if not self.fault_schedule:
+            # F-LIVE-010: a schedule whose terminal action is an asynchronous
+            # fault (kill, or full close during observed backpressure) cuts
+            # the child at a kernel-scheduled instant.  How far the child's
+            # control-event tail progressed (flush_count), which stop path it
+            # took (returncode 5 orderly abort versus a forced reap), and its
+            # stderr tail are race artifacts of that instant.  They stay in
+            # summary() as durable evidence but are excluded from replay
+            # identity; the schedule-driven data plane and barrier-synced
+            # counters above remain bound for every schedule.
+            metadata["returncode"] = self.returncode
+            metadata["flush_count"] = self.flush_count
+            metadata["stderr_b64"] = base64.b64encode(self.stderr).decode("ascii")
         return json.dumps(metadata, sort_keys=True, separators=(",", ":")).encode("ascii")
 
     def summary(self) -> dict[str, Any]:
@@ -536,16 +549,36 @@ class _Connection:
         self.input_closed = False
         self.output_closed = False
 
+    def _await_pipe(self, fd: int, mode: str) -> None:
+        # F-LIVE-011: every controller data-plane OS call carries the same
+        # watchdog bound the event waits already have, so an unresponsive
+        # child produces a minimized TransportError witness instead of an
+        # unbounded stall.  select() bounds POSIX pipes; Windows pipes cannot
+        # be select()ed and retain the schedule-level reap watchdog only.
+        if os.name == "nt":
+            return
+        readable = [fd] if mode == "read" else []
+        writable = [fd] if mode == "write" else []
+        ready = select.select(readable, writable, [], WATCHDOG_SECONDS)
+        if not any(ready):
+            raise TransportError(f"watchdog: parent pipe {mode} stalled")
+
     def write_all(self, data: bytes) -> None:
         view = memoryview(data)
         offset = 0
         while offset < len(view):
             if self.transport == "pipe":
                 assert self.process.stdin is not None
+                self._await_pipe(self.process.stdin.fileno(), "write")
                 written = os.write(self.process.stdin.fileno(), view[offset:])
             else:
                 assert self.endpoint is not None
-                written = self.endpoint.send(view[offset:])
+                try:
+                    written = self.endpoint.send(view[offset:])
+                except socket.timeout as error:
+                    raise TransportError(
+                        "watchdog: parent socket write stalled"
+                    ) from error
             if written <= 0:
                 raise TransportError("parent transport write made no progress")
             offset += written
@@ -557,10 +590,16 @@ class _Connection:
             offered = 1 if each_byte else min(remaining, 64 * 1024)
             if self.transport == "pipe":
                 assert self.process.stdout is not None
+                self._await_pipe(self.process.stdout.fileno(), "read")
                 chunk = os.read(self.process.stdout.fileno(), offered)
             else:
                 assert self.endpoint is not None
-                chunk = self.endpoint.recv(offered)
+                try:
+                    chunk = self.endpoint.recv(offered)
+                except socket.timeout as error:
+                    raise TransportError(
+                        "watchdog: parent socket read stalled"
+                    ) from error
             if not chunk:
                 raise TransportError(f"EOF with {remaining} scheduled response bytes missing")
             chunks.append(chunk)
@@ -573,7 +612,12 @@ class _Connection:
         payload = json.dumps(command, sort_keys=True, separators=(",", ":")).encode(
             "ascii"
         )
-        self.control_endpoint.sendall(payload + b"\n")
+        try:
+            self.control_endpoint.sendall(payload + b"\n")
+        except socket.timeout as error:
+            raise TransportError(
+                "watchdog: boundary-control write stalled"
+            ) from error
 
     def close_half(self) -> None:
         if self.input_closed:
@@ -637,6 +681,7 @@ def _spawn(transport: str, *, boundary_control: bool = False) -> _Connection:
     pass_fds: list[int] = []
     if boundary_control:
         control_parent, control_child = socket.socketpair()
+        control_parent.settimeout(WATCHDOG_SECONDS)
         if os.name == "nt":
             command.append("--boundary-control-bootstrap")
         else:
@@ -674,6 +719,9 @@ def _spawn(transport: str, *, boundary_control: bool = False) -> _Connection:
         )
 
     parent, child = socket.socketpair()
+    # F-LIVE-011: the same watchdog bound as every event wait, applied at the
+    # socket layer so no controller data-plane call can stall unboundedly.
+    parent.settimeout(WATCHDOG_SECONDS)
     parent.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 4096)
     child.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 4096)
     if os.name == "nt":
@@ -1007,6 +1055,7 @@ def _run_schedule_once(
             forced_short_write_count=0,
             os_short_write_count=connection.monitor.count("short_write"),
             write_resume_ack_count=connection.monitor.count("write_resumed"),
+            fault_schedule=disruptive,
         )
         if returncode == 0 and not disruptive:
             expected = isolated_expected(bytes(raw_input))

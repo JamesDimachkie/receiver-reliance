@@ -255,7 +255,7 @@
         "cwd": ".",
         "argv": ["{python}", "-B", "portability/live/test_live.py"],
         "timeout_seconds": 900,
-        "expected": {"tests": [31]}
+        "expected": {"tests": [33]}
       },
       {
         "id": "concurrency-tests",

@@ -1078,5 +1078,80 @@ class WorkerPeerCloseAbortTests(unittest.TestCase):
             source.readline()
 
 
+class FaultScheduleIdentityTests(unittest.TestCase):
+    @staticmethod
+    def _result(**overrides: object) -> controller.RunResult:
+        base: dict[str, object] = dict(
+            schedule="child_kill.ndjson",
+            transport="socketpair",
+            stdout=b"data",
+            stderr=b"RRCTL control-tail",
+            returncode=5,
+            acknowledgments=({"step": 0, "action": "write", "barrier": "b"},),
+            backpressure_observed=True,
+            flush_count=7,
+            w_partition_count=0,
+            pause_count=1,
+            resume_count=0,
+            write_boundary_count=0,
+            forced_short_write_count=0,
+            os_short_write_count=0,
+            write_resume_ack_count=0,
+            fault_schedule=True,
+        )
+        base.update(overrides)
+        return controller.RunResult(**base)  # type: ignore[arg-type]
+
+    def test_fault_schedule_identity_excludes_death_racy_fields(self) -> None:
+        # F-LIVE-010: an asynchronous fault (kill, or full close during
+        # observed backpressure) cuts the child at a kernel-scheduled
+        # instant; the control-event tail length, stop path, and stderr tail
+        # are artifacts of that instant and must not break replay identity.
+        first = self._result()
+        for racy in (
+            self._result(flush_count=8),
+            self._result(returncode=-9),
+            self._result(stderr=b"RRCTL control-tail plus traceback"),
+        ):
+            self.assertEqual(first.stable_bytes(), racy.stable_bytes())
+        # The schedule-driven surfaces stay bound for fault schedules.
+        self.assertNotEqual(
+            first.stable_bytes(), self._result(stdout=b"other").stable_bytes()
+        )
+        self.assertNotEqual(
+            first.stable_bytes(), self._result(pause_count=2).stable_bytes()
+        )
+        # Orderly schedules keep the full binding, and the flag itself is
+        # part of identity so the two receipt shapes can never alias.
+        orderly = self._result(fault_schedule=False)
+        self.assertNotEqual(first.stable_bytes(), orderly.stable_bytes())
+        self.assertNotEqual(
+            orderly.stable_bytes(),
+            self._result(fault_schedule=False, flush_count=8).stable_bytes(),
+        )
+        self.assertNotEqual(
+            orderly.stable_bytes(),
+            self._result(fault_schedule=False, returncode=-9).stable_bytes(),
+        )
+        # Durable evidence retains the excluded values for every schedule.
+        summary = first.summary()
+        self.assertEqual(summary["returncode"], 5)
+
+    def test_controller_transport_watchdog_bounds(self) -> None:
+        # F-LIVE-011: every controller data-plane OS call carries the same
+        # watchdog bound as the event waits, so a stalled child produces a
+        # minimized TransportError witness instead of an unbounded hang.
+        connection = controller._spawn("socketpair")
+        try:
+            assert connection.endpoint is not None
+            self.assertEqual(
+                connection.endpoint.gettimeout(), controller.WATCHDOG_SECONDS
+            )
+        finally:
+            connection.kill()
+            connection.process.wait(timeout=controller.WATCHDOG_SECONDS)
+            connection.monitor.thread.join(controller.WATCHDOG_SECONDS)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
