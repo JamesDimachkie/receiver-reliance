@@ -18,8 +18,8 @@
    "fields": [
     {
      "field": "provenance_subject_id",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "predecessor_id",
@@ -33,8 +33,8 @@
     },
     {
      "field": "provenance_record_sha256",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "support_record_sha256",
@@ -54,8 +54,8 @@
    "fields": [
     {
      "field": "sender_id",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "recipient_id",
@@ -243,8 +243,8 @@
     },
     {
      "field": "last_authority_arrival_sequence",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "decision_sequence",
@@ -331,8 +331,8 @@
     },
     {
      "field": "revoked_at",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "consumption_state",
@@ -341,8 +341,8 @@
     },
     {
      "field": "invocation_nonce",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "prior_invocation_nonces",
@@ -351,13 +351,13 @@
     },
     {
      "field": "effect_sha256",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "execution_receipt_effect_sha256",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "effect_receipt_count",
@@ -413,8 +413,8 @@
    "fields": [
     {
      "field": "exact_reference",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "record_versions",
@@ -444,13 +444,13 @@
     },
     {
      "field": "manifest_effect_sha256",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "requested_effect_sha256",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "input_ids",
@@ -684,8 +684,8 @@
     },
     {
      "field": "invocation_sha256",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "subject_sha256",
@@ -806,18 +806,18 @@
     },
     {
      "field": "authorized_effect_sha256",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "invoked_effect_sha256",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "observed_effect_sha256",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     }
    ]
   },
@@ -862,8 +862,8 @@
     },
     {
      "field": "affordable_covering_query_id",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "budget_remaining",
@@ -877,23 +877,23 @@
     },
     {
      "field": "asked_query_id",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "asked_addressee_id",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "asked_query_cost",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "asked_query_target_fact_id",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "unnecessary_query_count",
@@ -955,18 +955,18 @@
    "fields": [
     {
      "field": "trusted_render_bytes_base64",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "action_manifest_bytes_base64",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "executed_effect_bytes_base64",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "rendered_field_names",
@@ -1001,13 +1001,13 @@
     },
     {
      "field": "assessed_claim_version_sha256",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "evidence_claim_version_sha256",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     }
    ]
   },
@@ -1032,13 +1032,13 @@
     },
     {
      "field": "declared_scope_sha256",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "recorded_use_scope_sha256",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     }
    ]
   },
@@ -1084,8 +1084,8 @@
     },
     {
      "field": "validation_result",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "conflicting_write_sha256s",
@@ -1172,8 +1172,8 @@
     },
     {
      "field": "authorization_record_sha256",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     },
     {
      "field": "support_result",
@@ -1182,8 +1182,8 @@
     },
     {
      "field": "authorization_decision",
-     "status": "presence_only",
-     "rationale": "required-and-non-null is the tested property; value carries no classification authority"
+     "status": "semantic",
+     "rationale": "referenced by a value-comparing predicate"
     }
    ]
   }

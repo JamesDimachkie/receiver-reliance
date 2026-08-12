@@ -93,6 +93,47 @@ def mutate_semantic_to_inert(staged: pathlib.Path) -> str:
     raise AssertionError("baseline register has no semantic field to falsify")
 
 
+def mutate_dual_use_semantic_to_presence_only(staged: pathlib.Path) -> str:
+    """Recreate the independently reproduced WP2 under-classification."""
+    path = staged / REGISTER
+    register = read_json(path)
+    operation = next(
+        row for row in register["operations"] if row["obligation_id"] == "OBL-02"
+    )
+    field = next(row for row in operation["fields"] if row["field"] == "exact_reference")
+    if field["status"] != "semantic":
+        raise AssertionError("corrected OBL-02.exact_reference is not semantic")
+    field["status"] = "presence_only"
+    field["rationale"] = (
+        "required-and-non-null is the tested property; value carries no "
+        "classification authority"
+    )
+    write_json(path, register)
+    return (
+        "L1: OBL-02.exact_reference registered presence_only but predicates "
+        "DO reference it semantically (stale register)"
+    )
+
+
+def mutate_dual_use_derivation_regression(staged: pathlib.Path) -> str:
+    """Reintroduce set subtraction so presence use erases value authority."""
+    path = staged / LINTER
+    source = path.read_text(encoding="utf-8")
+    corrected = (
+        "semantic_fields = {top_field(pointer) for pointer in value_refs} - {None}"
+    )
+    regressed = (
+        "semantic_fields = {top_field(pointer) for pointer in value_refs - presence_refs} - {None}"
+    )
+    if source.count(corrected) != 1:
+        raise AssertionError("could not identify corrected per-atomic derivation")
+    path.write_text(source.replace(corrected, regressed), encoding="utf-8")
+    return (
+        "L1: OBL-04.provenance_subject_id registered semantic but no "
+        "value-comparing predicate references it"
+    )
+
+
 def mutate_inert_to_semantic(staged: pathlib.Path) -> str:
     path = staged / REGISTER
     register = read_json(path)
@@ -158,6 +199,8 @@ CASES: tuple[tuple[str, Mutation | None], ...] = (
     ("baseline-accepted", None),
     ("deleted-register-entry-rejected", mutate_deleted_register_entry),
     ("semantic-to-inert-rejected", mutate_semantic_to_inert),
+    ("dual-use-semantic-to-presence-rejected", mutate_dual_use_semantic_to_presence_only),
+    ("dual-use-derivation-regression-rejected", mutate_dual_use_derivation_regression),
     ("inert-to-semantic-rejected", mutate_inert_to_semantic),
     ("stale-extra-field-rejected", mutate_stale_extra_field),
     ("duplicate-wire-format-rejected", mutate_duplicate_wire_format),

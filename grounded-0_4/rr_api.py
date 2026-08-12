@@ -32,9 +32,12 @@ from typing import Any
 
 _HERE = pathlib.Path(__file__).resolve().parent
 _IMPL3 = _HERE.parent / "baseline-run" / "implementation-output-0.3"
+if str(_HERE) not in sys.path:
+    sys.path.insert(0, str(_HERE))
 if str(_IMPL3) not in sys.path:
     sys.path.insert(0, str(_IMPL3))
 
+from authority_surface import authority_for_operation  # noqa: E402,F401
 import b1_capabilities as b1  # noqa: E402
 import pcb_runner  # noqa: E402
 

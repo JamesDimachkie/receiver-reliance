@@ -79,8 +79,13 @@ INAPPLICABLE declaration with its own fixture class.
 
 ## Authority census (context for E5)
 
-Of 199 schema-required fact fields across the 30 operations: 111 are
-semantically referenced by predicates, 64 are presence-only, 24 are never
-referenced (10 disclosed non-authoritative, 14 registered as debt). The
+Of 199 schema-required fact fields across the 30 operations: 141 are
+semantically referenced by at least one value-comparing predicate, 34 are
+referenced only by presence predicates, and 24 are never referenced (10
+disclosed non-authoritative, 14 registered as debt). An earlier census
+under-counted semantic authority by subtracting every presence-referenced path
+globally, which erased 30 fields that also had value-comparing uses; finding
+`grounded-0_4/findings/F-WP2-001.md` records the witness and correction. The
 machine-checked ledger is `grounded-0_4/authority_register_0_4.json`;
-CI-gating both directions is `grounded-0_4/lint_contract.py` L1.
+CI-gating both directions is `grounded-0_4/lint_contract.py` L1, and the
+generated public view is `grounded-0_4/AUTHORITY_TABLE.md`.

@@ -46,15 +46,26 @@ VALUE_IS_PATH = {"OUTSIDE_HALF_OPEN"}
 DEFECT_CLASSES = {"MALFORMED_OR_BOUNDARY", "BINDING_OR_CONFLICT", "OMISSION_OR_INCOMPLETE"}
 
 
-def collect_refs(node, refs: set[str], presence_only: set[str]) -> None:
+def collect_refs(
+    node: object,
+    value_refs: set[str],
+    presence_refs: set[str],
+) -> None:
+    """Collect uses per atomic predicate, preserving dual-use paths.
+
+    A path is value-authoritative when *any* atomic value-comparing predicate
+    references it, even if a separate presence predicate also references it.
+    Keeping the two use sets independent prevents presence use from erasing
+    value authority.
+    """
     if not isinstance(node, dict):
         return
     if "all" in node or "any" in node:
         for child in node.get("all", []) + node.get("any", []):
-            collect_refs(child, refs, presence_only)
+            collect_refs(child, value_refs, presence_refs)
         return
     if "not" in node:
-        collect_refs(node["not"], refs, presence_only)
+        collect_refs(node["not"], value_refs, presence_refs)
         return
     op = node.get("op")
     here: list[str] = []
@@ -67,10 +78,8 @@ def collect_refs(node, refs: set[str], presence_only: set[str]) -> None:
                 here.append(value)
     if op in VALUE_IS_PATH and isinstance(node.get("value"), str) and node["value"].startswith("/"):
         here.append(node["value"])
-    for pointer in here:
-        refs.add(pointer)
-        if op in PRESENCE_OPS:
-            presence_only.add(pointer)
+    target = presence_refs if op in PRESENCE_OPS else value_refs
+    target.update(here)
 
 
 def top_field(pointer: str) -> str | None:
@@ -107,12 +116,13 @@ def main() -> int:
     # L1 both directions
     for handle, row in sorted(table.items()):
         ob = row["obligation_id"]
-        refs: set[str] = set()
-        presence: set[str] = set()
+        value_refs: set[str] = set()
+        presence_refs: set[str] = set()
         for predicate in row["class_predicates"].values():
-            collect_refs(predicate, refs, presence)
-        semantic_fields = {top_field(p) for p in refs - presence} - {None}
-        referenced_fields = {top_field(p) for p in refs} - {None}
+            collect_refs(predicate, value_refs, presence_refs)
+        semantic_fields = {top_field(pointer) for pointer in value_refs} - {None}
+        presence_fields = {top_field(pointer) for pointer in presence_refs} - {None}
+        referenced_fields = semantic_fields | presence_fields
         reg = reg_by_ob.get(ob)
         if reg is None:
             findings.append(f"L1: {ob} has no authority-register entry")
@@ -129,6 +139,10 @@ def main() -> int:
             if entry["status"] != "semantic" and field in semantic_fields:
                 findings.append(
                     f"L1: {ob}.{field} registered {entry['status']} but predicates DO reference it semantically (stale register)"
+                )
+            if entry["status"] == "presence_only" and field not in presence_fields:
+                findings.append(
+                    f"L1: {ob}.{field} registered presence_only but no presence predicate references it"
                 )
             if entry["status"].startswith("inert") and field in referenced_fields:
                 findings.append(

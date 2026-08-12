@@ -31,10 +31,15 @@ host system — [HOST_OBLIGATIONS.md](HOST_OBLIGATIONS.md) is the explicit,
 testable contract for that division (state truthfulness, atomicity,
 derive-don't-assert, applicability calibration, input binding, effects).
 Some schema-required inputs are bound for future semantics and are
-classification-inert today; the machine-checked ledger of exactly which
-fields carry classification authority is
-`grounded-0_4/authority_register_0_4.json`, and known defects with their
-enforcement are recorded in [ERRATA.md](ERRATA.md).
+classification-inert today. Call
+`grounded-0_4/rr_api.py::authority_for_operation` with an obligation ID or
+operation handle to ask the artifact which required fields carry authority;
+the result is read from `grounded-0_4/authority_register_0_4.json`, not a
+second code table. The generated one-glance view is
+[grounded-0_4/AUTHORITY_TABLE.md](grounded-0_4/AUTHORITY_TABLE.md), and
+`python -B grounded-0_4/generate_authority_table.py --check` fails if it
+drifts from the register. Known defects and enforcement are recorded in
+[ERRATA.md](ERRATA.md).
 
 The 30 operations — the 28-operation accepted core plus the two
 supplemental rows — cover the obligation surface a careful receiver faces:
