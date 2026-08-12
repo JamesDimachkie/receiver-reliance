@@ -1,0 +1,405 @@
+{
+  "claim_scope": "current_intel_macos_non_substitute_observation",
+  "classification": "stress",
+  "commands": [],
+  "commands_planned": [
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "portability/matrix/test_receipt.py"
+      ],
+      "cwd": ".",
+      "expected": {
+        "tests": [
+          48
+        ]
+      },
+      "id": "matrix-receipt-tests",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "portability/model/test_model.py"
+      ],
+      "cwd": ".",
+      "expected": {
+        "tests": [
+          17
+        ]
+      },
+      "id": "finite-model-focused-tests",
+      "timeout_seconds": 300
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "portability/oracle/test_oracle.py"
+      ],
+      "cwd": ".",
+      "expected": {
+        "tests": [
+          35
+        ]
+      },
+      "id": "independent-oracle-tests",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "portability/live/test_live.py"
+      ],
+      "cwd": ".",
+      "expected": {
+        "tests": [
+          33
+        ]
+      },
+      "id": "live-transport-tests",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "-m",
+        "portability.concurrency.test_ladder"
+      ],
+      "cwd": ".",
+      "expected": {
+        "tests": [
+          15
+        ]
+      },
+      "id": "concurrency-tests",
+      "timeout_seconds": 300
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "portability/concurrency/ladder.py",
+        "--levels",
+        "1,2",
+        "--requests",
+        "5",
+        "--skip-soak",
+        "--no-free-threaded",
+        "--runtime-label",
+        "matrix-focused",
+        "--receipt",
+        "portability/concurrency/receipts/matrix-focused-{entry_id}.json"
+      ],
+      "cwd": ".",
+      "id": "concurrency-focused-smoke",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "portability/sandbox/test_sandbox.py"
+      ],
+      "cwd": ".",
+      "expected": {
+        "tests": [
+          77
+        ]
+      },
+      "id": "sandbox-spec-tests",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "portability/verify_receipts.py"
+      ],
+      "cwd": ".",
+      "expected": {
+        "checks": [
+          62
+        ],
+        "failures": [
+          0
+        ]
+      },
+      "id": "verify-committed-receipts",
+      "timeout_seconds": 300
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "implementation-output-0.2/run_conformance_0_2.py"
+      ],
+      "cwd": "baseline-run",
+      "expected": {
+        "count_totals": [
+          800
+        ],
+        "failures": [
+          0
+        ]
+      },
+      "id": "accepted-0.2",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "implementation-output-0.3/run_conformance_0_3.py",
+        "--suite",
+        "all"
+      ],
+      "cwd": "baseline-run",
+      "expected": {
+        "count_totals": [
+          800,
+          107
+        ],
+        "failures": [
+          0,
+          0
+        ]
+      },
+      "id": "composed-0.3-all",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "grounded-0_4/test_grounded_0_4.py"
+      ],
+      "cwd": ".",
+      "expected": {
+        "checks": [
+          504
+        ],
+        "failures": [
+          0
+        ]
+      },
+      "id": "grounded-0.4-regression",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "grounded-0_4/lint_contract.py",
+        "--gate"
+      ],
+      "cwd": ".",
+      "expected": {
+        "findings": [
+          0
+        ]
+      },
+      "id": "contract-lint",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "grounded-0_4/test_lint_gate.py"
+      ],
+      "cwd": ".",
+      "expected": {
+        "checks": [
+          7
+        ],
+        "failures": [
+          0
+        ]
+      },
+      "id": "lint-gate-meta",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "grounded-0_4/test_properties.py"
+      ],
+      "cwd": ".",
+      "expected": {
+        "checks": [
+          2296
+        ],
+        "failures": [
+          0
+        ]
+      },
+      "id": "grounded-properties",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "grounded-0_4/test_audit_adversarial.py"
+      ],
+      "cwd": ".",
+      "expected": {
+        "checks": [
+          6497
+        ],
+        "failures": [
+          0
+        ]
+      },
+      "id": "audit-adversarial",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "proof/test_proof_harness.py"
+      ],
+      "cwd": ".",
+      "expected": {
+        "tests": [
+          7
+        ]
+      },
+      "id": "synthetic-proof-harness",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "fuzz/fuzz.py",
+        "--ci-smoke"
+      ],
+      "cwd": ".",
+      "expected": {
+        "case_progress": [
+          [
+            31,
+            31
+          ]
+        ],
+        "failures": [
+          0
+        ]
+      },
+      "id": "seeded-fuzz-smoke",
+      "timeout_seconds": 900
+    }
+  ],
+  "entry_id": "stress-non-substitute-cpython-3-12-macos-15-intel-x64",
+  "environment": {
+    "abi": {
+      "byte_order": "little",
+      "word_size_bits": 64
+    },
+    "architecture": {
+      "darwin_rosetta": null,
+      "machine": "x64",
+      "mode": "native",
+      "requested": "x64",
+      "windows_wow64": false
+    },
+    "encoding": {
+      "default": "utf-8",
+      "filesystem": "utf-8",
+      "filesystem_errors": "surrogateescape",
+      "locale": "C/en_US.UTF-8/C/C/C/C",
+      "preferred": "utf-8",
+      "stderr": "utf-8",
+      "stdout": "utf-8"
+    },
+    "os": {
+      "kernel_version": "Darwin Kernel Version 24.6.0: Tue Apr 21 20:17:54 PDT 2026; root:xnu-11417.140.69.710.16~1/RELEASE_X86_64",
+      "release": "24.6.0",
+      "system": "Darwin",
+      "uname": [
+        "Darwin",
+        "sjc20-bb658-49231717-46b4-408c-812b-487b70a66f2e-A28FB8CDD241.local",
+        "24.6.0",
+        "Darwin Kernel Version 24.6.0: Tue Apr 21 20:17:54 PDT 2026; root:xnu-11417.140.69.710.16~1/RELEASE_X86_64",
+        "x86_64",
+        "i386"
+      ]
+    },
+    "resources": {
+      "disk_free_bytes": 118287859712,
+      "disk_total_bytes": 348622118912,
+      "logical_cpu_count": 4,
+      "physical_memory_bytes": 15032385536
+    },
+    "runtime": {
+      "build": [
+        "v3.12.10:0cc81280367",
+        "Apr  8 2025 08:47:00"
+      ],
+      "build_flags": {
+        "CONFIG_ARGS": "'-C' '--enable-framework' '--enable-universalsdk=/' '--with-universal-archs=universal2' '--with-computed-gotos' '--without-ensurepip' '--with-openssl=/tmp/_py/libraries/usr/local' '--enable-optimizations' '--with-lto' 'TCLTK_CFLAGS=-I/tmp/_py/libraries/usr/local/include' 'TCLTK_LIBS=-ltcl8.6 -ltk8.6' 'LDFLAGS=-g' 'CFLAGS=-g' 'CC=clang'",
+        "Py_DEBUG": 0,
+        "Py_GIL_DISABLED": null,
+        "WITH_DOC_STRINGS": 1,
+        "WITH_DTRACE": 0,
+        "WITH_MIMALLOC": null,
+        "WITH_PYMALLOC": 1,
+        "WITH_VALGRIND": 0
+      },
+      "compiler": "Clang 13.0.0 (clang-1300.0.29.30)",
+      "dev_mode": false,
+      "executable": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python",
+      "full_version": "3.12.10 (v3.12.10:0cc81280367, Apr  8 2025, 08:47:00) [Clang 13.0.0 (clang-1300.0.29.30)]",
+      "gil_enabled": null,
+      "implementation": "CPython",
+      "setup_python_version": "3.12.10",
+      "version_info": [
+        3,
+        12,
+        10,
+        "final",
+        0
+      ]
+    }
+  },
+  "git": {
+    "clean": true,
+    "github_sha": "7facfa34bb7b841fd0a7d911f15b4da71efde95b",
+    "sha": "7facfa34bb7b841fd0a7d911f15b4da71efde95b",
+    "status_line_count": 0,
+    "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "infra_proof": {
+    "evidence": "native macOS execution lacks negative Rosetta evidence",
+    "kind": "runtime_build_unavailable",
+    "producer": "portability/matrix/receipt.py:runtime-probe"
+  },
+  "outcome": "INFRA_UNAVAILABLE",
+  "reason": "native macOS execution lacks negative Rosetta evidence",
+  "requested": {
+    "architecture": "x64",
+    "distribution_release": null,
+    "implementation": "CPython",
+    "language_floor": null,
+    "non_substitute_for": "macos-13",
+    "os_family": "Darwin",
+    "profile": "focused",
+    "python_language_version": null,
+    "python_version": "3.12",
+    "required_capability": null,
+    "runner": "macos-15-intel",
+    "runtime": "CPython",
+    "setup_architecture": "x64"
+  },
+  "role": "stress_matrix",
+  "schema": "rr.portability.matrix-receipt.v1",
+  "suite_counts": []
+}

@@ -1,0 +1,1676 @@
+{
+  "attempt": 1,
+  "bounds": {
+    "identical_seed_runs_per_level": 2,
+    "levels": [
+      1,
+      2
+    ],
+    "modes": [
+      "library",
+      "process"
+    ],
+    "requests_per_caller": 5,
+    "seed": 23171517194915395,
+    "soak_highest_passing_levels": 2,
+    "soak_requests_per_caller": 1000,
+    "timeout_seconds_per_mode_level_including_two_runs_and_cancellation": 120.0
+  },
+  "ceiling_stopped": false,
+  "completed_normative_levels": [
+    1,
+    2
+  ],
+  "elapsed_seconds": 23.213182602999993,
+  "format_version": "RR-CONCURRENCY-LADDER-3",
+  "free_threaded_3_14t": {
+    "status": "NOT_REQUESTED_BY_CONTROLLER"
+  },
+  "git": {
+    "clean": true,
+    "head": "7facfa34bb7b841fd0a7d911f15b4da71efde95b",
+    "head_exit": 0,
+    "status_exit": 0,
+    "status_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+  },
+  "highest_passing_level": 2,
+  "levels": [
+    {
+      "modes": [
+        {
+          "aggregate_framed_output_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+          "byte_match": true,
+          "elapsed_seconds": 5.597177899000002,
+          "identical_seed_runs": 2,
+          "mode": "library",
+          "participants": 1,
+          "requests_per_caller": 5,
+          "runs": [
+            {
+              "aggregate_framed_output_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+              "caller_receipts": [
+                {
+                  "caller_id": 0,
+                  "output_bytes": 4322,
+                  "output_order_sha256": "A79EBDFF308C46ED0317BF66409928B20A14E4B6F4027DD9DD63F84CE7F6B70F",
+                  "request_count": 5,
+                  "request_order_sha256": "58E99E12C8FE440113E2B3F099A1A09EEB3362848875BFCE811964799B8DD705",
+                  "response_count": 5
+                }
+              ],
+              "cancellation": null,
+              "elapsed_seconds": 2.5718173209999975,
+              "format_version": "RR-CONCURRENCY-WORKER-3",
+              "mode": "library",
+              "participants": 1,
+              "physical_transport_comparator": {
+                "actual_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+                "cache_scope": "one worker run, keyed by exact raw input bytes",
+                "compared_response_lines": 5,
+                "expected_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+                "isolated_binding_sha256": "5AE15364DDB85021C54A7EB405CDB3795EB8ADA4790529EA682CA59156F69B8A",
+                "kind": "cached-one-record-isolated-grounded-0.4-rr_batch.py",
+                "semantic_nonclaim": "CUT-derived isolated bytes establish physical-line transport parity only; they are not semantic expected results.",
+                "source": "grounded-0_4/rr_batch.py, one input record per fresh process",
+                "unique_input_records": 5
+              },
+              "repeat": 1,
+              "requests_per_caller": 5,
+              "resources": {
+                "after": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4378": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 45129728,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 45129728,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "before": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4378": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 43159552,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 43159552,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "peak": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "requested_process_count": 1,
+                  "rss_bytes": 45129728,
+                  "thread_count": 3
+                },
+                "sample_count": 2,
+                "sampling_interval_seconds": 0.01,
+                "scheduling_nonclaim": "sampling observes resources; it is not an execution schedule"
+              },
+              "runtime": {
+                "byte_order": "little",
+                "executable": "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+                "filesystem_encoding": "utf-8",
+                "gil_receipt": {
+                  "sys._is_gil_enabled": true,
+                  "sys._is_gil_enabled_available": true
+                },
+                "implementation": "CPython",
+                "machine": "x86_64",
+                "platform": "Linux-6.17.0-1020-azure-x86_64-with-glibc2.39",
+                "preferred_encoding": "utf-8",
+                "processor": "x86_64",
+                "release": "6.17.0-1020-azure",
+                "system": "Linux",
+                "version": "3.14.6 (main, Jun 10 2026, 14:29:35) [GCC 13.3.0]",
+                "version_info": [
+                  3,
+                  14,
+                  6,
+                  "final",
+                  0
+                ],
+                "word_size_bits": 64
+              },
+              "schedule": {
+                "caller_order": [
+                  0
+                ],
+                "input_generation": "valid-every-50; otherwise seeded malformed selection",
+                "os_interleaving": "uncontrolled stress dimension",
+                "start_barrier": "all-callers-ready"
+              },
+              "seed": 23171517194915395,
+              "semantic_oracle": {
+                "compared_audited_envelopes": 5,
+                "envelope_format_version": "B1-AUDITED-DECISION-0.4",
+                "envelope_validation": "strict UTF-8 integer-domain JSON; exact top-level fields and types; audit seal; independent whole-envelope JCS+LF canonicality; request hash binding",
+                "fixture_binding_sha256": "78FC43470C9AD4C41932CD38926F8430A004D02FE18E065D3DD6BE59A5A4B80B",
+                "projected_sealed_responses_sha256": "7A9BE823255B8240A4DFC6DBB8D545E6AAA50B77B776B321F1480976E9F09FF6",
+                "projection": "independent JCS(sealed_response) plus LF",
+                "source": "portability.oracle.FixtureOracle.expected_record",
+                "status": "PASS"
+              },
+              "status": "PASS",
+              "valid_fixture_inputs": [
+                {
+                  "behavior_class": "VALID",
+                  "entry_id": "SEMFX-OBL-22-IO-291939EAD3C56032",
+                  "request_sha256": "50DE63075B898F16D5C733F6FF3726B3029E22ACF4E41040784D6971873CE04A"
+                },
+                {
+                  "behavior_class": "MALFORMED_OR_BOUNDARY",
+                  "entry_id": "SEMFX-OBL-22-INV-7B6C57EA427965C7",
+                  "request_sha256": "5FC6BEA25A274674CF4FD86738CF525C1984A83EC04815BC7F344ED21D1B8FB4"
+                },
+                {
+                  "behavior_class": "BINDING_OR_CONFLICT",
+                  "entry_id": "SEMFX-OBL-22-CTRL-E0B52A921327B33D",
+                  "request_sha256": "9E2E14ED997D10B94D79DB86216E88E7EE0AFB2F016F414CA3BCB2EECCF5D7EB"
+                },
+                {
+                  "behavior_class": "OMISSION_OR_INCOMPLETE",
+                  "entry_id": "SEMFX-OBL-22-FAIL-A1CA45D53BC99336",
+                  "request_sha256": "8FDDD752E6E73FB92A2C56632973D81F64BCF840B8A347F9E3B69837E1ACE1E5"
+                }
+              ],
+              "worker_process_exit": 0,
+              "worker_stderr_bytes": 0,
+              "worker_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+            },
+            {
+              "aggregate_framed_output_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+              "caller_receipts": [
+                {
+                  "caller_id": 0,
+                  "output_bytes": 4322,
+                  "output_order_sha256": "A79EBDFF308C46ED0317BF66409928B20A14E4B6F4027DD9DD63F84CE7F6B70F",
+                  "request_count": 5,
+                  "request_order_sha256": "58E99E12C8FE440113E2B3F099A1A09EEB3362848875BFCE811964799B8DD705",
+                  "response_count": 5
+                }
+              ],
+              "cancellation": {
+                "after": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4387": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 45281280,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 45281280,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "alive_threads_after": [],
+                "barriers": [
+                  "all-callers-started",
+                  "one-response-acknowledged"
+                ],
+                "before": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4387": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 45277184,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 45277184,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "cancellation_action": "threading.Event.set",
+                "during": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4387": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 45285376,
+                      "thread_count": 2
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 45285376,
+                  "sampled_process_count": 1,
+                  "thread_count": 2,
+                  "unavailable_pids": []
+                },
+                "pass": true,
+                "physical_comparator": "cached-one-record-isolated-grounded-0.4-rr_batch.py",
+                "processed_max": 1,
+                "processed_min": 1,
+                "resource_cleanup": {
+                  "handle_or_fd_count": {
+                    "after": 4,
+                    "allowance": 2,
+                    "before": 4,
+                    "pass": true
+                  },
+                  "pass": true,
+                  "thread_count": {
+                    "after": 1,
+                    "allowance": 0,
+                    "before": 1,
+                    "pass": true
+                  }
+                },
+                "semantic_oracle": "portability.oracle.FixtureOracle.expected_record"
+              },
+              "elapsed_seconds": 2.669043259999995,
+              "format_version": "RR-CONCURRENCY-WORKER-3",
+              "mode": "library",
+              "participants": 1,
+              "physical_transport_comparator": {
+                "actual_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+                "cache_scope": "one worker run, keyed by exact raw input bytes",
+                "compared_response_lines": 5,
+                "expected_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+                "isolated_binding_sha256": "1AB3ED53C82F3663D945A3492E887640511364A4146C73B3942F9261AD3A7C48",
+                "kind": "cached-one-record-isolated-grounded-0.4-rr_batch.py",
+                "semantic_nonclaim": "CUT-derived isolated bytes establish physical-line transport parity only; they are not semantic expected results.",
+                "source": "grounded-0_4/rr_batch.py, one input record per fresh process",
+                "unique_input_records": 5
+              },
+              "repeat": 2,
+              "requests_per_caller": 5,
+              "resources": {
+                "after": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4387": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 45268992,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 45268992,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "before": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4387": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 43298816,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 43298816,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "peak": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "requested_process_count": 1,
+                  "rss_bytes": 45268992,
+                  "thread_count": 3
+                },
+                "sample_count": 2,
+                "sampling_interval_seconds": 0.01,
+                "scheduling_nonclaim": "sampling observes resources; it is not an execution schedule"
+              },
+              "runtime": {
+                "byte_order": "little",
+                "executable": "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+                "filesystem_encoding": "utf-8",
+                "gil_receipt": {
+                  "sys._is_gil_enabled": true,
+                  "sys._is_gil_enabled_available": true
+                },
+                "implementation": "CPython",
+                "machine": "x86_64",
+                "platform": "Linux-6.17.0-1020-azure-x86_64-with-glibc2.39",
+                "preferred_encoding": "utf-8",
+                "processor": "x86_64",
+                "release": "6.17.0-1020-azure",
+                "system": "Linux",
+                "version": "3.14.6 (main, Jun 10 2026, 14:29:35) [GCC 13.3.0]",
+                "version_info": [
+                  3,
+                  14,
+                  6,
+                  "final",
+                  0
+                ],
+                "word_size_bits": 64
+              },
+              "schedule": {
+                "caller_order": [
+                  0
+                ],
+                "input_generation": "valid-every-50; otherwise seeded malformed selection",
+                "os_interleaving": "uncontrolled stress dimension",
+                "start_barrier": "all-callers-ready"
+              },
+              "seed": 23171517194915395,
+              "semantic_oracle": {
+                "compared_audited_envelopes": 5,
+                "envelope_format_version": "B1-AUDITED-DECISION-0.4",
+                "envelope_validation": "strict UTF-8 integer-domain JSON; exact top-level fields and types; audit seal; independent whole-envelope JCS+LF canonicality; request hash binding",
+                "fixture_binding_sha256": "78FC43470C9AD4C41932CD38926F8430A004D02FE18E065D3DD6BE59A5A4B80B",
+                "projected_sealed_responses_sha256": "7A9BE823255B8240A4DFC6DBB8D545E6AAA50B77B776B321F1480976E9F09FF6",
+                "projection": "independent JCS(sealed_response) plus LF",
+                "source": "portability.oracle.FixtureOracle.expected_record",
+                "status": "PASS"
+              },
+              "status": "PASS",
+              "valid_fixture_inputs": [
+                {
+                  "behavior_class": "VALID",
+                  "entry_id": "SEMFX-OBL-22-IO-291939EAD3C56032",
+                  "request_sha256": "50DE63075B898F16D5C733F6FF3726B3029E22ACF4E41040784D6971873CE04A"
+                },
+                {
+                  "behavior_class": "MALFORMED_OR_BOUNDARY",
+                  "entry_id": "SEMFX-OBL-22-INV-7B6C57EA427965C7",
+                  "request_sha256": "5FC6BEA25A274674CF4FD86738CF525C1984A83EC04815BC7F344ED21D1B8FB4"
+                },
+                {
+                  "behavior_class": "BINDING_OR_CONFLICT",
+                  "entry_id": "SEMFX-OBL-22-CTRL-E0B52A921327B33D",
+                  "request_sha256": "9E2E14ED997D10B94D79DB86216E88E7EE0AFB2F016F414CA3BCB2EECCF5D7EB"
+                },
+                {
+                  "behavior_class": "OMISSION_OR_INCOMPLETE",
+                  "entry_id": "SEMFX-OBL-22-FAIL-A1CA45D53BC99336",
+                  "request_sha256": "8FDDD752E6E73FB92A2C56632973D81F64BCF840B8A347F9E3B69837E1ACE1E5"
+                }
+              ],
+              "worker_process_exit": 0,
+              "worker_stderr_bytes": 0,
+              "worker_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+            }
+          ],
+          "status": "PASS",
+          "timeout_seconds": 120.0,
+          "total_requests_per_repeat": 5
+        },
+        {
+          "aggregate_framed_output_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+          "byte_match": true,
+          "elapsed_seconds": 5.699373654999988,
+          "identical_seed_runs": 2,
+          "mode": "process",
+          "participants": 1,
+          "requests_per_caller": 5,
+          "runs": [
+            {
+              "aggregate_framed_output_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+              "caller_receipts": [
+                {
+                  "caller_id": 0,
+                  "output_bytes": 4322,
+                  "output_order_sha256": "A79EBDFF308C46ED0317BF66409928B20A14E4B6F4027DD9DD63F84CE7F6B70F",
+                  "request_count": 5,
+                  "request_order_sha256": "58E99E12C8FE440113E2B3F099A1A09EEB3362848875BFCE811964799B8DD705",
+                  "response_count": 5
+                }
+              ],
+              "cancellation": null,
+              "elapsed_seconds": 2.5946242159999997,
+              "format_version": "RR-CONCURRENCY-WORKER-3",
+              "mode": "process",
+              "participants": 1,
+              "physical_transport_comparator": {
+                "actual_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+                "cache_scope": "one worker run, keyed by exact raw input bytes",
+                "compared_response_lines": 5,
+                "expected_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+                "isolated_binding_sha256": "5AE15364DDB85021C54A7EB405CDB3795EB8ADA4790529EA682CA59156F69B8A",
+                "kind": "cached-one-record-isolated-grounded-0.4-rr_batch.py",
+                "semantic_nonclaim": "CUT-derived isolated bytes establish physical-line transport parity only; they are not semantic expected results.",
+                "source": "grounded-0_4/rr_batch.py, one input record per fresh process",
+                "unique_input_records": 5
+              },
+              "repeat": 1,
+              "requests_per_caller": 5,
+              "resources": {
+                "after": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4399": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 43880448,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 43880448,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "before": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4399": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 43118592,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 43118592,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "peak": {
+                  "handle_or_fd_count": 9,
+                  "method": "procfs",
+                  "requested_process_count": 2,
+                  "rss_bytes": 70664192,
+                  "thread_count": 4
+                },
+                "sample_count": 10,
+                "sampling_interval_seconds": 0.01,
+                "scheduling_nonclaim": "sampling observes resources; it is not an execution schedule"
+              },
+              "runtime": {
+                "byte_order": "little",
+                "executable": "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+                "filesystem_encoding": "utf-8",
+                "gil_receipt": {
+                  "sys._is_gil_enabled": true,
+                  "sys._is_gil_enabled_available": true
+                },
+                "implementation": "CPython",
+                "machine": "x86_64",
+                "platform": "Linux-6.17.0-1020-azure-x86_64-with-glibc2.39",
+                "preferred_encoding": "utf-8",
+                "processor": "x86_64",
+                "release": "6.17.0-1020-azure",
+                "system": "Linux",
+                "version": "3.14.6 (main, Jun 10 2026, 14:29:35) [GCC 13.3.0]",
+                "version_info": [
+                  3,
+                  14,
+                  6,
+                  "final",
+                  0
+                ],
+                "word_size_bits": 64
+              },
+              "schedule": {
+                "caller_order": [
+                  0
+                ],
+                "input_generation": "valid-every-50; otherwise seeded malformed selection",
+                "os_interleaving": "uncontrolled stress dimension",
+                "start_barrier": "all-callers-ready"
+              },
+              "seed": 23171517194915395,
+              "semantic_oracle": {
+                "compared_audited_envelopes": 5,
+                "envelope_format_version": "B1-AUDITED-DECISION-0.4",
+                "envelope_validation": "strict UTF-8 integer-domain JSON; exact top-level fields and types; audit seal; independent whole-envelope JCS+LF canonicality; request hash binding",
+                "fixture_binding_sha256": "78FC43470C9AD4C41932CD38926F8430A004D02FE18E065D3DD6BE59A5A4B80B",
+                "projected_sealed_responses_sha256": "7A9BE823255B8240A4DFC6DBB8D545E6AAA50B77B776B321F1480976E9F09FF6",
+                "projection": "independent JCS(sealed_response) plus LF",
+                "source": "portability.oracle.FixtureOracle.expected_record",
+                "status": "PASS"
+              },
+              "status": "PASS",
+              "valid_fixture_inputs": [
+                {
+                  "behavior_class": "VALID",
+                  "entry_id": "SEMFX-OBL-22-IO-291939EAD3C56032",
+                  "request_sha256": "50DE63075B898F16D5C733F6FF3726B3029E22ACF4E41040784D6971873CE04A"
+                },
+                {
+                  "behavior_class": "MALFORMED_OR_BOUNDARY",
+                  "entry_id": "SEMFX-OBL-22-INV-7B6C57EA427965C7",
+                  "request_sha256": "5FC6BEA25A274674CF4FD86738CF525C1984A83EC04815BC7F344ED21D1B8FB4"
+                },
+                {
+                  "behavior_class": "BINDING_OR_CONFLICT",
+                  "entry_id": "SEMFX-OBL-22-CTRL-E0B52A921327B33D",
+                  "request_sha256": "9E2E14ED997D10B94D79DB86216E88E7EE0AFB2F016F414CA3BCB2EECCF5D7EB"
+                },
+                {
+                  "behavior_class": "OMISSION_OR_INCOMPLETE",
+                  "entry_id": "SEMFX-OBL-22-FAIL-A1CA45D53BC99336",
+                  "request_sha256": "8FDDD752E6E73FB92A2C56632973D81F64BCF840B8A347F9E3B69837E1ACE1E5"
+                }
+              ],
+              "worker_process_exit": 0,
+              "worker_stderr_bytes": 0,
+              "worker_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+            },
+            {
+              "aggregate_framed_output_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+              "caller_receipts": [
+                {
+                  "caller_id": 0,
+                  "output_bytes": 4322,
+                  "output_order_sha256": "A79EBDFF308C46ED0317BF66409928B20A14E4B6F4027DD9DD63F84CE7F6B70F",
+                  "request_count": 5,
+                  "request_order_sha256": "58E99E12C8FE440113E2B3F099A1A09EEB3362848875BFCE811964799B8DD705",
+                  "response_count": 5
+                }
+              ],
+              "cancellation": {
+                "acknowledgements": [
+                  {
+                    "caller_id": 0,
+                    "pid": 4420
+                  }
+                ],
+                "after": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4409": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 43999232,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 43999232,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "barrier": "one-flushed-response-acknowledged-per-process",
+                "before": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4409": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 43999232,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 43999232,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "cancellation_action": "Popen.terminate then bounded wait/kill fallback",
+                "during": {
+                  "handle_or_fd_count": 10,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4409": {
+                      "handle_or_fd_count": 7,
+                      "rss_bytes": 43999232,
+                      "thread_count": 1
+                    },
+                    "4420": {
+                      "handle_or_fd_count": 3,
+                      "rss_bytes": 23986176,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 2,
+                  "rss_bytes": 67985408,
+                  "sampled_process_count": 2,
+                  "thread_count": 2,
+                  "unavailable_pids": []
+                },
+                "exit_codes": [
+                  {
+                    "exit_code": -15,
+                    "pid": 4420
+                  }
+                ],
+                "lingering_pids_after": [],
+                "pass": true,
+                "physical_comparator": "cached-one-record-isolated-grounded-0.4-rr_batch.py",
+                "resource_cleanup": {
+                  "handle_or_fd_count": {
+                    "after": 4,
+                    "allowance": 2,
+                    "before": 4,
+                    "pass": true
+                  },
+                  "pass": true,
+                  "thread_count": {
+                    "after": 1,
+                    "allowance": 0,
+                    "before": 1,
+                    "pass": true
+                  }
+                },
+                "semantic_oracle": "portability.oracle.FixtureOracle.expected_record"
+              },
+              "elapsed_seconds": 2.757708796000003,
+              "format_version": "RR-CONCURRENCY-WORKER-3",
+              "mode": "process",
+              "participants": 1,
+              "physical_transport_comparator": {
+                "actual_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+                "cache_scope": "one worker run, keyed by exact raw input bytes",
+                "compared_response_lines": 5,
+                "expected_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+                "isolated_binding_sha256": "1AB3ED53C82F3663D945A3492E887640511364A4146C73B3942F9261AD3A7C48",
+                "kind": "cached-one-record-isolated-grounded-0.4-rr_batch.py",
+                "semantic_nonclaim": "CUT-derived isolated bytes establish physical-line transport parity only; they are not semantic expected results.",
+                "source": "grounded-0_4/rr_batch.py, one input record per fresh process",
+                "unique_input_records": 5
+              },
+              "repeat": 2,
+              "requests_per_caller": 5,
+              "resources": {
+                "after": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4409": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 43995136,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 43995136,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "before": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4409": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 43233280,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 43233280,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "peak": {
+                  "handle_or_fd_count": 9,
+                  "method": "procfs",
+                  "requested_process_count": 2,
+                  "rss_bytes": 70799360,
+                  "thread_count": 4
+                },
+                "sample_count": 10,
+                "sampling_interval_seconds": 0.01,
+                "scheduling_nonclaim": "sampling observes resources; it is not an execution schedule"
+              },
+              "runtime": {
+                "byte_order": "little",
+                "executable": "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+                "filesystem_encoding": "utf-8",
+                "gil_receipt": {
+                  "sys._is_gil_enabled": true,
+                  "sys._is_gil_enabled_available": true
+                },
+                "implementation": "CPython",
+                "machine": "x86_64",
+                "platform": "Linux-6.17.0-1020-azure-x86_64-with-glibc2.39",
+                "preferred_encoding": "utf-8",
+                "processor": "x86_64",
+                "release": "6.17.0-1020-azure",
+                "system": "Linux",
+                "version": "3.14.6 (main, Jun 10 2026, 14:29:35) [GCC 13.3.0]",
+                "version_info": [
+                  3,
+                  14,
+                  6,
+                  "final",
+                  0
+                ],
+                "word_size_bits": 64
+              },
+              "schedule": {
+                "caller_order": [
+                  0
+                ],
+                "input_generation": "valid-every-50; otherwise seeded malformed selection",
+                "os_interleaving": "uncontrolled stress dimension",
+                "start_barrier": "all-callers-ready"
+              },
+              "seed": 23171517194915395,
+              "semantic_oracle": {
+                "compared_audited_envelopes": 5,
+                "envelope_format_version": "B1-AUDITED-DECISION-0.4",
+                "envelope_validation": "strict UTF-8 integer-domain JSON; exact top-level fields and types; audit seal; independent whole-envelope JCS+LF canonicality; request hash binding",
+                "fixture_binding_sha256": "78FC43470C9AD4C41932CD38926F8430A004D02FE18E065D3DD6BE59A5A4B80B",
+                "projected_sealed_responses_sha256": "7A9BE823255B8240A4DFC6DBB8D545E6AAA50B77B776B321F1480976E9F09FF6",
+                "projection": "independent JCS(sealed_response) plus LF",
+                "source": "portability.oracle.FixtureOracle.expected_record",
+                "status": "PASS"
+              },
+              "status": "PASS",
+              "valid_fixture_inputs": [
+                {
+                  "behavior_class": "VALID",
+                  "entry_id": "SEMFX-OBL-22-IO-291939EAD3C56032",
+                  "request_sha256": "50DE63075B898F16D5C733F6FF3726B3029E22ACF4E41040784D6971873CE04A"
+                },
+                {
+                  "behavior_class": "MALFORMED_OR_BOUNDARY",
+                  "entry_id": "SEMFX-OBL-22-INV-7B6C57EA427965C7",
+                  "request_sha256": "5FC6BEA25A274674CF4FD86738CF525C1984A83EC04815BC7F344ED21D1B8FB4"
+                },
+                {
+                  "behavior_class": "BINDING_OR_CONFLICT",
+                  "entry_id": "SEMFX-OBL-22-CTRL-E0B52A921327B33D",
+                  "request_sha256": "9E2E14ED997D10B94D79DB86216E88E7EE0AFB2F016F414CA3BCB2EECCF5D7EB"
+                },
+                {
+                  "behavior_class": "OMISSION_OR_INCOMPLETE",
+                  "entry_id": "SEMFX-OBL-22-FAIL-A1CA45D53BC99336",
+                  "request_sha256": "8FDDD752E6E73FB92A2C56632973D81F64BCF840B8A347F9E3B69837E1ACE1E5"
+                }
+              ],
+              "worker_process_exit": 0,
+              "worker_stderr_bytes": 0,
+              "worker_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+            }
+          ],
+          "status": "PASS",
+          "timeout_seconds": 120.0,
+          "total_requests_per_repeat": 5
+        }
+      ],
+      "participants": 1,
+      "status": "PASS"
+    },
+    {
+      "modes": [
+        {
+          "aggregate_framed_output_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+          "byte_match": true,
+          "elapsed_seconds": 5.80891149899999,
+          "identical_seed_runs": 2,
+          "mode": "library",
+          "participants": 2,
+          "requests_per_caller": 5,
+          "runs": [
+            {
+              "aggregate_framed_output_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+              "caller_receipts": [
+                {
+                  "caller_id": 0,
+                  "output_bytes": 4322,
+                  "output_order_sha256": "A79EBDFF308C46ED0317BF66409928B20A14E4B6F4027DD9DD63F84CE7F6B70F",
+                  "request_count": 5,
+                  "request_order_sha256": "58E99E12C8FE440113E2B3F099A1A09EEB3362848875BFCE811964799B8DD705",
+                  "response_count": 5
+                },
+                {
+                  "caller_id": 1,
+                  "output_bytes": 4421,
+                  "output_order_sha256": "E8D1CA167CDD316A37C22E8E8046231DD0A821DF8269425A58A4B3E609FA0E44",
+                  "request_count": 5,
+                  "request_order_sha256": "2813817D7BD6A8FF7D4227A0162603F302F52C347145B39EDDEFF371943895AF",
+                  "response_count": 5
+                }
+              ],
+              "cancellation": null,
+              "elapsed_seconds": 2.7431916540000003,
+              "format_version": "RR-CONCURRENCY-WORKER-3",
+              "mode": "library",
+              "participants": 2,
+              "physical_transport_comparator": {
+                "actual_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+                "cache_scope": "one worker run, keyed by exact raw input bytes",
+                "compared_response_lines": 10,
+                "expected_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+                "isolated_binding_sha256": "AD7594938A4D1EE346793C17A3CEE74B30E73554EB64EAE7456D34285F7F122E",
+                "kind": "cached-one-record-isolated-grounded-0.4-rr_batch.py",
+                "semantic_nonclaim": "CUT-derived isolated bytes establish physical-line transport parity only; they are not semantic expected results.",
+                "source": "grounded-0_4/rr_batch.py, one input record per fresh process",
+                "unique_input_records": 7
+              },
+              "repeat": 1,
+              "requests_per_caller": 5,
+              "resources": {
+                "after": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4421": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 46878720,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 46878720,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "before": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4421": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 43237376,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 43237376,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "peak": {
+                  "handle_or_fd_count": 5,
+                  "method": "procfs",
+                  "requested_process_count": 1,
+                  "rss_bytes": 46936064,
+                  "thread_count": 4
+                },
+                "sample_count": 3,
+                "sampling_interval_seconds": 0.01,
+                "scheduling_nonclaim": "sampling observes resources; it is not an execution schedule"
+              },
+              "runtime": {
+                "byte_order": "little",
+                "executable": "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+                "filesystem_encoding": "utf-8",
+                "gil_receipt": {
+                  "sys._is_gil_enabled": true,
+                  "sys._is_gil_enabled_available": true
+                },
+                "implementation": "CPython",
+                "machine": "x86_64",
+                "platform": "Linux-6.17.0-1020-azure-x86_64-with-glibc2.39",
+                "preferred_encoding": "utf-8",
+                "processor": "x86_64",
+                "release": "6.17.0-1020-azure",
+                "system": "Linux",
+                "version": "3.14.6 (main, Jun 10 2026, 14:29:35) [GCC 13.3.0]",
+                "version_info": [
+                  3,
+                  14,
+                  6,
+                  "final",
+                  0
+                ],
+                "word_size_bits": 64
+              },
+              "schedule": {
+                "caller_order": [
+                  0,
+                  1
+                ],
+                "input_generation": "valid-every-50; otherwise seeded malformed selection",
+                "os_interleaving": "uncontrolled stress dimension",
+                "start_barrier": "all-callers-ready"
+              },
+              "seed": 23171517194915395,
+              "semantic_oracle": {
+                "compared_audited_envelopes": 10,
+                "envelope_format_version": "B1-AUDITED-DECISION-0.4",
+                "envelope_validation": "strict UTF-8 integer-domain JSON; exact top-level fields and types; audit seal; independent whole-envelope JCS+LF canonicality; request hash binding",
+                "fixture_binding_sha256": "78FC43470C9AD4C41932CD38926F8430A004D02FE18E065D3DD6BE59A5A4B80B",
+                "projected_sealed_responses_sha256": "F5A7111685B217F0146718686F5A10C256B3559316BDCC226467C465208009C8",
+                "projection": "independent JCS(sealed_response) plus LF",
+                "source": "portability.oracle.FixtureOracle.expected_record",
+                "status": "PASS"
+              },
+              "status": "PASS",
+              "valid_fixture_inputs": [
+                {
+                  "behavior_class": "VALID",
+                  "entry_id": "SEMFX-OBL-22-IO-291939EAD3C56032",
+                  "request_sha256": "50DE63075B898F16D5C733F6FF3726B3029E22ACF4E41040784D6971873CE04A"
+                },
+                {
+                  "behavior_class": "MALFORMED_OR_BOUNDARY",
+                  "entry_id": "SEMFX-OBL-22-INV-7B6C57EA427965C7",
+                  "request_sha256": "5FC6BEA25A274674CF4FD86738CF525C1984A83EC04815BC7F344ED21D1B8FB4"
+                },
+                {
+                  "behavior_class": "BINDING_OR_CONFLICT",
+                  "entry_id": "SEMFX-OBL-22-CTRL-E0B52A921327B33D",
+                  "request_sha256": "9E2E14ED997D10B94D79DB86216E88E7EE0AFB2F016F414CA3BCB2EECCF5D7EB"
+                },
+                {
+                  "behavior_class": "OMISSION_OR_INCOMPLETE",
+                  "entry_id": "SEMFX-OBL-22-FAIL-A1CA45D53BC99336",
+                  "request_sha256": "8FDDD752E6E73FB92A2C56632973D81F64BCF840B8A347F9E3B69837E1ACE1E5"
+                }
+              ],
+              "worker_process_exit": 0,
+              "worker_stderr_bytes": 0,
+              "worker_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+            },
+            {
+              "aggregate_framed_output_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+              "caller_receipts": [
+                {
+                  "caller_id": 0,
+                  "output_bytes": 4322,
+                  "output_order_sha256": "A79EBDFF308C46ED0317BF66409928B20A14E4B6F4027DD9DD63F84CE7F6B70F",
+                  "request_count": 5,
+                  "request_order_sha256": "58E99E12C8FE440113E2B3F099A1A09EEB3362848875BFCE811964799B8DD705",
+                  "response_count": 5
+                },
+                {
+                  "caller_id": 1,
+                  "output_bytes": 4421,
+                  "output_order_sha256": "E8D1CA167CDD316A37C22E8E8046231DD0A821DF8269425A58A4B3E609FA0E44",
+                  "request_count": 5,
+                  "request_order_sha256": "2813817D7BD6A8FF7D4227A0162603F302F52C347145B39EDDEFF371943895AF",
+                  "response_count": 5
+                }
+              ],
+              "cancellation": {
+                "after": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4435": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 46903296,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 46903296,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "alive_threads_after": [],
+                "barriers": [
+                  "all-callers-started",
+                  "one-response-acknowledged"
+                ],
+                "before": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4435": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 46899200,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 46899200,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "cancellation_action": "threading.Event.set",
+                "during": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4435": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 46911488,
+                      "thread_count": 3
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 46911488,
+                  "sampled_process_count": 1,
+                  "thread_count": 3,
+                  "unavailable_pids": []
+                },
+                "pass": true,
+                "physical_comparator": "cached-one-record-isolated-grounded-0.4-rr_batch.py",
+                "processed_max": 1,
+                "processed_min": 1,
+                "resource_cleanup": {
+                  "handle_or_fd_count": {
+                    "after": 4,
+                    "allowance": 2,
+                    "before": 4,
+                    "pass": true
+                  },
+                  "pass": true,
+                  "thread_count": {
+                    "after": 1,
+                    "allowance": 0,
+                    "before": 1,
+                    "pass": true
+                  }
+                },
+                "semantic_oracle": "portability.oracle.FixtureOracle.expected_record"
+              },
+              "elapsed_seconds": 2.7057835210000007,
+              "format_version": "RR-CONCURRENCY-WORKER-3",
+              "mode": "library",
+              "participants": 2,
+              "physical_transport_comparator": {
+                "actual_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+                "cache_scope": "one worker run, keyed by exact raw input bytes",
+                "compared_response_lines": 10,
+                "expected_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+                "isolated_binding_sha256": "AD7594938A4D1EE346793C17A3CEE74B30E73554EB64EAE7456D34285F7F122E",
+                "kind": "cached-one-record-isolated-grounded-0.4-rr_batch.py",
+                "semantic_nonclaim": "CUT-derived isolated bytes establish physical-line transport parity only; they are not semantic expected results.",
+                "source": "grounded-0_4/rr_batch.py, one input record per fresh process",
+                "unique_input_records": 7
+              },
+              "repeat": 2,
+              "requests_per_caller": 5,
+              "resources": {
+                "after": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4435": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 46895104,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 46895104,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "before": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4435": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 43253760,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 43253760,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "peak": {
+                  "handle_or_fd_count": 5,
+                  "method": "procfs",
+                  "requested_process_count": 1,
+                  "rss_bytes": 46923776,
+                  "thread_count": 4
+                },
+                "sample_count": 3,
+                "sampling_interval_seconds": 0.01,
+                "scheduling_nonclaim": "sampling observes resources; it is not an execution schedule"
+              },
+              "runtime": {
+                "byte_order": "little",
+                "executable": "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+                "filesystem_encoding": "utf-8",
+                "gil_receipt": {
+                  "sys._is_gil_enabled": true,
+                  "sys._is_gil_enabled_available": true
+                },
+                "implementation": "CPython",
+                "machine": "x86_64",
+                "platform": "Linux-6.17.0-1020-azure-x86_64-with-glibc2.39",
+                "preferred_encoding": "utf-8",
+                "processor": "x86_64",
+                "release": "6.17.0-1020-azure",
+                "system": "Linux",
+                "version": "3.14.6 (main, Jun 10 2026, 14:29:35) [GCC 13.3.0]",
+                "version_info": [
+                  3,
+                  14,
+                  6,
+                  "final",
+                  0
+                ],
+                "word_size_bits": 64
+              },
+              "schedule": {
+                "caller_order": [
+                  0,
+                  1
+                ],
+                "input_generation": "valid-every-50; otherwise seeded malformed selection",
+                "os_interleaving": "uncontrolled stress dimension",
+                "start_barrier": "all-callers-ready"
+              },
+              "seed": 23171517194915395,
+              "semantic_oracle": {
+                "compared_audited_envelopes": 10,
+                "envelope_format_version": "B1-AUDITED-DECISION-0.4",
+                "envelope_validation": "strict UTF-8 integer-domain JSON; exact top-level fields and types; audit seal; independent whole-envelope JCS+LF canonicality; request hash binding",
+                "fixture_binding_sha256": "78FC43470C9AD4C41932CD38926F8430A004D02FE18E065D3DD6BE59A5A4B80B",
+                "projected_sealed_responses_sha256": "F5A7111685B217F0146718686F5A10C256B3559316BDCC226467C465208009C8",
+                "projection": "independent JCS(sealed_response) plus LF",
+                "source": "portability.oracle.FixtureOracle.expected_record",
+                "status": "PASS"
+              },
+              "status": "PASS",
+              "valid_fixture_inputs": [
+                {
+                  "behavior_class": "VALID",
+                  "entry_id": "SEMFX-OBL-22-IO-291939EAD3C56032",
+                  "request_sha256": "50DE63075B898F16D5C733F6FF3726B3029E22ACF4E41040784D6971873CE04A"
+                },
+                {
+                  "behavior_class": "MALFORMED_OR_BOUNDARY",
+                  "entry_id": "SEMFX-OBL-22-INV-7B6C57EA427965C7",
+                  "request_sha256": "5FC6BEA25A274674CF4FD86738CF525C1984A83EC04815BC7F344ED21D1B8FB4"
+                },
+                {
+                  "behavior_class": "BINDING_OR_CONFLICT",
+                  "entry_id": "SEMFX-OBL-22-CTRL-E0B52A921327B33D",
+                  "request_sha256": "9E2E14ED997D10B94D79DB86216E88E7EE0AFB2F016F414CA3BCB2EECCF5D7EB"
+                },
+                {
+                  "behavior_class": "OMISSION_OR_INCOMPLETE",
+                  "entry_id": "SEMFX-OBL-22-FAIL-A1CA45D53BC99336",
+                  "request_sha256": "8FDDD752E6E73FB92A2C56632973D81F64BCF840B8A347F9E3B69837E1ACE1E5"
+                }
+              ],
+              "worker_process_exit": 0,
+              "worker_stderr_bytes": 0,
+              "worker_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+            }
+          ],
+          "status": "PASS",
+          "timeout_seconds": 120.0,
+          "total_requests_per_repeat": 10
+        },
+        {
+          "aggregate_framed_output_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+          "byte_match": true,
+          "elapsed_seconds": 6.101115124999993,
+          "identical_seed_runs": 2,
+          "mode": "process",
+          "participants": 2,
+          "requests_per_caller": 5,
+          "runs": [
+            {
+              "aggregate_framed_output_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+              "caller_receipts": [
+                {
+                  "caller_id": 0,
+                  "output_bytes": 4322,
+                  "output_order_sha256": "A79EBDFF308C46ED0317BF66409928B20A14E4B6F4027DD9DD63F84CE7F6B70F",
+                  "request_count": 5,
+                  "request_order_sha256": "58E99E12C8FE440113E2B3F099A1A09EEB3362848875BFCE811964799B8DD705",
+                  "response_count": 5
+                },
+                {
+                  "caller_id": 1,
+                  "output_bytes": 4421,
+                  "output_order_sha256": "E8D1CA167CDD316A37C22E8E8046231DD0A821DF8269425A58A4B3E609FA0E44",
+                  "request_count": 5,
+                  "request_order_sha256": "2813817D7BD6A8FF7D4227A0162603F302F52C347145B39EDDEFF371943895AF",
+                  "response_count": 5
+                }
+              ],
+              "cancellation": null,
+              "elapsed_seconds": 2.8063322839999927,
+              "format_version": "RR-CONCURRENCY-WORKER-3",
+              "mode": "process",
+              "participants": 2,
+              "physical_transport_comparator": {
+                "actual_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+                "cache_scope": "one worker run, keyed by exact raw input bytes",
+                "compared_response_lines": 10,
+                "expected_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+                "isolated_binding_sha256": "AD7594938A4D1EE346793C17A3CEE74B30E73554EB64EAE7456D34285F7F122E",
+                "kind": "cached-one-record-isolated-grounded-0.4-rr_batch.py",
+                "semantic_nonclaim": "CUT-derived isolated bytes establish physical-line transport parity only; they are not semantic expected results.",
+                "source": "grounded-0_4/rr_batch.py, one input record per fresh process",
+                "unique_input_records": 7
+              },
+              "repeat": 1,
+              "requests_per_caller": 5,
+              "resources": {
+                "after": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4449": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 44478464,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 44478464,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "before": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4449": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 43261952,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 43261952,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "peak": {
+                  "handle_or_fd_count": 14,
+                  "method": "procfs",
+                  "requested_process_count": 3,
+                  "rss_bytes": 98041856,
+                  "thread_count": 6
+                },
+                "sample_count": 10,
+                "sampling_interval_seconds": 0.01,
+                "scheduling_nonclaim": "sampling observes resources; it is not an execution schedule"
+              },
+              "runtime": {
+                "byte_order": "little",
+                "executable": "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+                "filesystem_encoding": "utf-8",
+                "gil_receipt": {
+                  "sys._is_gil_enabled": true,
+                  "sys._is_gil_enabled_available": true
+                },
+                "implementation": "CPython",
+                "machine": "x86_64",
+                "platform": "Linux-6.17.0-1020-azure-x86_64-with-glibc2.39",
+                "preferred_encoding": "utf-8",
+                "processor": "x86_64",
+                "release": "6.17.0-1020-azure",
+                "system": "Linux",
+                "version": "3.14.6 (main, Jun 10 2026, 14:29:35) [GCC 13.3.0]",
+                "version_info": [
+                  3,
+                  14,
+                  6,
+                  "final",
+                  0
+                ],
+                "word_size_bits": 64
+              },
+              "schedule": {
+                "caller_order": [
+                  0,
+                  1
+                ],
+                "input_generation": "valid-every-50; otherwise seeded malformed selection",
+                "os_interleaving": "uncontrolled stress dimension",
+                "start_barrier": "all-callers-ready"
+              },
+              "seed": 23171517194915395,
+              "semantic_oracle": {
+                "compared_audited_envelopes": 10,
+                "envelope_format_version": "B1-AUDITED-DECISION-0.4",
+                "envelope_validation": "strict UTF-8 integer-domain JSON; exact top-level fields and types; audit seal; independent whole-envelope JCS+LF canonicality; request hash binding",
+                "fixture_binding_sha256": "78FC43470C9AD4C41932CD38926F8430A004D02FE18E065D3DD6BE59A5A4B80B",
+                "projected_sealed_responses_sha256": "F5A7111685B217F0146718686F5A10C256B3559316BDCC226467C465208009C8",
+                "projection": "independent JCS(sealed_response) plus LF",
+                "source": "portability.oracle.FixtureOracle.expected_record",
+                "status": "PASS"
+              },
+              "status": "PASS",
+              "valid_fixture_inputs": [
+                {
+                  "behavior_class": "VALID",
+                  "entry_id": "SEMFX-OBL-22-IO-291939EAD3C56032",
+                  "request_sha256": "50DE63075B898F16D5C733F6FF3726B3029E22ACF4E41040784D6971873CE04A"
+                },
+                {
+                  "behavior_class": "MALFORMED_OR_BOUNDARY",
+                  "entry_id": "SEMFX-OBL-22-INV-7B6C57EA427965C7",
+                  "request_sha256": "5FC6BEA25A274674CF4FD86738CF525C1984A83EC04815BC7F344ED21D1B8FB4"
+                },
+                {
+                  "behavior_class": "BINDING_OR_CONFLICT",
+                  "entry_id": "SEMFX-OBL-22-CTRL-E0B52A921327B33D",
+                  "request_sha256": "9E2E14ED997D10B94D79DB86216E88E7EE0AFB2F016F414CA3BCB2EECCF5D7EB"
+                },
+                {
+                  "behavior_class": "OMISSION_OR_INCOMPLETE",
+                  "entry_id": "SEMFX-OBL-22-FAIL-A1CA45D53BC99336",
+                  "request_sha256": "8FDDD752E6E73FB92A2C56632973D81F64BCF840B8A347F9E3B69837E1ACE1E5"
+                }
+              ],
+              "worker_process_exit": 0,
+              "worker_stderr_bytes": 0,
+              "worker_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+            },
+            {
+              "aggregate_framed_output_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+              "caller_receipts": [
+                {
+                  "caller_id": 0,
+                  "output_bytes": 4322,
+                  "output_order_sha256": "A79EBDFF308C46ED0317BF66409928B20A14E4B6F4027DD9DD63F84CE7F6B70F",
+                  "request_count": 5,
+                  "request_order_sha256": "58E99E12C8FE440113E2B3F099A1A09EEB3362848875BFCE811964799B8DD705",
+                  "response_count": 5
+                },
+                {
+                  "caller_id": 1,
+                  "output_bytes": 4421,
+                  "output_order_sha256": "E8D1CA167CDD316A37C22E8E8046231DD0A821DF8269425A58A4B3E609FA0E44",
+                  "request_count": 5,
+                  "request_order_sha256": "2813817D7BD6A8FF7D4227A0162603F302F52C347145B39EDDEFF371943895AF",
+                  "response_count": 5
+                }
+              ],
+              "cancellation": {
+                "acknowledgements": [
+                  {
+                    "caller_id": 0,
+                    "pid": 4497
+                  },
+                  {
+                    "caller_id": 1,
+                    "pid": 4498
+                  }
+                ],
+                "after": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4483": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 44363776,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 44363776,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "barrier": "one-flushed-response-acknowledged-per-process",
+                "before": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4483": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 44363776,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 44363776,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "cancellation_action": "Popen.terminate then bounded wait/kill fallback",
+                "during": {
+                  "handle_or_fd_count": 16,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4483": {
+                      "handle_or_fd_count": 10,
+                      "rss_bytes": 44363776,
+                      "thread_count": 1
+                    },
+                    "4497": {
+                      "handle_or_fd_count": 3,
+                      "rss_bytes": 23982080,
+                      "thread_count": 1
+                    },
+                    "4498": {
+                      "handle_or_fd_count": 3,
+                      "rss_bytes": 24031232,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 3,
+                  "rss_bytes": 92377088,
+                  "sampled_process_count": 3,
+                  "thread_count": 3,
+                  "unavailable_pids": []
+                },
+                "exit_codes": [
+                  {
+                    "exit_code": -15,
+                    "pid": 4497
+                  },
+                  {
+                    "exit_code": -15,
+                    "pid": 4498
+                  }
+                ],
+                "lingering_pids_after": [],
+                "pass": true,
+                "physical_comparator": "cached-one-record-isolated-grounded-0.4-rr_batch.py",
+                "resource_cleanup": {
+                  "handle_or_fd_count": {
+                    "after": 4,
+                    "allowance": 2,
+                    "before": 4,
+                    "pass": true
+                  },
+                  "pass": true,
+                  "thread_count": {
+                    "after": 1,
+                    "allowance": 0,
+                    "before": 1,
+                    "pass": true
+                  }
+                },
+                "semantic_oracle": "portability.oracle.FixtureOracle.expected_record"
+              },
+              "elapsed_seconds": 2.9163467740000044,
+              "format_version": "RR-CONCURRENCY-WORKER-3",
+              "mode": "process",
+              "participants": 2,
+              "physical_transport_comparator": {
+                "actual_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+                "cache_scope": "one worker run, keyed by exact raw input bytes",
+                "compared_response_lines": 10,
+                "expected_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+                "isolated_binding_sha256": "AD7594938A4D1EE346793C17A3CEE74B30E73554EB64EAE7456D34285F7F122E",
+                "kind": "cached-one-record-isolated-grounded-0.4-rr_batch.py",
+                "semantic_nonclaim": "CUT-derived isolated bytes establish physical-line transport parity only; they are not semantic expected results.",
+                "source": "grounded-0_4/rr_batch.py, one input record per fresh process",
+                "unique_input_records": 7
+              },
+              "repeat": 2,
+              "requests_per_caller": 5,
+              "resources": {
+                "after": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4483": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 44359680,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 44359680,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "before": {
+                  "handle_or_fd_count": 4,
+                  "method": "procfs",
+                  "per_pid": {
+                    "4483": {
+                      "handle_or_fd_count": 4,
+                      "rss_bytes": 43143168,
+                      "thread_count": 1
+                    }
+                  },
+                  "requested_process_count": 1,
+                  "rss_bytes": 43143168,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "peak": {
+                  "handle_or_fd_count": 14,
+                  "method": "procfs",
+                  "requested_process_count": 3,
+                  "rss_bytes": 97849344,
+                  "thread_count": 6
+                },
+                "sample_count": 10,
+                "sampling_interval_seconds": 0.01,
+                "scheduling_nonclaim": "sampling observes resources; it is not an execution schedule"
+              },
+              "runtime": {
+                "byte_order": "little",
+                "executable": "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+                "filesystem_encoding": "utf-8",
+                "gil_receipt": {
+                  "sys._is_gil_enabled": true,
+                  "sys._is_gil_enabled_available": true
+                },
+                "implementation": "CPython",
+                "machine": "x86_64",
+                "platform": "Linux-6.17.0-1020-azure-x86_64-with-glibc2.39",
+                "preferred_encoding": "utf-8",
+                "processor": "x86_64",
+                "release": "6.17.0-1020-azure",
+                "system": "Linux",
+                "version": "3.14.6 (main, Jun 10 2026, 14:29:35) [GCC 13.3.0]",
+                "version_info": [
+                  3,
+                  14,
+                  6,
+                  "final",
+                  0
+                ],
+                "word_size_bits": 64
+              },
+              "schedule": {
+                "caller_order": [
+                  0,
+                  1
+                ],
+                "input_generation": "valid-every-50; otherwise seeded malformed selection",
+                "os_interleaving": "uncontrolled stress dimension",
+                "start_barrier": "all-callers-ready"
+              },
+              "seed": 23171517194915395,
+              "semantic_oracle": {
+                "compared_audited_envelopes": 10,
+                "envelope_format_version": "B1-AUDITED-DECISION-0.4",
+                "envelope_validation": "strict UTF-8 integer-domain JSON; exact top-level fields and types; audit seal; independent whole-envelope JCS+LF canonicality; request hash binding",
+                "fixture_binding_sha256": "78FC43470C9AD4C41932CD38926F8430A004D02FE18E065D3DD6BE59A5A4B80B",
+                "projected_sealed_responses_sha256": "F5A7111685B217F0146718686F5A10C256B3559316BDCC226467C465208009C8",
+                "projection": "independent JCS(sealed_response) plus LF",
+                "source": "portability.oracle.FixtureOracle.expected_record",
+                "status": "PASS"
+              },
+              "status": "PASS",
+              "valid_fixture_inputs": [
+                {
+                  "behavior_class": "VALID",
+                  "entry_id": "SEMFX-OBL-22-IO-291939EAD3C56032",
+                  "request_sha256": "50DE63075B898F16D5C733F6FF3726B3029E22ACF4E41040784D6971873CE04A"
+                },
+                {
+                  "behavior_class": "MALFORMED_OR_BOUNDARY",
+                  "entry_id": "SEMFX-OBL-22-INV-7B6C57EA427965C7",
+                  "request_sha256": "5FC6BEA25A274674CF4FD86738CF525C1984A83EC04815BC7F344ED21D1B8FB4"
+                },
+                {
+                  "behavior_class": "BINDING_OR_CONFLICT",
+                  "entry_id": "SEMFX-OBL-22-CTRL-E0B52A921327B33D",
+                  "request_sha256": "9E2E14ED997D10B94D79DB86216E88E7EE0AFB2F016F414CA3BCB2EECCF5D7EB"
+                },
+                {
+                  "behavior_class": "OMISSION_OR_INCOMPLETE",
+                  "entry_id": "SEMFX-OBL-22-FAIL-A1CA45D53BC99336",
+                  "request_sha256": "8FDDD752E6E73FB92A2C56632973D81F64BCF840B8A347F9E3B69837E1ACE1E5"
+                }
+              ],
+              "worker_process_exit": 0,
+              "worker_stderr_bytes": 0,
+              "worker_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+            }
+          ],
+          "status": "PASS",
+          "timeout_seconds": 120.0,
+          "total_requests_per_repeat": 10
+        }
+      ],
+      "participants": 2,
+      "status": "PASS"
+    }
+  ],
+  "nonclaims": [
+    "No efficacy, novelty, security, fuzzing-completeness, external-standard, or universal-portability claim.",
+    "OS thread/process interleavings are sampled stress, not exhaustively enumerated schedules.",
+    "Isolated accepted rr_batch bytes are a physical transport comparator only and make no semantic claim.",
+    "Semantic expectations come only from independent projection of each audited envelope's sealed_response through the clean-room FixtureOracle API."
+  ],
+  "runtime": {
+    "byte_order": "little",
+    "executable": "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+    "filesystem_encoding": "utf-8",
+    "gil_receipt": {
+      "sys._is_gil_enabled": true,
+      "sys._is_gil_enabled_available": true
+    },
+    "implementation": "CPython",
+    "machine": "x86_64",
+    "platform": "Linux-6.17.0-1020-azure-x86_64-with-glibc2.39",
+    "preferred_encoding": "utf-8",
+    "processor": "x86_64",
+    "release": "6.17.0-1020-azure",
+    "system": "Linux",
+    "version": "3.14.6 (main, Jun 10 2026, 14:29:35) [GCC 13.3.0]",
+    "version_info": [
+      3,
+      14,
+      6,
+      "final",
+      0
+    ],
+    "word_size_bits": 64
+  },
+  "runtime_label": "matrix-focused",
+  "soaks": [],
+  "status": "PASS",
+  "treatment_exposed": true,
+  "treatment_notice": "This lane must never author future blinded worlds, oracle, gold, or renderer."
+}

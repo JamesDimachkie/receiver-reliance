@@ -16,12 +16,21 @@ adjudication handoff recorded in `PORTABILITY_FABLE_RETURN_20260810.md`. Codex
 root then performed the 2026-08-11 corrective release audit documented below;
 that historical handoff file is not a current-state authority.
 
-Status: **LOCAL EVIDENCE COMPLETE AFTER CORRECTIVE RELEASE AUDIT.** The hosted
-matrix, hosted sandbox, and hosted expanded-gate receipts have not run because
-no branch push has been authorized or performed. Pushes to the named branch
-and manual `workflow_dispatch` can start the workflow. Every category below
-is local evidence unless marked otherwise, and no category is ever merged
-into a single pass count.
+Hosted evidence HEAD: `7facfa34bb7b841fd0a7d911f15b4da71efde95b`
+(green run `31562391384`; receipts committed under
+`portability/receipts/hosted/`)
+
+Status: **LOCAL AND HOSTED EVIDENCE COMPLETE; CLOSE PUSH PENDING.** James
+authorized and performed the first branch push on 2026-08-11/12. Four hosted
+runs failed and drove harness repairs (F-MATRIX-013, F-SANDBOX-026/027,
+F-LIVE-009/010/011 — all harness/validator defects, no
+accepted-implementation divergence); the fifth run, on
+`7facfa3`, passed every job. Section 12 records the hosted reconciliation.
+Every category below is local evidence unless marked otherwise, and no
+category is ever merged into a single pass count. The prose of sections 1–11
+describes the corrective-release-audit state (`8a525b1`/`4c9250a`) and is
+retained unedited except where marked "updated 2026-08-12"; hosted-pending
+statements inside historical sections are superseded by section 12.
 
 ## Adjudication and decision record (Fable)
 
@@ -216,19 +225,36 @@ Receipt `CD6210F8706C7B37B6CD25A9EF67B53696207EAFED716284151D67B20444732E`
   every profile entry now binds its expected count (matrix 44, model 17,
   oracle 35, live 29, concurrency 15, sandbox 76) — and the matrix suite
   passed twice consecutively with no new evidence after final settlement.
-- Hosted: **not run.** The workflow (`.github/workflows/portability.yml`,
-  read-only permissions, named-branch push trigger plus manual
-  `workflow_dispatch`, SHA-pinned actions) can run only after an authorized
-  remote action. Normative CPython 3.12/3.13/3.14 across
-  ubuntu/macos/windows on x64 and arm64 remains PENDING with
-  `INFRA_UNAVAILABLE` as the only admissible absence record.
+- Hosted (updated 2026-08-12): **run and green.** Normative CPython
+  3.12/3.13/3.14 across ubuntu-latest x64, ubuntu-24.04-arm arm64,
+  macos-latest arm64, windows-latest x64, and windows-11-arm arm64 — all 15
+  runnable rows PASS at plan-bound counts; the three predeclared `macos-13`
+  x64 rows are evidenced `INFRA_UNAVAILABLE` exactly as forecast. The
+  hosted expanded gate (CPython 3.12.13, ubuntu) and the hardened Linux
+  container sandbox gate also PASS. Full record: section 12. (This bullet's
+  historical local counts above — matrix 44, live 29, sandbox 76 — describe
+  the `8a525b1` audit state; the hosted-repair commits settled the plan at
+  matrix 48, live 33, sandbox 77, and the reconciliation commit rebinds
+  `verify-committed-receipts` at 154 checks.)
 
 ## 10. Alternative-runtime observations
 
 Stress-only and off-contract entries (CPython 3.14t with GIL receipt,
 dev-mode, pydebug, PyPy, GraalPy below the 3.12 floor) are defined and
-labeled in the plan; no local evidence exists and none is claimed. Hosted
-observations remain pending with the matrix.
+labeled in the plan; no local evidence exists and none is claimed.
+
+Hosted observations (updated 2026-08-12, none normative): CPython 3.14t
+free-threaded PASS including the bounded concurrency ladder at
+`P = 1, 2, 4, 8` × 200 requests; CPython 3.14 dev-mode PASS; pydebug
+`INFRA_UNAVAILABLE` (no `Py_DEBUG=1` build); the three `macos-15-intel`
+rows `INFRA_UNAVAILABLE` (native-execution probe lacked negative Rosetta
+evidence); PyPy 3.11 `OBSERVED_DIVERGENCE` (first failing command
+`matrix-receipt-tests`; PyPy 3.11 is below the 3.12 floor); PyPy 3.12
+`INFRA_UNAVAILABLE` (setup could not provide the build); GraalPy 24.0
+`RECEIPT_MISSING` — its receipt was rejected by the fail-closed validator
+because GraalPy's `full_version` disagrees with its `version_info` release
+metadata, and the row closed as no-valid-durable-receipt rather than
+adopting the file's self-reported outcome.
 
 ## 11. Hygiene and custody
 
@@ -245,6 +271,73 @@ observations remain pending with the matrix.
 - Current finding dispositions were swept for pending/refutation boilerplate;
   no stale current-status match remains. Historical discovery prose remains
   only where the file explicitly labels it as history.
+
+## 12. Hosted execution and reconciliation (2026-08-12)
+
+James authorized the first branch push. Five hosted runs of the
+`portability` workflow followed on this branch:
+
+| Run | Head | Conclusion | Adjudication |
+|---|---|---|---|
+| `31548278804` | `4c9250a` | failure | hosted sandbox preflight and observation validation defects → F-MATRIX-013, F-SANDBOX-026, fixed in `00479e6` |
+| `31549925307` | `00479e6` | failure | replay identity and sandbox comparator not daemon-real → F-LIVE-009, F-SANDBOX-027, fixed in `baa7b20` |
+| `31552953993` | `baa7b20` | failure | residual defects; author-separated review returned four corrections, applied in `254b248` |
+| `31553920699` | `254b248` | failure | controller liveness and fault-schedule replay identity → F-LIVE-010, F-LIVE-011, fixed in `7facfa3` |
+| `31562391384` | `7facfa3` | **success** | all 28 jobs green; receipts collected below |
+
+Every failure was a harness, workflow, or validator defect with its own
+pinned finding and regression; none established an accepted-implementation
+divergence. The plan settled at matrix 48, live 33, sandbox 77 during these
+repairs (model 17, oracle 35, concurrency 15 unchanged).
+
+Green-run evidence, validated by the runner's fail-closed summary and
+re-derived locally:
+
+- **Normative:** 16 PASS — 15 matrix rows (CPython 3.12/3.13/3.14 ×
+  ubuntu-latest x64, ubuntu-24.04-arm arm64, macos-latest arm64,
+  windows-latest x64, windows-11-arm arm64, at plan-bound suite counts) plus
+  the hosted expanded gate (11/11 commands, totals identical to the local
+  gate: 800; 800+107; 504; lint 0; meta 7; 2,296; 6,497; proof 7; 31/31;
+  2,160; 1,142). The three predeclared `macos-13` x64 rows are evidenced
+  `INFRA_UNAVAILABLE`. Zero normative failures, zero gating errors.
+- **Hardened Linux sandbox:** daemon-real Docker 28.0.4 build from the
+  committed Dockerfile (hash-bound), read-only rootfs, all capabilities
+  dropped, no network, private namespaces, non-root UID; inner 11-command
+  gate PASS; outer host receipt PASS; container removed cleanly.
+- **Stress/off-contract observations:** recorded in section 10; the PyPy
+  3.11 divergence and the GraalPy invalid receipt are observations, not
+  normative failures, exactly as the plan's evidence classes define.
+- **Conformance workflow** (pre-existing) also green on `7facfa3`
+  (run `31562391410`, three OS jobs).
+
+Custody: all 27 durable artifacts (25 row/gate receipts, the matrix
+summary, the sandbox host receipt) plus 17 secondary concurrency smoke
+receipts are committed under `portability/receipts/hosted/` with a
+hash-bound manifest (`MANIFEST.json`, raw SHA-256
+`9DC261CA316C4F8E83342FE6AD24EBF15C3A21F3FD38AE6565EE28651569D5E6`) and a
+provenance record (`PROVENANCE.md`). `portability/verify_receipts.py` now
+re-verifies the manifest hash, enumerates the directory fail-closed,
+re-hashes every listed file, and re-checks the summary's 28-row outcome
+vector, counts, source bindings, the sandbox receipt's status and
+Dockerfile binding, and the hosted gate's exits and load-bearing totals —
+154 checks, 0 failures (tamper-tested against a mutated receipt and a
+mutated manifest; both fail closed). `verify-committed-receipts` in
+`plan.json` is rebound from 62 to 154 so the next hosted run gates on the
+extended verifier.
+
+Independent local revalidation: the committed summary validator, re-run
+locally over the downloaded row receipts with the same inputs, reproduced
+the runner's `matrix-summary.json` in every field except the absolute
+receipt path inside the single invalid-receipt error string (environment
+detail), independently re-deriving the GraalPy metadata rejection.
+
+At the reconciliation state all focused suites are green locally —
+model 17 (one platform-specific skip), oracle 35, live 33, concurrency 15,
+sandbox 77, matrix 48 — with `verify_receipts` 154/0 and `HYGIENE_PASS`
+(138 allowed raw-capture diagnostics, zero unexpected). The full
+11-command expanded gate passed with every command green; the clean-tree
+close receipt is bound after the reconciliation commit and recorded in the
+ledger.
 
 ## Dogfooding audit: the validation system tested itself
 
@@ -364,18 +457,23 @@ findings F-LIVE-007, F-LIVE-008, F-MATRIX-012, and F-SANDBOX-023 through
 F-SANDBOX-025 are resolved locally and regression-pinned. No
 accepted-implementation divergence was established anywhere in the
 portability effort; each finding concerns a model, oracle, harness, workflow,
-validator, sandbox, or evidence-custody defect. Local Docker remains an honest
-`INFRA_UNAVAILABLE`; the sandbox correction rests on static checks
-pending the hosted Linux daemon.
+validator, sandbox, or evidence-custody defect. The hosted-repair cycle
+added F-MATRIX-013, F-SANDBOX-026, F-SANDBOX-027, F-LIVE-009, F-LIVE-010,
+and F-LIVE-011, all resolved and regression-pinned (section 12). Local
+Docker remains an honest `INFRA_UNAVAILABLE`; the sandbox correction is now
+additionally confirmed by the daemon-real hosted Linux container run
+(updated 2026-08-12).
 
 ## Open items (all James-gated or downstream of his gate)
 
-1. First push of this branch — can trigger the hosted matrix; requires
-   explicit current-turn authorization.
-2. Collection and reconciliation of hosted normative, stress,
-   expanded-gate, and Linux sandbox receipts into this report.
-3. Ledger close, terminal return, and the second (close) push.
-4. Task-claim closure after (1)–(3).
+1. ~~First push of this branch~~ — done: James authorized and performed it;
+   five hosted runs followed (section 12).
+2. ~~Collection and reconciliation of hosted receipts~~ — done: committed
+   under `portability/receipts/hosted/`, bound by the extended
+   `verify_receipts.py`, recorded in section 12.
+3. Second (close) push of the reconciliation and close-evidence commits —
+   staged; requires James's explicit current-turn authorization.
+4. Task-claim closure after the close push is verified on the remote.
 
 ## Nonclaims
 
@@ -384,9 +482,15 @@ or universal-portability claim. The proof tier stays `internal held-out`.
 The charter's full success statement — independent cross-platform,
 cross-architecture, cross-runtime, bounded-state, and transport-scheduling
 validation finding no divergence within the stated environments and bounds
-— is **asserted here only in its local scope**: bounded-state and
-transport-scheduling validation on local CPython 3.12.10 (plus 3.14.5 for
-the sandbox suite) found no divergence within the stated bounds, with
-everything outside the model reported as outside the model. The
-cross-platform, cross-architecture, and cross-runtime clauses remain
-contingent on the hosted receipts.
+— is **asserted within, and only within, the executed evidence** (updated
+2026-08-12): bounded-state and transport-scheduling validation found no
+divergence locally (CPython 3.12.10 Windows x64; 3.14.5 for the sandbox
+suite) or on any of the 15 executed hosted normative rows — CPython 3.12,
+3.13, and 3.14 across Ubuntu x64/arm64, macOS arm64, and Windows
+x64/arm64 — nor in the hosted expanded gate or the hardened Linux
+container gate, with everything outside the model reported as outside the
+model. "Cross-runtime" here means across those CPython versions and
+builds; alternative implementations (PyPy, GraalPy) remain off-contract
+observations, the three predeclared `macos-13` x64 rows remain evidenced
+`INFRA_UNAVAILABLE`, and no claim extends to any environment, schedule, or
+input outside the declared finite bounds.

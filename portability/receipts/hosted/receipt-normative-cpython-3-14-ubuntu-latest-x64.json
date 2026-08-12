@@ -1,0 +1,1332 @@
+{
+  "claim_scope": "supported_cpython",
+  "classification": "normative",
+  "commands": [
+    {
+      "argv": [
+        "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+        "-B",
+        "portability/matrix/test_receipt.py"
+      ],
+      "cwd": ".",
+      "elapsed_seconds": 9.062249,
+      "exit": 0,
+      "expectation_mismatches": [],
+      "expected_counts": {
+        "tests": [
+          48
+        ]
+      },
+      "id": "matrix-receipt-tests",
+      "resources": {
+        "children_system_seconds": 2.99,
+        "children_user_seconds": 5.68,
+        "max_rss_kib": 53164
+      },
+      "stderr_bytes": 147,
+      "stderr_sha256": "f6364050670b13809d9e14b8bad642d499b2522adcd1a668d02c9ecb4cc3a581",
+      "stdout_bytes": 75366,
+      "stdout_sha256": "c0b9922c63e4912c06696a26b9431101ceb0dbd332cea54fc67e944ddac2dc68",
+      "suite_counts": {
+        "case_progress": [],
+        "checks": [
+          1
+        ],
+        "count_totals": [],
+        "failures": [
+          0
+        ],
+        "findings": [],
+        "tests": [
+          48
+        ]
+      },
+      "timed_out": false,
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+        "-B",
+        "portability/model/test_model.py"
+      ],
+      "cwd": ".",
+      "elapsed_seconds": 3.068029,
+      "exit": 0,
+      "expectation_mismatches": [],
+      "expected_counts": {
+        "tests": [
+          17
+        ]
+      },
+      "id": "finite-model-focused-tests",
+      "resources": {
+        "children_system_seconds": 0.03,
+        "children_user_seconds": 3.02,
+        "max_rss_kib": 53164
+      },
+      "stderr_bytes": 2290,
+      "stderr_sha256": "26af0821e52c62b09b6c4a215606c82049aaf56de69deac17c7c7538719c0d01",
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "suite_counts": {
+        "case_progress": [],
+        "checks": [],
+        "count_totals": [],
+        "failures": [],
+        "findings": [],
+        "tests": [
+          17
+        ]
+      },
+      "timed_out": false,
+      "timeout_seconds": 300
+    },
+    {
+      "argv": [
+        "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+        "-B",
+        "portability/oracle/test_oracle.py"
+      ],
+      "cwd": ".",
+      "elapsed_seconds": 14.857016,
+      "exit": 0,
+      "expectation_mismatches": [],
+      "expected_counts": {
+        "tests": [
+          35
+        ]
+      },
+      "id": "independent-oracle-tests",
+      "resources": {
+        "children_system_seconds": 0.23,
+        "children_user_seconds": 14.61,
+        "max_rss_kib": 350004
+      },
+      "stderr_bytes": 4495,
+      "stderr_sha256": "9380d46e0e48912f1adb002684f9bb8503bf0d65cba4e5b77c1170aec7cf6a8e",
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "suite_counts": {
+        "case_progress": [],
+        "checks": [],
+        "count_totals": [],
+        "failures": [],
+        "findings": [],
+        "tests": [
+          35
+        ]
+      },
+      "timed_out": false,
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+        "-B",
+        "portability/live/test_live.py"
+      ],
+      "cwd": ".",
+      "elapsed_seconds": 7.734464,
+      "exit": 0,
+      "expectation_mismatches": [],
+      "expected_counts": {
+        "tests": [
+          33
+        ]
+      },
+      "id": "live-transport-tests",
+      "resources": {
+        "children_system_seconds": 1.07,
+        "children_user_seconds": 7.15,
+        "max_rss_kib": 350004
+      },
+      "stderr_bytes": 5248,
+      "stderr_sha256": "58a21c6e508535e95a0e3578d9bb7bb2ea964ec344b7c421eb11164ec993839f",
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "suite_counts": {
+        "case_progress": [],
+        "checks": [],
+        "count_totals": [],
+        "failures": [],
+        "findings": [],
+        "tests": [
+          33
+        ]
+      },
+      "timed_out": false,
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+        "-B",
+        "-m",
+        "portability.concurrency.test_ladder"
+      ],
+      "cwd": ".",
+      "elapsed_seconds": 4.264159,
+      "exit": 0,
+      "expectation_mismatches": [],
+      "expected_counts": {
+        "tests": [
+          15
+        ]
+      },
+      "id": "concurrency-tests",
+      "resources": {
+        "children_system_seconds": 0.06,
+        "children_user_seconds": 4.2,
+        "max_rss_kib": 350004
+      },
+      "stderr_bytes": 126,
+      "stderr_sha256": "9078790d792ea5baae0a2f3af7bf985f9f7ad8d34ddbb393d1f6e1c13981041b",
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "suite_counts": {
+        "case_progress": [],
+        "checks": [],
+        "count_totals": [],
+        "failures": [],
+        "findings": [],
+        "tests": [
+          15
+        ]
+      },
+      "timed_out": false,
+      "timeout_seconds": 300
+    },
+    {
+      "argv": [
+        "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+        "-B",
+        "portability/concurrency/ladder.py",
+        "--levels",
+        "1,2",
+        "--requests",
+        "5",
+        "--skip-soak",
+        "--no-free-threaded",
+        "--runtime-label",
+        "matrix-focused",
+        "--receipt",
+        "portability/concurrency/receipts/matrix-focused-normative-cpython-3-14-ubuntu-latest-x64.json"
+      ],
+      "cwd": ".",
+      "elapsed_seconds": 20.661613,
+      "exit": 0,
+      "expectation_mismatches": [],
+      "expected_counts": {},
+      "id": "concurrency-focused-smoke",
+      "resources": {
+        "children_system_seconds": 0.88,
+        "children_user_seconds": 19.97,
+        "max_rss_kib": 350004
+      },
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 205,
+      "stdout_sha256": "6738dba1c4c4a031c8a649612aafdbd72f855424c4d7db3fd21b8605abf6a658",
+      "suite_counts": {
+        "case_progress": [],
+        "checks": [],
+        "count_totals": [],
+        "failures": [],
+        "findings": [],
+        "tests": []
+      },
+      "timed_out": false,
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+        "-B",
+        "portability/sandbox/test_sandbox.py"
+      ],
+      "cwd": ".",
+      "elapsed_seconds": 0.80935,
+      "exit": 0,
+      "expectation_mismatches": [],
+      "expected_counts": {
+        "tests": [
+          77
+        ]
+      },
+      "id": "sandbox-spec-tests",
+      "resources": {
+        "children_system_seconds": 0.04,
+        "children_user_seconds": 0.76,
+        "max_rss_kib": 350004
+      },
+      "stderr_bytes": 11748,
+      "stderr_sha256": "7c0cb2e24772bcec8b00768dc6dc5a83e6fbcc783cf291cdb160a9fdcf794f97",
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "suite_counts": {
+        "case_progress": [],
+        "checks": [],
+        "count_totals": [],
+        "failures": [],
+        "findings": [],
+        "tests": [
+          77
+        ]
+      },
+      "timed_out": false,
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+        "-B",
+        "portability/verify_receipts.py"
+      ],
+      "cwd": ".",
+      "elapsed_seconds": 0.072625,
+      "exit": 0,
+      "expectation_mismatches": [],
+      "expected_counts": {
+        "checks": [
+          62
+        ],
+        "failures": [
+          0
+        ]
+      },
+      "id": "verify-committed-receipts",
+      "resources": {
+        "children_system_seconds": 0.01,
+        "children_user_seconds": 0.07,
+        "max_rss_kib": 350004
+      },
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 38,
+      "stdout_sha256": "1e83a7071693714d5ff0c87be7d7d581b5e4031c1a2309a1a080bd41cc52a862",
+      "suite_counts": {
+        "case_progress": [],
+        "checks": [
+          62
+        ],
+        "count_totals": [],
+        "failures": [
+          0
+        ],
+        "findings": [],
+        "tests": []
+      },
+      "timed_out": false,
+      "timeout_seconds": 300
+    },
+    {
+      "argv": [
+        "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+        "-B",
+        "implementation-output-0.2/run_conformance_0_2.py"
+      ],
+      "cwd": "baseline-run",
+      "elapsed_seconds": 15.993375,
+      "exit": 0,
+      "expectation_mismatches": [],
+      "expected_counts": {
+        "count_totals": [
+          800
+        ],
+        "failures": [
+          0
+        ]
+      },
+      "id": "accepted-0.2",
+      "resources": {
+        "children_system_seconds": 0.35,
+        "children_user_seconds": 15.64,
+        "max_rss_kib": 2098272
+      },
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 143,
+      "stdout_sha256": "941b5fe942f505db5f297ce80183a4c85c52356d0fa08bf40b59c9d7b9d691b9",
+      "suite_counts": {
+        "case_progress": [],
+        "checks": [],
+        "count_totals": [
+          800
+        ],
+        "failures": [
+          0
+        ],
+        "findings": [],
+        "tests": []
+      },
+      "timed_out": false,
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+        "-B",
+        "implementation-output-0.3/run_conformance_0_3.py",
+        "--suite",
+        "all"
+      ],
+      "cwd": "baseline-run",
+      "elapsed_seconds": 17.712604,
+      "exit": 0,
+      "expectation_mismatches": [],
+      "expected_counts": {
+        "count_totals": [
+          800,
+          107
+        ],
+        "failures": [
+          0,
+          0
+        ]
+      },
+      "id": "composed-0.3-all",
+      "resources": {
+        "children_system_seconds": 0.36,
+        "children_user_seconds": 17.35,
+        "max_rss_kib": 2100472
+      },
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 306,
+      "stdout_sha256": "d5a4daf43cc7a68ed32e3aa62b0c38952db137a9b5c2d6751663e04536f86e44",
+      "suite_counts": {
+        "case_progress": [],
+        "checks": [],
+        "count_totals": [
+          800,
+          107
+        ],
+        "failures": [
+          0,
+          0
+        ],
+        "findings": [],
+        "tests": []
+      },
+      "timed_out": false,
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+        "-B",
+        "grounded-0_4/test_grounded_0_4.py"
+      ],
+      "cwd": ".",
+      "elapsed_seconds": 1.590408,
+      "exit": 0,
+      "expectation_mismatches": [],
+      "expected_counts": {
+        "checks": [
+          504
+        ],
+        "failures": [
+          0
+        ]
+      },
+      "id": "grounded-0.4-regression",
+      "resources": {
+        "children_system_seconds": 0.03,
+        "children_user_seconds": 1.56,
+        "max_rss_kib": 2100472
+      },
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 47,
+      "stdout_sha256": "44db37d2e2bfc1e46ede29e3db5da1c925dcc109f105baa61a7440d83716af1f",
+      "suite_counts": {
+        "case_progress": [],
+        "checks": [
+          504
+        ],
+        "count_totals": [],
+        "failures": [
+          0
+        ],
+        "findings": [],
+        "tests": []
+      },
+      "timed_out": false,
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+        "-B",
+        "grounded-0_4/lint_contract.py",
+        "--gate"
+      ],
+      "cwd": ".",
+      "elapsed_seconds": 0.07173,
+      "exit": 0,
+      "expectation_mismatches": [],
+      "expected_counts": {
+        "findings": [
+          0
+        ]
+      },
+      "id": "contract-lint",
+      "resources": {
+        "children_system_seconds": 0.02,
+        "children_user_seconds": 0.05,
+        "max_rss_kib": 2100472
+      },
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 149,
+      "stdout_sha256": "2193e0360a609652c0cf92943cf28e7600ac847b15d7985b049e96a627f4a3ad",
+      "suite_counts": {
+        "case_progress": [],
+        "checks": [],
+        "count_totals": [],
+        "failures": [],
+        "findings": [
+          0
+        ],
+        "tests": []
+      },
+      "timed_out": false,
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+        "-B",
+        "grounded-0_4/test_lint_gate.py"
+      ],
+      "cwd": ".",
+      "elapsed_seconds": 0.573827,
+      "exit": 0,
+      "expectation_mismatches": [],
+      "expected_counts": {
+        "checks": [
+          7
+        ],
+        "failures": [
+          0
+        ]
+      },
+      "id": "lint-gate-meta",
+      "resources": {
+        "children_system_seconds": 0.11,
+        "children_user_seconds": 0.47,
+        "max_rss_kib": 2100472
+      },
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 1005,
+      "stdout_sha256": "6d70d3536c6387a393ae47ba7bc8116bb9be8012413bcf647a5f92fe5484ab1c",
+      "suite_counts": {
+        "case_progress": [],
+        "checks": [
+          7
+        ],
+        "count_totals": [],
+        "failures": [
+          0
+        ],
+        "findings": [
+          0
+        ],
+        "tests": []
+      },
+      "timed_out": false,
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+        "-B",
+        "grounded-0_4/test_properties.py"
+      ],
+      "cwd": ".",
+      "elapsed_seconds": 0.126685,
+      "exit": 0,
+      "expectation_mismatches": [],
+      "expected_counts": {
+        "checks": [
+          2296
+        ],
+        "failures": [
+          0
+        ]
+      },
+      "id": "grounded-properties",
+      "resources": {
+        "children_system_seconds": 0.01,
+        "children_user_seconds": 0.11,
+        "max_rss_kib": 2100472
+      },
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 252,
+      "stdout_sha256": "d07a9d87e6036df7854139bc4e540d0c4b09e7534ec06424a334db5e69b8dbc2",
+      "suite_counts": {
+        "case_progress": [],
+        "checks": [
+          2296
+        ],
+        "count_totals": [],
+        "failures": [
+          0
+        ],
+        "findings": [],
+        "tests": []
+      },
+      "timed_out": false,
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+        "-B",
+        "grounded-0_4/test_audit_adversarial.py"
+      ],
+      "cwd": ".",
+      "elapsed_seconds": 0.504833,
+      "exit": 0,
+      "expectation_mismatches": [],
+      "expected_counts": {
+        "checks": [
+          6497
+        ],
+        "failures": [
+          0
+        ]
+      },
+      "id": "audit-adversarial",
+      "resources": {
+        "children_system_seconds": 0.02,
+        "children_user_seconds": 0.48,
+        "max_rss_kib": 2100472
+      },
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 55,
+      "stdout_sha256": "4d6605f835d9c3e5ac9d829946136a6cca474d211fb13714b2c6aa5f3c9ecca8",
+      "suite_counts": {
+        "case_progress": [],
+        "checks": [
+          6497
+        ],
+        "count_totals": [],
+        "failures": [
+          0
+        ],
+        "findings": [],
+        "tests": []
+      },
+      "timed_out": false,
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+        "-B",
+        "proof/test_proof_harness.py"
+      ],
+      "cwd": ".",
+      "elapsed_seconds": 0.627264,
+      "exit": 0,
+      "expectation_mismatches": [],
+      "expected_counts": {
+        "tests": [
+          7
+        ]
+      },
+      "id": "synthetic-proof-harness",
+      "resources": {
+        "children_system_seconds": 0.06,
+        "children_user_seconds": 0.49,
+        "max_rss_kib": 2100472
+      },
+      "stderr_bytes": 1063,
+      "stderr_sha256": "83f8956d7e9ddc9b3ef2487cb1709ccf6ada2f9081265fa523efa12beed3ac96",
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "suite_counts": {
+        "case_progress": [],
+        "checks": [],
+        "count_totals": [],
+        "failures": [],
+        "findings": [],
+        "tests": [
+          7
+        ]
+      },
+      "timed_out": false,
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+        "-B",
+        "fuzz/fuzz.py",
+        "--ci-smoke"
+      ],
+      "cwd": ".",
+      "elapsed_seconds": 4.571639,
+      "exit": 0,
+      "expectation_mismatches": [],
+      "expected_counts": {
+        "case_progress": [
+          [
+            31,
+            31
+          ]
+        ],
+        "failures": [
+          0
+        ]
+      },
+      "id": "seeded-fuzz-smoke",
+      "resources": {
+        "children_system_seconds": 0.72,
+        "children_user_seconds": 3.85,
+        "max_rss_kib": 2100472
+      },
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 745,
+      "stdout_sha256": "9707b8dc2567ba510d525d2f79a6835fa711b288d8f7610c821d9766561925a0",
+      "suite_counts": {
+        "case_progress": [
+          [
+            31,
+            31
+          ]
+        ],
+        "checks": [],
+        "count_totals": [
+          31,
+          31
+        ],
+        "failures": [
+          0
+        ],
+        "findings": [],
+        "tests": []
+      },
+      "timed_out": false,
+      "timeout_seconds": 900
+    }
+  ],
+  "commands_planned": [
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "portability/matrix/test_receipt.py"
+      ],
+      "cwd": ".",
+      "expected": {
+        "tests": [
+          48
+        ]
+      },
+      "id": "matrix-receipt-tests",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "portability/model/test_model.py"
+      ],
+      "cwd": ".",
+      "expected": {
+        "tests": [
+          17
+        ]
+      },
+      "id": "finite-model-focused-tests",
+      "timeout_seconds": 300
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "portability/oracle/test_oracle.py"
+      ],
+      "cwd": ".",
+      "expected": {
+        "tests": [
+          35
+        ]
+      },
+      "id": "independent-oracle-tests",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "portability/live/test_live.py"
+      ],
+      "cwd": ".",
+      "expected": {
+        "tests": [
+          33
+        ]
+      },
+      "id": "live-transport-tests",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "-m",
+        "portability.concurrency.test_ladder"
+      ],
+      "cwd": ".",
+      "expected": {
+        "tests": [
+          15
+        ]
+      },
+      "id": "concurrency-tests",
+      "timeout_seconds": 300
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "portability/concurrency/ladder.py",
+        "--levels",
+        "1,2",
+        "--requests",
+        "5",
+        "--skip-soak",
+        "--no-free-threaded",
+        "--runtime-label",
+        "matrix-focused",
+        "--receipt",
+        "portability/concurrency/receipts/matrix-focused-{entry_id}.json"
+      ],
+      "cwd": ".",
+      "id": "concurrency-focused-smoke",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "portability/sandbox/test_sandbox.py"
+      ],
+      "cwd": ".",
+      "expected": {
+        "tests": [
+          77
+        ]
+      },
+      "id": "sandbox-spec-tests",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "portability/verify_receipts.py"
+      ],
+      "cwd": ".",
+      "expected": {
+        "checks": [
+          62
+        ],
+        "failures": [
+          0
+        ]
+      },
+      "id": "verify-committed-receipts",
+      "timeout_seconds": 300
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "implementation-output-0.2/run_conformance_0_2.py"
+      ],
+      "cwd": "baseline-run",
+      "expected": {
+        "count_totals": [
+          800
+        ],
+        "failures": [
+          0
+        ]
+      },
+      "id": "accepted-0.2",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "implementation-output-0.3/run_conformance_0_3.py",
+        "--suite",
+        "all"
+      ],
+      "cwd": "baseline-run",
+      "expected": {
+        "count_totals": [
+          800,
+          107
+        ],
+        "failures": [
+          0,
+          0
+        ]
+      },
+      "id": "composed-0.3-all",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "grounded-0_4/test_grounded_0_4.py"
+      ],
+      "cwd": ".",
+      "expected": {
+        "checks": [
+          504
+        ],
+        "failures": [
+          0
+        ]
+      },
+      "id": "grounded-0.4-regression",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "grounded-0_4/lint_contract.py",
+        "--gate"
+      ],
+      "cwd": ".",
+      "expected": {
+        "findings": [
+          0
+        ]
+      },
+      "id": "contract-lint",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "grounded-0_4/test_lint_gate.py"
+      ],
+      "cwd": ".",
+      "expected": {
+        "checks": [
+          7
+        ],
+        "failures": [
+          0
+        ]
+      },
+      "id": "lint-gate-meta",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "grounded-0_4/test_properties.py"
+      ],
+      "cwd": ".",
+      "expected": {
+        "checks": [
+          2296
+        ],
+        "failures": [
+          0
+        ]
+      },
+      "id": "grounded-properties",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "grounded-0_4/test_audit_adversarial.py"
+      ],
+      "cwd": ".",
+      "expected": {
+        "checks": [
+          6497
+        ],
+        "failures": [
+          0
+        ]
+      },
+      "id": "audit-adversarial",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "proof/test_proof_harness.py"
+      ],
+      "cwd": ".",
+      "expected": {
+        "tests": [
+          7
+        ]
+      },
+      "id": "synthetic-proof-harness",
+      "timeout_seconds": 900
+    },
+    {
+      "argv": [
+        "{python}",
+        "-B",
+        "fuzz/fuzz.py",
+        "--ci-smoke"
+      ],
+      "cwd": ".",
+      "expected": {
+        "case_progress": [
+          [
+            31,
+            31
+          ]
+        ],
+        "failures": [
+          0
+        ]
+      },
+      "id": "seeded-fuzz-smoke",
+      "timeout_seconds": 900
+    }
+  ],
+  "entry_id": "normative-cpython-3-14-ubuntu-latest-x64",
+  "environment": {
+    "abi": {
+      "byte_order": "little",
+      "word_size_bits": 64
+    },
+    "architecture": {
+      "darwin_rosetta": null,
+      "machine": "x64",
+      "mode": "native",
+      "requested": "x64",
+      "windows_wow64": false
+    },
+    "encoding": {
+      "default": "utf-8",
+      "filesystem": "utf-8",
+      "filesystem_errors": "surrogateescape",
+      "locale": "LC_CTYPE=C.UTF-8;LC_NUMERIC=C;LC_TIME=C;LC_COLLATE=C;LC_MONETARY=C;LC_MESSAGES=C;LC_PAPER=C;LC_NAME=C;LC_ADDRESS=C;LC_TELEPHONE=C;LC_MEASUREMENT=C;LC_IDENTIFICATION=C",
+      "preferred": "utf-8",
+      "stderr": "utf-8",
+      "stdout": "utf-8"
+    },
+    "os": {
+      "kernel_version": "#20~24.04.1-Ubuntu SMP Fri Jun 19 20:09:14 UTC 2026",
+      "release": "6.17.0-1020-azure",
+      "system": "Linux",
+      "uname": [
+        "Linux",
+        "runnervmvrwv9",
+        "6.17.0-1020-azure",
+        "#20~24.04.1-Ubuntu SMP Fri Jun 19 20:09:14 UTC 2026",
+        "x86_64",
+        "x86_64"
+      ]
+    },
+    "resources": {
+      "disk_free_bytes": 93625286656,
+      "disk_total_bytes": 154894188544,
+      "logical_cpu_count": 4,
+      "physical_memory_bytes": 16766423040
+    },
+    "runtime": {
+      "build": [
+        "main",
+        "Jun 10 2026 14:29:35"
+      ],
+      "build_flags": {
+        "CONFIG_ARGS": "'--prefix=/opt/hostedtoolcache/Python/3.14.6/x64' '--enable-shared' '--enable-optimizations' '--enable-loadable-sqlite-extensions' 'LDFLAGS=-Wl,--rpath=/opt/hostedtoolcache/Python/3.14.6/x64/lib'",
+        "Py_DEBUG": 0,
+        "Py_GIL_DISABLED": 0,
+        "WITH_DOC_STRINGS": 1,
+        "WITH_DTRACE": 0,
+        "WITH_MIMALLOC": 1,
+        "WITH_PYMALLOC": 1,
+        "WITH_VALGRIND": 0
+      },
+      "compiler": "GCC 13.3.0",
+      "dev_mode": false,
+      "executable": "/opt/hostedtoolcache/Python/3.14.6/x64/bin/python",
+      "full_version": "3.14.6 (main, Jun 10 2026, 14:29:35) [GCC 13.3.0]",
+      "gil_enabled": true,
+      "implementation": "CPython",
+      "setup_python_version": null,
+      "version_info": [
+        3,
+        14,
+        6,
+        "final",
+        0
+      ]
+    }
+  },
+  "git": {
+    "clean": true,
+    "github_sha": "7facfa34bb7b841fd0a7d911f15b4da71efde95b",
+    "sha": "7facfa34bb7b841fd0a7d911f15b4da71efde95b",
+    "status_line_count": 0,
+    "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "infra_proof": null,
+  "outcome": "PASS",
+  "reason": null,
+  "requested": {
+    "architecture": "x64",
+    "distribution_release": null,
+    "implementation": "CPython",
+    "language_floor": null,
+    "non_substitute_for": null,
+    "os_family": "Linux",
+    "profile": "focused",
+    "python_language_version": null,
+    "python_version": "3.14",
+    "required_capability": null,
+    "runner": "ubuntu-latest",
+    "runtime": "CPython",
+    "setup_architecture": "x64"
+  },
+  "role": "normative_matrix",
+  "schema": "rr.portability.matrix-receipt.v1",
+  "suite_counts": [
+    {
+      "case_progress": [],
+      "checks": [
+        1
+      ],
+      "count_totals": [],
+      "failures": [
+        0
+      ],
+      "findings": [],
+      "id": "matrix-receipt-tests",
+      "tests": [
+        48
+      ]
+    },
+    {
+      "case_progress": [],
+      "checks": [],
+      "count_totals": [],
+      "failures": [],
+      "findings": [],
+      "id": "finite-model-focused-tests",
+      "tests": [
+        17
+      ]
+    },
+    {
+      "case_progress": [],
+      "checks": [],
+      "count_totals": [],
+      "failures": [],
+      "findings": [],
+      "id": "independent-oracle-tests",
+      "tests": [
+        35
+      ]
+    },
+    {
+      "case_progress": [],
+      "checks": [],
+      "count_totals": [],
+      "failures": [],
+      "findings": [],
+      "id": "live-transport-tests",
+      "tests": [
+        33
+      ]
+    },
+    {
+      "case_progress": [],
+      "checks": [],
+      "count_totals": [],
+      "failures": [],
+      "findings": [],
+      "id": "concurrency-tests",
+      "tests": [
+        15
+      ]
+    },
+    {
+      "case_progress": [],
+      "checks": [],
+      "count_totals": [],
+      "failures": [],
+      "findings": [],
+      "id": "concurrency-focused-smoke",
+      "tests": []
+    },
+    {
+      "case_progress": [],
+      "checks": [],
+      "count_totals": [],
+      "failures": [],
+      "findings": [],
+      "id": "sandbox-spec-tests",
+      "tests": [
+        77
+      ]
+    },
+    {
+      "case_progress": [],
+      "checks": [
+        62
+      ],
+      "count_totals": [],
+      "failures": [
+        0
+      ],
+      "findings": [],
+      "id": "verify-committed-receipts",
+      "tests": []
+    },
+    {
+      "case_progress": [],
+      "checks": [],
+      "count_totals": [
+        800
+      ],
+      "failures": [
+        0
+      ],
+      "findings": [],
+      "id": "accepted-0.2",
+      "tests": []
+    },
+    {
+      "case_progress": [],
+      "checks": [],
+      "count_totals": [
+        800,
+        107
+      ],
+      "failures": [
+        0,
+        0
+      ],
+      "findings": [],
+      "id": "composed-0.3-all",
+      "tests": []
+    },
+    {
+      "case_progress": [],
+      "checks": [
+        504
+      ],
+      "count_totals": [],
+      "failures": [
+        0
+      ],
+      "findings": [],
+      "id": "grounded-0.4-regression",
+      "tests": []
+    },
+    {
+      "case_progress": [],
+      "checks": [],
+      "count_totals": [],
+      "failures": [],
+      "findings": [
+        0
+      ],
+      "id": "contract-lint",
+      "tests": []
+    },
+    {
+      "case_progress": [],
+      "checks": [
+        7
+      ],
+      "count_totals": [],
+      "failures": [
+        0
+      ],
+      "findings": [
+        0
+      ],
+      "id": "lint-gate-meta",
+      "tests": []
+    },
+    {
+      "case_progress": [],
+      "checks": [
+        2296
+      ],
+      "count_totals": [],
+      "failures": [
+        0
+      ],
+      "findings": [],
+      "id": "grounded-properties",
+      "tests": []
+    },
+    {
+      "case_progress": [],
+      "checks": [
+        6497
+      ],
+      "count_totals": [],
+      "failures": [
+        0
+      ],
+      "findings": [],
+      "id": "audit-adversarial",
+      "tests": []
+    },
+    {
+      "case_progress": [],
+      "checks": [],
+      "count_totals": [],
+      "failures": [],
+      "findings": [],
+      "id": "synthetic-proof-harness",
+      "tests": [
+        7
+      ]
+    },
+    {
+      "case_progress": [
+        [
+          31,
+          31
+        ]
+      ],
+      "checks": [],
+      "count_totals": [
+        31,
+        31
+      ],
+      "failures": [
+        0
+      ],
+      "findings": [],
+      "id": "seeded-fuzz-smoke",
+      "tests": []
+    }
+  ]
+}

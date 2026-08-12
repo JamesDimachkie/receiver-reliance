@@ -1,0 +1,243 @@
+{
+ "conformance_run": {
+  "conclusion": "success",
+  "head_sha": "7facfa34bb7b841fd0a7d911f15b4da71efde95b",
+  "run_id": 31562391410,
+  "run_url": "https://github.com/JimGHTB12/receiver-reliance/actions/runs/31562391410"
+ },
+ "download_method": "gh run download 31562391384",
+ "downloaded_at": "2026-08-12",
+ "files": {
+  "PROVENANCE.md": {
+   "bytes": 4854,
+   "class": "provenance_document",
+   "sha256": "56EBCC9166939205E26402673FE8F084E51C3D3A4A76842ECC0512966414915D"
+  },
+  "concurrency-smoke/matrix-focused-normative-cpython-3-12-macos-latest-arm64.json": {
+   "bytes": 70732,
+   "class": "secondary_unbound_concurrency_smoke",
+   "sha256": "7EB16FBCFD859E67BDDDEBDA49D1B79B6E569CA279B04B613A86DA995DD41078"
+  },
+  "concurrency-smoke/matrix-focused-normative-cpython-3-12-ubuntu-24-04-arm-arm64.json": {
+   "bytes": 73167,
+   "class": "secondary_unbound_concurrency_smoke",
+   "sha256": "D7FF7AC3A4C0007A6B7356A3A14F316C7116A5996F390A68CCA8A8E8726F4C3D"
+  },
+  "concurrency-smoke/matrix-focused-normative-cpython-3-12-ubuntu-latest-x64.json": {
+   "bytes": 73116,
+   "class": "secondary_unbound_concurrency_smoke",
+   "sha256": "91E6F72CF0518C93D77129925F28C6247CC49CD7437231C450D42BBC97F05058"
+  },
+  "concurrency-smoke/matrix-focused-normative-cpython-3-12-windows-11-arm-arm64.json": {
+   "bytes": 75688,
+   "class": "secondary_unbound_concurrency_smoke",
+   "sha256": "1C08227DCE28A351B9D669A80A5BBC5EC222AD65BA34335B0DA50C1837ED341F"
+  },
+  "concurrency-smoke/matrix-focused-normative-cpython-3-12-windows-latest-x64.json": {
+   "bytes": 75650,
+   "class": "secondary_unbound_concurrency_smoke",
+   "sha256": "9067471EFDE987CF3013D6D53F372FC22E9692B91C9E65DBDB8106FF5B3762DB"
+  },
+  "concurrency-smoke/matrix-focused-normative-cpython-3-13-macos-latest-arm64.json": {
+   "bytes": 70767,
+   "class": "secondary_unbound_concurrency_smoke",
+   "sha256": "4DF0B060D97E71C817F48EC4A0C35E943CC1CA1D8A09E9E5306EEB591A710C90"
+  },
+  "concurrency-smoke/matrix-focused-normative-cpython-3-13-ubuntu-24-04-arm-arm64.json": {
+   "bytes": 73159,
+   "class": "secondary_unbound_concurrency_smoke",
+   "sha256": "E2467E12722B10422DB45027E1CD8534D53DAC97E55689D68E22BD0CDB3FA8C1"
+  },
+  "concurrency-smoke/matrix-focused-normative-cpython-3-13-ubuntu-latest-x64.json": {
+   "bytes": 73105,
+   "class": "secondary_unbound_concurrency_smoke",
+   "sha256": "E6D56BE523D36407A1941D8132355647BBB64AFDD23FDB446DC982FEBF4D54F2"
+  },
+  "concurrency-smoke/matrix-focused-normative-cpython-3-13-windows-11-arm-arm64.json": {
+   "bytes": 75703,
+   "class": "secondary_unbound_concurrency_smoke",
+   "sha256": "13DE5E03E65EE1A48E0E8463CD30F0F8E4CED5B82C8421EFD7EC89C75E1FFB7F"
+  },
+  "concurrency-smoke/matrix-focused-normative-cpython-3-13-windows-latest-x64.json": {
+   "bytes": 75625,
+   "class": "secondary_unbound_concurrency_smoke",
+   "sha256": "0E2E3B4157804E5D8C38720C12E7DCBF13F0FAA60592141FDEBF12874F8B9D4C"
+  },
+  "concurrency-smoke/matrix-focused-normative-cpython-3-14-macos-latest-arm64.json": {
+   "bytes": 70749,
+   "class": "secondary_unbound_concurrency_smoke",
+   "sha256": "9F83AC6C86E9DD86D3765FBD1F39795896C07732521C8131FECB76AD2AA60CE7"
+  },
+  "concurrency-smoke/matrix-focused-normative-cpython-3-14-ubuntu-24-04-arm-arm64.json": {
+   "bytes": 73134,
+   "class": "secondary_unbound_concurrency_smoke",
+   "sha256": "6475452310ADA6BDE8B89325384A7FE614300FED5A2DB1EFCF60D8AE421B0D0B"
+  },
+  "concurrency-smoke/matrix-focused-normative-cpython-3-14-ubuntu-latest-x64.json": {
+   "bytes": 73080,
+   "class": "secondary_unbound_concurrency_smoke",
+   "sha256": "6A35960863C8CE87AD62E026A7B9DBFDD6DBDE4F7BE2A463E570C3F0578FAE39"
+  },
+  "concurrency-smoke/matrix-focused-normative-cpython-3-14-windows-11-arm-arm64.json": {
+   "bytes": 75666,
+   "class": "secondary_unbound_concurrency_smoke",
+   "sha256": "12E0EF52BA889897397B17BF62FA9BB8F6314FEC68F422FB8A4468A7FCD86041"
+  },
+  "concurrency-smoke/matrix-focused-normative-cpython-3-14-windows-latest-x64.json": {
+   "bytes": 75595,
+   "class": "secondary_unbound_concurrency_smoke",
+   "sha256": "B789AD2F3B64B89EEE1DFB685B1B77DE42D40D1531719FF25DFC3605348071AD"
+  },
+  "concurrency-smoke/matrix-focused-stress-cpython-3-14-dev-mode-ubuntu-latest-x64.json": {
+   "bytes": 73091,
+   "class": "secondary_unbound_concurrency_smoke",
+   "sha256": "6E696211E0621195446C9AFFEC01AEE7CF33BE6E7A03D1A403827ADF9BAB5E9D"
+  },
+  "concurrency-smoke/matrix-focused-stress-cpython-3-14t-ubuntu-latest-x64.json": {
+   "bytes": 73396,
+   "class": "secondary_unbound_concurrency_smoke",
+   "sha256": "5F0DF96E2872D9CCC172E4F4245D96CA08F63B471B249E0628F455D58B646F67"
+  },
+  "matrix-summary.json": {
+   "bytes": 741424,
+   "class": "aggregate_summary",
+   "sha256": "CFAD7E2DA9D90D10737AF8F262512CBBACC654A2A7F53F51C40A7D1ADBD84CC1"
+  },
+  "receipt-expanded-gate-cpython-3-12-ubuntu-latest-x64.json": {
+   "bytes": 21289,
+   "class": "row_receipt",
+   "sha256": "90256F12986AFE31C52BB447A3B298801712E8694576DDF0E25BD31D07901A92"
+  },
+  "receipt-normative-cpython-3-12-macos-latest-arm64.json": {
+   "bytes": 30923,
+   "class": "row_receipt",
+   "sha256": "0277B0E3ECE10C13566390D06BEDB0C31FE69C6C3E35FD4EE6D9B518D19E986D"
+  },
+  "receipt-normative-cpython-3-12-ubuntu-24-04-arm-arm64.json": {
+   "bytes": 30546,
+   "class": "row_receipt",
+   "sha256": "C56F1855D45EFD77DC5112458745F91561983E6A1A1FBA141BB71696B39C4F18"
+  },
+  "receipt-normative-cpython-3-12-ubuntu-latest-x64.json": {
+   "bytes": 30483,
+   "class": "row_receipt",
+   "sha256": "865CE7B49B17EB326E8256E0F32F1771BF9EF77E2288EEC76C5AB754C71FBE19"
+  },
+  "receipt-normative-cpython-3-12-windows-11-arm-arm64.json": {
+   "bytes": 30399,
+   "class": "row_receipt",
+   "sha256": "6CD6B18FA8B4B14035B546AE2A54CB95B10B290BB44E9AF0D7E85FC4861E08B8"
+  },
+  "receipt-normative-cpython-3-12-windows-latest-x64.json": {
+   "bytes": 30347,
+   "class": "row_receipt",
+   "sha256": "B9D7E4553FC3E87437D815AE25AB6F15803ECEE85B9D52744863D0727CC8C9D2"
+  },
+  "receipt-normative-cpython-3-13-macos-latest-arm64.json": {
+   "bytes": 32297,
+   "class": "row_receipt",
+   "sha256": "46F42C662C16755CBAA5FC6E77FC7E36CCDC3BF995216056BF7E3CB4BA622BCF"
+  },
+  "receipt-normative-cpython-3-13-ubuntu-24-04-arm-arm64.json": {
+   "bytes": 30543,
+   "class": "row_receipt",
+   "sha256": "AE9178D287D21CF86294917E948B1715EDCE09421A58264839F499C235D6040B"
+  },
+  "receipt-normative-cpython-3-13-ubuntu-latest-x64.json": {
+   "bytes": 30495,
+   "class": "row_receipt",
+   "sha256": "E7ADC39BDC8452B9F38E49CFA20A98C339A0565918CE00C34B9DD037B254F143"
+  },
+  "receipt-normative-cpython-3-13-windows-11-arm-arm64.json": {
+   "bytes": 30444,
+   "class": "row_receipt",
+   "sha256": "EC0A3DA75EC6BD772F928A1AA01B8077A3EC4BABB00B1C7FB843570DA9E29A82"
+  },
+  "receipt-normative-cpython-3-13-windows-latest-x64.json": {
+   "bytes": 30394,
+   "class": "row_receipt",
+   "sha256": "C6C9A075A781C76C67E1A4644D33D21564FAD78D1AD099524E0D8553A66731D0"
+  },
+  "receipt-normative-cpython-3-14-macos-latest-arm64.json": {
+   "bytes": 32602,
+   "class": "row_receipt",
+   "sha256": "DB7191110EECB9A3A4B75505A9E83E17049CFEC1307A15480A98681EED74DD4E"
+  },
+  "receipt-normative-cpython-3-14-ubuntu-24-04-arm-arm64.json": {
+   "bytes": 30536,
+   "class": "row_receipt",
+   "sha256": "4C9069A52F4C0EE0BCFD4ACCF64C47151484D2F2474CA2B56D0E0352B4504616"
+  },
+  "receipt-normative-cpython-3-14-ubuntu-latest-x64.json": {
+   "bytes": 30473,
+   "class": "row_receipt",
+   "sha256": "E87CEE5C798BB0A6AAFB0E73AF676A176B6FD1F36BC9492B2CB91491B2C4665B"
+  },
+  "receipt-normative-cpython-3-14-windows-11-arm-arm64.json": {
+   "bytes": 30422,
+   "class": "row_receipt",
+   "sha256": "5B6F256CEE25AC07C7C6DA59D753B7754F6AEEDCA26A18A02F6B4C79DA59B4BE"
+  },
+  "receipt-normative-cpython-3-14-windows-latest-x64.json": {
+   "bytes": 30366,
+   "class": "row_receipt",
+   "sha256": "C8ED95EF51726D25B20661559B15DD3C3FD0A91F27E6254A8A7B37B594D47EF6"
+  },
+  "receipt-off-contract-graalpy-24-0-ubuntu-latest-x64.json": {
+   "bytes": 8476,
+   "class": "row_receipt",
+   "sha256": "D6D5E7A3AFFB21063FFA78B5FA21AF346ADD03913C844759B4EE4E986AB10B74"
+  },
+  "receipt-off-contract-pypy-3-11-ubuntu-latest-x64.json": {
+   "bytes": 9781,
+   "class": "row_receipt",
+   "sha256": "2169611729653913F9066D3E64A4C71B07BF6D1064050ABE30F5104178F533BA"
+  },
+  "receipt-off-contract-pypy-3-12-ubuntu-latest-x64.json": {
+   "bytes": 8911,
+   "class": "row_receipt",
+   "sha256": "15E82AB7E23CB61C0AFF3B2F2D19111A550AC76E4F97CD774BB2C517EB9A227E"
+  },
+  "receipt-stress-cpython-3-14-dev-mode-ubuntu-latest-x64.json": {
+   "bytes": 30509,
+   "class": "row_receipt",
+   "sha256": "753F64F7B4C2D37350B01F0E0BB2589BE18B15614C45540A68DF6D9454AFD08D"
+  },
+  "receipt-stress-cpython-3-14-pydebug-ubuntu-latest-x64.json": {
+   "bytes": 8704,
+   "class": "row_receipt",
+   "sha256": "2353F4A9D22B64A682F0A29EA218F6A0DF6296AB5AE2000F51B25E14DCDD606B"
+  },
+  "receipt-stress-cpython-3-14t-ubuntu-latest-x64.json": {
+   "bytes": 32761,
+   "class": "row_receipt",
+   "sha256": "EF3191AC68F6F78B2A86C4E2737F01FB4277DF953FB9BB33F491FADE10A5FCA6"
+  },
+  "receipt-stress-non-substitute-cpython-3-12-macos-15-intel-x64.json": {
+   "bytes": 9025,
+   "class": "row_receipt",
+   "sha256": "23FC15B847872978DC9AAB1B61A64CCF059E0D1C955DA7014C68E767FAF1B3CD"
+  },
+  "receipt-stress-non-substitute-cpython-3-13-macos-15-intel-x64.json": {
+   "bytes": 10399,
+   "class": "row_receipt",
+   "sha256": "8275D4A1309B129EACE89D69DA91DAE53DE622580EA8A8B7E27EF975C5381738"
+  },
+  "receipt-stress-non-substitute-cpython-3-14-macos-15-intel-x64.json": {
+   "bytes": 10702,
+   "class": "row_receipt",
+   "sha256": "88E15530025E7FA21E28A8865B6059A6265B2E1DF0F6C5578246EAC042C49AE0"
+  },
+  "sandbox-receipt.json": {
+   "bytes": 22075,
+   "class": "sandbox_host_receipt",
+   "sha256": "6730EC44F0AE229E813B33325DCD5D7424982FD27C36FDFBB84CB1C4C798F8B0"
+  }
+ },
+ "head_sha": "7facfa34bb7b841fd0a7d911f15b4da71efde95b",
+ "run_created_at": "2026-08-12T04:10:21Z",
+ "run_id": 31562391384,
+ "run_url": "https://github.com/JimGHTB12/receiver-reliance/actions/runs/31562391384",
+ "schema": "receiver-reliance/hosted-receipt-manifest-1",
+ "workflow": "portability"
+}

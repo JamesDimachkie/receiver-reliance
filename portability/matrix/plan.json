@@ -282,7 +282,7 @@
         "cwd": ".",
         "argv": ["{python}", "-B", "portability/verify_receipts.py"],
         "timeout_seconds": 300,
-        "expected": {"checks": [62], "failures": [0]}
+        "expected": {"checks": [154], "failures": [0]}
       }
     ],
     "baseline_nonperformance": [

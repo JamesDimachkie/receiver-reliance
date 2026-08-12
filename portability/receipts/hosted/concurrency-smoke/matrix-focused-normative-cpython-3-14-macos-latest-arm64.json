@@ -1,0 +1,1526 @@
+{
+  "attempt": 1,
+  "bounds": {
+    "identical_seed_runs_per_level": 2,
+    "levels": [
+      1,
+      2
+    ],
+    "modes": [
+      "library",
+      "process"
+    ],
+    "requests_per_caller": 5,
+    "seed": 23171517194915395,
+    "soak_highest_passing_levels": 2,
+    "soak_requests_per_caller": 1000,
+    "timeout_seconds_per_mode_level_including_two_runs_and_cancellation": 120.0
+  },
+  "ceiling_stopped": false,
+  "completed_normative_levels": [
+    1,
+    2
+  ],
+  "elapsed_seconds": 19.152831082999995,
+  "format_version": "RR-CONCURRENCY-LADDER-3",
+  "free_threaded_3_14t": {
+    "status": "NOT_REQUESTED_BY_CONTROLLER"
+  },
+  "git": {
+    "clean": true,
+    "head": "7facfa34bb7b841fd0a7d911f15b4da71efde95b",
+    "head_exit": 0,
+    "status_exit": 0,
+    "status_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+  },
+  "highest_passing_level": 2,
+  "levels": [
+    {
+      "modes": [
+        {
+          "aggregate_framed_output_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+          "byte_match": true,
+          "elapsed_seconds": 5.048725458000007,
+          "identical_seed_runs": 2,
+          "mode": "library",
+          "participants": 1,
+          "requests_per_caller": 5,
+          "runs": [
+            {
+              "aggregate_framed_output_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+              "caller_receipts": [
+                {
+                  "caller_id": 0,
+                  "output_bytes": 4322,
+                  "output_order_sha256": "A79EBDFF308C46ED0317BF66409928B20A14E4B6F4027DD9DD63F84CE7F6B70F",
+                  "request_count": 5,
+                  "request_order_sha256": "58E99E12C8FE440113E2B3F099A1A09EEB3362848875BFCE811964799B8DD705",
+                  "response_count": 5
+                }
+              ],
+              "cancellation": null,
+              "elapsed_seconds": 2.471836416000002,
+              "format_version": "RR-CONCURRENCY-WORKER-3",
+              "mode": "library",
+              "participants": 1,
+              "physical_transport_comparator": {
+                "actual_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+                "cache_scope": "one worker run, keyed by exact raw input bytes",
+                "compared_response_lines": 5,
+                "expected_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+                "isolated_binding_sha256": "5AE15364DDB85021C54A7EB405CDB3795EB8ADA4790529EA682CA59156F69B8A",
+                "kind": "cached-one-record-isolated-grounded-0.4-rr_batch.py",
+                "semantic_nonclaim": "CUT-derived isolated bytes establish physical-line transport parity only; they are not semantic expected results.",
+                "source": "grounded-0_4/rr_batch.py, one input record per fresh process",
+                "unique_input_records": 5
+              },
+              "repeat": 1,
+              "requests_per_caller": 5,
+              "resources": {
+                "after": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 63488000,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "before": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 63307776,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "peak": {
+                  "handle_or_fd_count": 4,
+                  "method": "stdlib-self-fallback",
+                  "requested_process_count": 1,
+                  "rss_bytes": 63488000,
+                  "thread_count": 1
+                },
+                "sample_count": 1,
+                "sampling_interval_seconds": 0.01,
+                "scheduling_nonclaim": "sampling observes resources; it is not an execution schedule"
+              },
+              "runtime": {
+                "byte_order": "little",
+                "executable": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python",
+                "filesystem_encoding": "utf-8",
+                "gil_receipt": {
+                  "sys._is_gil_enabled": true,
+                  "sys._is_gil_enabled_available": true
+                },
+                "implementation": "CPython",
+                "machine": "arm64",
+                "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+                "preferred_encoding": "utf-8",
+                "processor": "arm",
+                "release": "25.5.0",
+                "system": "Darwin",
+                "version": "3.14.6 (v3.14.6:c63aec69bd5, Jun 10 2026, 08:07:54) [Clang 21.0.0 (clang-2100.1.1.101)]",
+                "version_info": [
+                  3,
+                  14,
+                  6,
+                  "final",
+                  0
+                ],
+                "word_size_bits": 64
+              },
+              "schedule": {
+                "caller_order": [
+                  0
+                ],
+                "input_generation": "valid-every-50; otherwise seeded malformed selection",
+                "os_interleaving": "uncontrolled stress dimension",
+                "start_barrier": "all-callers-ready"
+              },
+              "seed": 23171517194915395,
+              "semantic_oracle": {
+                "compared_audited_envelopes": 5,
+                "envelope_format_version": "B1-AUDITED-DECISION-0.4",
+                "envelope_validation": "strict UTF-8 integer-domain JSON; exact top-level fields and types; audit seal; independent whole-envelope JCS+LF canonicality; request hash binding",
+                "fixture_binding_sha256": "78FC43470C9AD4C41932CD38926F8430A004D02FE18E065D3DD6BE59A5A4B80B",
+                "projected_sealed_responses_sha256": "7A9BE823255B8240A4DFC6DBB8D545E6AAA50B77B776B321F1480976E9F09FF6",
+                "projection": "independent JCS(sealed_response) plus LF",
+                "source": "portability.oracle.FixtureOracle.expected_record",
+                "status": "PASS"
+              },
+              "status": "PASS",
+              "valid_fixture_inputs": [
+                {
+                  "behavior_class": "VALID",
+                  "entry_id": "SEMFX-OBL-22-IO-291939EAD3C56032",
+                  "request_sha256": "50DE63075B898F16D5C733F6FF3726B3029E22ACF4E41040784D6971873CE04A"
+                },
+                {
+                  "behavior_class": "MALFORMED_OR_BOUNDARY",
+                  "entry_id": "SEMFX-OBL-22-INV-7B6C57EA427965C7",
+                  "request_sha256": "5FC6BEA25A274674CF4FD86738CF525C1984A83EC04815BC7F344ED21D1B8FB4"
+                },
+                {
+                  "behavior_class": "BINDING_OR_CONFLICT",
+                  "entry_id": "SEMFX-OBL-22-CTRL-E0B52A921327B33D",
+                  "request_sha256": "9E2E14ED997D10B94D79DB86216E88E7EE0AFB2F016F414CA3BCB2EECCF5D7EB"
+                },
+                {
+                  "behavior_class": "OMISSION_OR_INCOMPLETE",
+                  "entry_id": "SEMFX-OBL-22-FAIL-A1CA45D53BC99336",
+                  "request_sha256": "8FDDD752E6E73FB92A2C56632973D81F64BCF840B8A347F9E3B69837E1ACE1E5"
+                }
+              ],
+              "worker_process_exit": 0,
+              "worker_stderr_bytes": 0,
+              "worker_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+            },
+            {
+              "aggregate_framed_output_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+              "caller_receipts": [
+                {
+                  "caller_id": 0,
+                  "output_bytes": 4322,
+                  "output_order_sha256": "A79EBDFF308C46ED0317BF66409928B20A14E4B6F4027DD9DD63F84CE7F6B70F",
+                  "request_count": 5,
+                  "request_order_sha256": "58E99E12C8FE440113E2B3F099A1A09EEB3362848875BFCE811964799B8DD705",
+                  "response_count": 5
+                }
+              ],
+              "cancellation": {
+                "after": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 63176704,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "alive_threads_after": [],
+                "barriers": [
+                  "all-callers-started",
+                  "one-response-acknowledged"
+                ],
+                "before": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 63176704,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "cancellation_action": "threading.Event.set",
+                "during": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 63176704,
+                  "sampled_process_count": 1,
+                  "thread_count": 2,
+                  "unavailable_pids": []
+                },
+                "pass": true,
+                "physical_comparator": "cached-one-record-isolated-grounded-0.4-rr_batch.py",
+                "processed_max": 1,
+                "processed_min": 1,
+                "resource_cleanup": {
+                  "handle_or_fd_count": {
+                    "after": 4,
+                    "allowance": 2,
+                    "before": 4,
+                    "pass": true
+                  },
+                  "pass": true,
+                  "thread_count": {
+                    "after": 1,
+                    "allowance": 0,
+                    "before": 1,
+                    "pass": true
+                  }
+                },
+                "semantic_oracle": "portability.oracle.FixtureOracle.expected_record"
+              },
+              "elapsed_seconds": 2.2809011660000067,
+              "format_version": "RR-CONCURRENCY-WORKER-3",
+              "mode": "library",
+              "participants": 1,
+              "physical_transport_comparator": {
+                "actual_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+                "cache_scope": "one worker run, keyed by exact raw input bytes",
+                "compared_response_lines": 5,
+                "expected_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+                "isolated_binding_sha256": "1AB3ED53C82F3663D945A3492E887640511364A4146C73B3942F9261AD3A7C48",
+                "kind": "cached-one-record-isolated-grounded-0.4-rr_batch.py",
+                "semantic_nonclaim": "CUT-derived isolated bytes establish physical-line transport parity only; they are not semantic expected results.",
+                "source": "grounded-0_4/rr_batch.py, one input record per fresh process",
+                "unique_input_records": 5
+              },
+              "repeat": 2,
+              "requests_per_caller": 5,
+              "resources": {
+                "after": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 63176704,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "before": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 62996480,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "peak": {
+                  "handle_or_fd_count": 4,
+                  "method": "stdlib-self-fallback",
+                  "requested_process_count": 1,
+                  "rss_bytes": 63176704,
+                  "thread_count": 1
+                },
+                "sample_count": 1,
+                "sampling_interval_seconds": 0.01,
+                "scheduling_nonclaim": "sampling observes resources; it is not an execution schedule"
+              },
+              "runtime": {
+                "byte_order": "little",
+                "executable": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python",
+                "filesystem_encoding": "utf-8",
+                "gil_receipt": {
+                  "sys._is_gil_enabled": true,
+                  "sys._is_gil_enabled_available": true
+                },
+                "implementation": "CPython",
+                "machine": "arm64",
+                "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+                "preferred_encoding": "utf-8",
+                "processor": "arm",
+                "release": "25.5.0",
+                "system": "Darwin",
+                "version": "3.14.6 (v3.14.6:c63aec69bd5, Jun 10 2026, 08:07:54) [Clang 21.0.0 (clang-2100.1.1.101)]",
+                "version_info": [
+                  3,
+                  14,
+                  6,
+                  "final",
+                  0
+                ],
+                "word_size_bits": 64
+              },
+              "schedule": {
+                "caller_order": [
+                  0
+                ],
+                "input_generation": "valid-every-50; otherwise seeded malformed selection",
+                "os_interleaving": "uncontrolled stress dimension",
+                "start_barrier": "all-callers-ready"
+              },
+              "seed": 23171517194915395,
+              "semantic_oracle": {
+                "compared_audited_envelopes": 5,
+                "envelope_format_version": "B1-AUDITED-DECISION-0.4",
+                "envelope_validation": "strict UTF-8 integer-domain JSON; exact top-level fields and types; audit seal; independent whole-envelope JCS+LF canonicality; request hash binding",
+                "fixture_binding_sha256": "78FC43470C9AD4C41932CD38926F8430A004D02FE18E065D3DD6BE59A5A4B80B",
+                "projected_sealed_responses_sha256": "7A9BE823255B8240A4DFC6DBB8D545E6AAA50B77B776B321F1480976E9F09FF6",
+                "projection": "independent JCS(sealed_response) plus LF",
+                "source": "portability.oracle.FixtureOracle.expected_record",
+                "status": "PASS"
+              },
+              "status": "PASS",
+              "valid_fixture_inputs": [
+                {
+                  "behavior_class": "VALID",
+                  "entry_id": "SEMFX-OBL-22-IO-291939EAD3C56032",
+                  "request_sha256": "50DE63075B898F16D5C733F6FF3726B3029E22ACF4E41040784D6971873CE04A"
+                },
+                {
+                  "behavior_class": "MALFORMED_OR_BOUNDARY",
+                  "entry_id": "SEMFX-OBL-22-INV-7B6C57EA427965C7",
+                  "request_sha256": "5FC6BEA25A274674CF4FD86738CF525C1984A83EC04815BC7F344ED21D1B8FB4"
+                },
+                {
+                  "behavior_class": "BINDING_OR_CONFLICT",
+                  "entry_id": "SEMFX-OBL-22-CTRL-E0B52A921327B33D",
+                  "request_sha256": "9E2E14ED997D10B94D79DB86216E88E7EE0AFB2F016F414CA3BCB2EECCF5D7EB"
+                },
+                {
+                  "behavior_class": "OMISSION_OR_INCOMPLETE",
+                  "entry_id": "SEMFX-OBL-22-FAIL-A1CA45D53BC99336",
+                  "request_sha256": "8FDDD752E6E73FB92A2C56632973D81F64BCF840B8A347F9E3B69837E1ACE1E5"
+                }
+              ],
+              "worker_process_exit": 0,
+              "worker_stderr_bytes": 0,
+              "worker_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+            }
+          ],
+          "status": "PASS",
+          "timeout_seconds": 120.0,
+          "total_requests_per_repeat": 5
+        },
+        {
+          "aggregate_framed_output_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+          "byte_match": true,
+          "elapsed_seconds": 4.468929666999998,
+          "identical_seed_runs": 2,
+          "mode": "process",
+          "participants": 1,
+          "requests_per_caller": 5,
+          "runs": [
+            {
+              "aggregate_framed_output_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+              "caller_receipts": [
+                {
+                  "caller_id": 0,
+                  "output_bytes": 4322,
+                  "output_order_sha256": "A79EBDFF308C46ED0317BF66409928B20A14E4B6F4027DD9DD63F84CE7F6B70F",
+                  "request_count": 5,
+                  "request_order_sha256": "58E99E12C8FE440113E2B3F099A1A09EEB3362848875BFCE811964799B8DD705",
+                  "response_count": 5
+                }
+              ],
+              "cancellation": null,
+              "elapsed_seconds": 2.0824714579999863,
+              "format_version": "RR-CONCURRENCY-WORKER-3",
+              "mode": "process",
+              "participants": 1,
+              "physical_transport_comparator": {
+                "actual_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+                "cache_scope": "one worker run, keyed by exact raw input bytes",
+                "compared_response_lines": 5,
+                "expected_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+                "isolated_binding_sha256": "5AE15364DDB85021C54A7EB405CDB3795EB8ADA4790529EA682CA59156F69B8A",
+                "kind": "cached-one-record-isolated-grounded-0.4-rr_batch.py",
+                "semantic_nonclaim": "CUT-derived isolated bytes establish physical-line transport parity only; they are not semantic expected results.",
+                "source": "grounded-0_4/rr_batch.py, one input record per fresh process",
+                "unique_input_records": 5
+              },
+              "repeat": 1,
+              "requests_per_caller": 5,
+              "resources": {
+                "after": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 63471616,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "before": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 63291392,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "peak": {
+                  "handle_or_fd_count": 6,
+                  "method": "stdlib-self-fallback",
+                  "requested_process_count": 2,
+                  "rss_bytes": 63471616,
+                  "thread_count": 3
+                },
+                "sample_count": 4,
+                "sampling_interval_seconds": 0.01,
+                "scheduling_nonclaim": "sampling observes resources; it is not an execution schedule"
+              },
+              "runtime": {
+                "byte_order": "little",
+                "executable": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python",
+                "filesystem_encoding": "utf-8",
+                "gil_receipt": {
+                  "sys._is_gil_enabled": true,
+                  "sys._is_gil_enabled_available": true
+                },
+                "implementation": "CPython",
+                "machine": "arm64",
+                "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+                "preferred_encoding": "utf-8",
+                "processor": "arm",
+                "release": "25.5.0",
+                "system": "Darwin",
+                "version": "3.14.6 (v3.14.6:c63aec69bd5, Jun 10 2026, 08:07:54) [Clang 21.0.0 (clang-2100.1.1.101)]",
+                "version_info": [
+                  3,
+                  14,
+                  6,
+                  "final",
+                  0
+                ],
+                "word_size_bits": 64
+              },
+              "schedule": {
+                "caller_order": [
+                  0
+                ],
+                "input_generation": "valid-every-50; otherwise seeded malformed selection",
+                "os_interleaving": "uncontrolled stress dimension",
+                "start_barrier": "all-callers-ready"
+              },
+              "seed": 23171517194915395,
+              "semantic_oracle": {
+                "compared_audited_envelopes": 5,
+                "envelope_format_version": "B1-AUDITED-DECISION-0.4",
+                "envelope_validation": "strict UTF-8 integer-domain JSON; exact top-level fields and types; audit seal; independent whole-envelope JCS+LF canonicality; request hash binding",
+                "fixture_binding_sha256": "78FC43470C9AD4C41932CD38926F8430A004D02FE18E065D3DD6BE59A5A4B80B",
+                "projected_sealed_responses_sha256": "7A9BE823255B8240A4DFC6DBB8D545E6AAA50B77B776B321F1480976E9F09FF6",
+                "projection": "independent JCS(sealed_response) plus LF",
+                "source": "portability.oracle.FixtureOracle.expected_record",
+                "status": "PASS"
+              },
+              "status": "PASS",
+              "valid_fixture_inputs": [
+                {
+                  "behavior_class": "VALID",
+                  "entry_id": "SEMFX-OBL-22-IO-291939EAD3C56032",
+                  "request_sha256": "50DE63075B898F16D5C733F6FF3726B3029E22ACF4E41040784D6971873CE04A"
+                },
+                {
+                  "behavior_class": "MALFORMED_OR_BOUNDARY",
+                  "entry_id": "SEMFX-OBL-22-INV-7B6C57EA427965C7",
+                  "request_sha256": "5FC6BEA25A274674CF4FD86738CF525C1984A83EC04815BC7F344ED21D1B8FB4"
+                },
+                {
+                  "behavior_class": "BINDING_OR_CONFLICT",
+                  "entry_id": "SEMFX-OBL-22-CTRL-E0B52A921327B33D",
+                  "request_sha256": "9E2E14ED997D10B94D79DB86216E88E7EE0AFB2F016F414CA3BCB2EECCF5D7EB"
+                },
+                {
+                  "behavior_class": "OMISSION_OR_INCOMPLETE",
+                  "entry_id": "SEMFX-OBL-22-FAIL-A1CA45D53BC99336",
+                  "request_sha256": "8FDDD752E6E73FB92A2C56632973D81F64BCF840B8A347F9E3B69837E1ACE1E5"
+                }
+              ],
+              "worker_process_exit": 0,
+              "worker_stderr_bytes": 0,
+              "worker_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+            },
+            {
+              "aggregate_framed_output_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+              "caller_receipts": [
+                {
+                  "caller_id": 0,
+                  "output_bytes": 4322,
+                  "output_order_sha256": "A79EBDFF308C46ED0317BF66409928B20A14E4B6F4027DD9DD63F84CE7F6B70F",
+                  "request_count": 5,
+                  "request_order_sha256": "58E99E12C8FE440113E2B3F099A1A09EEB3362848875BFCE811964799B8DD705",
+                  "response_count": 5
+                }
+              ],
+              "cancellation": {
+                "acknowledgements": [
+                  {
+                    "caller_id": 0,
+                    "pid": 3973
+                  }
+                ],
+                "after": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 63422464,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "barrier": "one-flushed-response-acknowledged-per-process",
+                "before": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 63422464,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "cancellation_action": "Popen.terminate then bounded wait/kill fallback",
+                "during": {
+                  "handle_or_fd_count": 7,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 2,
+                  "rss_bytes": 63422464,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": [
+                    3973
+                  ]
+                },
+                "exit_codes": [
+                  {
+                    "exit_code": -15,
+                    "pid": 3973
+                  }
+                ],
+                "lingering_pids_after": [],
+                "pass": true,
+                "physical_comparator": "cached-one-record-isolated-grounded-0.4-rr_batch.py",
+                "resource_cleanup": {
+                  "handle_or_fd_count": {
+                    "after": 4,
+                    "allowance": 2,
+                    "before": 4,
+                    "pass": true
+                  },
+                  "pass": true,
+                  "thread_count": {
+                    "after": 1,
+                    "allowance": 0,
+                    "before": 1,
+                    "pass": true
+                  }
+                },
+                "semantic_oracle": "portability.oracle.FixtureOracle.expected_record"
+              },
+              "elapsed_seconds": 2.1302775000000054,
+              "format_version": "RR-CONCURRENCY-WORKER-3",
+              "mode": "process",
+              "participants": 1,
+              "physical_transport_comparator": {
+                "actual_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+                "cache_scope": "one worker run, keyed by exact raw input bytes",
+                "compared_response_lines": 5,
+                "expected_sha256": "1E9C23DC6776A14EE01E5946F4EFE650DBB4FEC564AF6370A938153CD17A7BCF",
+                "isolated_binding_sha256": "1AB3ED53C82F3663D945A3492E887640511364A4146C73B3942F9261AD3A7C48",
+                "kind": "cached-one-record-isolated-grounded-0.4-rr_batch.py",
+                "semantic_nonclaim": "CUT-derived isolated bytes establish physical-line transport parity only; they are not semantic expected results.",
+                "source": "grounded-0_4/rr_batch.py, one input record per fresh process",
+                "unique_input_records": 5
+              },
+              "repeat": 2,
+              "requests_per_caller": 5,
+              "resources": {
+                "after": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 63422464,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "before": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 63242240,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "peak": {
+                  "handle_or_fd_count": 6,
+                  "method": "stdlib-self-fallback",
+                  "requested_process_count": 2,
+                  "rss_bytes": 63422464,
+                  "thread_count": 3
+                },
+                "sample_count": 2,
+                "sampling_interval_seconds": 0.01,
+                "scheduling_nonclaim": "sampling observes resources; it is not an execution schedule"
+              },
+              "runtime": {
+                "byte_order": "little",
+                "executable": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python",
+                "filesystem_encoding": "utf-8",
+                "gil_receipt": {
+                  "sys._is_gil_enabled": true,
+                  "sys._is_gil_enabled_available": true
+                },
+                "implementation": "CPython",
+                "machine": "arm64",
+                "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+                "preferred_encoding": "utf-8",
+                "processor": "arm",
+                "release": "25.5.0",
+                "system": "Darwin",
+                "version": "3.14.6 (v3.14.6:c63aec69bd5, Jun 10 2026, 08:07:54) [Clang 21.0.0 (clang-2100.1.1.101)]",
+                "version_info": [
+                  3,
+                  14,
+                  6,
+                  "final",
+                  0
+                ],
+                "word_size_bits": 64
+              },
+              "schedule": {
+                "caller_order": [
+                  0
+                ],
+                "input_generation": "valid-every-50; otherwise seeded malformed selection",
+                "os_interleaving": "uncontrolled stress dimension",
+                "start_barrier": "all-callers-ready"
+              },
+              "seed": 23171517194915395,
+              "semantic_oracle": {
+                "compared_audited_envelopes": 5,
+                "envelope_format_version": "B1-AUDITED-DECISION-0.4",
+                "envelope_validation": "strict UTF-8 integer-domain JSON; exact top-level fields and types; audit seal; independent whole-envelope JCS+LF canonicality; request hash binding",
+                "fixture_binding_sha256": "78FC43470C9AD4C41932CD38926F8430A004D02FE18E065D3DD6BE59A5A4B80B",
+                "projected_sealed_responses_sha256": "7A9BE823255B8240A4DFC6DBB8D545E6AAA50B77B776B321F1480976E9F09FF6",
+                "projection": "independent JCS(sealed_response) plus LF",
+                "source": "portability.oracle.FixtureOracle.expected_record",
+                "status": "PASS"
+              },
+              "status": "PASS",
+              "valid_fixture_inputs": [
+                {
+                  "behavior_class": "VALID",
+                  "entry_id": "SEMFX-OBL-22-IO-291939EAD3C56032",
+                  "request_sha256": "50DE63075B898F16D5C733F6FF3726B3029E22ACF4E41040784D6971873CE04A"
+                },
+                {
+                  "behavior_class": "MALFORMED_OR_BOUNDARY",
+                  "entry_id": "SEMFX-OBL-22-INV-7B6C57EA427965C7",
+                  "request_sha256": "5FC6BEA25A274674CF4FD86738CF525C1984A83EC04815BC7F344ED21D1B8FB4"
+                },
+                {
+                  "behavior_class": "BINDING_OR_CONFLICT",
+                  "entry_id": "SEMFX-OBL-22-CTRL-E0B52A921327B33D",
+                  "request_sha256": "9E2E14ED997D10B94D79DB86216E88E7EE0AFB2F016F414CA3BCB2EECCF5D7EB"
+                },
+                {
+                  "behavior_class": "OMISSION_OR_INCOMPLETE",
+                  "entry_id": "SEMFX-OBL-22-FAIL-A1CA45D53BC99336",
+                  "request_sha256": "8FDDD752E6E73FB92A2C56632973D81F64BCF840B8A347F9E3B69837E1ACE1E5"
+                }
+              ],
+              "worker_process_exit": 0,
+              "worker_stderr_bytes": 0,
+              "worker_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+            }
+          ],
+          "status": "PASS",
+          "timeout_seconds": 120.0,
+          "total_requests_per_repeat": 5
+        }
+      ],
+      "participants": 1,
+      "status": "PASS"
+    },
+    {
+      "modes": [
+        {
+          "aggregate_framed_output_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+          "byte_match": true,
+          "elapsed_seconds": 4.758195457999989,
+          "identical_seed_runs": 2,
+          "mode": "library",
+          "participants": 2,
+          "requests_per_caller": 5,
+          "runs": [
+            {
+              "aggregate_framed_output_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+              "caller_receipts": [
+                {
+                  "caller_id": 0,
+                  "output_bytes": 4322,
+                  "output_order_sha256": "A79EBDFF308C46ED0317BF66409928B20A14E4B6F4027DD9DD63F84CE7F6B70F",
+                  "request_count": 5,
+                  "request_order_sha256": "58E99E12C8FE440113E2B3F099A1A09EEB3362848875BFCE811964799B8DD705",
+                  "response_count": 5
+                },
+                {
+                  "caller_id": 1,
+                  "output_bytes": 4421,
+                  "output_order_sha256": "E8D1CA167CDD316A37C22E8E8046231DD0A821DF8269425A58A4B3E609FA0E44",
+                  "request_count": 5,
+                  "request_order_sha256": "2813817D7BD6A8FF7D4227A0162603F302F52C347145B39EDDEFF371943895AF",
+                  "response_count": 5
+                }
+              ],
+              "cancellation": null,
+              "elapsed_seconds": 2.1820502499999748,
+              "format_version": "RR-CONCURRENCY-WORKER-3",
+              "mode": "library",
+              "participants": 2,
+              "physical_transport_comparator": {
+                "actual_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+                "cache_scope": "one worker run, keyed by exact raw input bytes",
+                "compared_response_lines": 10,
+                "expected_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+                "isolated_binding_sha256": "AD7594938A4D1EE346793C17A3CEE74B30E73554EB64EAE7456D34285F7F122E",
+                "kind": "cached-one-record-isolated-grounded-0.4-rr_batch.py",
+                "semantic_nonclaim": "CUT-derived isolated bytes establish physical-line transport parity only; they are not semantic expected results.",
+                "source": "grounded-0_4/rr_batch.py, one input record per fresh process",
+                "unique_input_records": 7
+              },
+              "repeat": 1,
+              "requests_per_caller": 5,
+              "resources": {
+                "after": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 63340544,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "before": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 63143936,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "peak": {
+                  "handle_or_fd_count": 4,
+                  "method": "stdlib-self-fallback",
+                  "requested_process_count": 1,
+                  "rss_bytes": 63340544,
+                  "thread_count": 1
+                },
+                "sample_count": 1,
+                "sampling_interval_seconds": 0.01,
+                "scheduling_nonclaim": "sampling observes resources; it is not an execution schedule"
+              },
+              "runtime": {
+                "byte_order": "little",
+                "executable": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python",
+                "filesystem_encoding": "utf-8",
+                "gil_receipt": {
+                  "sys._is_gil_enabled": true,
+                  "sys._is_gil_enabled_available": true
+                },
+                "implementation": "CPython",
+                "machine": "arm64",
+                "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+                "preferred_encoding": "utf-8",
+                "processor": "arm",
+                "release": "25.5.0",
+                "system": "Darwin",
+                "version": "3.14.6 (v3.14.6:c63aec69bd5, Jun 10 2026, 08:07:54) [Clang 21.0.0 (clang-2100.1.1.101)]",
+                "version_info": [
+                  3,
+                  14,
+                  6,
+                  "final",
+                  0
+                ],
+                "word_size_bits": 64
+              },
+              "schedule": {
+                "caller_order": [
+                  0,
+                  1
+                ],
+                "input_generation": "valid-every-50; otherwise seeded malformed selection",
+                "os_interleaving": "uncontrolled stress dimension",
+                "start_barrier": "all-callers-ready"
+              },
+              "seed": 23171517194915395,
+              "semantic_oracle": {
+                "compared_audited_envelopes": 10,
+                "envelope_format_version": "B1-AUDITED-DECISION-0.4",
+                "envelope_validation": "strict UTF-8 integer-domain JSON; exact top-level fields and types; audit seal; independent whole-envelope JCS+LF canonicality; request hash binding",
+                "fixture_binding_sha256": "78FC43470C9AD4C41932CD38926F8430A004D02FE18E065D3DD6BE59A5A4B80B",
+                "projected_sealed_responses_sha256": "F5A7111685B217F0146718686F5A10C256B3559316BDCC226467C465208009C8",
+                "projection": "independent JCS(sealed_response) plus LF",
+                "source": "portability.oracle.FixtureOracle.expected_record",
+                "status": "PASS"
+              },
+              "status": "PASS",
+              "valid_fixture_inputs": [
+                {
+                  "behavior_class": "VALID",
+                  "entry_id": "SEMFX-OBL-22-IO-291939EAD3C56032",
+                  "request_sha256": "50DE63075B898F16D5C733F6FF3726B3029E22ACF4E41040784D6971873CE04A"
+                },
+                {
+                  "behavior_class": "MALFORMED_OR_BOUNDARY",
+                  "entry_id": "SEMFX-OBL-22-INV-7B6C57EA427965C7",
+                  "request_sha256": "5FC6BEA25A274674CF4FD86738CF525C1984A83EC04815BC7F344ED21D1B8FB4"
+                },
+                {
+                  "behavior_class": "BINDING_OR_CONFLICT",
+                  "entry_id": "SEMFX-OBL-22-CTRL-E0B52A921327B33D",
+                  "request_sha256": "9E2E14ED997D10B94D79DB86216E88E7EE0AFB2F016F414CA3BCB2EECCF5D7EB"
+                },
+                {
+                  "behavior_class": "OMISSION_OR_INCOMPLETE",
+                  "entry_id": "SEMFX-OBL-22-FAIL-A1CA45D53BC99336",
+                  "request_sha256": "8FDDD752E6E73FB92A2C56632973D81F64BCF840B8A347F9E3B69837E1ACE1E5"
+                }
+              ],
+              "worker_process_exit": 0,
+              "worker_stderr_bytes": 0,
+              "worker_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+            },
+            {
+              "aggregate_framed_output_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+              "caller_receipts": [
+                {
+                  "caller_id": 0,
+                  "output_bytes": 4322,
+                  "output_order_sha256": "A79EBDFF308C46ED0317BF66409928B20A14E4B6F4027DD9DD63F84CE7F6B70F",
+                  "request_count": 5,
+                  "request_order_sha256": "58E99E12C8FE440113E2B3F099A1A09EEB3362848875BFCE811964799B8DD705",
+                  "response_count": 5
+                },
+                {
+                  "caller_id": 1,
+                  "output_bytes": 4421,
+                  "output_order_sha256": "E8D1CA167CDD316A37C22E8E8046231DD0A821DF8269425A58A4B3E609FA0E44",
+                  "request_count": 5,
+                  "request_order_sha256": "2813817D7BD6A8FF7D4227A0162603F302F52C347145B39EDDEFF371943895AF",
+                  "response_count": 5
+                }
+              ],
+              "cancellation": {
+                "after": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 63438848,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "alive_threads_after": [],
+                "barriers": [
+                  "all-callers-started",
+                  "one-response-acknowledged"
+                ],
+                "before": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 63438848,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "cancellation_action": "threading.Event.set",
+                "during": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 63438848,
+                  "sampled_process_count": 1,
+                  "thread_count": 3,
+                  "unavailable_pids": []
+                },
+                "pass": true,
+                "physical_comparator": "cached-one-record-isolated-grounded-0.4-rr_batch.py",
+                "processed_max": 1,
+                "processed_min": 1,
+                "resource_cleanup": {
+                  "handle_or_fd_count": {
+                    "after": 4,
+                    "allowance": 2,
+                    "before": 4,
+                    "pass": true
+                  },
+                  "pass": true,
+                  "thread_count": {
+                    "after": 1,
+                    "allowance": 0,
+                    "before": 1,
+                    "pass": true
+                  }
+                },
+                "semantic_oracle": "portability.oracle.FixtureOracle.expected_record"
+              },
+              "elapsed_seconds": 2.3259511669999995,
+              "format_version": "RR-CONCURRENCY-WORKER-3",
+              "mode": "library",
+              "participants": 2,
+              "physical_transport_comparator": {
+                "actual_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+                "cache_scope": "one worker run, keyed by exact raw input bytes",
+                "compared_response_lines": 10,
+                "expected_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+                "isolated_binding_sha256": "AD7594938A4D1EE346793C17A3CEE74B30E73554EB64EAE7456D34285F7F122E",
+                "kind": "cached-one-record-isolated-grounded-0.4-rr_batch.py",
+                "semantic_nonclaim": "CUT-derived isolated bytes establish physical-line transport parity only; they are not semantic expected results.",
+                "source": "grounded-0_4/rr_batch.py, one input record per fresh process",
+                "unique_input_records": 7
+              },
+              "repeat": 2,
+              "requests_per_caller": 5,
+              "resources": {
+                "after": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 63438848,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "before": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 63258624,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "peak": {
+                  "handle_or_fd_count": 4,
+                  "method": "stdlib-self-fallback",
+                  "requested_process_count": 1,
+                  "rss_bytes": 63438848,
+                  "thread_count": 1
+                },
+                "sample_count": 1,
+                "sampling_interval_seconds": 0.01,
+                "scheduling_nonclaim": "sampling observes resources; it is not an execution schedule"
+              },
+              "runtime": {
+                "byte_order": "little",
+                "executable": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python",
+                "filesystem_encoding": "utf-8",
+                "gil_receipt": {
+                  "sys._is_gil_enabled": true,
+                  "sys._is_gil_enabled_available": true
+                },
+                "implementation": "CPython",
+                "machine": "arm64",
+                "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+                "preferred_encoding": "utf-8",
+                "processor": "arm",
+                "release": "25.5.0",
+                "system": "Darwin",
+                "version": "3.14.6 (v3.14.6:c63aec69bd5, Jun 10 2026, 08:07:54) [Clang 21.0.0 (clang-2100.1.1.101)]",
+                "version_info": [
+                  3,
+                  14,
+                  6,
+                  "final",
+                  0
+                ],
+                "word_size_bits": 64
+              },
+              "schedule": {
+                "caller_order": [
+                  0,
+                  1
+                ],
+                "input_generation": "valid-every-50; otherwise seeded malformed selection",
+                "os_interleaving": "uncontrolled stress dimension",
+                "start_barrier": "all-callers-ready"
+              },
+              "seed": 23171517194915395,
+              "semantic_oracle": {
+                "compared_audited_envelopes": 10,
+                "envelope_format_version": "B1-AUDITED-DECISION-0.4",
+                "envelope_validation": "strict UTF-8 integer-domain JSON; exact top-level fields and types; audit seal; independent whole-envelope JCS+LF canonicality; request hash binding",
+                "fixture_binding_sha256": "78FC43470C9AD4C41932CD38926F8430A004D02FE18E065D3DD6BE59A5A4B80B",
+                "projected_sealed_responses_sha256": "F5A7111685B217F0146718686F5A10C256B3559316BDCC226467C465208009C8",
+                "projection": "independent JCS(sealed_response) plus LF",
+                "source": "portability.oracle.FixtureOracle.expected_record",
+                "status": "PASS"
+              },
+              "status": "PASS",
+              "valid_fixture_inputs": [
+                {
+                  "behavior_class": "VALID",
+                  "entry_id": "SEMFX-OBL-22-IO-291939EAD3C56032",
+                  "request_sha256": "50DE63075B898F16D5C733F6FF3726B3029E22ACF4E41040784D6971873CE04A"
+                },
+                {
+                  "behavior_class": "MALFORMED_OR_BOUNDARY",
+                  "entry_id": "SEMFX-OBL-22-INV-7B6C57EA427965C7",
+                  "request_sha256": "5FC6BEA25A274674CF4FD86738CF525C1984A83EC04815BC7F344ED21D1B8FB4"
+                },
+                {
+                  "behavior_class": "BINDING_OR_CONFLICT",
+                  "entry_id": "SEMFX-OBL-22-CTRL-E0B52A921327B33D",
+                  "request_sha256": "9E2E14ED997D10B94D79DB86216E88E7EE0AFB2F016F414CA3BCB2EECCF5D7EB"
+                },
+                {
+                  "behavior_class": "OMISSION_OR_INCOMPLETE",
+                  "entry_id": "SEMFX-OBL-22-FAIL-A1CA45D53BC99336",
+                  "request_sha256": "8FDDD752E6E73FB92A2C56632973D81F64BCF840B8A347F9E3B69837E1ACE1E5"
+                }
+              ],
+              "worker_process_exit": 0,
+              "worker_stderr_bytes": 0,
+              "worker_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+            }
+          ],
+          "status": "PASS",
+          "timeout_seconds": 120.0,
+          "total_requests_per_repeat": 10
+        },
+        {
+          "aggregate_framed_output_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+          "byte_match": true,
+          "elapsed_seconds": 4.712546540999995,
+          "identical_seed_runs": 2,
+          "mode": "process",
+          "participants": 2,
+          "requests_per_caller": 5,
+          "runs": [
+            {
+              "aggregate_framed_output_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+              "caller_receipts": [
+                {
+                  "caller_id": 0,
+                  "output_bytes": 4322,
+                  "output_order_sha256": "A79EBDFF308C46ED0317BF66409928B20A14E4B6F4027DD9DD63F84CE7F6B70F",
+                  "request_count": 5,
+                  "request_order_sha256": "58E99E12C8FE440113E2B3F099A1A09EEB3362848875BFCE811964799B8DD705",
+                  "response_count": 5
+                },
+                {
+                  "caller_id": 1,
+                  "output_bytes": 4421,
+                  "output_order_sha256": "E8D1CA167CDD316A37C22E8E8046231DD0A821DF8269425A58A4B3E609FA0E44",
+                  "request_count": 5,
+                  "request_order_sha256": "2813817D7BD6A8FF7D4227A0162603F302F52C347145B39EDDEFF371943895AF",
+                  "response_count": 5
+                }
+              ],
+              "cancellation": null,
+              "elapsed_seconds": 1.9564427079999973,
+              "format_version": "RR-CONCURRENCY-WORKER-3",
+              "mode": "process",
+              "participants": 2,
+              "physical_transport_comparator": {
+                "actual_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+                "cache_scope": "one worker run, keyed by exact raw input bytes",
+                "compared_response_lines": 10,
+                "expected_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+                "isolated_binding_sha256": "AD7594938A4D1EE346793C17A3CEE74B30E73554EB64EAE7456D34285F7F122E",
+                "kind": "cached-one-record-isolated-grounded-0.4-rr_batch.py",
+                "semantic_nonclaim": "CUT-derived isolated bytes establish physical-line transport parity only; they are not semantic expected results.",
+                "source": "grounded-0_4/rr_batch.py, one input record per fresh process",
+                "unique_input_records": 7
+              },
+              "repeat": 1,
+              "requests_per_caller": 5,
+              "resources": {
+                "after": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 63045632,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "before": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 62865408,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "peak": {
+                  "handle_or_fd_count": 8,
+                  "method": "stdlib-self-fallback",
+                  "requested_process_count": 3,
+                  "rss_bytes": 63045632,
+                  "thread_count": 4
+                },
+                "sample_count": 3,
+                "sampling_interval_seconds": 0.01,
+                "scheduling_nonclaim": "sampling observes resources; it is not an execution schedule"
+              },
+              "runtime": {
+                "byte_order": "little",
+                "executable": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python",
+                "filesystem_encoding": "utf-8",
+                "gil_receipt": {
+                  "sys._is_gil_enabled": true,
+                  "sys._is_gil_enabled_available": true
+                },
+                "implementation": "CPython",
+                "machine": "arm64",
+                "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+                "preferred_encoding": "utf-8",
+                "processor": "arm",
+                "release": "25.5.0",
+                "system": "Darwin",
+                "version": "3.14.6 (v3.14.6:c63aec69bd5, Jun 10 2026, 08:07:54) [Clang 21.0.0 (clang-2100.1.1.101)]",
+                "version_info": [
+                  3,
+                  14,
+                  6,
+                  "final",
+                  0
+                ],
+                "word_size_bits": 64
+              },
+              "schedule": {
+                "caller_order": [
+                  0,
+                  1
+                ],
+                "input_generation": "valid-every-50; otherwise seeded malformed selection",
+                "os_interleaving": "uncontrolled stress dimension",
+                "start_barrier": "all-callers-ready"
+              },
+              "seed": 23171517194915395,
+              "semantic_oracle": {
+                "compared_audited_envelopes": 10,
+                "envelope_format_version": "B1-AUDITED-DECISION-0.4",
+                "envelope_validation": "strict UTF-8 integer-domain JSON; exact top-level fields and types; audit seal; independent whole-envelope JCS+LF canonicality; request hash binding",
+                "fixture_binding_sha256": "78FC43470C9AD4C41932CD38926F8430A004D02FE18E065D3DD6BE59A5A4B80B",
+                "projected_sealed_responses_sha256": "F5A7111685B217F0146718686F5A10C256B3559316BDCC226467C465208009C8",
+                "projection": "independent JCS(sealed_response) plus LF",
+                "source": "portability.oracle.FixtureOracle.expected_record",
+                "status": "PASS"
+              },
+              "status": "PASS",
+              "valid_fixture_inputs": [
+                {
+                  "behavior_class": "VALID",
+                  "entry_id": "SEMFX-OBL-22-IO-291939EAD3C56032",
+                  "request_sha256": "50DE63075B898F16D5C733F6FF3726B3029E22ACF4E41040784D6971873CE04A"
+                },
+                {
+                  "behavior_class": "MALFORMED_OR_BOUNDARY",
+                  "entry_id": "SEMFX-OBL-22-INV-7B6C57EA427965C7",
+                  "request_sha256": "5FC6BEA25A274674CF4FD86738CF525C1984A83EC04815BC7F344ED21D1B8FB4"
+                },
+                {
+                  "behavior_class": "BINDING_OR_CONFLICT",
+                  "entry_id": "SEMFX-OBL-22-CTRL-E0B52A921327B33D",
+                  "request_sha256": "9E2E14ED997D10B94D79DB86216E88E7EE0AFB2F016F414CA3BCB2EECCF5D7EB"
+                },
+                {
+                  "behavior_class": "OMISSION_OR_INCOMPLETE",
+                  "entry_id": "SEMFX-OBL-22-FAIL-A1CA45D53BC99336",
+                  "request_sha256": "8FDDD752E6E73FB92A2C56632973D81F64BCF840B8A347F9E3B69837E1ACE1E5"
+                }
+              ],
+              "worker_process_exit": 0,
+              "worker_stderr_bytes": 0,
+              "worker_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+            },
+            {
+              "aggregate_framed_output_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+              "caller_receipts": [
+                {
+                  "caller_id": 0,
+                  "output_bytes": 4322,
+                  "output_order_sha256": "A79EBDFF308C46ED0317BF66409928B20A14E4B6F4027DD9DD63F84CE7F6B70F",
+                  "request_count": 5,
+                  "request_order_sha256": "58E99E12C8FE440113E2B3F099A1A09EEB3362848875BFCE811964799B8DD705",
+                  "response_count": 5
+                },
+                {
+                  "caller_id": 1,
+                  "output_bytes": 4421,
+                  "output_order_sha256": "E8D1CA167CDD316A37C22E8E8046231DD0A821DF8269425A58A4B3E609FA0E44",
+                  "request_count": 5,
+                  "request_order_sha256": "2813817D7BD6A8FF7D4227A0162603F302F52C347145B39EDDEFF371943895AF",
+                  "response_count": 5
+                }
+              ],
+              "cancellation": {
+                "acknowledgements": [
+                  {
+                    "caller_id": 0,
+                    "pid": 4257
+                  },
+                  {
+                    "caller_id": 1,
+                    "pid": 4258
+                  }
+                ],
+                "after": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 63488000,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "barrier": "one-flushed-response-acknowledged-per-process",
+                "before": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 63488000,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "cancellation_action": "Popen.terminate then bounded wait/kill fallback",
+                "during": {
+                  "handle_or_fd_count": 10,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 3,
+                  "rss_bytes": 63488000,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": [
+                    4257,
+                    4258
+                  ]
+                },
+                "exit_codes": [
+                  {
+                    "exit_code": -15,
+                    "pid": 4257
+                  },
+                  {
+                    "exit_code": -15,
+                    "pid": 4258
+                  }
+                ],
+                "lingering_pids_after": [],
+                "pass": true,
+                "physical_comparator": "cached-one-record-isolated-grounded-0.4-rr_batch.py",
+                "resource_cleanup": {
+                  "handle_or_fd_count": {
+                    "after": 4,
+                    "allowance": 2,
+                    "before": 4,
+                    "pass": true
+                  },
+                  "pass": true,
+                  "thread_count": {
+                    "after": 1,
+                    "allowance": 0,
+                    "before": 1,
+                    "pass": true
+                  }
+                },
+                "semantic_oracle": "portability.oracle.FixtureOracle.expected_record"
+              },
+              "elapsed_seconds": 2.508114000000006,
+              "format_version": "RR-CONCURRENCY-WORKER-3",
+              "mode": "process",
+              "participants": 2,
+              "physical_transport_comparator": {
+                "actual_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+                "cache_scope": "one worker run, keyed by exact raw input bytes",
+                "compared_response_lines": 10,
+                "expected_sha256": "B948B223C189E71B35F2F7DD5549F84C9A2FF1D56066C432CDB648B629B29F95",
+                "isolated_binding_sha256": "AD7594938A4D1EE346793C17A3CEE74B30E73554EB64EAE7456D34285F7F122E",
+                "kind": "cached-one-record-isolated-grounded-0.4-rr_batch.py",
+                "semantic_nonclaim": "CUT-derived isolated bytes establish physical-line transport parity only; they are not semantic expected results.",
+                "source": "grounded-0_4/rr_batch.py, one input record per fresh process",
+                "unique_input_records": 7
+              },
+              "repeat": 2,
+              "requests_per_caller": 5,
+              "resources": {
+                "after": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 63488000,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "before": {
+                  "handle_or_fd_count": 4,
+                  "limitation": "child RSS/thread/FD current values unavailable without non-stdlib tooling",
+                  "method": "stdlib-self-fallback",
+                  "per_pid": {},
+                  "requested_process_count": 1,
+                  "rss_bytes": 63307776,
+                  "sampled_process_count": 1,
+                  "thread_count": 1,
+                  "unavailable_pids": []
+                },
+                "peak": {
+                  "handle_or_fd_count": 8,
+                  "method": "stdlib-self-fallback",
+                  "requested_process_count": 3,
+                  "rss_bytes": 63488000,
+                  "thread_count": 4
+                },
+                "sample_count": 3,
+                "sampling_interval_seconds": 0.01,
+                "scheduling_nonclaim": "sampling observes resources; it is not an execution schedule"
+              },
+              "runtime": {
+                "byte_order": "little",
+                "executable": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python",
+                "filesystem_encoding": "utf-8",
+                "gil_receipt": {
+                  "sys._is_gil_enabled": true,
+                  "sys._is_gil_enabled_available": true
+                },
+                "implementation": "CPython",
+                "machine": "arm64",
+                "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+                "preferred_encoding": "utf-8",
+                "processor": "arm",
+                "release": "25.5.0",
+                "system": "Darwin",
+                "version": "3.14.6 (v3.14.6:c63aec69bd5, Jun 10 2026, 08:07:54) [Clang 21.0.0 (clang-2100.1.1.101)]",
+                "version_info": [
+                  3,
+                  14,
+                  6,
+                  "final",
+                  0
+                ],
+                "word_size_bits": 64
+              },
+              "schedule": {
+                "caller_order": [
+                  0,
+                  1
+                ],
+                "input_generation": "valid-every-50; otherwise seeded malformed selection",
+                "os_interleaving": "uncontrolled stress dimension",
+                "start_barrier": "all-callers-ready"
+              },
+              "seed": 23171517194915395,
+              "semantic_oracle": {
+                "compared_audited_envelopes": 10,
+                "envelope_format_version": "B1-AUDITED-DECISION-0.4",
+                "envelope_validation": "strict UTF-8 integer-domain JSON; exact top-level fields and types; audit seal; independent whole-envelope JCS+LF canonicality; request hash binding",
+                "fixture_binding_sha256": "78FC43470C9AD4C41932CD38926F8430A004D02FE18E065D3DD6BE59A5A4B80B",
+                "projected_sealed_responses_sha256": "F5A7111685B217F0146718686F5A10C256B3559316BDCC226467C465208009C8",
+                "projection": "independent JCS(sealed_response) plus LF",
+                "source": "portability.oracle.FixtureOracle.expected_record",
+                "status": "PASS"
+              },
+              "status": "PASS",
+              "valid_fixture_inputs": [
+                {
+                  "behavior_class": "VALID",
+                  "entry_id": "SEMFX-OBL-22-IO-291939EAD3C56032",
+                  "request_sha256": "50DE63075B898F16D5C733F6FF3726B3029E22ACF4E41040784D6971873CE04A"
+                },
+                {
+                  "behavior_class": "MALFORMED_OR_BOUNDARY",
+                  "entry_id": "SEMFX-OBL-22-INV-7B6C57EA427965C7",
+                  "request_sha256": "5FC6BEA25A274674CF4FD86738CF525C1984A83EC04815BC7F344ED21D1B8FB4"
+                },
+                {
+                  "behavior_class": "BINDING_OR_CONFLICT",
+                  "entry_id": "SEMFX-OBL-22-CTRL-E0B52A921327B33D",
+                  "request_sha256": "9E2E14ED997D10B94D79DB86216E88E7EE0AFB2F016F414CA3BCB2EECCF5D7EB"
+                },
+                {
+                  "behavior_class": "OMISSION_OR_INCOMPLETE",
+                  "entry_id": "SEMFX-OBL-22-FAIL-A1CA45D53BC99336",
+                  "request_sha256": "8FDDD752E6E73FB92A2C56632973D81F64BCF840B8A347F9E3B69837E1ACE1E5"
+                }
+              ],
+              "worker_process_exit": 0,
+              "worker_stderr_bytes": 0,
+              "worker_stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+            }
+          ],
+          "status": "PASS",
+          "timeout_seconds": 120.0,
+          "total_requests_per_repeat": 10
+        }
+      ],
+      "participants": 2,
+      "status": "PASS"
+    }
+  ],
+  "nonclaims": [
+    "No efficacy, novelty, security, fuzzing-completeness, external-standard, or universal-portability claim.",
+    "OS thread/process interleavings are sampled stress, not exhaustively enumerated schedules.",
+    "Isolated accepted rr_batch bytes are a physical transport comparator only and make no semantic claim.",
+    "Semantic expectations come only from independent projection of each audited envelope's sealed_response through the clean-room FixtureOracle API."
+  ],
+  "runtime": {
+    "byte_order": "little",
+    "executable": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python",
+    "filesystem_encoding": "utf-8",
+    "gil_receipt": {
+      "sys._is_gil_enabled": true,
+      "sys._is_gil_enabled_available": true
+    },
+    "implementation": "CPython",
+    "machine": "arm64",
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "preferred_encoding": "utf-8",
+    "processor": "arm",
+    "release": "25.5.0",
+    "system": "Darwin",
+    "version": "3.14.6 (v3.14.6:c63aec69bd5, Jun 10 2026, 08:07:54) [Clang 21.0.0 (clang-2100.1.1.101)]",
+    "version_info": [
+      3,
+      14,
+      6,
+      "final",
+      0
+    ],
+    "word_size_bits": 64
+  },
+  "runtime_label": "matrix-focused",
+  "soaks": [],
+  "status": "PASS",
+  "treatment_exposed": true,
+  "treatment_notice": "This lane must never author future blinded worlds, oracle, gold, or renderer."
+}

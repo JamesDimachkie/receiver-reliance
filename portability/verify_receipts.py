@@ -11,7 +11,13 @@ the committed evidence spine instead of trusting recorded summaries:
   capture binding, and the capture-embedded canonical model receipt's
   self-zeroed hash;
 - both clean concurrency receipts: raw hashes, clean-source binding, and
-  independent recomputation of worker-run and audited-envelope totals.
+  independent recomputation of worker-run and audited-envelope totals;
+- the hosted receipt custody tree: the manifest's raw hash, fail-closed
+  directory enumeration, byte-for-byte binding of every listed file, the
+  validated 28-row outcome vector and counts of the committed hosted
+  matrix summary, the sandbox host receipt's status, source, and committed
+  Dockerfile binding, and the hosted expanded-gate receipt's command exits
+  and load-bearing suite totals.
 
 The single summary line is machine-parseable by the matrix runner:
 ``verify-receipts: checks=<n> failures=<n>``.  Exit 0 only when every check
@@ -68,6 +74,68 @@ CONC_NORMATIVE_RAW_SHA256 = "B1782A43E4E4615569948953FFC45659BF0A820BEB67136F73F
 CONC_SMOKE_RAW_SHA256 = "8CBA926DFB61B2C729C5CEAB95FF89350B99AFAF03809CBDDEAF6B8AC7719030"
 CONC_WORKER_RUNS = 32
 CONC_AUDITED_ENVELOPES = 242400
+
+# Hosted receipt custody (green run 31562391384 on the pushed head).
+HOSTED_DIR = REPO / "portability" / "receipts" / "hosted"
+HOSTED_MANIFEST = HOSTED_DIR / "MANIFEST.json"
+HOSTED_MANIFEST_RAW_SHA256 = (
+    "9DC261CA316C4F8E83342FE6AD24EBF15C3A21F3FD38AE6565EE28651569D5E6"
+)
+HOSTED_HEAD = "7facfa34bb7b841fd0a7d911f15b4da71efde95b"
+HOSTED_RUN_ID = 31562391384
+HOSTED_SUMMARY_COUNTS = {
+    "normative": {"INFRA_UNAVAILABLE": 3, "PASS": 16},
+    "off_contract": {
+        "INFRA_UNAVAILABLE": 1,
+        "OBSERVED_DIVERGENCE": 1,
+        "RECEIPT_MISSING": 1,
+    },
+    "stress": {"INFRA_UNAVAILABLE": 4, "PASS": 2},
+}
+HOSTED_ROW_OUTCOMES = {
+    "normative-cpython-3-12-ubuntu-latest-x64": "PASS",
+    "normative-cpython-3-12-ubuntu-24-04-arm-arm64": "PASS",
+    "normative-cpython-3-12-macos-latest-arm64": "PASS",
+    "normative-cpython-3-12-macos-13-x64": "INFRA_UNAVAILABLE",
+    "normative-cpython-3-12-windows-latest-x64": "PASS",
+    "normative-cpython-3-12-windows-11-arm-arm64": "PASS",
+    "normative-cpython-3-13-ubuntu-latest-x64": "PASS",
+    "normative-cpython-3-13-ubuntu-24-04-arm-arm64": "PASS",
+    "normative-cpython-3-13-macos-latest-arm64": "PASS",
+    "normative-cpython-3-13-macos-13-x64": "INFRA_UNAVAILABLE",
+    "normative-cpython-3-13-windows-latest-x64": "PASS",
+    "normative-cpython-3-13-windows-11-arm-arm64": "PASS",
+    "normative-cpython-3-14-ubuntu-latest-x64": "PASS",
+    "normative-cpython-3-14-ubuntu-24-04-arm-arm64": "PASS",
+    "normative-cpython-3-14-macos-latest-arm64": "PASS",
+    "normative-cpython-3-14-macos-13-x64": "INFRA_UNAVAILABLE",
+    "normative-cpython-3-14-windows-latest-x64": "PASS",
+    "normative-cpython-3-14-windows-11-arm-arm64": "PASS",
+    "stress-cpython-3-14t-ubuntu-latest-x64": "PASS",
+    "stress-cpython-3-14-dev-mode-ubuntu-latest-x64": "PASS",
+    "stress-cpython-3-14-pydebug-ubuntu-latest-x64": "INFRA_UNAVAILABLE",
+    "off-contract-pypy-3-12-ubuntu-latest-x64": "INFRA_UNAVAILABLE",
+    "off-contract-pypy-3-11-ubuntu-latest-x64": "OBSERVED_DIVERGENCE",
+    "off-contract-graalpy-24-0-ubuntu-latest-x64": "RECEIPT_MISSING",
+    "stress-non-substitute-cpython-3-12-macos-15-intel-x64": "INFRA_UNAVAILABLE",
+    "stress-non-substitute-cpython-3-13-macos-15-intel-x64": "INFRA_UNAVAILABLE",
+    "stress-non-substitute-cpython-3-14-macos-15-intel-x64": "INFRA_UNAVAILABLE",
+    "expanded-gate-cpython-3-12-ubuntu-latest-x64": "PASS",
+}
+# Load-bearing hosted expanded-gate totals: id -> (field, expected values).
+HOSTED_GATE_TOTALS = {
+    "accepted-0.2": ("count_totals", [800]),
+    "composed-0.3-all": ("count_totals", [800, 107]),
+    "grounded-0.4-regression": ("checks", [504]),
+    "lint-gate-meta": ("checks", [7]),
+    "grounded-properties": ("checks", [2296]),
+    "audit-adversarial": ("checks", [6497]),
+    "synthetic-proof-harness": ("tests", [7]),
+    "seeded-fuzz-smoke": ("count_totals", [31, 31]),
+    "batch-performance-gate": ("checks", [2160]),
+    "single-pass-benchmark": ("checks", [1142]),
+}
+SANDBOX_DOCKERFILE = REPO / "portability" / "sandbox" / "Dockerfile"
 
 
 def _sha256_upper(data: bytes) -> str:
@@ -231,12 +299,115 @@ def _verify_concurrency(v: _Verifier) -> None:
     v.check("concurrency.audited_envelopes", envelopes == CONC_AUDITED_ENVELOPES)
 
 
+def _verify_hosted(v: _Verifier) -> None:
+    raw = HOSTED_MANIFEST.read_bytes()
+    v.check("hosted.manifest_raw_sha256", _sha256_upper(raw) == HOSTED_MANIFEST_RAW_SHA256)
+    manifest = json.loads(raw)
+    v.check(
+        "hosted.manifest_identity",
+        manifest["schema"] == "receiver-reliance/hosted-receipt-manifest-1"
+        and manifest["run_id"] == HOSTED_RUN_ID
+        and manifest["head_sha"] == HOSTED_HEAD,
+    )
+    listed = manifest["files"]
+    on_disk = {
+        p.relative_to(HOSTED_DIR).as_posix()
+        for p in HOSTED_DIR.rglob("*")
+        if p.is_file() and p.name != "MANIFEST.json"
+    }
+    v.check(
+        "hosted.directory_enumeration",
+        on_disk == set(listed),
+        f"unlisted={sorted(on_disk - set(listed))} missing={sorted(set(listed) - on_disk)}",
+    )
+    for rel, entry in sorted(listed.items()):
+        data = (HOSTED_DIR / rel).read_bytes() if rel in on_disk else b""
+        v.check(
+            f"hosted.file_binding.{rel}",
+            rel in on_disk
+            and len(data) == entry["bytes"]
+            and _sha256_upper(data) == entry["sha256"].upper(),
+        )
+
+    summary = json.loads((HOSTED_DIR / "matrix-summary.json").read_bytes())
+    v.check("hosted.summary_counts", summary["counts"] == HOSTED_SUMMARY_COUNTS)
+    v.check(
+        "hosted.summary_gating",
+        summary["gating_errors"] == []
+        and summary["normative_failures"] == []
+        and summary["upstream_job_results"]
+        == {"expanded_gate": "success", "normative_matrix": "success"},
+    )
+    rows = {row["entry_id"]: row for row in summary["rows"]}
+    v.check(
+        "hosted.summary_row_outcomes",
+        {entry_id: row["outcome"] for entry_id, row in rows.items()}
+        == HOSTED_ROW_OUTCOMES,
+    )
+    for entry_id, row in sorted(rows.items()):
+        git = row.get("git")
+        if not isinstance(git, dict) or git.get("github_sha") is None:
+            continue
+        if git.get("unavailable") is True:
+            # Predeclared synthesized rows never had a checkout: the workflow
+            # SHA must still bind, and no execution state may be asserted.
+            bound = git.get("sha") is None and git.get("clean") is None
+        else:
+            bound = git.get("sha") == HOSTED_HEAD and git.get("clean") is True
+        v.check(
+            f"hosted.summary_source_binding.{entry_id}",
+            git["github_sha"] == HOSTED_HEAD and bound,
+        )
+
+    sandbox = json.loads((HOSTED_DIR / "sandbox-receipt.json").read_bytes())
+    v.check(
+        "hosted.sandbox_verdict",
+        sandbox["status"] == "PASS"
+        and sandbox["inner_receipt"]["status"] == "PASS"
+        and sandbox["git"]["sha"] == HOSTED_HEAD
+        and sandbox["git"]["clean"] is True,
+    )
+    v.check(
+        "hosted.sandbox_dockerfile_binding",
+        sandbox["image"]["dockerfile_sha256"].upper()
+        == _sha256_upper(SANDBOX_DOCKERFILE.read_bytes()),
+    )
+
+    gate = json.loads(
+        (HOSTED_DIR / "receipt-expanded-gate-cpython-3-12-ubuntu-latest-x64.json").read_bytes()
+    )
+    v.check(
+        "hosted.gate_verdict",
+        gate["outcome"] == "PASS"
+        and gate["git"]["github_sha"] == HOSTED_HEAD
+        and len(gate["commands"]) == 11,
+    )
+    v.check(
+        "hosted.gate_command_exits",
+        all(
+            item["exit"] == 0
+            and item["timed_out"] is False
+            and item["expectation_mismatches"] == []
+            for item in gate["commands"]
+        ),
+    )
+    suites = {suite["id"]: suite for suite in gate["suite_counts"]}
+    for suite_id, (field, expected) in sorted(HOSTED_GATE_TOTALS.items()):
+        suite = suites.get(suite_id, {})
+        v.check(
+            f"hosted.gate_totals.{suite_id}",
+            suite.get(field) == expected
+            and all(failure == 0 for failure in suite.get("failures", [])),
+        )
+
+
 def main() -> int:
     verifier = _Verifier()
     _verify_gate_receipt(verifier)
     _verify_rejected(verifier)
     _verify_model_receipts(verifier)
     _verify_concurrency(verifier)
+    _verify_hosted(verifier)
     print(
         f"verify-receipts: checks={verifier.checks} "
         f"failures={len(verifier.failures)}"
