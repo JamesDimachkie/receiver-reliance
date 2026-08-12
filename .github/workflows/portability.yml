@@ -3,7 +3,7 @@ name: portability
 on:
   push:
     branches:
-      - sol/rr-portability-modelcheck-20260810
+      - main
   workflow_dispatch:
 
 permissions:
