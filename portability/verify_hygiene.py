@@ -3,9 +3,13 @@
 The four admitted model captures preserve CRLF bytes under ``* -text``.
 Git therefore reports their carriage returns as trailing whitespace.  Those
 bytes cannot be normalized without invalidating the published SHA-256 values.
-This verifier admits exactly the known warning counts only while each complete
-file retains its admitted hash; every other ``git diff --check`` diagnostic is
-an error.
+The merged blind-review evidence file ``evidence/A1_CAPABILITY_FLOOR_0_1.md``
+is admitted on the same terms: its single trailing-whitespace byte (line 5)
+is sealed by the published ``gate0_a1_pin`` byte length and raw SHA-256 in
+``supplemental-0_3/A1_FLOOR_COUNT_SUPPLEMENTAL_REGISTER_0_1.json``, so it
+cannot be normalized either.  This verifier admits exactly the known warning
+counts only while each complete file retains its admitted hash; every other
+``git diff --check`` diagnostic is an error.
 """
 from __future__ import annotations
 
@@ -35,6 +39,12 @@ ALLOWED = {
     "portability/model/receipts/precheck-retained-vs-streaming.txt": (
         12,
         "DC5DE278C57BE84EC380031C24E886022AB0257A5037C16D69A4AB6E5C2170B1",
+    ),
+    # Sealed by gate0_a1_pin in the supplemental register; merged from the
+    # continuation evidence branch.
+    "evidence/A1_CAPABILITY_FLOOR_0_1.md": (
+        1,
+        "3C694ECBD17CCCF3F2E52D0C13F5B03EDBE400D443F1B63E0561A29EB39C7FCE",
     ),
 }
 WARNING = re.compile(r"^(?P<path>.+):(?P<line>[0-9]+): (?P<kind>.+)\.$")
@@ -96,8 +106,8 @@ def main(argv: list[str] | None = None) -> int:
             print(f"HYGIENE_ERROR {error}", file=sys.stderr)
         return 1
     print(
-        "HYGIENE_PASS allowed_raw_receipt_warnings=138 "
-        "unexpected_diagnostics=0 custody_hashes=4/4"
+        f"HYGIENE_PASS allowed_raw_receipt_warnings={sum(expected_counts.values())} "
+        f"unexpected_diagnostics=0 custody_hashes={len(ALLOWED)}/{len(ALLOWED)}"
     )
     return 0
 
