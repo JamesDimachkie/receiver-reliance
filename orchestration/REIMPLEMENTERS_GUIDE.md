@@ -239,6 +239,41 @@ Run every Python gate with `-B` and an existing unique empty
 temporary prefix per process and must fail if the prefix gains an artifact.
 This is source-hygiene evidence, not semantic conformance evidence.
 
+## Law surfaces pinned by the decisive round (RI5, 2026-08-13)
+
+Attempt 4 repaired the pooled selection rule and still fell to five
+independent mechanisms (592 executed divergences; report
+`orchestration/refuters/RI5.md`, witnesses `orchestration/refuters/RI5-witnesses/`).
+Pinning the selection rule is not enough: pool membership and the row the
+pool is judged against carry equal authority.
+
+- **Binding presence is all-or-nothing.** The reference's binding stage
+  dereferences `inner_request` unconditionally; a missing member aborts the
+  entire binding pool, which also disables combinator-site suppression
+  (suppression requires a non-empty binding pool). A per-check presence gate
+  that keeps partial binding errors alive diverges (DIV-001, 223-byte
+  minimal witness).
+- **The canonical registry row is scored over five bound echo fields** —
+  `/operation_handle`, `/obligation_id`, `/decision_input/operation_handle`,
+  `/decision_input/obligation_id`, `/inner_request/operation_handle` — so
+  obligation evidence can select the row. A row is always returned: on a
+  total tie, the first registry row in UTF-8 order. A well-formed handle
+  absent from the registry must not collapse the binding pool (DIV-002; 239
+  divergences on fully digest-consistent, structurally complete requests).
+- **Non-finite JSON constants classify as `ERR_NUMBER`**, not generic
+  invalid JSON: `NaN\n` alone is a four-byte witness (DIV-003).
+- **Canonical-form `ERR_JSON` precedes `ERR_NUMBER`** when one input
+  violates both laws (unsorted members or escaped keys carrying an
+  out-of-domain number). Do not let a number-domain check preempt the
+  canonical-form check (DIV-004).
+- **Duplicate-member detection must handle lone-surrogate escapes** in
+  member names; consult the committed witness for the exact bytes (DIV-005).
+
+The candidate CLI's wrapper-format rejection was adjudicated as scope, not
+divergence: wrapper semantics live at the candidate's API surface and the
+cross gate exercises them there. State such scope boundaries explicitly and
+early — a refuter must be able to resolve them from committed documents.
+
 ## Claims discipline
 
 Passing the public fixture surface proves conformance on those executed bytes.

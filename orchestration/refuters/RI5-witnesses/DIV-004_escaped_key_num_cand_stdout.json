@@ -1,0 +1,1 @@
+{"errors":[{"code":"ERR_NUMBER","message":"Number violates the safe integer model.","pointer":"/é","precedence":70}],"exit_code":2,"format_version":"PCB-RUNNER-RESPONSE-0.2","ok":false,"output":null,"receipt_sha256":"948838CFED9F06D982264EADE344B752EB2024B9CC8E34C33B8D8B003CACA521","request_id":"RUN_000000000000000000000000","result":"INCOMPLETE"}

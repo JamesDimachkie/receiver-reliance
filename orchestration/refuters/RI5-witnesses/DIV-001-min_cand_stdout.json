@@ -1,0 +1,1 @@
+{"errors":[{"code":"ERR_SCHEMA","message":"Request does not validate.","pointer":"/decision_input","precedence":80}],"exit_code":2,"format_version":"PCB-RUNNER-RESPONSE-0.2","ok":false,"output":null,"receipt_sha256":"82D2BB09D059170C9F08EE0496F00DB29F13E622AF53FEC740662298FF542161","request_id":"RUN_000000000000000000000000","result":"INCOMPLETE"}
