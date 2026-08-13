@@ -36,7 +36,7 @@ import re
 import sys
 from collections.abc import Mapping, Sequence
 from fnmatch import fnmatchcase
-from typing import Any, TextIO
+from typing import IO, Any, TextIO
 
 RESULT_FORMAT_VERSION = "RR-PORTABLE-PREFLIGHT-1"
 FACT_PROFILE_FORMAT_VERSION = "RR-PORTABLE-FACT-PROFILE-1"
@@ -1060,30 +1060,40 @@ def _reject_duplicate_pairs(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
     return result
 
 
-def _bounded_lines(source: TextIO):
+def _bounded_lines(source: IO[str] | IO[bytes]):
     """Yield (number, line, oversized) without unbounded line buffering.
 
-    Characters are accumulated only up to ``MAX_JSONL_BYTES``; the remainder
-    of an oversized line is drained chunk-by-chunk and discarded, so a
+    Units are accumulated only up to ``MAX_JSONL_BYTES``; the remainder of
+    an oversized line is drained chunk-by-chunk and discarded, so a
     newline-free flood cannot force an allocation proportional to its length
-    (F-WP1-010).  One UTF-8 character is at least one byte, so a line whose
-    character count exceeds the byte cap necessarily exceeds it in bytes.
+    (F-WP1-010).  Byte sources are counted exactly; for text sources one
+    UTF-8 character is at least one byte, so a line whose character count
+    exceeds the byte cap necessarily exceeds it in bytes.  Lines from a byte
+    source are yielded as ``bytes``: the transport never decodes a whole
+    chunk, so one undecodable line cannot destroy its neighbours (F-WP1-014).
     """
 
     number = 0
-    buffer: list[str] = []
+    buffer: list[Any] = []
     buffered = 0
     oversized = False
+    sep: Any = "\n"
+    empty: Any = ""
+    first = True
     while True:
         chunk = source.read(65536)
         if not chunk:
             if buffer or oversized:
                 number += 1
-                yield number, "".join(buffer), oversized
+                yield number, empty.join(buffer), oversized
             return
+        if first:
+            first = False
+            if isinstance(chunk, (bytes, bytearray)):
+                sep, empty = b"\n", b""
         start = 0
         while True:
-            newline = chunk.find("\n", start)
+            newline = chunk.find(sep, start)
             if newline == -1:
                 tail = chunk[start:]
                 if not oversized:
@@ -1103,7 +1113,7 @@ def _bounded_lines(source: TextIO):
             if not oversized:
                 buffer.append(tail)
             number += 1
-            yield number, "".join(buffer), oversized
+            yield number, empty.join(buffer), oversized
             buffer.clear()
             buffered = 0
             oversized = False
@@ -1129,7 +1139,7 @@ def _line_error(number: int, message: str) -> PreflightResult:
     )
 
 
-def process_jsonl(source: TextIO, sink: TextIO) -> int:
+def process_jsonl(source: IO[str] | IO[bytes], sink: TextIO) -> int:
     """Process portable JSONL streams fail-closed.
 
     Returns 2 when any row is not READY **or when no row was supplied**: an
@@ -1137,17 +1147,32 @@ def process_jsonl(source: TextIO, sink: TextIO) -> int:
     row, so an exit-status gate can never mistake "no evidence supplied" for
     "all records READY" (F-WP1-010).  Rows are acquired with bounded
     buffering, parsed with duplicate-member rejection (F-WP1-011), and every
-    parser resource error becomes a deterministic per-line result.
+    parser resource error becomes a deterministic per-line result.  Byte
+    sources are decoded per line, so an undecodable line becomes a
+    deterministic per-line result instead of a process crash and cannot
+    discard the results of other rows (F-WP1-014).
     """
 
     nonready = 0
     rows = 0
     for number, line, oversized in _bounded_lines(source):
-        if not oversized and not line.strip():
+        decode_error: UnicodeDecodeError | None = None
+        if not oversized and isinstance(line, (bytes, bytearray)):
+            try:
+                line = line.decode("utf-8")
+            except UnicodeDecodeError as exc:
+                decode_error = exc
+        if decode_error is None and not oversized and not line.strip():
             continue
         rows += 1
-        if oversized or len(line.encode("utf-8")) > MAX_JSONL_BYTES:
+        if oversized or (
+            decode_error is None and len(line.encode("utf-8")) > MAX_JSONL_BYTES
+        ):
             result = _line_error(number, f"row exceeds {MAX_JSONL_BYTES} bytes")
+        elif decode_error is not None:
+            result = _line_error(
+                number, f"{type(decode_error).__name__}: {decode_error}"
+            )
         else:
             try:
                 payload = json.loads(
@@ -1214,7 +1239,11 @@ def main(argv: Sequence[str] | None = None) -> int:
 
         if os.path.abspath(args.input) == os.path.abspath(args.output):
             parser.error("input and output must differ: opening the output would truncate the input before any row is read")
-    source = sys.stdin if args.input == "-" else open(args.input, "r", encoding="utf-8")
+    source = (
+        getattr(sys.stdin, "buffer", sys.stdin)
+        if args.input == "-"
+        else open(args.input, "rb")
+    )
     sink = (
         sys.stdout
         if args.output == "-"
@@ -1223,9 +1252,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         return process_jsonl(source, sink)
     finally:
-        if source is not sys.stdin:
+        if args.input != "-":
             source.close()
-        if sink is not sys.stdout:
+        if args.output != "-":
             sink.close()
 
 

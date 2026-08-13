@@ -399,5 +399,64 @@ class FailClosedBoundaryTests(unittest.TestCase):
             self.assertEqual(path.read_text(encoding="utf-8"), payload)
 
 
+class TransportDecodeTests(unittest.TestCase):
+    """F-WP1-014: an undecodable line is a per-line result, never a crash."""
+
+    def test_invalid_utf8_line_is_a_deterministic_per_line_result(self):
+        ready = json.dumps(ref_record()).encode("utf-8")
+        stream = io.BytesIO(ready + b"\n" + b'{"bad": "\xff"}' + b"\n" + ready + b"\n")
+        sink = io.StringIO()
+        self.assertEqual(process_jsonl(stream, sink), 2)
+        rows = [json.loads(line) for line in sink.getvalue().splitlines()]
+        self.assertEqual(
+            [row["status"] for row in rows], [READY, REJECTED_INVALID, READY]
+        )
+        issue = rows[1]["issues"][0]
+        self.assertEqual(issue["code"], "PREFLIGHT_JSONL_INVALID")
+        self.assertIn("line 2: UnicodeDecodeError", issue["message"])
+
+    def test_blank_only_byte_stream_still_reports_insufficient_evidence(self):
+        sink = io.StringIO()
+        self.assertEqual(process_jsonl(io.BytesIO(b" \n\t\n"), sink), 2)
+        rows = [json.loads(line) for line in sink.getvalue().splitlines()]
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["status"], INSUFFICIENT_EVIDENCE)
+        self.assertEqual(rows[0]["issues"][0]["code"], "PREFLIGHT_STREAM_EMPTY")
+
+    def test_cli_invalid_utf8_byte_keeps_valid_row_results(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            inp = pathlib.Path(tmp) / "rows.jsonl"
+            out = pathlib.Path(tmp) / "out.jsonl"
+            ready = json.dumps(ref_record()).encode("utf-8")
+            inp.write_bytes(ready + b"\n" + b"\xff\xfe{" + b"\n" + ready + b"\n")
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    "-B",
+                    "adapters/portable_preflight.py",
+                    "--input",
+                    str(inp),
+                    "--output",
+                    str(out),
+                ],
+                cwd=REPO,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False,
+            )
+            self.assertEqual(completed.returncode, 2, completed.stderr)
+            self.assertEqual(completed.stderr, "")
+            rows = [
+                json.loads(line)
+                for line in out.read_text(encoding="utf-8").splitlines()
+            ]
+            self.assertEqual(
+                [row["status"] for row in rows], [READY, REJECTED_INVALID, READY]
+            )
+            codes = {issue["code"] for issue in rows[1]["issues"]}
+            self.assertIn("PREFLIGHT_JSONL_INVALID", codes)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
