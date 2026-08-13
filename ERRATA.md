@@ -98,6 +98,17 @@ commit remains the root that authenticates the digests themselves
 of `grounded-0_4/test_grounded_0_4.py` pins each digest to the bytes on
 disk and proves the seal covers them.
 
+*Scope (2026-08-13, increment refutation of `f08fa34`):*
+`governing_authorities` seals the governing data — closure policy,
+authority register, and engine-source digests — not the grounded
+evaluation layer (`grounded-0_4/rr_api.py`) that applies them. A checkout
+differing only in that evaluator produces audits whose
+`governing_authorities` are byte-identical; evaluator bytes are
+authenticated by the repository commit root alone, per the commit-root law
+in [TRUST_MODEL.md](TRUST_MODEL.md). Admitted erratum; sealing an
+evaluator digest into the audit (a format bump) is queued as optional
+hardening.
+
 ## E9 — Closure evaluator errors failed open to VALID
 
 Same source (finding `csf_2e9e3a58b7bde4789bf783ba`). `closure_findings`

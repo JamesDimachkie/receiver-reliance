@@ -360,15 +360,22 @@ finite bounds, and nowhere else.
 The highest-value additions are adversarial, and both invited classes now
 have recorded first attempts. A deterministic seeded campaign (100,000
 case identities, 67,599 unique raw byte strings, zero findings) ran on
-2026-08-10 (`fuzz/`, `orchestration/FUZZ_CAMPAIGN.md`); a coverage-guided
-campaign remains open. An independent second implementation was attempted
-under author separation and REJECTED four times by fresh-context refuters
-— four distinct minimized raw-ABI divergences (RFC 8785 UTF-16 member
-ordering, lone-surrogate handling, missing-LF duplicate-key precedence,
-duplicate-key pointer selection; reports in `orchestration/refuters/`).
-That is negative evidence about reimplementation sensitivity, not
-independent confirmation: a conforming second implementation still does
-not exist and remains the single most valuable outside contribution. To
+2026-08-10 (`fuzz/`, `orchestration/FUZZ_CAMPAIGN.md`). A coverage-guided
+differential campaign now has a recorded first run (hosted, 2026-08-13):
+steering on reference branch coverage, it refuted the then-current
+second-implementation candidate at identity 588
+(`second-implementation/findings/F-WP4-007.md`). An independent second
+implementation has been attempted under author separation and REJECTED in
+seven fresh-context refutation rounds across two programs — most recently
+attempt 4, refuted by a decisive round recording 592 executed divergences
+across five independent mechanisms (binding-pool membership under missing
+members, canonical registry-row derivation, non-finite constant
+classification, ERR_JSON/ERR_NUMBER precedence order, duplicate-key
+lone-surrogate handling; minimized witnesses and reports in
+`orchestration/refuters/`, decisive report `RI5.md`). That is negative
+evidence about reimplementation sensitivity, not independent
+confirmation: a conforming second implementation still does not exist and
+remains the single most valuable outside contribution. To
 re-verify what is here, run the conformance suite (both modes), then
 re-derive every seal per the RUNBOOK, then, from the repository root, run
 `python -B grounded-0_4/test_grounded_0_4.py`,
