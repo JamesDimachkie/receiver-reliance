@@ -78,7 +78,7 @@ ALLOWED = {
     ),
     "second-implementation/receipts/AUTHOR_INCREMENT_RECEIPT_0_1.json": (
         160,
-        "5D5B5FD6C00B1B60AC0225A1F943E2029FC5EE94B0D8CEDD4320A863ECD116EC",
+        "FF22DA0FE9B7326261ED723628B201E69AE3279E9C439D5186299FD7109CA6A7",
     ),
 }
 # Error-class diagnostics admitted byte-exactly.  The WP4 author increment

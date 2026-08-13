@@ -17,7 +17,7 @@
   "candidate_files": [
     {
       "path": "orchestration/REIMPLEMENTERS_GUIDE.md",
-      "raw_sha256": "4999504CD30C8E10C2A7A40D08DCD079CDC06E3DDAB78C1C35F50491DB7AE949"
+      "raw_sha256": "13717EEF7941FBE51B932AC5CA061AA0BEF4157DCFF7D20859D0DF43AA62FB8E"
     },
     {
       "path": "second-implementation/PROVENANCE.md",
