@@ -109,7 +109,7 @@ python -B perf/sidecar/test_sidecar.py
 python -B perf/sidecar/verify_receipts.py
 ```
 
-The admitted attempt-9 receipt records 728 passing checks: byte parity for all
+The admitted attempt-10 receipt records 728 passing checks: byte parity for all
 124 committed semantic fixtures under one stable PID; a 16 MiB+1 engine
 overlimit request; pre-, mid-, and post-write unsolicited output; a child that
 reads one byte of a 1 MiB request then emits `POISON`; a child that emits

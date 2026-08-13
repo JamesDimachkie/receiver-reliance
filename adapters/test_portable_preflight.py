@@ -299,12 +299,20 @@ class FailClosedBoundaryTests(unittest.TestCase):
         self.assertEqual(rows[0]["status"], REJECTED_INVALID)
 
     def test_parser_resource_errors_become_deterministic_line_results(self):
+        # A deeply nested row must yield exactly one deterministic
+        # REJECTED_INVALID line and never a crash.  The specific issue code
+        # is host-parser-dependent and deliberately NOT asserted: CPython
+        # 3.12/3.13 reject this depth in the parser (PREFLIGHT_JSONL_INVALID)
+        # while 3.14's parser accepts it and the non-object array is rejected
+        # downstream (PREFLIGHT_RECORD_NOT_OBJECT).  The fail-closed invariant
+        # is identical across versions; asserting the code would be a
+        # host-specific portability claim (F-WP1-011).
         deep = "[" * 4000 + "]" * 4000
         code, rows = self._run(deep + "\n")
         self.assertEqual(code, 2)
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["status"], REJECTED_INVALID)
-        self.assertEqual(rows[0]["issues"][0]["code"], "PREFLIGHT_JSONL_INVALID")
+        self.assertTrue(rows[0]["issues"], rows[0])
 
     def test_newline_free_flood_is_bounded_and_rejected(self):
         code, rows = self._run("x" * (5 * 1024 * 1024))

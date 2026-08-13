@@ -17,10 +17,10 @@ from _evidence import canonical, sha256  # noqa: E402
 
 
 ADMITTED = {
-    "perf/receipts/robustness/profile-windows-cpython-3.12-20260812-attempt6.json":
-        "F54B6300ACA8BB4E3D7BBE7F8F1A110B7D558A5E9E8D7448DD5F7315CC3B0166",
-    "perf/receipts/robustness/sidecar-parity-windows-cpython-3.12-20260812-attempt9.json":
-        "E082C27DB6CE00B95A594A26FD0460BC632D54E0CE4CB159C85A6EF56E8AB4AF",
+    "perf/receipts/robustness/profile-windows-cpython-3.12-20260812-attempt7.json":
+        "90A2F0BA3FB344FB500F7C600B3D7824F233E44EBA027D49544DF11C809B8D1F",
+    "perf/receipts/robustness/sidecar-parity-windows-cpython-3.12-20260812-attempt10.json":
+        "7295C40565B09405333C173CC136B7CBF8BE83DA106E7F1A63C3CC03BDB73904",
 }
 
 

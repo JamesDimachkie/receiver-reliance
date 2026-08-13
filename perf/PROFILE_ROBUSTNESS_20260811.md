@@ -1,5 +1,8 @@
 # WP5 robustness profile
 
+(The file name retains the work package's opening date, 2026-08-11; the
+admitted receipts below are dated 2026-08-12.)
+
 ## Verdict
 
 **PASS by the charter fallback: no new optimization; current cost model and
@@ -88,20 +91,20 @@ write and flush completion plus exact envelope correlation.
 Profile:
 
 - path:
-  `perf/receipts/robustness/profile-windows-cpython-3.12-20260812-attempt6.json`
+  `perf/receipts/robustness/profile-windows-cpython-3.12-20260812-attempt7.json`
 - raw SHA-256:
-  `F54B6300ACA8BB4E3D7BBE7F8F1A110B7D558A5E9E8D7448DD5F7315CC3B0166`
+  `90A2F0BA3FB344FB500F7C600B3D7824F233E44EBA027D49544DF11C809B8D1F`
 - embedded pre-seal SHA-256:
-  `694A5CABB14F5F4616135B5C4EBF67CCD0933422138CDC6403375772FBBB0737`
+  `202C4F6822772771075AC2B689D7A9FECCFE9E3ED348A4E7BA35A2303EC61EA7`
 
 Sidecar:
 
 - path:
-  `perf/receipts/robustness/sidecar-parity-windows-cpython-3.12-20260812-attempt9.json`
+  `perf/receipts/robustness/sidecar-parity-windows-cpython-3.12-20260812-attempt10.json`
 - raw SHA-256:
-  `E082C27DB6CE00B95A594A26FD0460BC632D54E0CE4CB159C85A6EF56E8AB4AF`
+  `7295C40565B09405333C173CC136B7CBF8BE83DA106E7F1A63C3CC03BDB73904`
 - embedded pre-seal SHA-256:
-  `1268D1EC32A766A2918651188EC550FD0F6243BB027F7FF1357E46FF386CB047`
+  `BB93274443F4F214EF73E341664DC19DB49D3F3CC857FEAB526FED03C3FB4535`
 
 The profile manifest pins 23 Python-audit-visible repository files; the
 sidecar manifest pins 21 (the 0.4.1 audit surface newly reads the
@@ -119,8 +122,8 @@ numbers or current sidecar admission.
 ## Commands
 
 ```powershell
-python -B perf/sidecar/profile_robustness.py --receipt perf/receipts/robustness/profile-windows-cpython-3.12-20260812-attempt6.json
-python -B perf/sidecar/test_sidecar.py --receipt perf/receipts/robustness/sidecar-parity-windows-cpython-3.12-20260812-attempt9.json
+python -B perf/sidecar/profile_robustness.py --receipt perf/receipts/robustness/profile-windows-cpython-3.12-20260812-attempt7.json
+python -B perf/sidecar/test_sidecar.py --receipt perf/receipts/robustness/sidecar-parity-windows-cpython-3.12-20260812-attempt10.json
 python -B perf/sidecar/verify_receipts.py
 ```
 

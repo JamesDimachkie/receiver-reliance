@@ -72,16 +72,16 @@ modeled.
 
 ## Admitted receipt custody
 
-- `perf/receipts/robustness/profile-windows-cpython-3.12-20260812-attempt6.json`
+- `perf/receipts/robustness/profile-windows-cpython-3.12-20260812-attempt7.json`
   — raw SHA-256
-  **F54B6300ACA8BB4E3D7BBE7F8F1A110B7D558A5E9E8D7448DD5F7315CC3B0166**;
+  **90A2F0BA3FB344FB500F7C600B3D7824F233E44EBA027D49544DF11C809B8D1F**;
   embedded pre-seal SHA-256
-  `694A5CABB14F5F4616135B5C4EBF67CCD0933422138CDC6403375772FBBB0737`.
-- `perf/receipts/robustness/sidecar-parity-windows-cpython-3.12-20260812-attempt9.json`
+  `202C4F6822772771075AC2B689D7A9FECCFE9E3ED348A4E7BA35A2303EC61EA7`.
+- `perf/receipts/robustness/sidecar-parity-windows-cpython-3.12-20260812-attempt10.json`
   — raw SHA-256
-  **E082C27DB6CE00B95A594A26FD0460BC632D54E0CE4CB159C85A6EF56E8AB4AF**;
+  **7295C40565B09405333C173CC136B7CBF8BE83DA106E7F1A63C3CC03BDB73904**;
   embedded pre-seal SHA-256
-  `1268D1EC32A766A2918651188EC550FD0F6243BB027F7FF1357E46FF386CB047`.
+  `BB93274443F4F214EF73E341664DC19DB49D3F3CC857FEAB526FED03C3FB4535`.
 
 The profile pins the Python-audit-visible repository inputs across its full
 traced child set; the sidecar receipt (728 checks) pins its own traced set.
@@ -153,6 +153,18 @@ Earlier receipts remain byte-untouched and are excluded from current numbers:
   source-pin change plus the F-WP5-007 repairs (valid early responses were
   spuriously rejected; the counted-timeout probe raced child cold start;
   stderr capture covered only the first chunk).
+
+- profile `20260812-attempt6.json`
+  (`F54B6300ACA8BB4E3D7BBE7F8F1A110B7D558A5E9E8D7448DD5F7315CC3B0166`):
+  first regeneration after the grounded 0.4.1 increment; ran under CPython
+  3.13.15 because installing 3.13 moved the launcher's `python` default,
+  while its filename claims 3.12 — retained for the label-integrity lesson,
+  superseded by the explicitly `py -3.12` attempt-7 run.
+- sidecar `20260812-attempt9.json`
+  (`E082C27DB6CE00B95A594A26FD0460BC632D54E0CE4CB159C85A6EF56E8AB4AF`):
+  same label mismatch (3.13.15 runtime under a 3.12 filename); first receipt
+  covering the F-WP5-006/007 repairs at 728 checks; superseded by the
+  explicitly `py -3.12` attempt-10 run.
 
 ## Admission and nonclaims
 
