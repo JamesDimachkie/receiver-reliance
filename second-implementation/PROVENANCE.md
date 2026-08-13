@@ -58,6 +58,16 @@ found six valid defects; their reports and repairs are recorded as
 `findings/F-WP4-001.md` through `F-WP4-006.md`. Final author attempt 3 added no
 new divergence and did not change the official strike count of 2.
 
+Author attempt 4 repaired `findings/F-WP4-007.md`, a multi-error pointer
+selection divergence discovered by the hosted coverage-guided campaign against
+the attempt-3 bytes. The attempt-4 author worked from the primary contract's
+error-selection clause, the campaign witness, and black-box differential
+probes of the frozen composed CLI only; no reference implementation source
+was opened, and every probe expectation was pinned from observed black-box
+reference output before being written into `test_cross.py`. The strike count
+remains 2: the campaign is the custodian's terminal instrument, not a
+refuter round.
+
 The runtime reads exactly four authority files. It authenticates the
 supplemental contract by the external receipt's raw SHA-256, then derives the
 primary-contract, packet, and projection length/SHA-256 pins from those

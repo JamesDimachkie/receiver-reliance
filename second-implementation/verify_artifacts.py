@@ -56,6 +56,7 @@ EXPECTED_CANDIDATE_PATHS = {
     "second-implementation/findings/F-WP4-004.md",
     "second-implementation/findings/F-WP4-005.md",
     "second-implementation/findings/F-WP4-006.md",
+    "second-implementation/findings/F-WP4-007.md",
     "second-implementation/process_harness.py",
     "second-implementation/raw_preflight_cases.py",
     "second-implementation/rr2.py",

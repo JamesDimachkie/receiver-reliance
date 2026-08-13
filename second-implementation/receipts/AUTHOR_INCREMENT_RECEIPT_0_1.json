@@ -1,9 +1,27 @@
 {
+  "bounded_raw_preflight_receipt": {
+    "divergence_count": 0,
+    "execute_only_falsifier_rejected": true,
+    "executed_cases": 132,
+    "family_counts": {
+      "deep": 36,
+      "number": 84,
+      "size": 12
+    },
+    "path": "second-implementation/receipts/BOUNDED_DEEP_PREFLIGHT_0_1.json",
+    "raw_sha256": "760F4CEE2C0A02E51C39C531B59EF8A7615C4C17993E9070A159BB366B23733A",
+    "stream_sha256": "AC64B3DF9DB40755B1B3879B4730EFA214E1CC75FC079A19C6D79640D98B0DC9",
+    "surfaces_per_case": 3
+  },
   "campaign_gate": "DEFERRED_PENDING_FRESH_CONTEXT_REFUTER_ZERO_DIVERGENCE",
   "candidate_files": [
     {
+      "path": "orchestration/REIMPLEMENTERS_GUIDE.md",
+      "raw_sha256": "4999504CD30C8E10C2A7A40D08DCD079CDC06E3DDAB78C1C35F50491DB7AE949"
+    },
+    {
       "path": "second-implementation/PROVENANCE.md",
-      "raw_sha256": "38BB57FBA03AA8F44967D3D3E6EABD59D3CB09429FE0BD83EEF4C86A615717D6"
+      "raw_sha256": "3DFAEF6DB89C17FC9458B3156E2D07C4487AA3A9D68E1DBB46E0D6A6D52BCFA7"
     },
     {
       "path": "second-implementation/README.md",
@@ -46,6 +64,10 @@
       "raw_sha256": "7E5F701F2DAB0D6849D5BFFD1F18510CA040E350A2AE2550D13AE99E42DF5998"
     },
     {
+      "path": "second-implementation/findings/F-WP4-007.md",
+      "raw_sha256": "6A9AA9DF5002DE7FCE08C94541452F081FB8FAA3C00771205B6811C528A73BA3"
+    },
+    {
       "path": "second-implementation/process_harness.py",
       "raw_sha256": "89621CC50982C4D49FAA11F8B9D6A1C111AF5D6FF1AAA904012370D4E3834593"
     },
@@ -55,43 +77,43 @@
     },
     {
       "path": "second-implementation/rr2.py",
-      "raw_sha256": "FC6E11E88B44E893E9A70BB67C58158F6028219B31957F09ACAF03D5D4215081"
+      "raw_sha256": "72B36891017236762E8BCC637E1B121E5E176D56542CD81D3BDD80BED635C9B6"
     },
     {
       "path": "second-implementation/test_cross.py",
-      "raw_sha256": "FF355BD1D37884BF6D775A899F34ECC0B508DBADCB78CA5EB7CA80CDA9C1B90B"
+      "raw_sha256": "0B52059EDF52CF38379EAE034A93674F490E4F5991FE090C04242D75DF06576B"
     },
     {
       "path": "second-implementation/verify_artifacts.py",
-      "raw_sha256": "3DF35B0CE26F03E1E732F218AE48F6560DF3E3DB59944B78EBDA96A10FBCCC7A"
-    },
-    {
-      "path": "orchestration/REIMPLEMENTERS_GUIDE.md",
-      "raw_sha256": "4999504CD30C8E10C2A7A40D08DCD079CDC06E3DDAB78C1C35F50491DB7AE949"
+      "raw_sha256": "CC8D1A776E4C8602F75CB5EABBF9D8A44A1CB0C3E8CFD7BC10AF6631723E9FE9"
     }
   ],
-  "bounded_raw_preflight_receipt": {
-    "path": "second-implementation/receipts/BOUNDED_DEEP_PREFLIGHT_0_1.json",
-    "raw_sha256": "760F4CEE2C0A02E51C39C531B59EF8A7615C4C17993E9070A159BB366B23733A",
-    "executed_cases": 132,
-    "surfaces_per_case": 3,
-    "divergence_count": 0,
-    "execute_only_falsifier_rejected": true,
-    "family_counts": {"deep": 36, "number": 84, "size": 12},
-    "stream_sha256": "AC64B3DF9DB40755B1B3879B4730EFA214E1CC75FC079A19C6D79640D98B0DC9"
-  },
   "coverage_steering_smoke_receipt": {
+    "divergence_count": 0,
+    "edge_set_sha256": "C1AD99B3BE029CC6E543B1D4632560D30D323BD68DC8E487A1F8A588F3683C2F",
+    "identity_count": 20,
     "path": "second-implementation/receipts/COVERAGE_STEERING_SMOKE_0_1.json",
     "raw_sha256": "7F4251C533DDB27338482FB1DA0C2C0D677B959B7578EFDE32837E31E55A63DB",
-    "identity_count": 20,
-    "divergence_count": 0,
-    "steering_code_objects_required": ["_dispatch", "_eval_atomic", "_execute", "_parse", "classify", "eval_predicate", "schema_errors"],
-    "steering_requirements_satisfied": true,
     "reference_unique_branch_edges": 347,
-    "edge_set_sha256": "C1AD99B3BE029CC6E543B1D4632560D30D323BD68DC8E487A1F8A588F3683C2F",
+    "steering_code_objects_required": [
+      "_dispatch",
+      "_eval_atomic",
+      "_execute",
+      "_parse",
+      "classify",
+      "eval_predicate",
+      "schema_errors"
+    ],
+    "steering_requirements_satisfied": true,
     "stream_sha256": "DDD9D66E6D6D4F9075258A0F8F4B0441D27F2553AAF1214D569AD2540215F03E"
   },
   "format_version": "RR2-AUTHOR-INCREMENT-RECEIPT-0.1",
+  "host_integer_guard_gate": {
+    "command": "python -I -B -X int_max_str_digits=640 -X pycache_prefix=<unique-empty-temp-root> second-implementation/test_cross.py",
+    "exit_code": 0,
+    "failures": 0,
+    "stdout_lf_sha256": "6AA5119E9EBAE788B87B4835B915C272E9A09E10182A87B833C0AA1DA23AB47E"
+  },
   "house_scale_campaign_receipt": null,
   "local_gate": {
     "command": "python -I -B -X pycache_prefix=<unique-empty-temp-root> second-implementation/test_cross.py",
@@ -99,9 +121,9 @@
       "authority_pin_mutations": 4,
       "competence_descriptor_only": 7,
       "competence_executed": 416,
+      "coverage_steering_checks": 2,
       "deep_api": 36,
       "deep_cli": 36,
-      "coverage_steering_checks": 2,
       "metamorphic_candidate_executed": 5,
       "metamorphic_descriptor_validated": 7,
       "metamorphic_records": 12,
@@ -119,12 +141,6 @@
       "wrapper_negative": 20,
       "wrapper_pair_projections": 124
     },
-    "exit_code": 0,
-    "failures": 0,
-    "stdout_lf_sha256": "6AA5119E9EBAE788B87B4835B915C272E9A09E10182A87B833C0AA1DA23AB47E"
-  },
-  "host_integer_guard_gate": {
-    "command": "python -I -B -X int_max_str_digits=640 -X pycache_prefix=<unique-empty-temp-root> second-implementation/test_cross.py",
     "exit_code": 0,
     "failures": 0,
     "stdout_lf_sha256": "6AA5119E9EBAE788B87B4835B915C272E9A09E10182A87B833C0AA1DA23AB47E"

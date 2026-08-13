@@ -261,6 +261,9 @@ def main() -> int:
 
     probes = [
         (b"", "ERR_EMPTY_INPUT", ""),
+        (b"\n", "ERR_EMPTY_INPUT", ""),
+        (b"\n\n", "ERR_JSON", ""),
+        (b" \n", "ERR_JSON", ""),
         (b"\xff\n", "ERR_UTF8", ""),
         (b"\xef\xbb\xbf{}\n", "ERR_BOM", ""),
         (b'{"a":0,"a":1}\n', "ERR_DUPLICATE_KEY", ""),
@@ -289,6 +292,30 @@ def main() -> int:
     precedence_requests.append((malformed, "/inner_request/request_id"))
     malformed = copy.deepcopy(base_request); malformed["inner_inptt_sha256"] = malformed.pop("inner_input_sha256")
     precedence_requests.append((malformed, "/inner_inptt_sha256"))
+    # F-WP4-007 regressions: with multiple precedence-80 mismatches the
+    # contract requires the lexicographically first mismatched pointer, with
+    # the discriminator/core gates and the structurally-complete binding
+    # stage preserved (campaign witness identity 588 plus minimized probes).
+    malformed = copy.deepcopy(base_request); malformed["decision_input"]["facts"] = 42; malformed["inner_input_sha256"] = "0" * 63 + "1"
+    precedence_requests.append((malformed, "/decision_input"))
+    malformed = copy.deepcopy(base_request); malformed["decision_input"]["facts"] = 42; malformed["obligation_id"] = 42
+    precedence_requests.append((malformed, "/decision_input"))
+    malformed = copy.deepcopy(base_request); malformed["request_id"] = 42; malformed["inner_input_sha256"] = "0" * 63 + "1"
+    precedence_requests.append((malformed, "/inner_input_sha256"))
+    malformed = copy.deepcopy(base_request); malformed["decision_input"]["facts"] = 42; malformed["inner_request_raw_sha256"] = "0" * 63 + "1"
+    precedence_requests.append((malformed, "/decision_input"))
+    malformed = copy.deepcopy(base_request); malformed["decision_input"]["facts"] = 42; malformed["obligation_id"] = 42; malformed["request_id"] = 42
+    precedence_requests.append((malformed, "/decision_input"))
+    malformed = copy.deepcopy(base_request); malformed["decision_input"]["facts"] = 42; malformed["operation_handle"] = 42
+    precedence_requests.append((malformed, "/decision_input"))
+    malformed = copy.deepcopy(base_request); malformed["decision_input"]["facts"] = 42; malformed["zzz_extra"] = 1
+    precedence_requests.append((malformed, "/decision_input"))
+    malformed = copy.deepcopy(base_request); malformed["decision_input"]["facts"] = 42; del malformed["inner_input_sha256"]
+    precedence_requests.append((malformed, "/decision_input"))
+    malformed = copy.deepcopy(base_request); malformed["decision_input"]["facts"] = 42; malformed["format_version"] = "WRONG-0.9"
+    precedence_requests.append((malformed, "/format_version"))
+    malformed = copy.deepcopy(base_request); malformed["inner_input_sha256"] = "0" * 63 + "1"; del malformed["request_id"]
+    precedence_requests.append((malformed, "/request_id"))
     for request, pointer in precedence_requests:
         counts["refuter_probes"] += 1
         response = json.loads(impl.execute_bytes(jcs(request) + b"\n")[1])

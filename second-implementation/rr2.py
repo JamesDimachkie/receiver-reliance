@@ -779,7 +779,11 @@ class Implementation:
             return self.error_response("ERR_INTERNAL")
 
     def _execute_bytes(self, raw: bytes) -> tuple[int, bytes]:
-        if not raw:
+        if raw in (b"", b"\n"):
+            # Absent-or-empty covers the empty payload with its bare LF
+            # terminator; two terminators or any other byte is wire content
+            # (F-WP4-007 campaign witness, identity 3606 of the 600-window
+            # stream).
             return self.error_response("ERR_EMPTY_INPUT")
         if len(raw) > 16_777_216:
             return self.error_response("ERR_LIMIT")
@@ -825,38 +829,53 @@ class Implementation:
             return self.error_response("ERR_SCHEMA", "/format_version", request_id)
         if any(name not in request for name in ("operation_handle", "obligation_id", "decision_input")):
             return self.error_response("ERR_SCHEMA", "", request_id)
-        top_issues = ["/" + pointer_escape(name) for name in schema.get("required", []) if name not in request]
+        if not isinstance(request["decision_input"], dict):
+            return self.error_response("ERR_SCHEMA", "", request_id)
+        # After the discriminator and core gates, the contract requires one
+        # deterministic ERR_SCHEMA at the lexicographically first mismatched
+        # pointer: every remaining mismatch pools into one set and the UTF-8
+        # minimum is selected, with no stage short-circuiting an earlier
+        # pointer out of the pool (F-WP4-007).  Value agreement between the
+        # bound copies of operation_handle, obligation_id, and request_id and
+        # the two digests belongs to the binding stage at member pointers;
+        # the schema stages therefore judge structure on a value-repaired
+        # copy so a value mismatch never doubles as a subtree collapse.
+        issues = ["/" + pointer_escape(name) for name in schema.get("required", []) if name not in request]
         allowed = set(schema.get("properties", {}))
-        top_issues.extend("/" + pointer_escape(name) for name in request if name not in allowed)
-        if top_issues:
-            return self.error_response("ERR_SCHEMA", min(top_issues, key=lambda p: p.encode("utf-8")), request_id)
+        issues.extend("/" + pointer_escape(name) for name in request if name not in allowed)
         for name, child_schema in schema.get("properties", {}).items():
-            if name in {"decision_input", "inner_request", "request_id"}:
+            if name in {"decision_input", "inner_request"} or name not in request:
                 continue
-            failure = validate(request[name], child_schema, self.contracts, "/" + pointer_escape(name), self.contracts.supp)
+            try:
+                failure = validate(request[name], child_schema, self.contracts, "/" + pointer_escape(name), self.contracts.supp)
+            except (KeyError, TypeError, ValueError, UnicodeError):
+                failure = None
             if failure is not None:
-                return self.error_response("ERR_SCHEMA", failure, request_id)
-        inner_schema, inner_root = self.contracts.resolve(schema["properties"]["inner_request"]["$ref"], self.contracts.supp)
-        inner = request["inner_request"]
-        if not isinstance(inner, dict):
-            return self.error_response("ERR_SCHEMA", "/inner_request", request_id)
-        inner_issues = ["/inner_request/" + pointer_escape(name) for name in inner_schema.get("required", []) if name not in inner]
-        inner_allowed = set(inner_schema.get("properties", {}))
-        inner_issues.extend("/inner_request/" + pointer_escape(name) for name in inner if name not in inner_allowed)
-        if inner_issues:
-            return self.error_response("ERR_SCHEMA", min(inner_issues, key=lambda p: p.encode("utf-8")), request_id)
-        for name, child_schema in inner_schema.get("properties", {}).items():
-            if name == "input":
-                continue
-            failure = validate(inner[name], child_schema, self.contracts, "/inner_request/" + pointer_escape(name), inner_root)
-            if failure is not None:
-                return self.error_response("ERR_SCHEMA", failure, request_id)
-        failure = self._binding_failure(request)
-        if failure is not None:
-            return self.error_response("ERR_SCHEMA", failure, request_id)
-        failure = validate(request, schema, self.contracts, current_root=self.contracts.supp)
-        if failure is not None:
-            return self.error_response("ERR_SCHEMA", failure, request_id)
+                issues.append(failure)
+        issues.extend(self._decision_input_issues(request, schema))
+        inner = request.get("inner_request")
+        if "inner_request" in request and not isinstance(inner, dict):
+            issues.append("/inner_request")
+        if isinstance(inner, dict):
+            inner_schema, inner_root = self.contracts.resolve(schema["properties"]["inner_request"]["$ref"], self.contracts.supp)
+            issues.extend("/inner_request/" + pointer_escape(name) for name in inner_schema.get("required", []) if name not in inner)
+            inner_allowed = set(inner_schema.get("properties", {}))
+            issues.extend("/inner_request/" + pointer_escape(name) for name in inner if name not in inner_allowed)
+            for name, child_schema in inner_schema.get("properties", {}).items():
+                if name == "input" or name not in inner:
+                    continue
+                try:
+                    failure = validate(inner[name], child_schema, self.contracts, "/inner_request/" + pointer_escape(name), inner_root)
+                except (KeyError, TypeError, ValueError, UnicodeError):
+                    failure = None
+                if failure is not None:
+                    issues.append(failure)
+        try:
+            issues.extend(self._binding_failures(request))
+        except (KeyError, TypeError, ValueError, UnicodeError):
+            pass
+        if issues:
+            return self.error_response("ERR_SCHEMA", min(issues, key=lambda p: p.encode("utf-8")), request_id)
         if parser.max_depth > 128 or parser.member_count > 100_000:
             return self.error_response("ERR_LIMIT", "", repaired_id)
         try:
@@ -864,34 +883,96 @@ class Implementation:
         except (KeyError, TypeError, ValueError, UnicodeError):
             return self.error_response("ERR_INTERNAL", "", request_id)
 
-    def _binding_failure(self, request: dict[str, Any]) -> str | None:
-        if any(name not in request for name in ("operation_handle", "obligation_id", "inner_input_sha256", "inner_request_raw_sha256")):
-            return None
+    def _canonical_operation(self, request: dict[str, Any]) -> tuple[Any, Any]:
+        # Majority over however many of the three bound copies are present:
+        # a missing copy is a schema issue at its own pointer and never
+        # blocks deriving the canonical operation from the remaining copies.
+        op_values = []
+        for holder in (request, request.get("decision_input"), request.get("inner_request")):
+            if isinstance(holder, dict) and "operation_handle" in holder:
+                op_values.append(holder["operation_handle"])
+        if not op_values:
+            return None, None
         try:
-            op = request["operation_handle"]
-            decision = request["decision_input"]
-            inner = request["inner_request"]
-            op_values = [op, decision["operation_handle"], inner["operation_handle"]]
             canonical_op = max(op_values, key=op_values.count)
-            canonical_obligation = self.contracts.registry.get(canonical_op)
-            if canonical_obligation is None:
-                return None
-        except (KeyError, TypeError):
-            return None
-        checks = [
-            (op == canonical_op, "/operation_handle"),
-            (decision.get("operation_handle") == canonical_op, "/decision_input/operation_handle"),
-            (inner.get("operation_handle") == canonical_op, "/inner_request/operation_handle"),
-            (request.get("obligation_id") == canonical_obligation, "/obligation_id"),
-            (decision.get("obligation_id") == canonical_obligation, "/decision_input/obligation_id"),
-            (inner.get("request_id") == request["request_id"], "/inner_request/request_id"),
-            (sha256_upper(jcs(inner["input"])) == request["inner_input_sha256"], "/inner_input_sha256"),
-            (sha256_upper(jcs(inner) + b"\n") == request["inner_request_raw_sha256"], "/inner_request_raw_sha256"),
-        ]
-        for valid, pointer in checks:
-            if not valid:
-                return pointer
-        return None
+            return canonical_op, self.contracts.registry.get(canonical_op)
+        except TypeError:
+            return None, None
+
+    def _decision_input_issues(self, request: dict[str, Any], schema: dict[str, Any]) -> list[str]:
+        # Observed reference semantics for the decision_input subtree: a
+        # missing binding-owned member (operation_handle, obligation_id)
+        # localizes to its member pointer; a missing or malformed
+        # structure-owned member (format_version, facts), an unknown member,
+        # or any arm failure of the value-repaired copy collapses to
+        # /decision_input.  Binding-owned member VALUES are judged only by
+        # the binding stage, so the arm walk runs with those values repaired
+        # to the canonical operation context.
+        decision = request["decision_input"]
+        di_schema, _ = self.contracts.resolve(schema["properties"]["decision_input"]["$ref"], self.contracts.supp)
+        arms = di_schema.get("oneOf", [])
+        required = set.intersection(*(set(arm.get("required", [])) for arm in arms)) if arms else set()
+        allowed = set().union(*(set(arm.get("properties", {})) for arm in arms)) if arms else set()
+        issues = []
+        for name in sorted(required):
+            if name in decision:
+                continue
+            if name in ("operation_handle", "obligation_id"):
+                issues.append("/decision_input/" + pointer_escape(name))
+            else:
+                issues.append("/decision_input")
+        if any(name not in allowed for name in decision):
+            issues.append("/decision_input")
+        canonical_op, canonical_obligation = self._canonical_operation(request)
+        walk = dict(decision)
+        if canonical_op is not None and canonical_obligation is not None:
+            walk["operation_handle"] = canonical_op
+            walk["obligation_id"] = canonical_obligation
+        try:
+            failure = validate(walk, schema["properties"]["decision_input"], self.contracts, "/decision_input", self.contracts.supp)
+        except (KeyError, TypeError, ValueError, UnicodeError):
+            failure = None
+        if failure is not None:
+            issues.append("/decision_input")
+        return issues
+
+    def _binding_failures(self, request: dict[str, Any]) -> list[str]:
+        # The binding stage evaluates only on structurally complete requests
+        # (a missing member is a schema issue at its own pointer, never a
+        # binding mismatch); each check is additionally gated on its own
+        # members being present, and under the pooled selection law every
+        # failing binding pointer is reported, not the first in evaluation
+        # order.
+        if any(name not in request for name in ("operation_handle", "obligation_id", "inner_input_sha256", "inner_request_raw_sha256", "request_id")):
+            return []
+        canonical_op, canonical_obligation = self._canonical_operation(request)
+        if canonical_obligation is None:
+            return []
+        decision = request.get("decision_input")
+        inner = request.get("inner_request")
+        decision = decision if isinstance(decision, dict) else {}
+        inner = inner if isinstance(inner, dict) else {}
+        failures = []
+        def check(holder: dict[str, Any], name: str, expected: Any, pointer: str) -> None:
+            if name in holder and holder[name] != expected:
+                failures.append(pointer)
+        check(request, "operation_handle", canonical_op, "/operation_handle")
+        check(decision, "operation_handle", canonical_op, "/decision_input/operation_handle")
+        check(inner, "operation_handle", canonical_op, "/inner_request/operation_handle")
+        check(request, "obligation_id", canonical_obligation, "/obligation_id")
+        check(decision, "obligation_id", canonical_obligation, "/decision_input/obligation_id")
+        check(inner, "request_id", request["request_id"], "/inner_request/request_id")
+        if "input" in inner:
+            try:
+                check(request, "inner_input_sha256", sha256_upper(jcs(inner["input"])), "/inner_input_sha256")
+            except (TypeError, ValueError, UnicodeError):
+                pass
+        if inner:
+            try:
+                check(request, "inner_request_raw_sha256", sha256_upper(jcs(inner) + b"\n"), "/inner_request_raw_sha256")
+            except (TypeError, ValueError, UnicodeError):
+                pass
+        return failures
 
     def _execute_request(self, request: dict[str, Any]) -> tuple[int, bytes]:
         obligation = request["obligation_id"]
@@ -997,7 +1078,7 @@ class Implementation:
             if validate(transcript, transcript_schema, self.contracts, current_root=self.contracts.supp) is not None:
                 return False
             semantic = request["semantic_request"]
-            if self._binding_failure(semantic) is not None:
+            if self._binding_failures(semantic):
                 return False
             if not (transcript["request_id"] == response["request_id"] == request["request_id"] == semantic["request_id"]):
                 return False
