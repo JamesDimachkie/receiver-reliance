@@ -48,7 +48,7 @@ class MatrixPlanTests(unittest.TestCase):
     def test_expanded_profile_adds_only_two_performance_commands(self) -> None:
         focused = receipt.profile_commands(self.plan, "focused")
         expanded = receipt.profile_commands(self.plan, "expanded")
-        self.assertEqual(len(focused), 17)
+        self.assertEqual(len(focused), 18)
         self.assertEqual(len(expanded), 11)
         self.assertEqual(expanded[0]["id"], "accepted-0.2")
         self.assertEqual(
@@ -56,7 +56,7 @@ class MatrixPlanTests(unittest.TestCase):
             ["batch-performance-gate", "single-pass-benchmark"],
         )
         free_threaded = receipt.profile_commands(self.plan, "free_threaded")
-        self.assertEqual(len(free_threaded), 18)
+        self.assertEqual(len(free_threaded), 19)
         self.assertEqual(free_threaded[-1]["id"], "free-threaded-concurrency-p-le-8")
 
     def test_focused_profile_uses_bounded_entrypoints(self) -> None:
@@ -68,6 +68,7 @@ class MatrixPlanTests(unittest.TestCase):
             "matrix-receipt-tests": 48,
             "independent-oracle-tests": 35,
             "concurrency-tests": 15,
+            "portable-bundle-gate": 9,
         }
         for command_id, count in deterministic_test_counts.items():
             with self.subTest(command_id=command_id):

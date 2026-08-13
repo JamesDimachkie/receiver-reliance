@@ -25,6 +25,11 @@ is `ADMITTED` from its separate local N=48 run and fresh refuter verdict; the
 matrix neither admits nor substitutes that separately scoped full-model
 evidence. This keeps the matrix executable without turning one
 finite enumeration into fifteen redundant long-running jobs.
+Every scheduled normative row also verifies and executes the exact checked-in
+portable bundle. That gate covers the three-way host preflight, independent
+total runtime, raw-boundary probes, correlated sidecar transport, receipt
+bindings, and deterministic archive construction. A local bundle hash is not
+substituted for any hosted row.
 Concurrency v3 keeps its proof layers separate: concurrent physical bytes are
 compared with isolated grounded transport bytes, while each inner
 `sealed_response` is compared with the independent semantic oracle. That

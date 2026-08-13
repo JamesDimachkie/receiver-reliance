@@ -1,4 +1,7 @@
-# Errata and recorded defects (post external review, 2026-08-10)
+# Errata and recorded defects
+
+E1–E7 entered after the 2026-08-10 external review; E8–E9 after the
+2026-08-12 Deep Security Scan (Intake 10).
 
 Confirmed against the artifact at cc6f3657 by reproducing the external
 review's probes (conformance 800+107 green; OBL-08/OBL-30 mutation probes;

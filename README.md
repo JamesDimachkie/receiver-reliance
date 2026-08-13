@@ -39,7 +39,9 @@ second code table. The generated one-glance view is
 [grounded-0_4/AUTHORITY_TABLE.md](grounded-0_4/AUTHORITY_TABLE.md), and
 `python -B grounded-0_4/generate_authority_table.py --check` fails if it
 drifts from the register. Known defects and enforcement are recorded in
-[ERRATA.md](ERRATA.md).
+[ERRATA.md](ERRATA.md). What every seal and receipt in this repository
+does and does not prove — and who is assumed to consume it — is declared
+once, canonically, in [TRUST_MODEL.md](TRUST_MODEL.md).
 
 The 30 operations — the 28-operation accepted core plus the two
 supplemental rows — cover the obligation surface a careful receiver faces:
@@ -282,7 +284,12 @@ sealed 0.2/0.3 bytes changed:
   `proof/RESULTS.md`) and an audited surface (`decide_audited`) whose
   seal binds the request bytes, the decision-input digest, and the frozen
   receipt, and which carries the matched-predicate witness trace and derived
-  record references the sealed response lacks.
+  record references the sealed response lacks. The current audit format
+  (`B1-AUDITED-DECISION-0.4.1`, ERRATA E8/E9) additionally seals the
+  governing closure-policy, authority-register, and engine-source digests
+  into every audit, discloses record-reference truncation explicitly, and
+  fails closed to `AUDIT_INCOMPLETE` when a closure evaluator errors on an
+  otherwise-VALID decision.
 - `grounded-0_4/closures_0_4.json` — tighten-only closure predicates fixing
   the confirmed OBL-30 holes (caller projections now cross-checked against
   the verdict rows they summarize; disposition exhaustiveness derived, not

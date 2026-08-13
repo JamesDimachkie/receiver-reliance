@@ -278,6 +278,13 @@
         "expected": {"tests": [77]}
       },
       {
+        "id": "portable-bundle-gate",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "portable/gate.py"],
+        "timeout_seconds": 1800,
+        "expected": {"checks": [9], "failures": [0]}
+      },
+      {
         "id": "verify-committed-receipts",
         "cwd": ".",
         "argv": ["{python}", "-B", "portability/verify_receipts.py"],
@@ -305,7 +312,7 @@
         "cwd": ".",
         "argv": ["{python}", "-B", "grounded-0_4/test_grounded_0_4.py"],
         "timeout_seconds": 900,
-        "expected": {"checks": [504], "failures": [0]}
+        "expected": {"checks": [517], "failures": [0]}
       },
       {
         "id": "contract-lint",
@@ -319,7 +326,7 @@
         "cwd": ".",
         "argv": ["{python}", "-B", "grounded-0_4/test_lint_gate.py"],
         "timeout_seconds": 900,
-        "expected": {"checks": [7], "failures": [0]}
+        "expected": {"checks": [9], "failures": [0]}
       },
       {
         "id": "grounded-properties",
