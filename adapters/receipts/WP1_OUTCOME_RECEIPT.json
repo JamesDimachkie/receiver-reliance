@@ -4,11 +4,11 @@
     "fallback_surface_delivered": true,
     "measured_current_detection": "18/18",
     "outcome_bar_met": true,
-    "package_complete": false,
-    "package_status": "FALLBACK_DELIVERED_CPYTHON_3_13_PENDING",
-    "reason": "paired all-408 measure is met; CPython 3.13 evidence for these bytes is still absent",
+    "package_complete": true,
+    "package_status": "FALLBACK_DELIVERED_RUNTIME_BAR_MET",
+    "reason": "paired all-408 measure is met; local CPython 3.12/3.13/3.14 suite evidence is recorded for these bytes in adapters/RUNTIME_EVIDENCE.md (2026-08-13 re-pin)",
     "required_current_detection": "18/18",
-    "runtime_evidence_bar_met": false
+    "runtime_evidence_bar_met": true
   },
   "format_version": "RR-WP1-OUTCOME-RECEIPT-3",
   "historical_forced_reexecution": {
@@ -37,7 +37,7 @@
   "pins": {
     "fixture_extract_raw_sha256": "01B8E0ED320D15D5B7A7F69FDA0D46A84E119033DF90AB6A4B3B1A0C61EEFD0A",
     "hosted_manifest_raw_sha256": "9DC261CA316C4F8E83342FE6AD24EBF15C3A21F3FD38AE6565EE28651569D5E6",
-    "outcome_runner_raw_sha256": "A6A4FEB4DE5D519EC770DCDE8D7F5916A9AB6332FD899746040384691973F2E5",
+    "outcome_runner_raw_sha256": "662C9F31E55097DC316DA5353DDC268E009BAC9B7E3D1340CF67EBD855A1A807",
     "parent_corpus_raw_sha256": "09B4B05FE26CF46F063EC637C1A4D27B4D5190961756888099F96254C49B334E",
     "parent_truth_raw_sha256": "4FEEF9BE65DD7523849CEE71B5A43EA6F7667710745E71D79C0EE5B054E3E2C7",
     "portable_preflight_raw_sha256": "25DD05F5731FC142ADC4CDDDBCC294354E9119C063FCFF4E506E3098BE280384",
@@ -104,12 +104,12 @@
     },
     "row_bindings_sha256": "27B7837AFF5595C111C2622C1A2258548BF62424B5B184E3C471C47A1BE07DFA"
   },
-  "receipt_sha256": "FFDC25F1D46D5B3399233F43D335FA4AC4D97912572399B3B8108414B38C8C14",
+  "receipt_sha256": "1CF2D7159729BBAD867509851FAB614A641BABB9B1F996E42D5D231659D1D14F",
   "runtime_evidence": {
     "cpython_3_12": "local suite evidence recorded separately for these bytes",
-    "cpython_3_13": "PENDING: no local or hosted run exercised these bytes",
+    "cpython_3_13": "local suite evidence recorded separately for these bytes",
     "cpython_3_14": "local suite evidence recorded separately for these bytes",
-    "evidence_bar_met": false,
+    "evidence_bar_met": true,
     "hosted_evidence_inspection": {
       "conclusion": "existing hosted rows do not exercise current WP1 fallback bytes",
       "current_portable_preflight_sha_present": false,

@@ -626,7 +626,7 @@ class Finding006OutcomeTests(unittest.TestCase):
         self.assertEqual(assessment["required_current_detection"], "18/18")
         self.assertEqual(assessment["measured_current_detection"], "18/18")
         self.assertTrue(assessment["outcome_bar_met"])
-        self.assertFalse(assessment["package_complete"])
+        self.assertTrue(assessment["package_complete"])
 
     def test_receipt_self_seal(self):
         receipt = json.loads(RECEIPT.read_text(encoding="utf-8"))
@@ -636,11 +636,12 @@ class Finding006OutcomeTests(unittest.TestCase):
 
 
 class Finding007RuntimeEvidenceTests(unittest.TestCase):
-    def test_313_is_explicitly_pending_and_bar_unmet(self):
+    def test_313_evidence_recorded_and_bar_met(self):
         receipt = json.loads(RECEIPT.read_text(encoding="utf-8"))
         evidence = receipt["runtime_evidence"]
-        self.assertIn("PENDING", evidence["cpython_3_13"])
-        self.assertFalse(evidence["evidence_bar_met"])
+        self.assertNotIn("PENDING", evidence["cpython_3_13"])
+        self.assertIn("local suite evidence", evidence["cpython_3_13"])
+        self.assertTrue(evidence["evidence_bar_met"])
         inspection = evidence["hosted_evidence_inspection"]
         self.assertFalse(inspection["current_wp1_command_present"])
         self.assertFalse(inspection["current_portable_preflight_sha_present"])

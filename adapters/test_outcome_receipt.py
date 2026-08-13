@@ -42,8 +42,8 @@ class OutcomeReceiptTests(unittest.TestCase):
         self.assertFalse(boundary["claimable_as_fallback_capability"])
         assessment = receipt["charter_assessment"]
         self.assertTrue(assessment["outcome_bar_met"])
-        self.assertFalse(assessment["package_complete"])
-        self.assertIn("3_13_PENDING", assessment["package_status"])
+        self.assertTrue(assessment["package_complete"])
+        self.assertIn("RUNTIME_BAR_MET", assessment["package_status"])
 
     def test_receipt_self_seal(self):
         receipt = json.loads(RECEIPT.read_text(encoding="utf-8"))

@@ -262,16 +262,16 @@ def replay() -> tuple[dict[str, Any], bytes, bytes]:
             "measured_current_detection": "18/18",
             "outcome_bar_met": True,
             "fallback_surface_delivered": True,
-            "runtime_evidence_bar_met": False,
-            "package_complete": False,
-            "package_status": "FALLBACK_DELIVERED_CPYTHON_3_13_PENDING",
-            "reason": "paired all-408 measure is met; CPython 3.13 evidence for these bytes is still absent",
+            "runtime_evidence_bar_met": True,
+            "package_complete": True,
+            "package_status": "FALLBACK_DELIVERED_RUNTIME_BAR_MET",
+            "reason": "paired all-408 measure is met; local CPython 3.12/3.13/3.14 suite evidence is recorded for these bytes in adapters/RUNTIME_EVIDENCE.md (2026-08-13 re-pin)",
         },
         "runtime_evidence": {
             "cpython_3_12": "local suite evidence recorded separately for these bytes",
-            "cpython_3_13": "PENDING: no local or hosted run exercised these bytes",
+            "cpython_3_13": "local suite evidence recorded separately for these bytes",
             "cpython_3_14": "local suite evidence recorded separately for these bytes",
-            "evidence_bar_met": False,
+            "evidence_bar_met": True,
             "hosted_evidence_inspection": {
                 "manifest_raw_sha256": EXPECTED["hosted_manifest_raw_sha256"],
                 "hosted_head_sha": hosted_manifest["head_sha"],
@@ -316,8 +316,9 @@ mutable local measurement machinery. They are non-shipping, absent from the
 exported fallback API, and not claimable as integration capability.
 
 The paired outcome bar is met at 0 new false holds and 18/18 detection. The
-fallback package is not complete because CPython 3.13 evidence for these bytes
-is still **pending**; existing hosted receipts do not cover them.
+runtime evidence bar is met: local CPython 3.12/3.13/3.14 suite evidence for
+these bytes is recorded in `RUNTIME_EVIDENCE.md` (2026-08-13 re-pin). Existing
+hosted receipts still do not cover these bytes.
 
 - Receipt raw SHA-256: `{receipt_raw_sha}`
 - Parent corpus raw SHA-256: `{EXPECTED['parent_corpus_raw_sha256']}`
