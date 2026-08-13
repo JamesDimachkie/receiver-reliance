@@ -1,0 +1,160 @@
+name: robustness-verification
+
+# Branch-scoped hosted verification for the robustness program
+# (sol/rr-robustness-20260811). Moves the program's heavy verification off
+# operator hardware onto hosted runners with live, reviewable logs:
+# every program suite across three operating systems and CPython
+# 3.12/3.13/3.14, plus the WP4 coverage-guided differential campaign at
+# house scale. Read-only for the repository: nothing this workflow
+# produces is an admitted receipt by itself — admission of any campaign
+# receipt into the repository remains a custodian act, gated on the
+# fresh-context refuter verdict recorded in the program ledger.
+
+on:
+  push:
+    branches:
+      - sol/rr-robustness-20260811
+  workflow_dispatch:
+    inputs:
+      campaign_identities:
+        description: WP4 campaign identities (deterministic, seed-fixed)
+        required: false
+        default: "50000"
+
+permissions:
+  contents: read
+
+env:
+  PYTHONDONTWRITEBYTECODE: "1"
+  PYTHONHASHSEED: "0"
+  PYTHONIOENCODING: utf-8
+  PYTHONUTF8: "1"
+  TZ: UTC
+
+jobs:
+  suites:
+    name: suites • ${{ matrix.python-version }} • ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.12", "3.13", "3.14"]
+    steps:
+      - name: Check out the pushed SHA
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Select interpreter
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - name: Grounded 0.4 regression suite
+        shell: bash
+        run: python -B grounded-0_4/test_grounded_0_4.py
+      - name: Grounded single-pass audit suite
+        shell: bash
+        run: python -B grounded-0_4/test_single_pass_audit.py
+      - name: Grounded batch suite
+        shell: bash
+        run: python -B grounded-0_4/test_batch.py
+      - name: Grounded audit adversarial suite
+        shell: bash
+        run: python -B grounded-0_4/test_audit_adversarial.py
+      - name: Grounded property suite
+        shell: bash
+        run: python -B grounded-0_4/test_properties.py
+      - name: Authority legibility suite
+        shell: bash
+        run: python -B grounded-0_4/test_authority_legibility.py
+      - name: Contract lint gate
+        shell: bash
+        run: python -B grounded-0_4/lint_contract.py --gate
+      - name: Lint gate meta-tests
+        shell: bash
+        run: python -B grounded-0_4/test_lint_gate.py
+      - name: Authority table drift check
+        shell: bash
+        run: python -B grounded-0_4/generate_authority_table.py --check
+      - name: WP1 portable preflight suite
+        shell: bash
+        run: python -B adapters/test_portable_preflight.py
+      - name: WP1 outcome measurement suite
+        shell: bash
+        run: python -B adapters/test_outcome_receipt.py
+      - name: WP1 outcome receipt deterministic check
+        shell: bash
+        run: python -B adapters/outcome_receipt.py --check
+      - name: WP1 fixture extraction binding check
+        shell: bash
+        run: python -B adapters/fixture_extract.py --check
+      - name: WP1 reference-host historical regressions
+        shell: bash
+        run: python -B adapters/test_reference_host.py
+      - name: WP4 author-separated cross gate
+        shell: bash
+        run: python -B second-implementation/test_cross.py
+      - name: WP4 artifact and read-set verifier
+        shell: bash
+        run: python -B second-implementation/verify_artifacts.py
+      - name: WP4 bounded raw-totality preflight
+        shell: bash
+        run: python -B second-implementation/bounded_preflight.py
+      - name: WP5 sidecar suite
+        shell: bash
+        run: python -B perf/sidecar/test_sidecar.py
+      - name: WP5 receipt verifier
+        shell: bash
+        run: python -B perf/sidecar/verify_receipts.py
+      - name: Portable bundle offline gate
+        shell: bash
+        run: python -B portable/gate.py
+      - name: Custody receipt verifier
+        shell: bash
+        run: python -B portability/verify_receipts.py
+      - name: Custody hygiene verifier
+        shell: bash
+        run: python -B portability/verify_hygiene.py
+
+  wp4-campaign:
+    name: wp4 campaign • ${{ matrix.os }} • 3.12
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - name: Check out the pushed SHA
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Select interpreter
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+          architecture: x64
+      - name: WP4 author-separated cross gate
+        shell: bash
+        run: python -B second-implementation/test_cross.py
+      - name: Coverage-guided differential campaign
+        shell: bash
+        run: |
+          identities="${{ github.event.inputs.campaign_identities }}"
+          identities="${identities:-50000}"
+          python -B second-implementation/coverage_campaign.py --identities "${identities}" | tee "wp4-campaign-receipt-${{ matrix.os }}.json"
+          {
+            echo '## WP4 coverage-guided campaign receipt (${{ matrix.os }}, CPython 3.12)'
+            echo '```json'
+            cat "wp4-campaign-receipt-${{ matrix.os }}.json"
+            echo '```'
+          } >> "${GITHUB_STEP_SUMMARY}"
+      - name: Upload campaign receipt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: wp4-campaign-receipt-${{ matrix.os }}
+          path: wp4-campaign-receipt-${{ matrix.os }}.json
+          if-no-files-found: error
