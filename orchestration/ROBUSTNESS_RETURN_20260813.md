@@ -54,3 +54,32 @@ re-pinned, commit `a4dbfe5`; hygiene re-bound, commit `c8476b7`).
 Unchanged this session: no push, tag, release, workflow, settings,
 deployment, or secret mutation. Branch is ahead of origin by local commits
 only; every push remains separately James-gated.
+
+## Terminal close — 2026-08-13
+
+All five gate items landed, James-approved at the close gate:
+
+1. README fallback claims edit committed (`7c6f737`); round accounting
+   preserved (seven refutation rounds, one campaign run).
+2. Increment-A disposition: the recommended wording amendment adopted —
+   ERRATA E8 and TRUST_MODEL now scope `governing_authorities` to the data
+   authorities, with the evaluator covered by the commit root (`7c6f737`);
+   `grounded_layer_sha256` hardening remains a queued post-close option.
+3. WP1 3.13 claim re-pin committed (`e2985ae`): CPython 3.12/3.13/3.14
+   runtime evidence recorded, `evidence_bar_met` flipped with its paired
+   regression update, WP1 runtime bar met.
+4. Combined workflow patch James-applied via the staged close script,
+   committed `18f76cc`: `fetch-depth: 0` on the suites checkout (custody
+   hygiene needs the base object); `wp4-campaign` moved to
+   `workflow_dispatch` under the RI5 fallback.
+5. Carrying push landed 2026-08-13 20:05 PDT; remote head `18f76cc`
+   verified byte-identical to local.
+
+Hosted terminal evidence: conformance run `31765740173` green;
+`robustness-verification` run `31765740175` green in 6m12s — all nine
+suites cells (ubuntu/windows/macos-latest × CPython 3.12/3.13/3.14) fully
+green with the custody-hygiene step passing in every cell, and
+`wp4-campaign` skipped by design. This supersedes the "Remote state"
+section above: the carrying push is the one authorized remote mutation of
+this close. Claim `TASK-20260811-RR-ROBUSTNESS` is closed; the terminal
+ledger row is recorded by the seal commit carrying this section.
