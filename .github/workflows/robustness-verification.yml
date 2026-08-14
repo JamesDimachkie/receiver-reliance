@@ -46,6 +46,9 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          # The custody hygiene verifier diffs against the program base
+          # commit, which a shallow checkout does not contain.
+          fetch-depth: 0
       - name: Select interpreter
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
@@ -120,6 +123,10 @@ jobs:
 
   wp4-campaign:
     name: wp4 campaign • ${{ matrix.os }} • 3.12
+    # Under the WP4 fallback the campaign is evidence-on-demand, not a
+    # push gate: the decisive refuter closed admission (RI5.md), so
+    # pushes run the suites; the campaign runs via workflow_dispatch.
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 300
     strategy:
