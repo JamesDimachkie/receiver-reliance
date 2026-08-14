@@ -130,7 +130,7 @@ class LiveTransportTests(unittest.TestCase):
             with self.subTest(transport=transport):
                 self.assertEqual(0, result.returncode)
                 self.assertEqual(1, result.flush_count)
-                self.assertEqual(812, len(result.stdout))
+                self.assertEqual(1212, len(result.stdout))
 
     def test_partial_final_request_is_processed_at_eof(self) -> None:
         expected = controller.isolated_expected(b"{")

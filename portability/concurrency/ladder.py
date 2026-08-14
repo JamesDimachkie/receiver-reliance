@@ -68,7 +68,7 @@ from portability.oracle import (  # noqa: E402
 )
 
 
-AUDITED_FORMAT_VERSION = "B1-AUDITED-DECISION-0.4"
+AUDITED_FORMAT_VERSION = "B1-AUDITED-DECISION-0.4.1"
 AUDITED_FIELDS = frozenset(
     {
         "audit",
