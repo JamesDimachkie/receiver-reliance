@@ -142,6 +142,12 @@ def historical_pass_receipt_before_f015() -> dict[str, object]:
     commands = receipt["commands"]
     if not isinstance(boundary, dict) or not isinstance(commands, list):
         raise AssertionError("synthetic receipt fixture lost expected shape")
+    # Discovery-era declared counts: these witnesses pin pre-0.4.1 bytes, so
+    # they must not track the live EXPECTED_OBSERVED table.
+    historical_observed = {
+        "grounded_0_4_regression": {"checks": 504, "failures": 0},
+        "lint_gate_meta": {"checks": 7, "failures": 0},
+    }
     for index, command in enumerate(commands):
         # Preserve the exact discovery-time receipt bytes. Transcript custody
         # fields were added later by F-SANDBOX-023 and are deliberately absent
@@ -150,6 +156,9 @@ def historical_pass_receipt_before_f015() -> dict[str, object]:
         command.pop("stderr_b64")
         command["stdout_sha256"] = f"{index + 1:064x}"
         command["stdout_bytes"] = index + 1
+        frozen = historical_observed.get(command["gate_id"])
+        if frozen is not None:
+            command["observed"] = copy.deepcopy(frozen)
     projection = expanded_gate._stable_projection(boundary, commands)
     projected_boundary = projection["boundary"]
     if not isinstance(projected_boundary, dict):
