@@ -79,7 +79,7 @@ GATES = (
         "grounded_0_4_regression",
         "/repo",
         ("python", "-B", "grounded-0_4/test_grounded_0_4.py"),
-        "checks_504",
+        "checks_517",
     ),
     GateSpec(
         "contract_lint",
@@ -91,7 +91,7 @@ GATES = (
         "lint_gate_meta",
         "/repo",
         ("python", "-B", "grounded-0_4/test_lint_gate.py"),
-        "checks_7",
+        "checks_9",
     ),
     GateSpec(
         "grounded_properties",
@@ -461,12 +461,17 @@ def validate_gate_output(validator: str, stdout: bytes, stderr: bytes) -> dict[s
         return observed
 
     count_validators = {
-        "checks_504": 504,
-        "checks_7": 7,
+        "checks_517": 517,
+        "checks_9": 9,
         "checks_2296": 2296,
         "checks_6497": 6497,
         "checks_2160": 2160,
         "checks_1142": 1142,
+        # Era-legacy values: the SHA-pinned portability-era gate receipts
+        # replay through these via verify_receipts.py; no live GateSpec
+        # references them.
+        "checks_504": 504,
+        "checks_7": 7,
     }
     if validator in count_validators:
         return _extract_counts(

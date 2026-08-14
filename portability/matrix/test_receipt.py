@@ -68,13 +68,17 @@ class MatrixPlanTests(unittest.TestCase):
             "matrix-receipt-tests": 48,
             "independent-oracle-tests": 35,
             "concurrency-tests": 15,
-            "portable-bundle-gate": 9,
         }
         for command_id, count in deterministic_test_counts.items():
             with self.subTest(command_id=command_id):
                 self.assertEqual(
                     focused[command_id]["expected"], {"tests": [count]}
                 )
+        with self.subTest(command_id="portable-bundle-gate"):
+            self.assertEqual(
+                focused["portable-bundle-gate"]["expected"],
+                {"checks": [9], "failures": [0]},
+            )
         self.assertNotIn("finite-model-explorer", focused)
         self.assertEqual(
             focused["finite-model-focused-tests"]["argv"],
@@ -526,7 +530,7 @@ class SummaryTests(unittest.TestCase):
             )
         )
         self.assertTrue(all(row["infra_evidence"] for row in macos_13))
-        self.assertTrue(all(len(row["commands_planned"]) == 17 for row in macos_13))
+        self.assertTrue(all(len(row["commands_planned"]) == 18 for row in macos_13))
 
     def test_exact_deep_hostile_receipt_cli_persists_deterministic_red_summary(self) -> None:
         target = next(
@@ -1517,7 +1521,7 @@ class SummaryTests(unittest.TestCase):
             row = json.loads(output.read_text(encoding="utf-8"))
         self.assertEqual(exit_code, 0)
         self.assertEqual(row["outcome"], "INFRA_UNAVAILABLE")
-        self.assertEqual(len(row["commands_planned"]), 17)
+        self.assertEqual(len(row["commands_planned"]), 18)
         for field in (
             "git",
             "environment",

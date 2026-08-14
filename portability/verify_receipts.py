@@ -146,6 +146,13 @@ HOSTED_GATE_TOTALS = {
     "single-pass-benchmark": ("checks", [1142]),
 }
 SANDBOX_DOCKERFILE = REPO / "portability" / "sandbox" / "Dockerfile"
+# The two committed expanded-gate receipts are sealed portability-era
+# evidence; their streams replay through the validators that governed that
+# era, not the current-tree pins.
+LEGACY_GATE_VALIDATORS = {
+    "grounded_0_4_regression": "checks_504",
+    "lint_gate_meta": "checks_7",
+}
 
 
 def _sha256_upper(data: bytes) -> str:
@@ -216,8 +223,9 @@ def _verify_clean_gate_receipt(
             and len(stderr) == item["stderr_bytes"]
             and _sha256_upper(stderr) == item["stderr_sha256"],
         )
+        validator = LEGACY_GATE_VALIDATORS.get(gate_id, spec.validator)
         try:
-            observed = expanded_gate.validate_gate_output(spec.validator, stdout, stderr)
+            observed = expanded_gate.validate_gate_output(validator, stdout, stderr)
             v.check(f"{prefix}.{gate_id}.validator_rerun", observed == item.get("observed"))
         except (expanded_gate.GateFailure, UnicodeError, ValueError) as error:
             v.check(f"{prefix}.{gate_id}.validator_rerun", False, str(error))

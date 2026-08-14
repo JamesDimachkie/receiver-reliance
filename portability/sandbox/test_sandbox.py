@@ -2847,8 +2847,8 @@ class SandboxSpecTests(unittest.TestCase):
             ),
         }
         for validator, expected in (
-            ("checks_504", 504),
-            ("checks_7", 7),
+            ("checks_517", 517),
+            ("checks_9", 9),
             ("checks_2296", 2296),
             ("checks_6497", 6497),
             ("checks_2160", 2160),
@@ -2890,7 +2890,7 @@ class SandboxSpecTests(unittest.TestCase):
                         )
 
         with self.assertRaisesRegex(expanded_gate.GateFailure, "strict UTF-8"):
-            expanded_gate.validate_gate_output("checks_504", b"\xff", b"")
+            expanded_gate.validate_gate_output("checks_517", b"\xff", b"")
 
     def test_composed_validator_requires_both_suites(self) -> None:
         output = (
