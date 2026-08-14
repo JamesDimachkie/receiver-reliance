@@ -307,7 +307,7 @@ sealed 0.2/0.3 bytes changed:
   run exposed and measured the applicability gap (ERRATA E7). Full
   protocol and limits in `proof/README.md`.
 
-`grounded-0_4/test_grounded_0_4.py` (504 checks) pins parity with every
+`grounded-0_4/test_grounded_0_4.py` (517 checks) pins parity with every
 frozen fixture plus the review's probes as regressions.
 
 ## Cross-platform validation: the portability program

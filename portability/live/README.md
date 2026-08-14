@@ -73,20 +73,21 @@ limit in the controller is an error-only deadlock watchdog, not a schedule
 transition or pass criterion.
 
 `pause_every_byte.ndjson` is a compact, deterministically expanded
-representation of the complete `W <= 2` domain for the first 812-byte response.
-The expansion executes 812 request/response trials in one child: one unsplit
-write and every two-write partition `[0,k),[k,812)` for `1 <= k < 812`.
+representation of the complete `W <= 2` domain for the first 1,212-byte
+response. The expansion executes 1,212 request/response trials in one child:
+one unsplit write and every two-write partition `[0,k),[k,1212)` for
+`1 <= k < 1212`.
 
 For each trial, the adapter limits its first real pipe/socket write to `k`
 bytes and reports the completed OS write on the control channel. The reader is
 paused until that `write_boundary` acknowledgement arrives. It then resumes,
 reads exactly the acknowledged prefix from the real data endpoint, and sends a
 matching `resume_write` acknowledgement. Only then may the child issue the
-suffix. Thus the accepted server observes 811 actual short `sink.write`
+suffix. Thus the accepted server observes 1,211 actual short `sink.write`
 returns, rather than the controller inferring sender partitions from one-byte
 reads of already-buffered output. The unsplit case is also gated and
-acknowledged, giving 812 W partitions, pauses, resumes, write-boundary events,
-and writer-resume events per transport run.
+acknowledged, giving 1,212 W partitions, pauses, resumes, write-boundary
+events, and writer-resume events per transport run.
 
 The W control gate is deliberately not reported as OS `EAGAIN` backpressure:
 its receipt has `backpressure_observed: false` and separate
