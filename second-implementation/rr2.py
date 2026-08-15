@@ -35,6 +35,10 @@ REQUEST_ID_RE = re.compile(r"^RUN_[A-F0-9]{24}$")
 SAFE_MIN = -9007199254740991
 SAFE_MAX = 9007199254740991
 SAFE_ABS_DIGITS = "9007199254740991"
+MAX_RAW_BYTES = 16_777_216
+MAX_JSON_DEPTH = 128
+MAX_JSON_MEMBERS = 100_000
+MAX_JSON_NODES = 100_000
 SUPPLEMENTAL_CONTRACT_REL = "supplemental-0_3/control/B1_SUPPLEMENTAL_COMPARATOR_CONTRACT_0_3.json"
 PRIMARY_CONTRACT_REL = "baseline-run/control/B1_PRIMARY_IMPLEMENTER_CONTRACT_0_1.json"
 PACKET_REL = "access/SANITIZED_PRIMARY_BASELINE_IMPLEMENTER_PACKET_0_1.json"
@@ -141,6 +145,10 @@ class DuplicateFault(ParseFault):
     pass
 
 
+class LimitFault(ParseFault):
+    pass
+
+
 class StrictParser:
     """Small JSON parser that exposes the contract's error layers.
 
@@ -148,12 +156,14 @@ class StrictParser:
     is seen.  This is required even when the second member is truncated.
     """
 
-    def __init__(self, text: str):
+    def __init__(self, text: str, *, enforce_limits: bool = False):
         self.text = text
         self.i = 0
+        self.enforce_limits = enforce_limits
         self.number_pointers: list[str] = []
         self.max_depth = 0
         self.member_count = 0
+        self.node_count = 0
 
     def parse(self) -> Any:
         missing = object()
@@ -169,6 +179,9 @@ class StrictParser:
                     raise ParseFault
                 root = value
                 return
+            self.node_count += 1
+            if self.enforce_limits and self.node_count > MAX_JSON_NODES:
+                raise LimitFault
             frame = stack[-1]
             if frame["kind"] == "array" and frame["state"] == "value":
                 frame["value"].append(value)
@@ -191,14 +204,20 @@ class StrictParser:
                 ch = self.text[self.i]
                 if ch == "{":
                     self.i += 1
+                    depth = len(stack) + 1
+                    self.max_depth = max(self.max_depth, depth)
+                    if self.enforce_limits and depth > MAX_JSON_DEPTH:
+                        raise LimitFault
                     stack.append({"kind": "object", "state": "key_or_end", "value": {}, "seen": set(), "pointer": value_pointer})
-                    self.max_depth = max(self.max_depth, len(stack))
                     expect_value = False
                     continue
                 if ch == "[":
                     self.i += 1
+                    depth = len(stack) + 1
+                    self.max_depth = max(self.max_depth, depth)
+                    if self.enforce_limits and depth > MAX_JSON_DEPTH:
+                        raise LimitFault
                     stack.append({"kind": "array", "state": "value_or_end", "value": [], "pointer": value_pointer})
-                    self.max_depth = max(self.max_depth, len(stack))
                     expect_value = False
                     continue
                 if ch == '"':
@@ -231,6 +250,8 @@ class StrictParser:
                         raise DuplicateFault
                     frame["seen"].add(key)
                     self.member_count += 1
+                    if self.enforce_limits and self.member_count > MAX_JSON_MEMBERS:
+                        raise LimitFault
                     frame["key"] = key
                     frame["state"] = "colon"
                     continue
@@ -390,6 +411,112 @@ def _nfc_pointers(node: Any) -> list[str]:
                 stack.append((item, child_link))
                 stack.append((name, child_link))
     return failures
+
+
+def _value_within_limits(root: Any) -> bool:
+    """Bound an already-materialized JSON-like value before recursive work."""
+    stack: list[tuple[str, Any, int, bool]] = [("value", root, 1, True)]
+    active: set[int] = set()
+    member_count = 0
+    node_count = 0
+    try:
+        while stack:
+            kind, node, depth, is_root = stack.pop()
+            if kind == "exit":
+                active.remove(id(node))
+                continue
+            if not is_root:
+                node_count += 1
+                if node_count > MAX_JSON_NODES:
+                    return False
+            if not isinstance(node, (list, dict)):
+                continue
+            if depth > MAX_JSON_DEPTH:
+                return False
+            identity = id(node)
+            if identity in active:
+                return False
+            active.add(identity)
+            stack.append(("exit", node, depth, is_root))
+            if isinstance(node, dict):
+                member_count += len(node)
+                if member_count > MAX_JSON_MEMBERS:
+                    return False
+                children = list(node.values())
+            else:
+                children = node
+            if node_count + len(children) > MAX_JSON_NODES:
+                return False
+            for child in reversed(children):
+                stack.append(("value", child, depth + 1, False))
+        return True
+    except (MemoryError, RecursionError):
+        return False
+
+
+def _decode_bounded_raw_value(
+    raw: bytes,
+    *,
+    defer_limits: bool = False,
+) -> tuple[Any, StrictParser | None, str | None, str]:
+    """Decode one exact JCS+LF value under the strict bounded wire profile.
+
+    'defer_limits' exists only for the semantic ABI, whose frozen
+    precedence requires schema failures to outrank structural limits.
+    Wrapper transcript inputs use the default and fail before JCS or schema
+    work as soon as a structural ceiling is crossed.
+    """
+    if raw in (b"", b"\n"):
+        return None, None, "ERR_EMPTY_INPUT", ""
+    if len(raw) > MAX_RAW_BYTES:
+        return None, None, "ERR_LIMIT", ""
+    try:
+        text = raw.decode("utf-8", errors="strict")
+    except UnicodeDecodeError:
+        return None, None, "ERR_UTF8", ""
+    except (MemoryError, RecursionError):
+        return None, None, "ERR_LIMIT", ""
+    if text.startswith("\ufeff"):
+        return None, None, "ERR_BOM", ""
+    json_text = text[:-1] if text.endswith("\n") else text
+    parser = StrictParser(json_text, enforce_limits=not defer_limits)
+    try:
+        value = parser.parse()
+    except DuplicateFault:
+        return None, parser, "ERR_DUPLICATE_KEY", ""
+    except LimitFault:
+        return None, parser, "ERR_LIMIT", ""
+    except ParseFault:
+        return None, parser, "ERR_JSON", ""
+    except (MemoryError, RecursionError):
+        return None, parser, "ERR_LIMIT", ""
+    if not text.endswith("\n") or "\r" in text:
+        return value, parser, "ERR_JSON", ""
+    if parser.number_pointers:
+        pointer = min(parser.number_pointers, key=lambda item: item.encode("utf-8"))
+        return value, parser, "ERR_NUMBER", pointer
+    if not defer_limits and (
+        parser.max_depth > MAX_JSON_DEPTH
+        or parser.member_count > MAX_JSON_MEMBERS
+        or parser.node_count > MAX_JSON_NODES
+    ):
+        return value, parser, "ERR_LIMIT", ""
+    try:
+        canonical = jcs(value)
+    except (MemoryError, RecursionError):
+        return value, parser, "ERR_LIMIT", ""
+    except (TypeError, UnicodeError):
+        return value, parser, "ERR_JSON", ""
+    if canonical != json_text.encode("utf-8"):
+        return value, parser, "ERR_JSON", ""
+    try:
+        nfc = _nfc_pointers(value)
+    except (MemoryError, RecursionError):
+        return value, parser, "ERR_LIMIT", ""
+    if nfc:
+        pointer = min(nfc, key=lambda item: item.encode("utf-8"))
+        return value, parser, "ERR_NFC", pointer
+    return value, parser, None, ""
 
 
 def _equal(left: Any, right: Any) -> bool:
@@ -779,42 +906,14 @@ class Implementation:
             return self.error_response("ERR_INTERNAL")
 
     def _execute_bytes(self, raw: bytes) -> tuple[int, bytes]:
-        if raw in (b"", b"\n"):
-            # Absent-or-empty covers the empty payload with its bare LF
-            # terminator; two terminators or any other byte is wire content
-            # (F-WP4-007 campaign witness, identity 3606 of the 600-window
-            # stream).
-            return self.error_response("ERR_EMPTY_INPUT")
-        if len(raw) > 16_777_216:
-            return self.error_response("ERR_LIMIT")
-        try:
-            text = raw.decode("utf-8", errors="strict")
-        except UnicodeDecodeError:
-            return self.error_response("ERR_UTF8")
-        if text.startswith("\ufeff"):
-            return self.error_response("ERR_BOM")
-        json_text = text[:-1] if text.endswith("\n") else text
-        parser = StrictParser(json_text)
-        try:
-            request = parser.parse()
-        except DuplicateFault:
-            return self.error_response("ERR_DUPLICATE_KEY")
-        except ParseFault:
-            return self.error_response("ERR_JSON")
+        # Limit adjudication stays deferred on this one surface so the
+        # established ERR_SCHEMA-before-ERR_LIMIT law remains byte-exact.
+        request, parser, error_code, pointer = _decode_bounded_raw_value(raw, defer_limits=True)
         repaired_id = request.get("request_id") if isinstance(request, dict) and isinstance(request.get("request_id"), str) and REQUEST_ID_RE.fullmatch(request["request_id"]) else DEFAULT_REQUEST_ID
-        if not text.endswith("\n") or "\r" in text:
-            return self.error_response("ERR_JSON", "", repaired_id)
-        if parser.number_pointers:
-            return self.error_response("ERR_NUMBER", min(parser.number_pointers, key=lambda p: p.encode("utf-8")), repaired_id)
-        try:
-            canonical = jcs(request)
-        except (TypeError, UnicodeError):
-            return self.error_response("ERR_JSON", "", repaired_id)
-        if canonical != json_text.encode("utf-8"):
-            return self.error_response("ERR_JSON", "", repaired_id)
-        nfc = _nfc_pointers(request)
-        if nfc:
-            return self.error_response("ERR_NFC", min(nfc, key=lambda p: p.encode("utf-8")), repaired_id)
+        if error_code is not None:
+            return self.error_response(error_code, pointer, repaired_id)
+        if parser is None:
+            return self.error_response("ERR_INTERNAL", "", repaired_id)
         if not isinstance(request, dict):
             return self.error_response("ERR_SCHEMA", "", repaired_id)
         request_id = repaired_id
@@ -876,7 +975,11 @@ class Implementation:
             pass
         if issues:
             return self.error_response("ERR_SCHEMA", min(issues, key=lambda p: p.encode("utf-8")), request_id)
-        if parser.max_depth > 128 or parser.member_count > 100_000:
+        if (
+            parser.max_depth > MAX_JSON_DEPTH
+            or parser.member_count > MAX_JSON_MEMBERS
+            or parser.node_count > MAX_JSON_NODES
+        ):
             return self.error_response("ERR_LIMIT", "", repaired_id)
         try:
             return self._execute_request(request)
@@ -1031,33 +1134,120 @@ class Implementation:
         }
         return sha256_upper(jcs(preimage))
 
-    def execute_wrapper(self, wrapper_request: dict[str, Any]) -> dict[str, Any]:
-        raw = jcs(wrapper_request["semantic_request"]) + b"\n"
-        _, semantic_raw = self.execute_bytes(raw)
-        semantic = json.loads(semantic_raw)
-        if not semantic["ok"]:
-            raise ValueError("invalid embedded semantic request")
-        output = semantic["output"]
+    def wrapper_error_response(
+        self,
+        code: str,
+        pointer: str = "",
+        wrapper_request: Any = None,
+    ) -> dict[str, Any]:
+        request = wrapper_request if isinstance(wrapper_request, dict) else {}
+        operation = request.get("operation_handle")
+        if not isinstance(operation, str) or operation not in self.contracts.registry:
+            operation = min(self.contracts.registry, key=lambda item: item.encode("utf-8"))
+        configuration = request.get("configuration")
+        if configuration not in {"B1", "B1-ATTENTION"}:
+            configuration = "B1"
+        request_id = request.get("request_id")
+        if not isinstance(request_id, str) or REQUEST_ID_RE.fullmatch(request_id) is None:
+            request_id = DEFAULT_REQUEST_ID
+        message, precedence = ERRORS[code]
         response = {
-            "configuration": wrapper_request["configuration"],
-            "errors": [],
-            "exit_code": semantic["exit_code"],
+            "configuration": configuration,
+            "errors": [{"code": code, "message": message, "pointer": pointer, "precedence": precedence}],
+            "exit_code": 3 if code == "ERR_INTERNAL" else 2,
             "format_version": "B1-WRAPPER-SEMANTIC-RESPONSE-0.2",
-            "obligation_id": output["obligation_id"],
-            "ok": True,
-            "operation_handle": output["operation_handle"],
-            "output": {
-                "effect_receipt_sha256": output["effect_receipt_sha256"],
-                "payload": output["result_object"],
-                "record_refs": output["record_references"],
-                "unresolved_reasons": output["unresolved_reasons"],
-            },
-            "request_id": semantic["request_id"],
+            "obligation_id": self.contracts.registry[operation],
+            "ok": False,
+            "operation_handle": operation,
+            "output": None,
+            "request_id": request_id,
             "response_sha256": ZERO64,
-            "result": semantic["result"],
+            "result": "INCOMPLETE",
         }
         _sealed_response(response, "response_sha256")
         return response
+
+    def validate_wrapper_request(self, wrapper_request: Any) -> tuple[str, str] | None:
+        """Validate the complete wrapper envelope before semantic execution."""
+        try:
+            if not _value_within_limits(wrapper_request):
+                return "ERR_LIMIT", ""
+            schema = self.contracts.supp["schemas"]["wrapper_configuration_request_schema"]
+            failure = validate(wrapper_request, schema, self.contracts, current_root=self.contracts.supp)
+            if failure is not None:
+                return "ERR_SCHEMA", failure
+            semantic = wrapper_request["semantic_request"]
+            issues = [
+                "/semantic_request" + pointer
+                for pointer in self._binding_failures(semantic)
+            ]
+            if wrapper_request["request_id"] != semantic["request_id"]:
+                issues.append("/semantic_request/request_id")
+            if wrapper_request["operation_handle"] != semantic["operation_handle"]:
+                issues.append("/semantic_request/operation_handle")
+            obligation = self.contracts.registry.get(wrapper_request["operation_handle"])
+            if obligation is None or semantic["obligation_id"] != obligation:
+                issues.append("/semantic_request/obligation_id")
+            card = wrapper_request["attention_card"]
+            if wrapper_request["configuration"] == "B1":
+                if card is not None:
+                    issues.append("/attention_card")
+            else:
+                card_copy = dict(card)
+                expected_card = card_copy["card_sha256"]
+                card_copy["card_sha256"] = ZERO64
+                if sha256_upper(jcs(card_copy)) != expected_card:
+                    issues.append("/attention_card/card_sha256")
+            if issues:
+                # First failing check wins, in the order the validation law
+                # enumerates its checks — the artifact's established error-
+                # precedence idiom (cf. the packet/launcher precedence lists),
+                # rather than a semantically arbitrary byte-order minimum.
+                return "ERR_SCHEMA", issues[0]
+            return None
+        except (MemoryError, RecursionError):
+            return "ERR_LIMIT", ""
+        except Exception:
+            return "ERR_SCHEMA", ""
+
+    def execute_wrapper(self, wrapper_request: dict[str, Any]) -> dict[str, Any]:
+        failure = self.validate_wrapper_request(wrapper_request)
+        if failure is not None:
+            return self.wrapper_error_response(failure[0], failure[1], wrapper_request)
+        try:
+            raw = jcs(wrapper_request["semantic_request"]) + b"\n"
+            _, semantic_raw = self.execute_bytes(raw)
+            semantic = json.loads(semantic_raw)
+            if not semantic["ok"]:
+                error = semantic["errors"][0]
+                pointer = "/semantic_request" + error["pointer"]
+                return self.wrapper_error_response(error["code"], pointer, wrapper_request)
+            output = semantic["output"]
+            operation = wrapper_request["operation_handle"]
+            response = {
+                "configuration": wrapper_request["configuration"],
+                "errors": [],
+                "exit_code": semantic["exit_code"],
+                "format_version": "B1-WRAPPER-SEMANTIC-RESPONSE-0.2",
+                "obligation_id": self.contracts.registry[operation],
+                "ok": True,
+                "operation_handle": operation,
+                "output": {
+                    "effect_receipt_sha256": output["effect_receipt_sha256"],
+                    "payload": output["result_object"],
+                    "record_refs": output["record_references"],
+                    "unresolved_reasons": output["unresolved_reasons"],
+                },
+                "request_id": wrapper_request["request_id"],
+                "response_sha256": ZERO64,
+                "result": semantic["result"],
+            }
+            _sealed_response(response, "response_sha256")
+            return response
+        except (MemoryError, RecursionError):
+            return self.wrapper_error_response("ERR_LIMIT", "", wrapper_request)
+        except Exception:
+            return self.wrapper_error_response("ERR_INTERNAL", "", wrapper_request)
 
     def validate_wrapper_binding(self, request_raw: bytes, response_raw: bytes, transcript: dict[str, Any]) -> bool:
         """Evaluate one wrapper transcript binding under the public steps.
@@ -1066,20 +1256,23 @@ class Implementation:
         this method covers every single-arm binding step.
         """
         try:
-            request = json.loads(request_raw)
-            response = json.loads(response_raw)
-            request_schema = self.contracts.supp["schemas"]["wrapper_configuration_request_schema"]
+            request, _, request_error, _ = _decode_bounded_raw_value(request_raw)
+            response, _, response_error, _ = _decode_bounded_raw_value(response_raw)
+            if request_error is not None or response_error is not None:
+                return False
+            if not isinstance(request, dict) or not isinstance(response, dict):
+                return False
+            if self.validate_wrapper_request(request) is not None:
+                return False
+            if not _value_within_limits(transcript):
+                return False
             response_schema = self.contracts.supp["schemas"]["wrapper_configuration_response_schema"]
             transcript_schema = self.contracts.supp["schemas"]["wrapper_transcript_schema"]
-            if validate(request, request_schema, self.contracts, current_root=self.contracts.supp) is not None:
-                return False
             if validate(response, response_schema, self.contracts, current_root=self.contracts.supp) is not None:
                 return False
             if validate(transcript, transcript_schema, self.contracts, current_root=self.contracts.supp) is not None:
                 return False
             semantic = request["semantic_request"]
-            if self._binding_failures(semantic):
-                return False
             if not (transcript["request_id"] == response["request_id"] == request["request_id"] == semantic["request_id"]):
                 return False
             if not (transcript["configuration"] == response["configuration"] == request["configuration"]):
@@ -1089,7 +1282,7 @@ class Implementation:
             obligation = self.contracts.registry.get(request["operation_handle"])
             if obligation is None or not (transcript["obligation_id"] == response["obligation_id"] == obligation):
                 return False
-            sealed_response = json.loads(json.dumps(response))
+            sealed_response = dict(response)
             expected_response_seal = sealed_response["response_sha256"]
             sealed_response["response_sha256"] = ZERO64
             if sha256_upper(jcs(sealed_response)) != expected_response_seal or transcript["normalized_response_sha256"] != expected_response_seal:
@@ -1099,18 +1292,17 @@ class Implementation:
                 if card is not None or transcript["attention_card_sha256"] is not None:
                     return False
             else:
-                if not isinstance(card, dict):
-                    return False
-                card_copy = json.loads(json.dumps(card)); expected_card = card_copy["card_sha256"]; card_copy["card_sha256"] = ZERO64
-                if sha256_upper(jcs(card_copy)) != expected_card or transcript["attention_card_sha256"] != expected_card:
+                if transcript["attention_card_sha256"] != card["card_sha256"]:
                     return False
             if transcript["request_raw_sha256"] != sha256_upper(request_raw) or transcript["response_raw_sha256"] != sha256_upper(response_raw):
                 return False
-            record = json.loads(json.dumps(transcript)); expected_record = record["record_sha256"]; record["record_sha256"] = ZERO64
+            record = dict(transcript)
+            expected_record = record["record_sha256"]
+            record["record_sha256"] = ZERO64
             if sha256_upper(jcs(record)) != expected_record:
                 return False
             return True
-        except (KeyError, TypeError, ValueError, UnicodeError, json.JSONDecodeError):
+        except Exception:
             return False
 
     @staticmethod
