@@ -33,6 +33,14 @@ audit object, carries the matched-predicate witness trace and derived record
 references (`grounded-0_4/test_grounded_0_4.py` BINDING section enforces
 divergence).
 Next sealed generation folds these fields into the sealed response schema.
+*2026-08-16 hardening:* the frozen defect itself is immutable (sealed 0.2/0.3
+bytes never change), and the top-level `receiver_reliance.decide` export
+that reached it as a supported route is WITHDRAWN (deep-scan
+csf_abbd6848); frozen execution survives only as the explicitly
+non-evidentiary `receiver_reliance.conformance.execute` /
+`rr_api.conformance_execute`. `decide_audited` is the one supported
+evidentiary decision API; `grounded-0_4/test_public_surface.py` pins the
+withdrawal.
 
 ## E3 — Envelope digests bind the inert half of the request
 
@@ -62,6 +70,14 @@ tighten-only closures (verdict/projection agreement; derived disposition
 exhaustiveness — `grounded-0_4/closures_0_4.json`); regression-pinned. The
 intent tuple remains non-authoritative BY CONTRACT (disclosed); the register
 carries it as `inert_disclosed`.
+*2026-08-16 hardening:* the frozen engine's acceptance of contradicted
+bookkeeping is immutable and remains reachable only through the
+non-evidentiary conformance namespace; the supported route that bypassed
+the closures (top-level `decide`, deep-scan csf_0479d1a9) is WITHDRAWN, so
+every supported decision returns the closure-tightened
+`audited_behavior_class`. `grounded-0_4/test_public_surface.py` pins an
+inverted-verdict case tightening to `BINDING_OR_CONFLICT` on the supported
+surface.
 
 ## E6 — Recorded contract non-closures (unchanged from ACCEPTANCE.md)
 

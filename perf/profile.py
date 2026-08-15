@@ -281,7 +281,7 @@ def profile_in_process_pair(
         return (time.perf_counter_ns() - start) / inner_loops / 1_000_000.0
 
     for fixture in fixtures:
-        decide_call = lambda fixture=fixture: rr_api.decide(fixture.raw)
+        decide_call = lambda fixture=fixture: rr_api.conformance_execute(fixture.raw)
         audited_call = lambda fixture=fixture: rr_api.decide_audited(fixture.raw)
         for warmup in range(warmups):
             ordered = (
@@ -327,7 +327,7 @@ def profile_in_process_pair(
 def validate_paths(fixtures: list[Fixture], child_timeout: int) -> None:
     """Untimed parity check before observing costs."""
     for fixture in fixtures:
-        response, exit_code = rr_api.decide(fixture.raw)
+        response, exit_code = rr_api.conformance_execute(fixture.raw)
         got = b1.jcs_bytes(response) + b"\n"
         if got != fixture.expected or exit_code != fixture.expected_exit:
             raise RuntimeError(f"in-process parity failed for {fixture.entry_id}")
@@ -548,7 +548,7 @@ def profile_memory(
     def decide_corpus() -> None:
         for _ in range(memory_loops):
             for fixture in fixtures:
-                rr_api.decide(fixture.raw)
+                rr_api.conformance_execute(fixture.raw)
 
     def audited_corpus() -> None:
         for _ in range(memory_loops):

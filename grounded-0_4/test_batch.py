@@ -407,7 +407,7 @@ def functional_gate(fixtures: list[Fixture]) -> tuple[int, int, list[bytes]]:
     family_counts: dict[str, int] = {}
     for fixture in fixtures:
         family_counts[fixture.family] = family_counts.get(fixture.family, 0) + 1
-        response, _exit_code = rr_api.decide(fixture.raw)
+        response, _exit_code = rr_api.conformance_execute(fixture.raw)
         sealed = rr_api.b1.jcs_bytes(response) + b"\n"
         check(f"sealed-fixture:{fixture.fixture_id}", sealed == fixture.sealed_expected)
         one_shot = audited_bytes(fixture.raw)

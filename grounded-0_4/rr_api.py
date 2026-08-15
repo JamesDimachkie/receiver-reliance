@@ -74,11 +74,16 @@ GOVERNING_AUTHORITIES: dict[str, str] = {
 _CLASS_ORDER = ("MALFORMED_OR_BOUNDARY", "BINDING_OR_CONFLICT", "OMISSION_OR_INCOMPLETE")
 
 
-def decide(request: dict[str, Any] | bytes) -> tuple[dict[str, Any], int]:
-    """Run one request through the frozen engine in-process.
+def conformance_execute(request: dict[str, Any] | bytes) -> tuple[dict[str, Any], int]:
+    """CONFORMANCE-ONLY frozen-engine execution. Not an evidentiary surface.
 
     Accepts a request object or exact wire bytes; returns (response, exit_code)
     with the response byte-identical (via JCS) to the frozen stdio runner's.
+    The sealed response binds no decision facts (ERRATA E2) and applies no
+    0.4 closure (E5): use it to reproduce the frozen suites, never to decide.
+    Every supported evidentiary decision goes through ``decide_audited``.
+    Formerly exported as ``decide``; that supported route is withdrawn
+    (deep-scan findings csf_abbd6848 / csf_0479d1a9, 2026-08-16).
     """
     raw = request if isinstance(request, bytes) else b1.jcs_bytes(request) + b"\n"
     return pcb_runner._execute(raw)

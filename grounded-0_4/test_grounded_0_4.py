@@ -1,7 +1,7 @@
 """Regression suite for the grounded 0.4 layer.
 
 Checks, in order:
-  1. PARITY  - decide() reproduces every frozen semantic fixture response
+  1. PARITY  - conformance_execute() reproduces every frozen semantic fixture response
               byte-for-byte across both packs (the layer changes nothing
               about the sealed surface).
   2. TRACE   - decide_audited() never diverges from the sealed class, and
@@ -57,7 +57,7 @@ for rel in PACKS:
     for entry in pack["entries"]:
         raw = base64.b64decode(entry["semantic_request_jcs_lf_base64"])
         expected = base64.b64decode(entry["expected_response_jcs_lf_base64"])
-        response, _exit = rr_api.decide(raw)
+        response, _exit = rr_api.conformance_execute(raw)
         got = b1.jcs_bytes(response) + b"\n"
         check(f"parity:{entry['entry_id']}", got == expected)
         audited = rr_api.decide_audited(raw)

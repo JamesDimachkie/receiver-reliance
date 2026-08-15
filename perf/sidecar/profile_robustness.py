@@ -404,7 +404,7 @@ def main(argv: list[str] | None = None) -> int:
         "decide_vs_decide_audited",
         raws,
         "decide_in_process",
-        rr_api.decide,
+        rr_api.conformance_execute,
         "decide_audited_in_process",
         rr_api.decide_audited,
     )
@@ -430,7 +430,7 @@ def main(argv: list[str] | None = None) -> int:
         "decide_library_vs_fresh_isolated_stdio",
         [(item["raw"], item["expected"]) for item in fixtures],
         "decide_in_process",
-        lambda item: rr_api.decide(item[0]),
+        lambda item: rr_api.conformance_execute(item[0]),
         "fresh_process_stdio_-I_-B",
         fresh_one,
         repetitions=INTEGRATION_REPETITIONS,
