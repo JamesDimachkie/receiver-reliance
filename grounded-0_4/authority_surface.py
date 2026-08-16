@@ -1,12 +1,12 @@
 """Runtime field-authority queries over the canonical 0.4 register.
 
 The JSON register is the only store of per-field authority values.  Public
-queries read it afresh, validate that operation selectors are unambiguous,
-and return copies of the selected register row.  No field or status value is
-duplicated in Python source.
+queries read it afresh, authenticate the runtime bytes, validate that operation
+selectors are unambiguous, and return copies of the selected register row.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import pathlib
 from typing import Any
@@ -14,6 +14,16 @@ from typing import Any
 
 HERE = pathlib.Path(__file__).resolve().parent
 AUTHORITY_REGISTER_PATH = HERE / "authority_register_0_4.json"
+AUTHORITY_REGISTER_FORMAT = "B1-AUTHORITY-REGISTER-0.4"
+AUTHORITY_REGISTER_BYTES = 35399
+AUTHORITY_REGISTER_SHA256 = (
+    "C3414FC751C3B5ECA43A4932C694641D801A21F2CF53C42BE3A8C87C234CF499"
+)
+AUTHORITY_STATUSES = frozenset(
+    {"semantic", "presence_only", "inert_disclosed", "inert_registered_debt"}
+)
+_MAX_REGISTER_BYTES = 1024 * 1024
+_MAX_REGISTER_NESTING = 64
 
 
 class AuthorityRegisterError(ValueError):
@@ -26,10 +36,40 @@ def _nonempty_string(value: Any, location: str) -> str:
     return value
 
 
+def _check_json_nesting(raw: bytes) -> None:
+    """Reject excessive JSON nesting before ``json.loads`` allocates a tree."""
+    depth = 0
+    in_string = False
+    escaped = False
+    for byte in raw:
+        if in_string:
+            if escaped:
+                escaped = False
+            elif byte == 0x5C:
+                escaped = True
+            elif byte == 0x22:
+                in_string = False
+            continue
+        if byte == 0x22:
+            in_string = True
+        elif byte in (0x5B, 0x7B):
+            depth += 1
+            if depth > _MAX_REGISTER_NESTING:
+                raise AuthorityRegisterError(
+                    "authority register exceeds the JSON nesting limit"
+                )
+        elif byte in (0x5D, 0x7D):
+            depth -= 1
+
+
 def _validate_register(register: Any) -> dict[str, Any]:
     if not isinstance(register, dict):
         raise AuthorityRegisterError("authority register must be a JSON object")
-    _nonempty_string(register.get("format_version"), "format_version")
+    format_version = _nonempty_string(register.get("format_version"), "format_version")
+    if format_version != AUTHORITY_REGISTER_FORMAT:
+        raise AuthorityRegisterError(
+            f"unsupported authority register format_version: {format_version}"
+        )
     operations = register.get("operations")
     if not isinstance(operations, list):
         raise AuthorityRegisterError("operations must be an array")
@@ -75,7 +115,11 @@ def _validate_register(register: Any) -> dict[str, Any]:
             field_name = _nonempty_string(
                 field.get("field"), f"{field_location}.field"
             )
-            _nonempty_string(field.get("status"), f"{field_location}.status")
+            status = _nonempty_string(field.get("status"), f"{field_location}.status")
+            if status not in AUTHORITY_STATUSES:
+                raise AuthorityRegisterError(
+                    f"unsupported {field_location}.status: {status}"
+                )
             _nonempty_string(field.get("rationale"), f"{field_location}.rationale")
             if field_name in field_names:
                 raise AuthorityRegisterError(
@@ -94,11 +138,27 @@ def read_authority_register(
     authority queries omit it and therefore always use the adjacent canonical
     register.
     """
-    source = AUTHORITY_REGISTER_PATH if path is None else pathlib.Path(path)
+    authenticate = path is None
+    source = AUTHORITY_REGISTER_PATH if authenticate else pathlib.Path(path)
     try:
-        raw = source.read_bytes()
+        with source.open("rb") as stream:
+            raw = stream.read(_MAX_REGISTER_BYTES + 1)
+        if len(raw) > _MAX_REGISTER_BYTES:
+            raise AuthorityRegisterError(
+                f"authority register exceeds {_MAX_REGISTER_BYTES} bytes"
+            )
+        if authenticate and (
+            len(raw) != AUTHORITY_REGISTER_BYTES
+            or hashlib.sha256(raw).hexdigest().upper() != AUTHORITY_REGISTER_SHA256
+        ):
+            raise AuthorityRegisterError(
+                "canonical authority register failed byte authentication"
+            )
+        _check_json_nesting(raw)
         register = json.loads(raw)
-    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
+    except AuthorityRegisterError:
+        raise
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError, RecursionError) as error:
         raise AuthorityRegisterError(
             f"cannot read authority register {source}: {error}"
         ) from error

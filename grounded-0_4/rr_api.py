@@ -34,26 +34,141 @@ by self-zero recomputation under their own recorded format string.
 """
 from __future__ import annotations
 
+import hashlib
+import importlib.util
 import json
 import pathlib
 import sys
+import types
 from typing import Any
 
 _HERE = pathlib.Path(__file__).resolve().parent
 _IMPL3 = _HERE.parent / "baseline-run" / "implementation-output-0.3"
-if str(_HERE) not in sys.path:
-    sys.path.insert(0, str(_HERE))
-if str(_IMPL3) not in sys.path:
-    sys.path.insert(0, str(_IMPL3))
+_SUPPLEMENTAL_CONTRACT = (
+    _HERE.parent
+    / "supplemental-0_3"
+    / "control"
+    / "B1_SUPPLEMENTAL_COMPARATOR_CONTRACT_0_3.json"
+)
+_CLOSURE_POLICY = _HERE / "closures_0_4.json"
+_AUTHORITY_REGISTER = _HERE / "authority_register_0_4.json"
 
-from authority_surface import authority_for_operation  # noqa: E402,F401
-import b1_capabilities as b1  # noqa: E402
-import pcb_runner  # noqa: E402
+
+class RuntimeIntegrityError(RuntimeError):
+    """A grounded runtime authority or implementation failed authentication."""
+
+
+def _read_pinned_bytes(
+    path: pathlib.Path,
+    expected_length: int,
+    expected_sha256: str,
+    label: str,
+) -> bytes:
+    """Read exactly one authenticated file without an unbounded allocation."""
+    try:
+        with path.open("rb") as stream:
+            raw = stream.read(expected_length + 1)
+    except OSError as error:
+        raise RuntimeIntegrityError(f"cannot read {label}: {error}") from error
+    if (
+        len(raw) != expected_length
+        or hashlib.sha256(raw).hexdigest().upper() != expected_sha256
+    ):
+        raise RuntimeIntegrityError(f"{label} failed byte authentication")
+    return raw
+
+
+def _load_verified_module(
+    name: str,
+    path: pathlib.Path,
+    expected_length: int,
+    expected_sha256: str,
+    *,
+    aliases: tuple[tuple[str, types.ModuleType], ...] = (),
+) -> types.ModuleType:
+    """Execute only the verified source bytes, insulated from ambient names."""
+    raw = _read_pinned_bytes(path, expected_length, expected_sha256, name)
+    module = types.ModuleType(name)
+    module.__file__ = str(path)
+    module.__package__ = name.rpartition(".")[0]
+    module.__spec__ = importlib.util.spec_from_loader(
+        name, loader=None, origin=str(path)
+    )
+    code = compile(raw, str(path), "exec", dont_inherit=True)
+    absent = object()
+    previous_modules = {
+        alias: sys.modules.get(alias, absent) for alias, _target in aliases
+    }
+    previous_path = list(sys.path)
+    sys.modules[name] = module
+    for alias, target in aliases:
+        sys.modules[alias] = target
+    try:
+        exec(code, module.__dict__)
+    except BaseException:
+        sys.modules.pop(name, None)
+        raise
+    finally:
+        sys.path[:] = previous_path
+        for alias, previous in previous_modules.items():
+            if previous is absent:
+                sys.modules.pop(alias, None)
+            else:
+                sys.modules[alias] = previous
+    return module
+
+
+_CLOSURE_POLICY_RAW = _read_pinned_bytes(
+    _CLOSURE_POLICY,
+    2329,
+    "EBA198726DE960E9F59ACE5A7E1BDB701BFBA5B1BD09BC59FF4540F2B14E8F9C",
+    "grounded closure policy",
+)
+_AUTHORITY_REGISTER_RAW = _read_pinned_bytes(
+    _AUTHORITY_REGISTER,
+    35399,
+    "C3414FC751C3B5ECA43A4932C694641D801A21F2CF53C42BE3A8C87C234CF499",
+    "grounded authority register",
+)
+_SUPPLEMENTAL_CONTRACT_RAW = _read_pinned_bytes(
+    _SUPPLEMENTAL_CONTRACT,
+    159277,
+    "6B2CAD02DDE7388D63D66E4863E5233CFBD1DC413575D9D260DB9799C7023A12",
+    "composed 0.3 authority contract",
+)
+
+authority_surface = _load_verified_module(
+    "_receiver_reliance_authority_surface",
+    _HERE / "authority_surface.py",
+    8634,
+    "62B689D964CA906C2E3F8376047E0DDD14C78364432B1A7EA8499C8FF7E8C5DD",
+)
+authority_for_operation = authority_surface.authority_for_operation
+b1 = _load_verified_module(
+    "_receiver_reliance_b1_capabilities",
+    _IMPL3 / "b1_capabilities.py",
+    50314,
+    "4D9FA1C9CCB60B980BCE1739FE8FDC10E84AEFC03D4C20E2AA1A8B0BBE2D18FC",
+)
+pcb_runner = _load_verified_module(
+    "_receiver_reliance_pcb_runner",
+    _IMPL3 / "pcb_runner.py",
+    19327,
+    "83319385C8B6D28965F4683B8C0689FB70158E86ED35D54E7467E8E3DF076E09",
+    aliases=(("b1_capabilities", b1),),
+)
+
+_authenticated_contract = json.loads(_SUPPLEMENTAL_CONTRACT_RAW)
+if b1.jcs_bytes(b1.authority_documents()["contract"]) != b1.jcs_bytes(
+    _authenticated_contract
+):
+    raise RuntimeIntegrityError("composed authority contract changed during loading")
 
 AUDIT_FORMAT = "B1-AUDITED-DECISION-0.4.1"
 
-with open(_HERE / "closures_0_4.json", encoding="utf-8") as _fh:
-    _CLOSURES: dict[str, list[dict]] = json.load(_fh)["closures_by_obligation"]
+_CLOSURES: dict[str, list[dict]] = json.loads(_CLOSURE_POLICY_RAW)[
+    "closures_by_obligation"
+]
 
 # The exact bytes that govern every audited decision this process produces.
 # Sealing these digests into each audit makes decisions produced under
@@ -61,17 +176,159 @@ with open(_HERE / "closures_0_4.json", encoding="utf-8") as _fh:
 # distinguishable by seal (ERRATA E8); the repository commit remains the
 # trust root that authenticates the digests themselves (TRUST_MODEL.md).
 GOVERNING_AUTHORITIES: dict[str, str] = {
-    "closure_policy_sha256": b1.sha256_upper((_HERE / "closures_0_4.json").read_bytes()),
-    "authority_register_sha256": b1.sha256_upper(
-        (_HERE / "authority_register_0_4.json").read_bytes()
-    ),
-    "engine_capabilities_sha256": b1.sha256_upper(
-        (_IMPL3 / "b1_capabilities.py").read_bytes()
-    ),
-    "engine_runner_sha256": b1.sha256_upper((_IMPL3 / "pcb_runner.py").read_bytes()),
+    "closure_policy_sha256": hashlib.sha256(_CLOSURE_POLICY_RAW).hexdigest().upper(),
+    "authority_register_sha256": hashlib.sha256(_AUTHORITY_REGISTER_RAW).hexdigest().upper(),
+    "engine_capabilities_sha256": "4D9FA1C9CCB60B980BCE1739FE8FDC10E84AEFC03D4C20E2AA1A8B0BBE2D18FC",
+    "engine_runner_sha256": "83319385C8B6D28965F4683B8C0689FB70158E86ED35D54E7467E8E3DF076E09",
 }
 
 _CLASS_ORDER = ("MALFORMED_OR_BOUNDARY", "BINDING_OR_CONFLICT", "OMISSION_OR_INCOMPLETE")
+
+
+class _ObjectRequestError(ValueError):
+    def __init__(self, code: str) -> None:
+        super().__init__(code)
+        self.code = code
+
+
+def _json_string_length(value: str) -> int:
+    """Return exact UTF-8 JSON-string length without allocating the encoding."""
+    length = 2
+    for character in value:
+        codepoint = ord(character)
+        if character in ('"', "\\") or character in "\b\f\n\r\t":
+            length += 2
+        elif codepoint < 0x20:
+            length += 6
+        elif codepoint < 0x80:
+            length += 1
+        elif codepoint < 0x800:
+            length += 2
+        elif 0xD800 <= codepoint <= 0xDFFF:
+            raise _ObjectRequestError("ERR_JSON")
+        elif codepoint < 0x10000:
+            length += 3
+        else:
+            length += 4
+        if length > b1.MAX_INPUT_BYTES:
+            raise _ObjectRequestError("ERR_LIMIT")
+    return length
+
+
+def _bounded_object_wire(request: Any) -> bytes:
+    """Canonicalize an object iteratively under the frozen wire limits."""
+    output = bytearray()
+    active_containers: set[int] = set()
+    member_count = 0
+    stack: list[tuple[str, Any, int]] = [("value", request, 1)]
+
+    def emit(raw: bytes) -> None:
+        if len(output) + len(raw) > b1.MAX_INPUT_BYTES:
+            raise _ObjectRequestError("ERR_LIMIT")
+        output.extend(raw)
+
+    while stack:
+        action, value, depth = stack.pop()
+        if action == "emit":
+            emit(value)
+            continue
+        if action == "leave":
+            active_containers.remove(value)
+            continue
+        if action == "string":
+            encoded_length = _json_string_length(value)
+            if len(output) + encoded_length > b1.MAX_INPUT_BYTES:
+                raise _ObjectRequestError("ERR_LIMIT")
+            try:
+                encoded = json.dumps(value, ensure_ascii=False).encode("utf-8")
+            except (TypeError, UnicodeError, ValueError):
+                raise _ObjectRequestError("ERR_JSON") from None
+            emit(encoded)
+            continue
+
+        value_type = type(value)
+        if value is None:
+            emit(b"null")
+        elif value_type is bool:
+            emit(b"true" if value else b"false")
+        elif value_type is int:
+            if not b1.SAFE_INTEGER_MIN <= value <= b1.SAFE_INTEGER_MAX:
+                raise _ObjectRequestError("ERR_NUMBER")
+            emit(str(value).encode("ascii"))
+        elif value_type is float:
+            raise _ObjectRequestError("ERR_NUMBER")
+        elif value_type is str:
+            stack.append(("string", value, 0))
+        elif value_type is list or value_type is dict:
+            if depth > b1.MAX_NESTING:
+                raise _ObjectRequestError("ERR_LIMIT")
+            identity = id(value)
+            if identity in active_containers:
+                raise _ObjectRequestError("ERR_JSON")
+            container_length = len(value)
+            member_count += container_length
+            if member_count > b1.MAX_MEMBERS_OR_ITEMS:
+                raise _ObjectRequestError("ERR_LIMIT")
+            active_containers.add(identity)
+
+            actions: list[tuple[str, Any, int]] = []
+            if value_type is list:
+                children = tuple(value)
+                if len(children) != container_length:
+                    raise _ObjectRequestError("ERR_JSON")
+                emit(b"[")
+                for index, child in enumerate(children):
+                    if index:
+                        actions.append(("emit", b",", 0))
+                    actions.append(("value", child, depth + 1))
+                actions.append(("emit", b"]", 0))
+            else:
+                items = tuple(value.items())
+                if len(items) != container_length:
+                    raise _ObjectRequestError("ERR_JSON")
+                key_wire_bytes = 2 + max(0, container_length - 1) + container_length
+                for key, _child in items:
+                    if type(key) is not str:
+                        raise _ObjectRequestError("ERR_JSON")
+                    key_wire_bytes += _json_string_length(key)
+                    if len(output) + key_wire_bytes > b1.MAX_INPUT_BYTES:
+                        raise _ObjectRequestError("ERR_LIMIT")
+                try:
+                    items = sorted(
+                        items, key=lambda item: item[0].encode("utf-16-be")
+                    )
+                except UnicodeError:
+                    raise _ObjectRequestError("ERR_JSON") from None
+                emit(b"{")
+                for index, (key, child) in enumerate(items):
+                    if index:
+                        actions.append(("emit", b",", 0))
+                    actions.extend(
+                        (
+                            ("string", key, 0),
+                            ("emit", b":", 0),
+                            ("value", child, depth + 1),
+                        )
+                    )
+                actions.append(("emit", b"}", 0))
+            actions.append(("leave", identity, 0))
+            stack.extend(reversed(actions))
+        else:
+            raise _ObjectRequestError("ERR_JSON")
+
+    emit(b"\n")
+    return bytes(output)
+
+
+def _prepare_request(request: dict[str, Any] | bytes) -> tuple[bytes | None, str | None]:
+    if isinstance(request, bytes):
+        return request, None
+    try:
+        return _bounded_object_wire(request), None
+    except _ObjectRequestError as error:
+        return None, error.code
+    except (KeyError, RuntimeError):
+        return None, "ERR_JSON"
 
 
 def conformance_execute(request: dict[str, Any] | bytes) -> tuple[dict[str, Any], int]:
@@ -85,7 +342,10 @@ def conformance_execute(request: dict[str, Any] | bytes) -> tuple[dict[str, Any]
     Formerly exported as ``decide``; that supported route is withdrawn
     (deep-scan findings csf_abbd6848 / csf_0479d1a9, 2026-08-16).
     """
-    raw = request if isinstance(request, bytes) else b1.jcs_bytes(request) + b"\n"
+    raw, object_error = _prepare_request(request)
+    if object_error is not None:
+        return pcb_runner._protocol_error(object_error, "")
+    assert raw is not None
     return pcb_runner._execute(raw)
 
 
@@ -134,6 +394,69 @@ def _eval_closure(node: dict[str, Any], doc: Any) -> bool:
     return _eval_closure_atomic(node, doc)
 
 
+_OBL30_RUNTIME_BINDINGS = (
+    (
+        "OBL-30-R1-candidate-pool-record-id-projection",
+        "candidate_pool",
+        "pool_record_ids",
+        "candidate_pool record IDs must equal pool_record_ids",
+    ),
+    (
+        "OBL-30-R2-verdict-record-id-projection",
+        "compatibility_verdicts",
+        "pool_record_ids",
+        "compatibility_verdict record IDs must equal pool_record_ids",
+    ),
+    (
+        "OBL-30-R3-exclusion-record-id-projection",
+        "excluded_records",
+        "excluded_record_ids",
+        "excluded_records record IDs must equal excluded_record_ids",
+    ),
+)
+
+
+def _obl30_runtime_binding_findings(
+    decision_input: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Additive unsealed mitigation for projections absent from frozen policy."""
+    facts = decision_input.get("facts")
+    if not isinstance(facts, dict):
+        return []
+    required = {
+        field
+        for _closure_id, rows_field, ids_field, _statement in _OBL30_RUNTIME_BINDINGS
+        for field in (rows_field, ids_field)
+    }
+    if not required.issubset(facts):
+        return []
+
+    findings: list[dict[str, Any]] = []
+    for closure_id, rows_field, ids_field, statement in _OBL30_RUNTIME_BINDINGS:
+        try:
+            row_ids = [row["record_id"] for row in facts[rows_field]]
+            fired = _jcs_set(row_ids) != _jcs_set(facts[ids_field])
+        except (KeyError, TypeError, b1.EvaluatorError) as error:
+            findings.append(
+                {
+                    "closure_id": closure_id,
+                    "fired": False,
+                    "evaluator_error": str(error)[:200],
+                }
+            )
+            continue
+        if fired:
+            findings.append(
+                {
+                    "closure_id": closure_id,
+                    "fired": True,
+                    "tightens_to": "MALFORMED_OR_BOUNDARY",
+                    "statement": statement,
+                }
+            )
+    return findings
+
+
 def closure_findings(obligation_id: str, decision_input: dict[str, Any]) -> list[dict[str, Any]]:
     findings = []
     for row in _CLOSURES.get(obligation_id, []):
@@ -154,6 +477,8 @@ def closure_findings(obligation_id: str, decision_input: dict[str, Any]) -> list
                     "statement": row["statement"],
                 }
             )
+    if obligation_id == "OBL-30":
+        findings.extend(_obl30_runtime_binding_findings(decision_input))
     return findings
 
 
@@ -299,8 +624,12 @@ def derive_record_references(facts: Any, prefix: str = "") -> list[str]:
 
 def decide_audited(request: dict[str, Any] | bytes) -> dict[str, Any]:
     """Frozen decision + input-bound, trace-carrying audit extension."""
-    raw = request if isinstance(request, bytes) else b1.jcs_bytes(request) + b"\n"
-    response, exit_code = pcb_runner._execute(raw)
+    raw, object_error = _prepare_request(request)
+    if object_error is None:
+        assert raw is not None
+        response, exit_code = pcb_runner._execute(raw)
+    else:
+        response, exit_code = pcb_runner._protocol_error(object_error, "")
     audited: dict[str, Any] = {
         "format_version": AUDIT_FORMAT,
         "sealed_response": response,
@@ -310,11 +639,14 @@ def decide_audited(request: dict[str, Any] | bytes) -> dict[str, Any]:
         "audit_sha256": b1.ZERO64,
     }
     audit: dict[str, Any] = {
-        "request_raw_sha256": b1.sha256_upper(raw),
+        "request_raw_sha256": b1.sha256_upper(raw) if raw is not None else None,
         "engine_generation": "composed-0.3-frozen",
         "governing_authorities": dict(GOVERNING_AUTHORITIES),
     }
+    if object_error is not None:
+        audit["object_request_error"] = object_error
     if response.get("ok"):
+        assert raw is not None
         parsed = json.loads(raw.decode("utf-8"))
         semantic = parsed["semantic_request"] if "semantic_request" in parsed else parsed
         decision_input = semantic["decision_input"]

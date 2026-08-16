@@ -25,6 +25,15 @@ if str(_HERE) not in sys.path:
 import rr_api
 
 _READ_CHUNK_BYTES = 64 * 1024
+_MAX_PHYSICAL_LINE_BYTES = 8 * rr_api.b1.MAX_INPUT_BYTES + _READ_CHUNK_BYTES
+
+
+class BatchRecordLimitError(RuntimeError):
+    """A record did not terminate within the finite transport work budget."""
+
+    def __init__(self, prefix_sha256: str) -> None:
+        super().__init__("batch record exceeded the physical-line work limit")
+        self.prefix_sha256 = prefix_sha256
 
 
 def response_bytes(raw_line: bytes) -> bytes:
@@ -60,6 +69,30 @@ def _overlimit_response_bytes(request_raw_sha256: str) -> bytes:
     return rr_api.b1.jcs_bytes(audited) + b"\n"
 
 
+def _unterminated_overlimit_response_bytes(prefix_sha256: str) -> tuple[bytes, int]:
+    """Return a sealed transport failure without claiming a full-request hash."""
+    sealed_response, exit_code = rr_api.pcb_runner._protocol_error("ERR_LIMIT", "")
+    audited = {
+        "format_version": rr_api.AUDIT_FORMAT,
+        "sealed_response": sealed_response,
+        "exit_code": exit_code,
+        "audit": {
+            "request_raw_sha256": None,
+            "request_prefix_sha256": prefix_sha256,
+            "request_prefix_bytes": _MAX_PHYSICAL_LINE_BYTES,
+            "transport_error": "ERR_BATCH_RECORD_LIMIT",
+            "engine_generation": "composed-0.3-frozen",
+            "governing_authorities": dict(rr_api.GOVERNING_AUTHORITIES),
+            "decision_input_sha256": None,
+            "errors": sealed_response.get("errors"),
+        },
+        "audited_behavior_class": "PROTOCOL_ERROR",
+        "audit_sha256": rr_api.b1.ZERO64,
+    }
+    audited["audit_sha256"] = rr_api.b1.self_zero_sha256(audited, "audit_sha256")
+    return rr_api.b1.jcs_bytes(audited) + b"\n", exit_code
+
+
 def _read_request(source: BinaryIO) -> tuple[bytes | None, str | None]:
     """Read one physical line with memory bounded by ``MAX_INPUT_BYTES``.
 
@@ -72,6 +105,7 @@ def _read_request(source: BinaryIO) -> tuple[bytes | None, str | None]:
     retained = 0
     digest = None
     saw_input = False
+    consumed = 0
     while True:
         chunk = source.readline(_READ_CHUNK_BYTES)
         if chunk == b"":
@@ -84,6 +118,12 @@ def _read_request(source: BinaryIO) -> tuple[bytes | None, str | None]:
             raise TypeError("binary source.readline() must return bytes")
         if len(chunk) > _READ_CHUNK_BYTES:
             raise OSError("binary source.readline(size) exceeded the requested bound")
+        remaining = _MAX_PHYSICAL_LINE_BYTES - consumed
+        if len(chunk) > remaining:
+            assert digest is not None
+            digest.update(chunk[:remaining])
+            raise BatchRecordLimitError(digest.hexdigest().upper())
+        consumed += len(chunk)
         saw_input = True
         if digest is not None:
             digest.update(chunk)
@@ -123,7 +163,15 @@ def serve(source: BinaryIO, sink: BinaryIO) -> int:
     not only by clients that close stdin after sending a complete batch.
     """
     while True:
-        raw_line, overlimit_sha256 = _read_request(source)
+        try:
+            raw_line, overlimit_sha256 = _read_request(source)
+        except BatchRecordLimitError as error:
+            response, exit_code = _unterminated_overlimit_response_bytes(
+                error.prefix_sha256
+            )
+            _write_all(sink, response)
+            sink.flush()
+            return exit_code
         if raw_line is None and overlimit_sha256 is None:
             return 0
         if overlimit_sha256 is not None:
