@@ -31,6 +31,7 @@ from __future__ import annotations
 import argparse
 import dataclasses
 import hashlib
+import io
 import json
 import re
 import sys
@@ -50,6 +51,7 @@ MAX_DEPTH = 32
 MAX_ITEMS = 256
 MAX_STRING = 4096
 MAX_JSONL_BYTES = 4 * 1024 * 1024
+MAX_JSON_NODES = 4096
 SAFE_INTEGER_MAX = 9007199254740991
 SAFE_INTEGER_MIN = -9007199254740991
 HEX64 = re.compile(r"^[0-9A-F]{64}$")
@@ -141,7 +143,17 @@ def _insufficient(*issues: PreflightIssue) -> _Assessment:
     return _Assessment(INSUFFICIENT_EVIDENCE, tuple(issues))
 
 
-def _walk_json(value: Any, pointer: str = "", depth: int = 0) -> None:
+def _walk_json(
+    value: Any,
+    pointer: str = "",
+    depth: int = 0,
+    node_count: list[int] | None = None,
+) -> None:
+    if node_count is None:
+        node_count = [0]
+    node_count[0] += 1
+    if node_count[0] > MAX_JSON_NODES:
+        raise ValueError(f"JSON graph exceeds {MAX_JSON_NODES} nodes")
     if depth > MAX_DEPTH:
         raise ValueError(f"JSON nesting exceeds {MAX_DEPTH} at {pointer or '/'}")
     if value is None or isinstance(value, (bool, int, str)):
@@ -165,13 +177,13 @@ def _walk_json(value: Any, pointer: str = "", depth: int = 0) -> None:
             if not isinstance(key, str):
                 raise ValueError(f"non-string object key at {pointer or '/'}")
             escaped = key.replace("~", "~0").replace("/", "~1")
-            _walk_json(child, f"{pointer}/{escaped}", depth + 1)
+            _walk_json(child, f"{pointer}/{escaped}", depth + 1, node_count)
         return
     if isinstance(value, Sequence) and not isinstance(value, (bytes, bytearray)):
         if len(value) > MAX_ITEMS:
             raise ValueError(f"array exceeds {MAX_ITEMS} items at {pointer or '/'}")
         for index, child in enumerate(value):
-            _walk_json(child, f"{pointer}/{index}", depth + 1)
+            _walk_json(child, f"{pointer}/{index}", depth + 1, node_count)
         return
     raise ValueError(f"non-JSON value {type(value).__name__} at {pointer or '/'}")
 
@@ -226,13 +238,45 @@ def _scope_hash(items: Sequence[str]) -> str:
     )
 
 
+def _path_glob_match(path: str, pattern: str) -> bool:
+    """Match a case-sensitive path glob without allowing ``*`` across ``/``."""
+
+    path_parts = path.split("/")
+    pattern_parts = pattern.split("/")
+    path_index = 0
+    pattern_index = 0
+    globstar_index = -1
+    globstar_path_index = -1
+
+    while path_index < len(path_parts):
+        if (
+            pattern_index < len(pattern_parts)
+            and pattern_parts[pattern_index] != "**"
+            and fnmatchcase(path_parts[path_index], pattern_parts[pattern_index])
+        ):
+            path_index += 1
+            pattern_index += 1
+        elif pattern_index < len(pattern_parts) and pattern_parts[pattern_index] == "**":
+            globstar_index = pattern_index
+            globstar_path_index = path_index
+            pattern_index += 1
+        elif globstar_index >= 0:
+            globstar_path_index += 1
+            path_index = globstar_path_index
+            pattern_index = globstar_index + 1
+        else:
+            return False
+
+    while pattern_index < len(pattern_parts) and pattern_parts[pattern_index] == "**":
+        pattern_index += 1
+    return pattern_index == len(pattern_parts)
+
+
 def _in_scope(path: str, claimed: Sequence[str]) -> bool:
-    """Match opaque, case-sensitive path strings without OS normalization."""
+    """Match opaque, case-sensitive, segment-bounded path strings."""
 
     for pattern in claimed:
-        if path == pattern or fnmatchcase(path, pattern):
-            return True
-        if pattern.endswith("/**") and path.startswith(pattern[:-2]):
+        if path == pattern or _path_glob_match(path, pattern):
             return True
     return False
 
@@ -245,6 +289,20 @@ def _check_record(record: Any) -> tuple[dict[str, Any] | None, tuple[PreflightIs
                 "/",
                 "native evidence is not an object",
                 "supply one JSON object per record",
+            ),
+        )
+    # Bounded JSON-domain walk FIRST: no key enumeration, sorting, or message
+    # rendering happens over an object that has not passed the aggregate
+    # node/depth/size bounds (review finding: early-bound bypass).
+    try:
+        canonical_json_bytes(record)
+    except (TypeError, ValueError) as exc:
+        return None, (
+            _issue(
+                "PREFLIGHT_JSON_DOMAIN_INVALID",
+                "/",
+                f"native evidence is outside the bounded JSON domain: {exc}",
+                "use bounded integer-only JSON observations",
             ),
         )
     allowed = {"record_id", "family", "native", "observations", "state_revision"}
@@ -280,6 +338,15 @@ def _check_record(record: Any) -> tuple[dict[str, Any] | None, tuple[PreflightIs
             ),
         )
     family = record.get("family")
+    if not isinstance(family, str):
+        return None, (
+            _issue(
+                "PREFLIGHT_FAMILY_INVALID",
+                "/family",
+                "family is not a string",
+                "supply one calibrated family name as a JSON string",
+            ),
+        )
     if family not in FAMILY_OBLIGATION:
         return record, (
             _issue(
@@ -460,6 +527,18 @@ def _assess_ref(record: Mapping[str, Any]) -> _Assessment:
 
 def _assess_scope(record: Mapping[str, Any]) -> _Assessment:
     native, observed = record["native"], record["observations"]
+    status = native.get("status")
+    if status is not None and (
+        not isinstance(status, str) or not (0 < len(status) <= MAX_STRING)
+    ):
+        return _invalid(
+            _issue(
+                "PREFLIGHT_SCOPE_STATUS_INVALID",
+                "/native/status",
+                "task status is not a bounded nonempty string",
+                "supply an opaque nonempty task status or omit it",
+            )
+        )
     claimed = native.get("claimed_paths")
     if claimed is None:
         return _insufficient(
@@ -499,6 +578,38 @@ def _assess_scope(record: Mapping[str, Any]) -> _Assessment:
                 "repair the Boolean evidence",
             )
         )
+    commit = native.get("result_commit")
+    if named and (
+        not isinstance(commit, str) or not (0 < len(commit) <= MAX_STRING)
+    ):
+        return _invalid(
+            _issue(
+                "PREFLIGHT_SCOPE_COMMIT_IDENTITY_INVALID",
+                "/native/result_commit",
+                "named result commit lacks an exact bounded identity",
+                "bind result_commit_named to the exact nonempty commit identity",
+            )
+        )
+    if not named and commit is not None:
+        return _invalid(
+            _issue(
+                "PREFLIGHT_SCOPE_COMMIT_IDENTITY_CONTRADICTION",
+                "/native/result_commit",
+                "an unnamed result commit carries a commit identity",
+                "repeat claim extraction and retain one coherent identity statement",
+                "/native/result_commit_named",
+            )
+        )
+    if found and not named:
+        return _invalid(
+            _issue(
+                "PREFLIGHT_SCOPE_LOOKUP_CONTRADICTION",
+                "/observations/commit_found",
+                "commit lookup reports a found result that was never named",
+                "resolve only the exact result commit named by the claim",
+                "/native/result_commit_named",
+            )
+        )
     changed = observed.get("commit_changed_paths")
     if found and changed is None:
         return _insufficient(
@@ -535,9 +646,7 @@ def _assess_scope(record: Mapping[str, Any]) -> _Assessment:
     else:
         outside = [path for path in changed if not _in_scope(path, claimed)]
         recorded = declared if not outside else _scope_hash(sorted(claimed + outside))
-    kinds = (["ADOPTION"] if claimed else []) + (
-        ["INTENDED_USE"] if native.get("status") is not None else []
-    )
+    kinds = (["ADOPTION"] if claimed else []) + (["INTENDED_USE"] if status is not None else [])
     return _Assessment(
         READY,
         (),
@@ -983,7 +1092,7 @@ def preflight(record: Any, fact_profile: Any | None = None) -> PreflightResult:
     checked, envelope_issues = _check_record(record)
     record_id = record.get("record_id") if isinstance(record, dict) else None
     family = record.get("family") if isinstance(record, dict) else None
-    obligation = FAMILY_OBLIGATION.get(family)
+    obligation = FAMILY_OBLIGATION.get(family) if isinstance(family, str) else None
     evidence_digest: str | None = None
     if checked is not None:
         try:
@@ -1002,7 +1111,8 @@ def preflight(record: Any, fact_profile: Any | None = None) -> PreflightResult:
         )
     assessment: _Assessment | None = None
     if (
-        family in _ASSESSORS
+        isinstance(family, str)
+        and family in _ASSESSORS
         and isinstance(checked.get("native"), dict)
         and isinstance(checked.get("observations"), dict)
     ):
@@ -1139,7 +1249,23 @@ def _line_error(number: int, message: str) -> PreflightResult:
     )
 
 
-def process_jsonl(source: IO[str] | IO[bytes], sink: TextIO) -> int:
+def _write_result(sink: TextIO | IO[bytes], result: PreflightResult) -> None:
+    raw = (
+        json.dumps(
+            result.as_dict(),
+            ensure_ascii=False,
+            separators=(",", ":"),
+            sort_keys=True,
+        )
+        + "\n"
+    ).encode("utf-8", errors="backslashreplace")
+    if isinstance(sink, io.TextIOBase):
+        sink.write(raw.decode("utf-8"))
+    else:
+        sink.write(raw)
+
+
+def process_jsonl(source: IO[str] | IO[bytes], sink: TextIO | IO[bytes]) -> int:
     """Process portable JSONL streams fail-closed.
 
     Returns 2 when any row is not READY **or when no row was supplied**: an
@@ -1156,18 +1282,22 @@ def process_jsonl(source: IO[str] | IO[bytes], sink: TextIO) -> int:
     nonready = 0
     rows = 0
     for number, line, oversized in _bounded_lines(source):
-        decode_error: UnicodeDecodeError | None = None
+        decode_error: UnicodeError | None = None
+        encoded_line: bytes | None = None
         if not oversized and isinstance(line, (bytes, bytearray)):
             try:
                 line = line.decode("utf-8")
             except UnicodeDecodeError as exc:
                 decode_error = exc
+        elif not oversized:
+            try:
+                encoded_line = line.encode("utf-8")
+            except UnicodeEncodeError as exc:
+                decode_error = exc
         if decode_error is None and not oversized and not line.strip():
             continue
         rows += 1
-        if oversized or (
-            decode_error is None and len(line.encode("utf-8")) > MAX_JSONL_BYTES
-        ):
+        if oversized or (encoded_line is not None and len(encoded_line) > MAX_JSONL_BYTES):
             result = _line_error(number, f"row exceeds {MAX_JSONL_BYTES} bytes")
         elif decode_error is not None:
             result = _line_error(
@@ -1187,18 +1317,10 @@ def process_jsonl(source: IO[str] | IO[bytes], sink: TextIO) -> int:
                         result = preflight(payload["record"], payload.get("fact_profile"))
                 else:
                     result = preflight(payload)
-            except (json.JSONDecodeError, ValueError, RecursionError) as exc:
+            except (TypeError, ValueError, RecursionError) as exc:
                 result = _line_error(number, f"{type(exc).__name__}: {exc}")
         nonready += result.status != READY
-        sink.write(
-            json.dumps(
-                result.as_dict(),
-                ensure_ascii=False,
-                separators=(",", ":"),
-                sort_keys=True,
-            )
-            + "\n"
-        )
+        _write_result(sink, result)
     if rows == 0:
         empty = PreflightResult(
             INSUFFICIENT_EVIDENCE,
@@ -1216,15 +1338,7 @@ def process_jsonl(source: IO[str] | IO[bytes], sink: TextIO) -> int:
                 ),
             ),
         )
-        sink.write(
-            json.dumps(
-                empty.as_dict(),
-                ensure_ascii=False,
-                separators=(",", ":"),
-                sort_keys=True,
-            )
-            + "\n"
-        )
+        _write_result(sink, empty)
         return 2
     return 2 if nonready else 0
 
@@ -1245,9 +1359,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         else open(args.input, "rb")
     )
     sink = (
-        sys.stdout
+        getattr(sys.stdout, "buffer", sys.stdout)
         if args.output == "-"
-        else open(args.output, "w", encoding="utf-8", newline="\n")
+        else open(args.output, "wb")
     )
     try:
         return process_jsonl(source, sink)

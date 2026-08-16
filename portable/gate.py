@@ -8,8 +8,10 @@ import importlib.util
 import json
 import os
 import pathlib
+import re
 import subprocess
 import sys
+import threading
 
 
 def _load_verify_bundle():
@@ -44,29 +46,210 @@ def _digest(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest().upper()
 
 
+def _text(raw: bytes) -> str | None:
+    if len(raw) > 4 * 1024 * 1024 or b"\x00" in raw:
+        return None
+    try:
+        text = raw.decode("utf-8", errors="strict")
+    except UnicodeDecodeError:
+        return None
+    text = text.replace("\r\n", "\n")
+    return None if "\r" in text else text
+
+
+def _one_line(raw: bytes, pattern: str) -> re.Match[str] | None:
+    text = _text(raw)
+    if text is None or not text.endswith("\n") or text.count("\n") != 1:
+        return None
+    return re.fullmatch(pattern, text[:-1])
+
+
+def _unittest_success(raw: bytes, expected_tests: int) -> bool:
+    text = _text(raw)
+    if text is None:
+        return False
+    marker = "\n\n----------------------------------------------------------------------\n"
+    if text.count(marker) != 1:
+        return False
+    progress, trailer = text.split(marker)
+    progress_lines = progress.splitlines()
+    if len(progress_lines) != expected_tests or not all(
+        re.fullmatch(
+            r"test_[A-Za-z0-9_]+ \(__main__\.[A-Za-z0-9_.]+\) \.\.\. ok",
+            line,
+        )
+        for line in progress_lines
+    ):
+        return False
+    match = re.fullmatch(
+        r"Ran ([0-9]+) tests? in [0-9]+(?:\.[0-9]+)?s\n\nOK\n",
+        trailer,
+    )
+    return match is not None and int(match.group(1)) == expected_tests
+
+
+def _strict_pairs(pairs):
+    value = {}
+    for key, item in pairs:
+        if key in value:
+            raise ValueError("duplicate JSON member")
+        value[key] = item
+    return value
+
+
+def _run_bounded(
+    argv: tuple[str, ...],
+    cwd: pathlib.Path,
+    env: dict[str, str],
+    timeout: int,
+    max_output_bytes: int = 4 * 1024 * 1024,
+) -> tuple[int, bytes, bytes, bool, bool]:
+    process = subprocess.Popen(
+        argv,
+        cwd=cwd,
+        env=env,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    buffers = {"stdout": bytearray(), "stderr": bytearray()}
+    overflow = threading.Event()
+
+    def drain(name: str, stream) -> None:
+        try:
+            while chunk := stream.read(64 * 1024):
+                buffer = buffers[name]
+                remaining = max_output_bytes + 1 - len(buffer)
+                if remaining > 0:
+                    buffer.extend(chunk[:remaining])
+                if len(buffer) > max_output_bytes:
+                    overflow.set()
+                    try:
+                        process.kill()
+                    except OSError:
+                        pass
+                    return
+        except OSError:
+            overflow.set()
+            try:
+                process.kill()
+            except OSError:
+                pass
+        finally:
+            stream.close()
+
+    assert process.stdout is not None and process.stderr is not None
+    threads = [
+        threading.Thread(target=drain, args=("stdout", process.stdout), daemon=True),
+        threading.Thread(target=drain, args=("stderr", process.stderr), daemon=True),
+    ]
+    for thread in threads:
+        thread.start()
+    timed_out = False
+    try:
+        process.wait(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        timed_out = True
+        process.kill()
+        process.wait()
+    for thread in threads:
+        thread.join()
+    return (
+        process.returncode,
+        bytes(buffers["stdout"]),
+        bytes(buffers["stderr"]),
+        timed_out,
+        overflow.is_set(),
+    )
+
+
 def _summary(command_id: str, stdout: bytes, stderr: bytes) -> bool:
-    text = stdout.decode("utf-8", "replace")
-    error_text = stderr.decode("utf-8", "replace")
     if command_id == "portable-manifest":
-        return "drift=0" in text
+        return stderr == b"" and _one_line(stdout, r"portable manifest: files=[1-9][0-9]* drift=0") is not None
     if command_id == "portable-manifest-tests":
-        return "portable bundle tests: tests=" in text and "failures=0" in text
+        match = _one_line(stdout, r"portable bundle tests: tests=([1-9][0-9]*) failures=0")
+        return match is not None and _unittest_success(stderr, int(match.group(1)))
     if command_id == "portable-cli-tests":
-        return "portable CLI tests: tests=" in text and "failures=0" in text
+        match = _one_line(stdout, r"portable CLI tests: tests=([1-9][0-9]*) failures=0")
+        return match is not None and _unittest_success(stderr, int(match.group(1)))
     if command_id == "portable-preflight":
-        return "Ran " in error_text and "OK" in error_text
+        text = _text(stderr)
+        match = re.search(r"\n-+\nRan ([1-9][0-9]*) tests? in [0-9.]+s\n\nOK\n\Z", text or "")
+        return stdout == b"" and match is not None and _unittest_success(stderr, int(match.group(1)))
     if command_id == "independent-runtime":
-        return "second-implementation counts=" in text and "failures=0" in text
+        text = _text(stdout)
+        prefix = "second-implementation counts="
+        suffix = " failures=0\n"
+        if stderr != b"" or text is None or not text.startswith(prefix) or not text.endswith(suffix):
+            return False
+        try:
+            counts = json.loads(
+                text[len(prefix):-len(suffix)],
+                object_pairs_hook=_strict_pairs,
+            )
+        except (ValueError, json.JSONDecodeError):
+            return False
+        return (
+            isinstance(counts, dict)
+            and bool(counts)
+            and all(isinstance(value, int) and not isinstance(value, bool) and value >= 0 for value in counts.values())
+        )
     if command_id == "raw-boundary-preflight":
         try:
-            row = json.loads(text.strip().splitlines()[-1])
-        except (IndexError, json.JSONDecodeError):
+            text = _text(stdout)
+            if stderr != b"" or text is None or not text.endswith("\n") or text.count("\n") != 1:
+                return False
+            row = json.loads(text, object_pairs_hook=_strict_pairs)
+        except (ValueError, json.JSONDecodeError):
             return False
-        return row.get("status") == "PASS" and row.get("divergence_count") == 0
+        required = {
+            "candidate_cli_flags",
+            "candidate_cli_pycache_policy",
+            "case_names",
+            "divergence_count",
+            "executed_cases",
+            "family_counts",
+            "first_divergence",
+            "format_version",
+            "status",
+            "stream_sha256",
+            "surfaces_per_case",
+        }
+        return (
+            isinstance(row, dict)
+            and set(row) == required
+            and row.get("format_version") == "RR2-BOUNDED-RAW-PREFLIGHT-0.2"
+            and row.get("status") == "PASS"
+            and row.get("divergence_count") == 0
+            and row.get("first_divergence") is None
+            and isinstance(row.get("executed_cases"), int)
+            and not isinstance(row["executed_cases"], bool)
+            and row["executed_cases"] > 0
+            and isinstance(row.get("case_names"), list)
+            and all(isinstance(name, str) for name in row["case_names"])
+            and len(row["case_names"]) == row["executed_cases"]
+            and isinstance(row.get("family_counts"), dict)
+            and all(
+                isinstance(name, str)
+                and isinstance(value, int)
+                and not isinstance(value, bool)
+                and value >= 0
+                for name, value in row["family_counts"].items()
+            )
+            and sum(row["family_counts"].values()) == row["executed_cases"]
+            and isinstance(row.get("stream_sha256"), str)
+            and re.fullmatch(r"[A-F0-9]{64}", row["stream_sha256"]) is not None
+        )
     if command_id == "sidecar-transport":
-        return "sidecar parity: checks=" in text and "failures=0" in text
+        return stderr == b"" and _one_line(
+            stdout,
+            r"sidecar parity: checks=[1-9][0-9]* failures=0 fixtures=[1-9][0-9]*",
+        ) is not None
     if command_id == "sidecar-receipts":
-        return "wp5 receipt verification: checks=" in text and "failures=0" in text
+        return stderr == b"" and _one_line(
+            stdout,
+            r"wp5 receipt verification: checks=[1-9][0-9]* failures=0",
+        ) is not None
     return False
 
 
@@ -89,30 +272,25 @@ def main() -> int:
     env["PYTHONHASHSEED"] = "0"
     for command_id, tail, timeout in COMMANDS:
         argv = (sys.executable, "-I", "-B", *tail)
-        try:
-            completed = subprocess.run(
-                argv,
-                cwd=ROOT,
-                env=env,
-                stdin=subprocess.DEVNULL,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                timeout=timeout,
-                check=False,
-            )
-            if completed.returncode != 0 or not _summary(command_id, completed.stdout, completed.stderr):
-                failures += 1
-                print(
-                    f"FAIL {command_id} exit={completed.returncode} "
-                    f"stdout_sha256={_digest(completed.stdout)} "
-                    f"stderr_sha256={_digest(completed.stderr)}"
-                )
-        except subprocess.TimeoutExpired as exc:
+        returncode, stdout, stderr, timed_out, overflow = _run_bounded(
+            argv,
+            ROOT,
+            env,
+            timeout,
+        )
+        if timed_out:
             failures += 1
             print(
                 f"FAIL {command_id} timeout={timeout} "
-                f"stdout_sha256={_digest(exc.stdout or b'')} "
-                f"stderr_sha256={_digest(exc.stderr or b'')}"
+                f"stdout_sha256={_digest(stdout)} "
+                f"stderr_sha256={_digest(stderr)}"
+            )
+        elif overflow or returncode != 0 or not _summary(command_id, stdout, stderr):
+            failures += 1
+            print(
+                f"FAIL {command_id} exit={returncode} output_overflow={int(overflow)} "
+                f"stdout_sha256={_digest(stdout)} "
+                f"stderr_sha256={_digest(stderr)}"
             )
     print(f"portable gate: checks={len(COMMANDS) + 1} failures={failures}")
     return 1 if failures else 0

@@ -2,41 +2,182 @@
 
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
 import pathlib
 import platform
 import sys
+import types
+from typing import Any
 
 
 HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parent
 VERSION_FILE = HERE / "VERSION"
-SECOND = ROOT / "second-implementation"
-SIDECAR = ROOT / "perf" / "sidecar"
-for path in (ROOT, SECOND, SIDECAR):
-    if str(path) not in sys.path:
-        sys.path.insert(0, str(path))
+MANIFEST_PATH = HERE / "MANIFEST.json"
+MAX_MANIFEST_BYTES = 4 * 1024 * 1024
+MAX_RUNTIME_MODULE_BYTES = 16 * 1024 * 1024
+ZERO64 = "0" * 64
+HEX = frozenset("0123456789ABCDEF")
+SUPPORTED_IMPLEMENTATION = "CPython"
+SUPPORTED_PYTHON_VERSIONS = frozenset({(3, 12), (3, 13), (3, 14)})
 
 
-def _load_beside(name: str):
-    """Path-bound import of a module shipped beside this file.
+def _pairs(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise RuntimeError(f"duplicate manifest member: {key}")
+        result[key] = value
+    return result
 
-    Binding by explicit file path instead of bare module name keeps the
-    verifier import inside the manifest-covered local set — an ambient
-    same-name module elsewhere on sys.path can never substitute for it —
-    and works under isolated-mode spawning (`-I`), which removes the
-    script directory from sys.path.
-    """
 
-    spec = importlib.util.spec_from_file_location(f"portable_{name}", HERE / f"{name}.py")
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = module
-    spec.loader.exec_module(module)
+def _sha(value: Any) -> bool:
+    return isinstance(value, str) and len(value) == 64 and all(char in HEX for char in value)
+
+
+def _canonical_manifest(value: Any) -> bytes:
+    return (
+        json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        + "\n"
+    ).encode("utf-8")
+
+
+def _read_manifest_index() -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
+    """Authenticate the manifest index before any repository module executes."""
+
+    if MANIFEST_PATH.is_symlink() or not MANIFEST_PATH.is_file():
+        raise RuntimeError("portable manifest must be a regular nonsymlink file")
+    with MANIFEST_PATH.open("rb") as stream:
+        raw = stream.read(MAX_MANIFEST_BYTES + 1)
+    if len(raw) > MAX_MANIFEST_BYTES:
+        raise RuntimeError("portable manifest exceeds 4 MiB")
+    try:
+        manifest = json.loads(raw.decode("utf-8"), object_pairs_hook=_pairs)
+    except (UnicodeError, ValueError) as exc:
+        raise RuntimeError(f"portable manifest is invalid: {exc}") from exc
+    required = {
+        "files",
+        "format_version",
+        "inventory_sha256",
+        "manifest_sha256",
+        "path_contract",
+        "runtime_contract",
+    }
+    if not isinstance(manifest, dict) or set(manifest) != required:
+        raise RuntimeError("portable manifest top-level members are not closed")
+    if manifest["format_version"] != "RR-PORTABLE-BUNDLE-MANIFEST-1":
+        raise RuntimeError("portable manifest format is unsupported")
+    if not _sha(manifest["manifest_sha256"]):
+        raise RuntimeError("portable manifest seal is malformed")
+    sealed = dict(manifest)
+    expected_seal = sealed["manifest_sha256"]
+    sealed["manifest_sha256"] = ZERO64
+    actual_seal = hashlib.sha256(_canonical_manifest(sealed)).hexdigest().upper()
+    if actual_seal != expected_seal:
+        raise RuntimeError("portable manifest self-seal mismatch")
+    rows = manifest["files"]
+    if not isinstance(rows, list) or not rows:
+        raise RuntimeError("portable manifest files must be a nonempty array")
+    index: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        if not isinstance(row, dict) or set(row) != {"byte_length", "path", "role", "sha256"}:
+            raise RuntimeError("portable manifest file row is not closed")
+        relpath = row["path"]
+        if not isinstance(relpath, str) or not relpath or relpath in index:
+            raise RuntimeError("portable manifest path is invalid or duplicated")
+        if (
+            not isinstance(row["byte_length"], int)
+            or isinstance(row["byte_length"], bool)
+            or row["byte_length"] < 0
+            or not _sha(row["sha256"])
+        ):
+            raise RuntimeError(f"portable manifest declaration is invalid: {relpath}")
+        index[relpath] = row
+    return manifest, index
+
+
+_MANIFEST, _MANIFEST_ROWS = _read_manifest_index()
+
+
+def _declared_source(relpath: str) -> tuple[pathlib.Path, bytes]:
+    """Read one declared repository module with a pre-allocation byte ceiling."""
+
+    row = _MANIFEST_ROWS.get(relpath)
+    if row is None:
+        raise RuntimeError(f"runtime module is undeclared: {relpath}")
+    expected_length = row["byte_length"]
+    if expected_length > MAX_RUNTIME_MODULE_BYTES:
+        raise RuntimeError(f"runtime module exceeds {MAX_RUNTIME_MODULE_BYTES} bytes: {relpath}")
+    pure = pathlib.PurePosixPath(relpath)
+    if pure.is_absolute() or any(part in ("", ".", "..") for part in pure.parts):
+        raise RuntimeError(f"runtime module path is unsafe: {relpath}")
+    path = ROOT.joinpath(*pure.parts)
+    cursor = ROOT
+    for part in pure.parts:
+        cursor = cursor / part
+        if cursor.is_symlink():
+            raise RuntimeError(f"runtime module path crosses a symlink: {relpath}")
+    try:
+        resolved = path.resolve(strict=True)
+    except OSError as exc:
+        raise RuntimeError(f"runtime module is unavailable: {relpath}: {exc}") from exc
+    if not resolved.is_relative_to(ROOT.resolve()) or not resolved.is_file():
+        raise RuntimeError(f"runtime module is outside the repository or not a file: {relpath}")
+    with resolved.open("rb") as stream:
+        raw = stream.read(expected_length + 1)
+    if (
+        len(raw) != expected_length
+        or hashlib.sha256(raw).hexdigest().upper() != row["sha256"]
+    ):
+        raise RuntimeError(f"runtime module failed byte authentication: {relpath}")
+    return resolved, raw
+
+
+def _load_manifest_module(
+    name: str,
+    relpath: str,
+    *,
+    aliases: tuple[tuple[str, types.ModuleType], ...] = (),
+) -> types.ModuleType:
+    """Execute only authenticated declared bytes, with project imports path-bound."""
+
+    path, raw = _declared_source(relpath)
+    module = types.ModuleType(name)
+    module.__file__ = str(path)
+    module.__package__ = name.rpartition(".")[0]
+    module.__spec__ = importlib.util.spec_from_loader(name, loader=None, origin=str(path))
+    absent = object()
+    previous_path = list(sys.path)
+    previous_modules = {
+        alias: sys.modules.get(alias, absent) for alias, _target in aliases
+    }
+    previous_name = sys.modules.get(name, absent)
+    sys.modules[name] = module
+    for alias, target in aliases:
+        sys.modules[alias] = target
+    try:
+        exec(compile(raw, str(path), "exec", dont_inherit=True), module.__dict__)
+    except BaseException:
+        if previous_name is absent:
+            sys.modules.pop(name, None)
+        else:
+            sys.modules[name] = previous_name
+        raise
+    finally:
+        sys.path[:] = previous_path
+        for alias, previous in previous_modules.items():
+            if previous is absent:
+                sys.modules.pop(alias, None)
+            else:
+                sys.modules[alias] = previous
     return module
 
 
-_verify_bundle = _load_beside("verify_bundle")
+_verify_bundle = _load_manifest_module(
+    "_receiver_reliance_portable_verify_bundle", "portable/verify_bundle.py"
+)
 MANIFEST = _verify_bundle.MANIFEST
 verify = _verify_bundle.verify
 
@@ -46,20 +187,53 @@ EXIT_USAGE = 64
 EXIT_STARTUP = 70
 
 
-def _verified() -> bool:
+def _binary(stream: Any) -> Any:
+    return getattr(stream, "buffer", stream)
+
+
+def _write_bytes(stream: Any, raw: bytes) -> None:
+    target = _binary(stream)
+    target.write(raw)
+    target.flush()
+
+
+def _runtime_identity() -> tuple[str, tuple[int, int]]:
+    return platform.python_implementation(), (sys.version_info.major, sys.version_info.minor)
+
+
+def _runtime_failures() -> list[str]:
+    implementation, version = _runtime_identity()
+    if implementation == SUPPORTED_IMPLEMENTATION and version in SUPPORTED_PYTHON_VERSIONS:
+        return []
+    return [
+        "runtime:unsupported:"
+        f"{implementation}-{version[0]}.{version[1]}:requires-CPython-3.12-3.14"
+    ]
+
+
+def _verification() -> tuple[int, list[str]]:
     count, failures = verify()
+    return count, [*failures, *_runtime_failures()]
+
+
+def _emit_failures(failures: list[str], stream: Any) -> None:
+    for failure in failures:
+        _write_bytes(stream, f"FAIL {failure}\n".encode("utf-8", errors="backslashreplace"))
+
+
+def _verified() -> bool:
+    count, failures = _verification()
     if failures:
-        for failure in failures:
-            print(f"FAIL {failure}", file=sys.stderr)
+        _emit_failures(failures, sys.stderr)
         return False
     return count > 0
 
 
 def _doctor() -> int:
-    count, failures = verify()
+    count, failures = _verification()
     manifest_seal = None
     if not failures:
-        manifest_seal = json.loads(MANIFEST.read_text(encoding="utf-8"))["manifest_sha256"]
+        manifest_seal = _MANIFEST["manifest_sha256"]
     record = {
         "bundle_files": count,
         "bundle_version": VERSION_FILE.read_text(encoding="ascii").strip(),
@@ -70,25 +244,58 @@ def _doctor() -> int:
         "status": "READY" if not failures else "NOT_READY",
         "system": platform.system(),
     }
-    sys.stdout.buffer.write(
-        (json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n").encode("utf-8")
+    _write_bytes(
+        sys.stdout,
+        (json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n").encode("utf-8"),
     )
     return 0 if not failures else EXIT_STARTUP
+
+
+def _preflight_module() -> types.ModuleType:
+    return _load_manifest_module(
+        "_receiver_reliance_portable_preflight", "adapters/portable_preflight.py"
+    )
+
+
+def _decision_module() -> types.ModuleType:
+    return _load_manifest_module(
+        "_receiver_reliance_portable_rr2", "second-implementation/rr2.py"
+    )
+
+
+def _sidecar_module() -> types.ModuleType:
+    rr_api = _load_manifest_module(
+        "_receiver_reliance_portable_rr_api", "grounded-0_4/rr_api.py"
+    )
+    rr_batch = _load_manifest_module(
+        "_receiver_reliance_portable_rr_batch",
+        "grounded-0_4/rr_batch.py",
+        aliases=(("rr_api", rr_api),),
+    )
+    transport = _load_manifest_module(
+        "_receiver_reliance_portable_transport_envelope",
+        "perf/sidecar/transport_envelope.py",
+    )
+    return _load_manifest_module(
+        "_receiver_reliance_portable_rr_sidecar",
+        "perf/sidecar/rr_sidecar.py",
+        aliases=(("rr_batch", rr_batch), ("transport_envelope", transport)),
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
     if len(args) != 1 or args[0] not in {"verify", "doctor", "preflight", "decide", "sidecar"}:
-        # Binary write: byte-exact LF on every OS (no text-mode translation).
-        sys.stderr.buffer.write(USAGE.encode("utf-8"))
-        sys.stderr.buffer.flush()
+        _write_bytes(sys.stderr, USAGE.encode("utf-8"))
         return EXIT_USAGE
     mode = args[0]
     if mode == "verify":
-        count, failures = verify()
-        for failure in failures:
-            print(f"FAIL {failure}")
-        print(f"portable bundle: files={count} failures={len(failures)}")
+        count, failures = _verification()
+        _emit_failures(failures, sys.stdout)
+        _write_bytes(
+            sys.stdout,
+            f"portable bundle: files={count} failures={len(failures)}\n".encode("utf-8"),
+        )
         return 1 if failures else 0
     if mode == "doctor":
         return _doctor()
@@ -96,21 +303,21 @@ def main(argv: list[str] | None = None) -> int:
         return EXIT_STARTUP
     try:
         if mode == "preflight":
-            from adapters.portable_preflight import process_jsonl
-
-            return process_jsonl(sys.stdin, sys.stdout)
+            process_jsonl = _preflight_module().process_jsonl
+            return process_jsonl(_binary(sys.stdin), _binary(sys.stdout))
         if mode == "decide":
-            from rr2 import execute
-
-            code, output = execute(sys.stdin.buffer.read())
-            sys.stdout.buffer.write(output)
+            engine = _decision_module()
+            # Bounded acquisition BEFORE any allocation-scale read: at most
+            # MAX_RAW_BYTES + 1 bytes enter memory; the engine's own limit
+            # law then classifies the over-size case deterministically.
+            limit = engine.MAX_RAW_BYTES
+            code, output = engine.execute(_binary(sys.stdin).read(limit + 1))
+            _write_bytes(sys.stdout, output)
             return code
         if mode == "sidecar":
-            from rr_sidecar import serve
-
-            return serve(sys.stdin.buffer, sys.stdout.buffer)
-    except (BrokenPipeError, OSError, RuntimeError, ValueError):
-        sys.stderr.write("portable-cli: bounded runtime failure\n")
+            return _sidecar_module().serve(_binary(sys.stdin), _binary(sys.stdout))
+    except (BrokenPipeError, ImportError, OSError, RuntimeError, TypeError, ValueError):
+        _write_bytes(sys.stderr, b"portable-cli: bounded runtime failure\n")
         return EXIT_STARTUP
     raise AssertionError(mode)
 

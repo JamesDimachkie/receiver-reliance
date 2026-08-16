@@ -3,10 +3,14 @@
 from __future__ import annotations
 
 import argparse
+import builtins
 import hashlib
+import importlib.util
+import io
 import json
 import pathlib
 import sys
+import types
 from collections import Counter
 from typing import Any
 
@@ -33,18 +37,37 @@ from adapters.portable_preflight import (  # noqa: E402
 
 IMPL = REPO / "baseline-run" / "implementation-output-0.3"
 PROOF = REPO / "proof"
-for path in (IMPL, PROOF):
-    if str(path) not in sys.path:
-        sys.path.insert(0, str(path))
-import arm_b1 as measurement_adapter  # noqa: E402
-import pcb_runner as mutable_measurement_runner  # noqa: E402
+MEASUREMENT_FIXTURE_PACK = (
+    REPO
+    / "baseline-run"
+    / "fixtures"
+    / "PRIMARY_BASELINE_SEMANTIC_FIXTURE_PACK_0_2.json"
+)
+SUPPLEMENTAL_CONTRACT = (
+    REPO
+    / "supplemental-0_3"
+    / "control"
+    / "B1_SUPPLEMENTAL_COMPARATOR_CONTRACT_0_3.json"
+)
 
 EXPECTED = {
     "parent_corpus_raw_sha256": "09B4B05FE26CF46F063EC637C1A4D27B4D5190961756888099F96254C49B334E",
     "parent_truth_raw_sha256": "4FEEF9BE65DD7523849CEE71B5A43EA6F7667710745E71D79C0EE5B054E3E2C7",
     "source_proof_results_raw_sha256": "3883F504C349D8884701586DB0B8B29744D094EBB6B7C6A5DB69456FAEC9C032",
     "source_proof_adapter_raw_sha256": "978BEE0A3F278BAE083B390A36153C08C1CDF4ABB0F9581A4EAE8860957BE12E",
+    "source_measurement_runner_raw_sha256": "83319385C8B6D28965F4683B8C0689FB70158E86ED35D54E7467E8E3DF076E09",
+    "source_measurement_capabilities_raw_sha256": "4D9FA1C9CCB60B980BCE1739FE8FDC10E84AEFC03D4C20E2AA1A8B0BBE2D18FC",
+    "source_measurement_fixture_pack_raw_sha256": "F27B93B3BE8BCBF5FBF7FF7789494621D17B426E16B38E958BB932899B0961B9",
+    "source_measurement_contract_raw_sha256": "6B2CAD02DDE7388D63D66E4863E5233CFBD1DC413575D9D260DB9799C7023A12",
     "hosted_manifest_raw_sha256": "9DC261CA316C4F8E83342FE6AD24EBF15C3A21F3FD38AE6565EE28651569D5E6",
+}
+
+EXPECTED_LENGTHS = {
+    "source_proof_adapter_raw_sha256": 11130,
+    "source_measurement_runner_raw_sha256": 19327,
+    "source_measurement_capabilities_raw_sha256": 50314,
+    "source_measurement_fixture_pack_raw_sha256": 1360792,
+    "source_measurement_contract_raw_sha256": 159277,
 }
 
 
@@ -62,7 +85,143 @@ def _response_behavior(response: dict[str, Any]) -> str:
     return response["output"]["result_object"]["behavior_class"]
 
 
-def _measurement_behavior(record: dict[str, Any]) -> str:
+def _read_pinned_bytes(
+    path: pathlib.Path,
+    expected_length: int,
+    expected_sha256: str,
+    label: str,
+) -> bytes:
+    """Read exactly one authenticated measurement file under a hard bound."""
+
+    try:
+        with path.open("rb") as stream:
+            raw = stream.read(expected_length + 1)
+    except OSError as error:
+        raise RuntimeError(f"cannot read {label}: {error}") from error
+    if (
+        len(raw) != expected_length
+        or hashlib.sha256(raw).hexdigest().upper() != expected_sha256
+    ):
+        raise RuntimeError(f"{label} failed byte authentication")
+    return raw
+
+
+def _load_verified_module(
+    name: str,
+    path: pathlib.Path,
+    expected_length: int,
+    expected_sha256: str,
+    *,
+    aliases: tuple[tuple[str, types.ModuleType], ...] = (),
+    module_globals: tuple[tuple[str, Any], ...] = (),
+) -> types.ModuleType:
+    """Execute only authenticated source bytes, insulated from ambient imports."""
+
+    raw = _read_pinned_bytes(path, expected_length, expected_sha256, name)
+
+    module = types.ModuleType(name)
+    module.__file__ = str(path)
+    module.__package__ = name.rpartition(".")[0]
+    module.__spec__ = importlib.util.spec_from_loader(
+        name, loader=None, origin=str(path)
+    )
+    module.__dict__.update(module_globals)
+    code = compile(raw, str(path), "exec", dont_inherit=True)
+    absent = object()
+    previous_modules = {
+        alias: sys.modules.get(alias, absent) for alias, _target in aliases
+    }
+    previous_path = list(sys.path)
+    sys.modules[name] = module
+    for alias, target in aliases:
+        sys.modules[alias] = target
+    try:
+        exec(code, module.__dict__)
+    except BaseException:
+        sys.modules.pop(name, None)
+        raise
+    finally:
+        sys.path[:] = previous_path
+        for alias, previous in previous_modules.items():
+            if previous is absent:
+                sys.modules.pop(alias, None)
+            else:
+                sys.modules[alias] = previous
+    return module
+
+
+def _load_measurement_modules() -> tuple[types.ModuleType, types.ModuleType]:
+    """Authenticate every transitive module/input before measurement replay."""
+
+    fixture_raw = _read_pinned_bytes(
+        MEASUREMENT_FIXTURE_PACK,
+        EXPECTED_LENGTHS["source_measurement_fixture_pack_raw_sha256"],
+        EXPECTED["source_measurement_fixture_pack_raw_sha256"],
+        "measurement fixture pack",
+    )
+    contract_raw = _read_pinned_bytes(
+        SUPPLEMENTAL_CONTRACT,
+        EXPECTED_LENGTHS["source_measurement_contract_raw_sha256"],
+        EXPECTED["source_measurement_contract_raw_sha256"],
+        "measurement supplemental contract",
+    )
+    capabilities = _load_verified_module(
+        "_outcome_receipt_b1_capabilities",
+        IMPL / "b1_capabilities.py",
+        EXPECTED_LENGTHS["source_measurement_capabilities_raw_sha256"],
+        EXPECTED["source_measurement_capabilities_raw_sha256"],
+    )
+    authenticated_contract = json.loads(contract_raw)
+    if capabilities.jcs_bytes(capabilities.authority_documents()["contract"]) != (
+        capabilities.jcs_bytes(authenticated_contract)
+    ):
+        raise RuntimeError("measurement supplemental contract changed during loading")
+    runner = _load_verified_module(
+        "_outcome_receipt_pcb_runner",
+        IMPL / "pcb_runner.py",
+        EXPECTED_LENGTHS["source_measurement_runner_raw_sha256"],
+        EXPECTED["source_measurement_runner_raw_sha256"],
+        aliases=(("b1_capabilities", capabilities),),
+    )
+
+    def pinned_open(
+        file: Any,
+        mode: str = "r",
+        buffering: int = -1,
+        encoding: str | None = None,
+        errors: str | None = None,
+        newline: str | None = None,
+        closefd: bool = True,
+        opener: Any = None,
+    ) -> io.StringIO:
+        del buffering, errors, newline, closefd, opener
+        if pathlib.Path(file) != MEASUREMENT_FIXTURE_PACK or mode not in {"r", "rt"}:
+            raise RuntimeError("measurement adapter attempted an unpinned file read")
+        if encoding not in {None, "utf-8"}:
+            raise RuntimeError("measurement adapter requested an unexpected encoding")
+        return io.StringIO(fixture_raw.decode("utf-8"))
+
+    pinned_builtins = dict(vars(builtins))
+    pinned_builtins["open"] = pinned_open
+    adapter = _load_verified_module(
+        "_outcome_receipt_arm_b1",
+        PROOF / "arm_b1.py",
+        EXPECTED_LENGTHS["source_proof_adapter_raw_sha256"],
+        EXPECTED["source_proof_adapter_raw_sha256"],
+        aliases=(
+            ("b1_capabilities", capabilities),
+            ("pcb_runner", runner),
+        ),
+        module_globals=(("__builtins__", pinned_builtins),),
+    )
+    return adapter, runner
+
+
+def _measurement_behavior(
+    record: dict[str, Any],
+    measurement_adapter: types.ModuleType,
+    mutable_measurement_runner: types.ModuleType,
+) -> str:
     """Exercise the pinned proof adapter/runner only inside this receipt.
 
     This mutable local harness is not imported by the portable fallback,
@@ -103,12 +262,16 @@ def replay() -> tuple[dict[str, Any], bytes, bytes]:
         "parent_truth_raw_sha256": TRUTH,
         "source_proof_results_raw_sha256": PROOF / "results.json",
         "source_proof_adapter_raw_sha256": PROOF / "arm_b1.py",
+        "source_measurement_runner_raw_sha256": IMPL / "pcb_runner.py",
         "hosted_manifest_raw_sha256": HOSTED_MANIFEST,
     }
     for key, path in pins_to_check.items():
-        actual = _raw_sha(path)
+        raw = path.read_bytes()
+        actual = hashlib.sha256(raw).hexdigest().upper()
         if actual != EXPECTED[key]:
             raise RuntimeError(f"raw SHA pin failed for {path}: {actual} != {EXPECTED[key]}")
+
+    measurement_adapter, mutable_measurement_runner = _load_measurement_modules()
 
     records = _load_jsonl(CORPUS)
     truths = {row["record_id"]: row for row in _load_jsonl(TRUTH)}
@@ -138,7 +301,9 @@ def replay() -> tuple[dict[str, Any], bytes, bytes]:
         issue_counts.update(problem.code for problem in result.issues)
 
         defective = bool(truths[record["record_id"]]["defective"])
-        old_behavior = _measurement_behavior(record)
+        old_behavior = _measurement_behavior(
+            record, measurement_adapter, mutable_measurement_runner
+        )
         historical_behaviors[old_behavior] += 1
         if old_behavior == "PROTOCOL_ERROR":
             historical["protocol_error"] += 1
@@ -156,7 +321,9 @@ def replay() -> tuple[dict[str, Any], bytes, bytes]:
                 "insufficient_evidence_defect" if defective else "insufficient_evidence_clean"
             ] += 1
         elif result.status == READY:
-            behavior = _measurement_behavior(record)
+            behavior = _measurement_behavior(
+                record, measurement_adapter, mutable_measurement_runner
+            )
             ready_behaviors[behavior] += 1
             if behavior == "PROTOCOL_ERROR":
                 fallback["protocol_error"] += 1

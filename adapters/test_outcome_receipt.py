@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import json
 import pathlib
+import shutil
+import subprocess
 import sys
+import tempfile
 import unittest
 
 HERE = pathlib.Path(__file__).resolve().parent
@@ -52,6 +55,56 @@ class OutcomeReceiptTests(unittest.TestCase):
         import hashlib
 
         self.assertEqual(claimed, hashlib.sha256(canonical_json_bytes(receipt)).hexdigest().upper())
+
+    def test_transitive_measurement_tampering_fails_closed(self):
+        cases = (
+            (
+                pathlib.Path(
+                    "baseline-run/implementation-output-0.3/b1_capabilities.py"
+                ),
+                "_outcome_receipt_b1_capabilities",
+            ),
+            (
+                pathlib.Path(
+                    "baseline-run/fixtures/"
+                    "PRIMARY_BASELINE_SEMANTIC_FIXTURE_PACK_0_2.json"
+                ),
+                "measurement fixture pack",
+            ),
+        )
+        for relative_path, label in cases:
+            with self.subTest(path=relative_path), tempfile.TemporaryDirectory(
+                prefix="rr-outcome-tamper-"
+            ) as temporary:
+                mirror = pathlib.Path(temporary) / "receiver-reliance"
+                shutil.copytree(
+                    REPO,
+                    mirror,
+                    ignore=shutil.ignore_patterns(".git", "__pycache__", "*.pyc"),
+                )
+                target = mirror / relative_path
+                raw = target.read_bytes()
+                target.write_bytes(bytes((raw[0] ^ 1,)) + raw[1:])
+                completed = subprocess.run(
+                    [
+                        sys.executable,
+                        "-I",
+                        "-B",
+                        str(mirror / "adapters/outcome_receipt.py"),
+                        "--check",
+                    ],
+                    cwd=mirror,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    check=False,
+                    timeout=120,
+                )
+                self.assertNotEqual(completed.returncode, 0)
+                self.assertEqual(completed.stdout, b"")
+                self.assertEqual(
+                    completed.stderr.decode("utf-8").rstrip().splitlines()[-1],
+                    f"RuntimeError: {label} failed byte authentication",
+                )
 
 
 if __name__ == "__main__":

@@ -11,8 +11,10 @@ import base64
 import binascii
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
+import stat
 import unicodedata
 from typing import Any
 
@@ -39,6 +41,8 @@ MAX_RAW_BYTES = 16_777_216
 MAX_JSON_DEPTH = 128
 MAX_JSON_MEMBERS = 100_000
 MAX_JSON_NODES = 100_000
+MAX_ERROR_POINTER_CHARS = 240
+MAX_AUTHORITY_BYTES = 4 * 1024 * 1024
 SUPPLEMENTAL_CONTRACT_REL = "supplemental-0_3/control/B1_SUPPLEMENTAL_COMPARATOR_CONTRACT_0_3.json"
 PRIMARY_CONTRACT_REL = "baseline-run/control/B1_PRIMARY_IMPLEMENTER_CONTRACT_0_1.json"
 PACKET_REL = "access/SANITIZED_PRIMARY_BASELINE_IMPLEMENTER_PACKET_0_1.json"
@@ -160,10 +164,11 @@ class StrictParser:
         self.text = text
         self.i = 0
         self.enforce_limits = enforce_limits
-        self.number_pointers: list[str] = []
+        self.number_pointer: str | None = None
         self.max_depth = 0
         self.member_count = 0
         self.node_count = 0
+        self.post_limit_fields: dict[str, str] | None = None
 
     def parse(self) -> Any:
         missing = object()
@@ -248,10 +253,10 @@ class StrictParser:
                     key = self._string()
                     if key in frame["seen"]:
                         raise DuplicateFault
+                    if self.enforce_limits and self.member_count >= MAX_JSON_MEMBERS:
+                        raise LimitFault
                     frame["seen"].add(key)
                     self.member_count += 1
-                    if self.enforce_limits and self.member_count > MAX_JSON_MEMBERS:
-                        raise LimitFault
                     frame["key"] = key
                     frame["state"] = "colon"
                     continue
@@ -379,28 +384,35 @@ class StrictParser:
                 raise ParseFault
         token = self.text[start:self.i]
         if is_fractional or token == "-0":
-            self.number_pointers.append(_pointer_text(ptr))
+            self._remember_number_pointer(ptr)
             # Invalid-number precedence is decided after the complete raw JSON
             # grammar is known.  A harmless placeholder lets parsing continue
             # without invoking Decimal on attacker-controlled digit strings.
             return 0
         digits = token[1:] if token.startswith("-") else token
         if len(digits) > len(SAFE_ABS_DIGITS) or (len(digits) == len(SAFE_ABS_DIGITS) and digits > SAFE_ABS_DIGITS):
-            self.number_pointers.append(_pointer_text(ptr))
+            self._remember_number_pointer(ptr)
             # Never pass an overlong decimal token to int(); Python's
             # interpreter-configured max-str-digits guard is not contractual.
             return 0
         return int(token)
 
+    def _remember_number_pointer(self, ptr: Any) -> None:
+        pointer = _pointer_text(ptr)
+        if self.number_pointer is None or pointer.encode("utf-8") < self.number_pointer.encode("utf-8"):
+            self.number_pointer = pointer
 
-def _nfc_pointers(node: Any) -> list[str]:
-    failures: list[str] = []
+
+def _nfc_pointer(node: Any) -> str | None:
+    failure: str | None = None
     stack = [(node, None)]
     while stack:
         current, current_link = stack.pop()
         if isinstance(current, str):
             if unicodedata.normalize("NFC", current) != current:
-                failures.append(_pointer_text(current_link))
+                pointer = _pointer_text(current_link)
+                if failure is None or pointer.encode("utf-8") < failure.encode("utf-8"):
+                    failure = pointer
         elif isinstance(current, list):
             for index in range(len(current) - 1, -1, -1):
                 stack.append((current[index], _pointer_child(current_link, str(index))))
@@ -410,7 +422,7 @@ def _nfc_pointers(node: Any) -> list[str]:
                 child_link = _pointer_child(current_link, pointer_escape(name))
                 stack.append((item, child_link))
                 stack.append((name, child_link))
-    return failures
+    return failure
 
 
 def _value_within_limits(root: Any) -> bool:
@@ -454,6 +466,330 @@ def _value_within_limits(root: Any) -> bool:
         return False
 
 
+def _post_limit_precedence_error(
+    text: str,
+    *,
+    has_terminal_lf: bool,
+) -> tuple[str, str, dict[str, str]]:
+    """Select the frozen parse/schema error after the depth allocation fence.
+
+    The ordinary parser has already stopped before allocating the 129th
+    container.  This scanner therefore replays the bounded raw text without
+    building a value tree.  It retains only one frame per open container,
+    decoded keys for duplicate detection, linked pointer state, and the
+    current string/number token.  That is enough to preserve every error that
+    outranks ERR_LIMIT and to classify the actual root format-version value.
+    """
+
+    object_first_key = 0
+    object_next_key = 1
+    object_colon = 2
+    object_value = 3
+    object_after = 4
+    array_first_value = 5
+    array_next_value = 6
+    array_after = 7
+
+    stack: list[dict[str, Any]] = []
+    index = 0
+    root_kind: str | None = None
+    root_complete = False
+    root_fields: dict[str, str] = {}
+    shallow_field_names = frozenset({"configuration", "format_version", "operation_handle", "request_id"})
+    canonical_error = not has_terminal_lf
+    syntax_error = not text
+    nfc_pointer: str | None = None
+    number_pointer: str | None = None
+    hex_digits = frozenset("0123456789abcdefABCDEF")
+
+    def remember_pointer(current: str | None, link: Any) -> str:
+        candidate = _pointer_text(link)
+        if current is None or candidate.encode("utf-8") < current.encode("utf-8"):
+            return candidate
+        return current
+
+    def read_string(start: int) -> tuple[str, int, bool] | None:
+        cursor = start + 1
+        characters: list[str] = []
+        while cursor < len(text):
+            character = text[cursor]
+            cursor += 1
+            if character == '"':
+                decoded = "".join(characters)
+                return decoded, cursor, text[start:cursor] != _json_string(decoded)
+            if ord(character) < 0x20 or 0xD800 <= ord(character) <= 0xDFFF:
+                return None
+            if character != "\\":
+                characters.append(character)
+                continue
+            if cursor >= len(text):
+                return None
+            escape = text[cursor]
+            cursor += 1
+            basic = {'"': '"', "\\": "\\", "/": "/", "b": "\b", "f": "\f", "n": "\n", "r": "\r", "t": "\t"}
+            if escape in basic:
+                characters.append(basic[escape])
+                continue
+            if escape != "u" or cursor + 4 > len(text):
+                return None
+            token = text[cursor:cursor + 4]
+            if any(character not in hex_digits for character in token):
+                return None
+            cursor += 4
+            codepoint = int(token, 16)
+            if 0xD800 <= codepoint <= 0xDBFF:
+                if not text.startswith("\\u", cursor) or cursor + 6 > len(text):
+                    return None
+                low = text[cursor + 2:cursor + 6]
+                if any(character not in hex_digits for character in low):
+                    return None
+                low_codepoint = int(low, 16)
+                if not 0xDC00 <= low_codepoint <= 0xDFFF:
+                    return None
+                cursor += 6
+                characters.append(chr(0x10000 + ((codepoint - 0xD800) << 10) + (low_codepoint - 0xDC00)))
+            elif 0xDC00 <= codepoint <= 0xDFFF:
+                return None
+            else:
+                characters.append(chr(codepoint))
+        return None
+
+    def read_number(start: int) -> tuple[int, bool] | None:
+        cursor = start
+        if text[cursor] == "-":
+            cursor += 1
+            if cursor >= len(text):
+                return None
+        if text[cursor] == "0":
+            cursor += 1
+            if cursor < len(text) and "0" <= text[cursor] <= "9":
+                return None
+        elif "1" <= text[cursor] <= "9":
+            cursor += 1
+            while cursor < len(text) and "0" <= text[cursor] <= "9":
+                cursor += 1
+        else:
+            return None
+        fractional = False
+        if cursor < len(text) and text[cursor] == ".":
+            fractional = True
+            cursor += 1
+            first_digit = cursor
+            while cursor < len(text) and "0" <= text[cursor] <= "9":
+                cursor += 1
+            if cursor == first_digit:
+                return None
+        if cursor < len(text) and text[cursor] in "eE":
+            fractional = True
+            cursor += 1
+            if cursor < len(text) and text[cursor] in "+-":
+                cursor += 1
+            first_digit = cursor
+            while cursor < len(text) and "0" <= text[cursor] <= "9":
+                cursor += 1
+            if cursor == first_digit:
+                return None
+        token = text[start:cursor]
+        digits = token[1:] if token.startswith("-") else token
+        outside_safe_integer = (
+            len(digits) > len(SAFE_ABS_DIGITS)
+            or (len(digits) == len(SAFE_ABS_DIGITS) and digits > SAFE_ABS_DIGITS)
+        )
+        return cursor, fractional or token == "-0" or outside_safe_integer
+
+    def complete_value() -> bool:
+        nonlocal root_complete
+        if not stack:
+            root_complete = True
+            return True
+        if stack[-1]["state"] == object_value:
+            stack[-1]["state"] = object_after
+            return True
+        if stack[-1]["state"] in {array_first_value, array_next_value}:
+            stack[-1]["state"] = array_after
+            return True
+        return False
+
+    def begin_value(pointer: Any, root_member: str | None = None) -> bool:
+        nonlocal canonical_error, index, nfc_pointer, number_pointer, root_kind
+        character = text[index]
+        if root_kind is None:
+            root_kind = "object" if character == "{" else "other"
+        if root_member in shallow_field_names and character != '"':
+            root_fields.pop(root_member, None)
+        if character == "{":
+            stack.append(
+                {
+                    "kind": "object",
+                    "pending_key": None,
+                    "pending_pointer": None,
+                    "pending_root_member": None,
+                    "pointer": pointer,
+                    "previous_key": None,
+                    "seen": set(),
+                    "state": object_first_key,
+                }
+            )
+            index += 1
+            return True
+        if character == "[":
+            stack.append(
+                {
+                    "index": 0,
+                    "kind": "array",
+                    "pointer": pointer,
+                    "state": array_first_value,
+                }
+            )
+            index += 1
+            return True
+        if character == '"':
+            scanned = read_string(index)
+            if scanned is None:
+                return False
+            decoded, end, noncanonical = scanned
+            canonical_error = canonical_error or noncanonical
+            if unicodedata.normalize("NFC", decoded) != decoded:
+                nfc_pointer = remember_pointer(nfc_pointer, pointer)
+            if root_member in shallow_field_names:
+                root_fields[root_member] = decoded
+            index = end
+            return complete_value()
+        for literal in ("true", "false", "null"):
+            if text.startswith(literal, index):
+                index += len(literal)
+                return complete_value()
+        for literal in ("NaN", "Infinity", "-Infinity"):
+            if text.startswith(literal, index):
+                number_pointer = remember_pointer(number_pointer, pointer)
+                index += len(literal)
+                return complete_value()
+        if character == "-" or "0" <= character <= "9":
+            scanned = read_number(index)
+            if scanned is None:
+                return False
+            end, invalid_number = scanned
+            if invalid_number:
+                number_pointer = remember_pointer(number_pointer, pointer)
+            index = end
+            return complete_value()
+        return False
+
+    duplicate = False
+    while not syntax_error:
+        while index < len(text) and text[index] in " \t\n\r":
+            canonical_error = True
+            index += 1
+        if root_complete:
+            if index != len(text):
+                syntax_error = True
+            break
+        if not stack:
+            if index >= len(text) or not begin_value(None):
+                syntax_error = True
+            continue
+
+        frame = stack[-1]
+        state = frame["state"]
+        if index >= len(text):
+            syntax_error = True
+            break
+        character = text[index]
+        if state in {object_first_key, object_next_key}:
+            if state == object_first_key and character == "}":
+                stack.pop()
+                index += 1
+                if not complete_value():
+                    syntax_error = True
+                continue
+            if character != '"':
+                syntax_error = True
+                continue
+            scanned = read_string(index)
+            if scanned is None:
+                syntax_error = True
+                continue
+            decoded, end, noncanonical = scanned
+            canonical_error = canonical_error or noncanonical
+            child_pointer = _pointer_child(frame["pointer"], pointer_escape(decoded))
+            if unicodedata.normalize("NFC", decoded) != decoded:
+                nfc_pointer = remember_pointer(nfc_pointer, child_pointer)
+            if decoded in frame["seen"]:
+                duplicate = True
+            else:
+                frame["seen"].add(decoded)
+            encoded = _utf16_key(decoded)
+            if frame["previous_key"] is not None and encoded < frame["previous_key"]:
+                canonical_error = True
+            frame["previous_key"] = encoded
+            frame["pending_key"] = decoded
+            frame["pending_pointer"] = child_pointer
+            frame["pending_root_member"] = decoded if len(stack) == 1 else None
+            index = end
+            frame["state"] = object_colon
+        elif state == object_colon:
+            if character != ":":
+                syntax_error = True
+                continue
+            index += 1
+            frame["state"] = object_value
+        elif state == object_value:
+            if not begin_value(frame["pending_pointer"], frame["pending_root_member"]):
+                syntax_error = True
+        elif state == object_after:
+            if character == "}":
+                stack.pop()
+                index += 1
+                if not complete_value():
+                    syntax_error = True
+            elif character == ",":
+                frame["state"] = object_next_key
+                index += 1
+            else:
+                syntax_error = True
+        elif state in {array_first_value, array_next_value}:
+            if state == array_first_value and character == "]":
+                stack.pop()
+                index += 1
+                if not complete_value():
+                    syntax_error = True
+            elif not begin_value(_pointer_child(frame["pointer"], str(frame["index"]))):
+                syntax_error = True
+        elif state == array_after:
+            if character == "]":
+                stack.pop()
+                index += 1
+                if not complete_value():
+                    syntax_error = True
+            elif character == ",":
+                frame["index"] += 1
+                frame["state"] = array_next_value
+                index += 1
+            else:
+                syntax_error = True
+        else:  # pragma: no cover - closed state taxonomy
+            syntax_error = True
+
+    if duplicate:
+        return "ERR_DUPLICATE_KEY", "", root_fields
+    if syntax_error or canonical_error:
+        return "ERR_JSON", "", root_fields
+    if nfc_pointer is not None:
+        return "ERR_NFC", nfc_pointer, root_fields
+    if number_pointer is not None:
+        return "ERR_NUMBER", number_pointer, root_fields
+    if root_kind != "object":
+        return "ERR_SCHEMA", "", root_fields
+    if root_fields.get("format_version") not in {
+        "B1-SEMANTIC-DECISION-REQUEST-0.2",
+        "B1-WRAPPER-SEMANTIC-REQUEST-0.2",
+    }:
+        return "ERR_SCHEMA", "/format_version", root_fields
+    # The frozen over-depth envelope treats a recognized dispatch family as a
+    # root schema failure; it never lets the lower-precedence limit replace it.
+    return "ERR_SCHEMA", "", root_fields
+
+
 def _decode_bounded_raw_value(
     raw: bytes,
     *,
@@ -479,22 +815,34 @@ def _decode_bounded_raw_value(
     if text.startswith("\ufeff"):
         return None, None, "ERR_BOM", ""
     json_text = text[:-1] if text.endswith("\n") else text
-    parser = StrictParser(json_text, enforce_limits=not defer_limits)
+    # Allocation ceilings are always active in the parser.  The semantic ABI
+    # may defer only the *error selection* for a closed over-limit value; it
+    # never gets to materialize past the ceiling.
+    parser = StrictParser(json_text, enforce_limits=True)
     try:
         value = parser.parse()
     except DuplicateFault:
         return None, parser, "ERR_DUPLICATE_KEY", ""
     except LimitFault:
-        return None, parser, "ERR_LIMIT", ""
+        if not defer_limits:
+            return None, parser, "ERR_LIMIT", ""
+        try:
+            post_limit_error = _post_limit_precedence_error(
+                json_text,
+                has_terminal_lf=text.endswith("\n"),
+            )
+        except (MemoryError, RecursionError):
+            return None, parser, "ERR_LIMIT", ""
+        parser.post_limit_fields = post_limit_error[2]
+        return None, parser, post_limit_error[0], post_limit_error[1]
     except ParseFault:
         return None, parser, "ERR_JSON", ""
     except (MemoryError, RecursionError):
         return None, parser, "ERR_LIMIT", ""
     if not text.endswith("\n") or "\r" in text:
         return value, parser, "ERR_JSON", ""
-    if parser.number_pointers:
-        pointer = min(parser.number_pointers, key=lambda item: item.encode("utf-8"))
-        return value, parser, "ERR_NUMBER", pointer
+    if parser.number_pointer is not None:
+        return value, parser, "ERR_NUMBER", parser.number_pointer
     if not defer_limits and (
         parser.max_depth > MAX_JSON_DEPTH
         or parser.member_count > MAX_JSON_MEMBERS
@@ -510,12 +858,11 @@ def _decode_bounded_raw_value(
     if canonical != json_text.encode("utf-8"):
         return value, parser, "ERR_JSON", ""
     try:
-        nfc = _nfc_pointers(value)
+        nfc = _nfc_pointer(value)
     except (MemoryError, RecursionError):
         return value, parser, "ERR_LIMIT", ""
-    if nfc:
-        pointer = min(nfc, key=lambda item: item.encode("utf-8"))
-        return value, parser, "ERR_NFC", pointer
+    if nfc is not None:
+        return value, parser, "ERR_NFC", nfc
     return value, parser, None, ""
 
 
@@ -525,6 +872,52 @@ def _equal(left: Any, right: Any) -> bool:
     if type(left) is not type(right):
         return False
     return left == right
+
+
+def _read_regular_bounded(path: Path, expected_length: int | None) -> bytes:
+    """Read one authority from a non-link regular handle under a hard cap."""
+
+    limit = expected_length if expected_length is not None else MAX_AUTHORITY_BYTES
+    try:
+        before = path.lstat()
+        reparse_flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0)
+        if (
+            stat.S_ISLNK(before.st_mode)
+            or not stat.S_ISREG(before.st_mode)
+            or bool(getattr(before, "st_file_attributes", 0) & reparse_flag)
+            or before.st_size < 0
+            or before.st_size > limit
+            or (expected_length is not None and before.st_size != expected_length)
+        ):
+            raise ValueError
+        flags = os.O_RDONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
+        descriptor = os.open(path, flags)
+        try:
+            opened = os.fstat(descriptor)
+            if (
+                not stat.S_ISREG(opened.st_mode)
+                or opened.st_size != before.st_size
+                or opened.st_dev != before.st_dev
+                or (before.st_ino and opened.st_ino != before.st_ino)
+            ):
+                raise ValueError
+            chunks: list[bytes] = []
+            remaining = limit + 1
+            while remaining:
+                chunk = os.read(descriptor, min(64 * 1024, remaining))
+                if not chunk:
+                    break
+                chunks.append(chunk)
+                remaining -= len(chunk)
+            raw = b"".join(chunks)
+            after = os.fstat(descriptor)
+            if after.st_size != opened.st_size or len(raw) != opened.st_size or len(raw) > limit:
+                raise ValueError
+            return raw
+        finally:
+            os.close(descriptor)
+    except (OSError, OverflowError, ValueError) as exc:
+        raise ValueError("authority is not a bounded regular file") from exc
 
 
 class Contracts:
@@ -598,8 +991,11 @@ class Contracts:
 
     def _load_pinned(self, rel: str, expected_length: int | None, expected_sha256: str) -> Any:
         path = self.root / rel
-        raw = path.read_bytes()
-        if (expected_length is not None and len(raw) != expected_length) or sha256_upper(raw) != expected_sha256:
+        try:
+            raw = _read_regular_bounded(path, expected_length)
+        except ValueError:
+            raise ValueError("authority pin mismatch: " + rel) from None
+        if sha256_upper(raw) != expected_sha256:
             raise ValueError("authority pin mismatch: " + rel)
         return json.loads(raw.decode("utf-8"))
 
@@ -828,15 +1224,26 @@ def evaluate_atom(node: dict[str, Any], facts_root: dict[str, Any]) -> bool:
     if op == "NOT_ACYCLIC":
         edges = get("path")
         graph: dict[bytes, set[bytes]] = {}
-        for edge in edges: graph.setdefault(jcs(edge[node["from"]]), set()).add(jcs(edge[node["to"]]))
-        visiting: set[bytes] = set(); done: set[bytes] = set()
-        def visit(vertex: bytes) -> bool:
-            if vertex in visiting: return True
-            if vertex in done: return False
-            visiting.add(vertex)
-            if any(visit(child) for child in graph.get(vertex, ())): return True
-            visiting.remove(vertex); done.add(vertex); return False
-        return any(visit(vertex) for vertex in list(graph))
+        indegree: dict[bytes, int] = {}
+        for edge in edges:
+            source = jcs(edge[node["from"]])
+            target = jcs(edge[node["to"]])
+            children = graph.setdefault(source, set())
+            indegree.setdefault(source, 0)
+            indegree.setdefault(target, 0)
+            if target not in children:
+                children.add(target)
+                indegree[target] += 1
+        ready = [vertex for vertex, count in indegree.items() if count == 0]
+        visited = 0
+        while ready:
+            vertex = ready.pop()
+            visited += 1
+            for child in graph.get(vertex, ()):
+                indegree[child] -= 1
+                if indegree[child] == 0:
+                    ready.append(child)
+        return visited != len(indegree)
     if op == "NOT_NEXT_SEQUENCE":
         prior, current = get("prior"), get("current")
         return current != (node["initial"] if prior is None else prior + 1)
@@ -877,24 +1284,39 @@ def _sealed_response(response: dict[str, Any], field: str) -> dict[str, Any]:
     return response
 
 
+def _bounded_error(code: str, pointer: str) -> tuple[str, str]:
+    if not isinstance(pointer, str) or len(pointer) > MAX_ERROR_POINTER_CHARS:
+        return "ERR_LIMIT", ""
+    return code, pointer
+
+
+def _raw_error_response(
+    code: str,
+    pointer: str = "",
+    request_id: str = DEFAULT_REQUEST_ID,
+) -> tuple[int, bytes]:
+    code, pointer = _bounded_error(code, pointer)
+    message, precedence = ERRORS[code]
+    response = {
+        "errors": [{"code": code, "message": message, "pointer": pointer, "precedence": precedence}],
+        "exit_code": 2,
+        "format_version": "PCB-RUNNER-RESPONSE-0.2",
+        "ok": False,
+        "output": None,
+        "receipt_sha256": ZERO64,
+        "request_id": request_id,
+        "result": "INCOMPLETE",
+    }
+    _sealed_response(response, "receipt_sha256")
+    return 2, jcs(response) + b"\n"
+
+
 class Implementation:
     def __init__(self, repo_root: Path | None = None):
         self.contracts = Contracts(repo_root)
 
     def error_response(self, code: str, pointer: str = "", request_id: str = DEFAULT_REQUEST_ID) -> tuple[int, bytes]:
-        message, precedence = ERRORS[code]
-        response = {
-            "errors": [{"code": code, "message": message, "pointer": pointer, "precedence": precedence}],
-            "exit_code": 2,
-            "format_version": "PCB-RUNNER-RESPONSE-0.2",
-            "ok": False,
-            "output": None,
-            "receipt_sha256": ZERO64,
-            "request_id": request_id,
-            "result": "INCOMPLETE",
-        }
-        _sealed_response(response, "receipt_sha256")
-        return 2, jcs(response) + b"\n"
+        return _raw_error_response(code, pointer, request_id)
 
     def execute_bytes(self, raw: bytes) -> tuple[int, bytes]:
         try:
@@ -909,7 +1331,10 @@ class Implementation:
         # Limit adjudication stays deferred on this one surface so the
         # established ERR_SCHEMA-before-ERR_LIMIT law remains byte-exact.
         request, parser, error_code, pointer = _decode_bounded_raw_value(raw, defer_limits=True)
-        repaired_id = request.get("request_id") if isinstance(request, dict) and isinstance(request.get("request_id"), str) and REQUEST_ID_RE.fullmatch(request["request_id"]) else DEFAULT_REQUEST_ID
+        repaired_candidate = request.get("request_id") if isinstance(request, dict) else None
+        if repaired_candidate is None and parser is not None and parser.post_limit_fields is not None:
+            repaired_candidate = parser.post_limit_fields.get("request_id")
+        repaired_id = repaired_candidate if isinstance(repaired_candidate, str) and REQUEST_ID_RE.fullmatch(repaired_candidate) else DEFAULT_REQUEST_ID
         if error_code is not None:
             return self.error_response(error_code, pointer, repaired_id)
         if parser is None:
@@ -1140,6 +1565,7 @@ class Implementation:
         pointer: str = "",
         wrapper_request: Any = None,
     ) -> dict[str, Any]:
+        code, pointer = _bounded_error(code, pointer)
         request = wrapper_request if isinstance(wrapper_request, dict) else {}
         operation = request.get("operation_handle")
         if not isinstance(operation, str) or operation not in self.contracts.registry:
@@ -1322,4 +1748,64 @@ def implementation() -> Implementation:
 
 
 def execute(raw: bytes) -> tuple[int, bytes]:
-    return implementation().execute_bytes(raw)
+    try:
+        return implementation().execute_bytes(raw)
+    except (MemoryError, RecursionError):
+        return _raw_error_response("ERR_LIMIT")
+    except Exception:
+        # Authority bootstrap belongs inside the raw ABI's total-response
+        # boundary.  Integrity failures remain fail closed but never disclose
+        # paths or escape as host exceptions.
+        return _raw_error_response("ERR_INTERNAL")
+
+
+def execute_wrapper_bytes(raw: bytes) -> tuple[int, bytes]:
+    """Strict raw CLI adapter for the already-public wrapper API."""
+
+    try:
+        request, _, error_code, pointer = _decode_bounded_raw_value(raw)
+        impl = implementation()
+        if error_code is not None:
+            response = impl.wrapper_error_response(error_code, pointer, request)
+        else:
+            response = impl.execute_wrapper(request)
+        return int(response["exit_code"]), jcs(response) + b"\n"
+    except (MemoryError, RecursionError):
+        return _raw_error_response("ERR_LIMIT")
+    except Exception:
+        return _raw_error_response("ERR_INTERNAL")
+
+
+def execute_cli_bytes(raw: bytes) -> tuple[int, bytes]:
+    """Dispatch a valid wrapper envelope without misclassifying semantic data."""
+
+    try:
+        request, parser, error_code, pointer = _decode_bounded_raw_value(
+            raw,
+            defer_limits=True,
+        )
+        post_limit_fields = parser.post_limit_fields if parser is not None else None
+        is_wrapper = (
+            isinstance(request, dict)
+            and request.get("format_version") == "B1-WRAPPER-SEMANTIC-REQUEST-0.2"
+        ) or (
+            error_code is not None
+            and post_limit_fields is not None
+            and post_limit_fields.get("format_version") == "B1-WRAPPER-SEMANTIC-REQUEST-0.2"
+        )
+        if is_wrapper:
+            impl = implementation()
+            response = (
+                impl.wrapper_error_response(error_code, pointer, post_limit_fields)
+                if error_code is not None
+                else impl.execute_wrapper(request)
+            )
+            return int(response["exit_code"]), jcs(response) + b"\n"
+        # Release the detection tree before the semantic ABI performs its own
+        # byte-exact parse and precedence adjudication.
+        del request, parser, error_code, pointer
+        return execute(raw)
+    except (MemoryError, RecursionError):
+        return _raw_error_response("ERR_LIMIT")
+    except Exception:
+        return _raw_error_response("ERR_INTERNAL")

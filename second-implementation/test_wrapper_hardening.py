@@ -6,14 +6,19 @@ import base64
 import copy
 import json
 from pathlib import Path
+import subprocess
 import sys
+import tempfile
 from typing import Any
+from unittest import mock
 
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 sys.path.insert(0, str(HERE))
 
+import rr2  # noqa: E402
+import verify_artifacts  # noqa: E402
 from rr2 import (  # noqa: E402
     MAX_JSON_DEPTH,
     MAX_JSON_MEMBERS,
@@ -28,6 +33,9 @@ from rr2 import (  # noqa: E402
 
 
 WRAPPER_PACK = ROOT / "supplemental-0_3/fixtures/B1_SUPPLEMENTAL_WRAPPER_PARITY_FIXTURE_PACK_0_3.json"
+FROZEN_RUNNER = (
+    ROOT / "baseline-run" / "implementation-output-0.3" / "pcb_runner.py"
+)
 
 
 def _duplicate_prefix(raw: bytes, name: str, value_raw: bytes) -> bytes:
@@ -270,10 +278,270 @@ def main() -> int:
         if accepted:
             failures.append("wrapper-raw-accepted:" + name)
 
+    deep_semantic = b"[" * 10_000 + b"0" + b"]" * 10_000 + b"\n"
+    value, parser, error_code, pointer = rr2._decode_bounded_raw_value(  # noqa: SLF001
+        deep_semantic,
+        defer_limits=True,
+    )
+    if value is not None or parser is None or parser.max_depth != MAX_JSON_DEPTH + 1 or (error_code, pointer) != ("ERR_SCHEMA", ""):
+        failures.append("semantic-depth-allocation-bound")
+    open_semantic = b"[" * 10_000
+    _, _, error_code, pointer = rr2._decode_bounded_raw_value(  # noqa: SLF001
+        open_semantic,
+        defer_limits=True,
+    )
+    if (error_code, pointer) != ("ERR_JSON", ""):
+        failures.append("semantic-depth-truncation-precedence")
+
+    format_version = b"B1-SEMANTIC-DECISION-REQUEST-0.2"
+    post_limit_request_id = b"RUN_0123456789ABCDEF01234567"
+    post_limit_root_tail = b'","request_id":"' + post_limit_request_id + b'","x":'
+    closed_deep_value = b"[" * 129 + b"0" + b"]" * 129
+    precedence_witnesses = {
+        "mismatched-container-types": (
+            b'{"format_version":"'
+            + format_version
+            + b'","x":'
+            + b"[" * 129
+            + b"0"
+            + b"]" * 128
+            + b"}}\n"
+        ),
+        "format-version-outside-root": (
+            b'{"x":{"deep":'
+            + closed_deep_value
+            + b',"format_version":"'
+            + format_version
+            + b'"}}\n'
+        ),
+        "trailing-bytes": (
+            b'{"format_version":"'
+            + format_version
+            + b'","x":'
+            + closed_deep_value
+            + b"}0\n"
+        ),
+        "missing-terminal-lf": (
+            b'{"format_version":"'
+            + format_version
+            + b'","x":'
+            + closed_deep_value
+            + b"}"
+        ),
+    }
+    for name, raw in precedence_witnesses.items():
+        frozen = subprocess.run(
+            [sys.executable, "-I", "-B", str(FROZEN_RUNNER), "execute"],
+            input=raw,
+            cwd=ROOT,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            timeout=120,
+        )
+        actual_exit, actual_raw = rr2.execute(raw)
+        if frozen.stderr:
+            failures.append("frozen-precedence-stderr:" + name)
+        elif (actual_exit, actual_raw) != (frozen.returncode, frozen.stdout):
+            failures.append("frozen-precedence-parity:" + name)
+
+    post_limit_witnesses = {
+        "duplicate-key": (
+            b'{"format_version":"'
+            + format_version
+            + post_limit_root_tail
+            + closed_deep_value
+            + b',"y":0,"y":1}\n',
+            ("ERR_DUPLICATE_KEY", ""),
+        ),
+        "fractional-number": (
+            b'{"format_version":"'
+            + format_version
+            + post_limit_root_tail
+            + closed_deep_value
+            + b',"y":1.5}\n',
+            ("ERR_NUMBER", "/y"),
+        ),
+        "negative-zero": (
+            b'{"format_version":"'
+            + format_version
+            + post_limit_root_tail
+            + closed_deep_value
+            + b',"y":-0}\n',
+            ("ERR_NUMBER", "/y"),
+        ),
+        "non-nfc-string": (
+            b'{"format_version":"'
+            + format_version
+            + post_limit_root_tail
+            + closed_deep_value
+            + b',"y":"e\xcc\x81"}\n',
+            ("ERR_NFC", "/y"),
+        ),
+        "escaped-format-version-key": (
+            b'{"\\u0066ormat_version":"'
+            + format_version
+            + post_limit_root_tail
+            + closed_deep_value
+            + b"}\n",
+            ("ERR_JSON", ""),
+        ),
+        "unknown-format-version": (
+            b'{"format_version":"B1-UNKNOWN-0.2'
+            + post_limit_root_tail
+            + closed_deep_value
+            + b"}\n",
+            ("ERR_SCHEMA", "/format_version"),
+        ),
+        "non-string-format-version": (
+            b'{"format_version":0,"request_id":"'
+            + post_limit_request_id
+            + b'","x":'
+            + closed_deep_value
+            + b"}\n",
+            ("ERR_SCHEMA", "/format_version"),
+        ),
+        "known-format-version-control": (
+            b'{"format_version":"'
+            + format_version
+            + post_limit_root_tail
+            + closed_deep_value
+            + b"}\n",
+            ("ERR_SCHEMA", ""),
+        ),
+    }
+    for name, (lf_raw, lf_law) in post_limit_witnesses.items():
+        for framing, raw, law in (
+            ("lf", lf_raw, lf_law),
+            ("unframed", lf_raw[:-1], ("ERR_DUPLICATE_KEY", "") if name == "duplicate-key" else ("ERR_JSON", "")),
+        ):
+            frozen = subprocess.run(
+                [sys.executable, "-I", "-B", str(FROZEN_RUNNER), "execute"],
+                input=raw,
+                cwd=ROOT,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False,
+                timeout=120,
+            )
+            try:
+                frozen_error = json.loads(frozen.stdout)["errors"][0]
+            except (KeyError, IndexError, json.JSONDecodeError):
+                failures.append(f"frozen-post-limit-envelope:{name}:{framing}")
+                continue
+            if frozen.stderr or (frozen_error["code"], frozen_error["pointer"]) != law:
+                failures.append(f"frozen-post-limit-law:{name}:{framing}")
+                continue
+            actual_exit, actual_raw = rr2.execute(raw)
+            if (actual_exit, actual_raw) != (frozen.returncode, frozen.stdout):
+                failures.append(f"frozen-post-limit-parity:{name}:{framing}")
+
+    long_key = "k" * 2_000
+    amplified = ('{"' + long_key + '":[' + ",".join("1.5" for _ in range(2_000)) + "]}").encode("utf-8")
+    pointer_parser = rr2.StrictParser(amplified.decode("utf-8"), enforce_limits=True)
+    pointer_parser.parse()
+    if pointer_parser.number_pointer != "/" + long_key + "/0" or hasattr(pointer_parser, "number_pointers"):
+        failures.append("number-pointer-retention")
+
+    long_pointer = "/" + "p" * 241
+    _, bounded_raw = impl.error_response("ERR_SCHEMA", long_pointer)
+    bounded_error = json.loads(bounded_raw)["errors"][0]
+    if (bounded_error["code"], bounded_error["pointer"]) != ("ERR_LIMIT", ""):
+        failures.append("core-error-pointer-cap")
+    bounded_wrapper = impl.wrapper_error_response("ERR_SCHEMA", long_pointer, b1_request)
+    if (bounded_wrapper["errors"][0]["code"], bounded_wrapper["errors"][0]["pointer"]) != ("ERR_LIMIT", ""):
+        failures.append("wrapper-error-pointer-cap")
+
+    recursion_limit = sys.getrecursionlimit()
+    try:
+        sys.setrecursionlimit(80)
+        edges = [{"from": str(index), "to": str(index + 1)} for index in range(200)]
+        cyclic = rr2.evaluate_atom(
+            {"op": "NOT_ACYCLIC", "path": "/edges", "from": "from", "to": "to"},
+            {"edges": edges},
+        )
+        if cyclic:
+            failures.append("iterative-acyclic-chain")
+        edges.append({"from": "200", "to": "0"})
+        if not rr2.evaluate_atom(
+            {"op": "NOT_ACYCLIC", "path": "/edges", "from": "from", "to": "to"},
+            {"edges": edges},
+        ):
+            failures.append("iterative-acyclic-cycle")
+    except RecursionError:
+        failures.append("iterative-acyclic-recursion")
+    finally:
+        sys.setrecursionlimit(recursion_limit)
+
+    expected_wrapper = impl.execute_wrapper(b1_request)
+    completed = subprocess.run(
+        [sys.executable, "-I", "-B", str(HERE / "cli.py"), "execute"],
+        input=jcs(b1_request) + b"\n",
+        cwd=ROOT,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+        timeout=120,
+    )
+    if (
+        completed.returncode != expected_wrapper["exit_code"]
+        or completed.stdout != jcs(expected_wrapper) + b"\n"
+        or completed.stderr
+    ):
+        failures.append("wrapper-cli-parity")
+
+    original_default = rr2._DEFAULT  # noqa: SLF001
+    rr2._DEFAULT = None  # noqa: SLF001
+    try:
+        with mock.patch.object(rr2, "Implementation", side_effect=ValueError("bootstrap")):
+            code, bootstrap_raw = rr2.execute(b"\n")
+        bootstrap_error = json.loads(bootstrap_raw)["errors"][0]
+        if code != 2 or (bootstrap_error["code"], bootstrap_error["pointer"]) != ("ERR_INTERNAL", ""):
+            failures.append("authority-bootstrap-totality")
+    finally:
+        rr2._DEFAULT = original_default  # noqa: SLF001
+
+    malicious_author = {
+        "candidate_files": [
+            {"path": "../../outside", "raw_sha256": "A" * 64},
+        ]
+    }
+    original_bounded_read = verify_artifacts._read_regular_bounded  # noqa: SLF001
+
+    def guarded_receipt_read(path: Path, expected_length: int | None) -> bytes:
+        if path == verify_artifacts.AUTHOR_RECEIPT:
+            return json.dumps(malicious_author, separators=(",", ":")).encode("utf-8")
+        if path in {verify_artifacts.PREFLIGHT_RECEIPT, verify_artifacts.COVERAGE_RECEIPT}:
+            return original_bounded_read(path, expected_length)
+        raise AssertionError("invalid receipt path was dereferenced")
+
+    try:
+        with mock.patch.object(
+            verify_artifacts,
+            "_read_regular_bounded",
+            side_effect=guarded_receipt_read,
+        ):
+            verify_artifacts._verify_receipts([], None)  # noqa: SLF001
+    except AssertionError:
+        failures.append("invalid-author-path-dereferenced")
+
+    with tempfile.TemporaryDirectory(prefix="rr2-authority-bound-") as temp:
+        oversized = Path(temp) / "authority.json"
+        with oversized.open("wb") as stream:
+            stream.truncate(rr2.MAX_AUTHORITY_BYTES + 1)
+        try:
+            rr2._read_regular_bounded(oversized, None)  # noqa: SLF001
+        except ValueError:
+            pass
+        else:
+            failures.append("oversized-authority-read")
+
     result = {
         "direct_wrapper_negative": len(invalid_requests),
         "failures": len(failures),
+        "post_limit_precedence_regressions": len(post_limit_witnesses) * 2,
         "raw_wrapper_negative": len(raw_cases),
+        "w4_security_regressions": 15,
         "wrapper_binding_positive": 1,
     }
     print(json.dumps(result, sort_keys=True, separators=(",", ":")))

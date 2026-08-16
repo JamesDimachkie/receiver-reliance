@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import ast
 from collections import Counter
 import hashlib
@@ -16,6 +17,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 sys.path.insert(0, str(HERE))
 
+import rr2  # noqa: E402
 from raw_preflight_cases import raw_cases  # noqa: E402
 from rr2 import (  # noqa: E402
     AUTHORITY_PATHS,
@@ -27,6 +29,7 @@ from rr2 import (  # noqa: E402
     SUPPLEMENTAL_CONTRACT_REL,
     SUPPLEMENTAL_CONTRACT_SHA256,
     Contracts,
+    _read_regular_bounded,
     sha256_upper,
 )
 
@@ -35,6 +38,7 @@ AUTHOR_RECEIPT = HERE / "receipts/AUTHOR_INCREMENT_RECEIPT_0_1.json"
 PREFLIGHT_RECEIPT = HERE / "receipts/BOUNDED_DEEP_PREFLIGHT_0_1.json"
 COVERAGE_RECEIPT = HERE / "receipts/COVERAGE_STEERING_SMOKE_0_1.json"
 SUPPLEMENTAL_ACCEPTANCE_RECEIPT = ROOT / "supplemental-0_3/receipts/SUPPLEMENTAL_FIXTURE_ACCEPTANCE_RECEIPT_0_3.json"
+ZERO64 = "0" * 64
 REQUIRED_STEERING = {
     "_dispatch",
     "_eval_atomic",
@@ -57,17 +61,24 @@ EXPECTED_CANDIDATE_PATHS = {
     "second-implementation/findings/F-WP4-005.md",
     "second-implementation/findings/F-WP4-006.md",
     "second-implementation/findings/F-WP4-007.md",
+    "second-implementation/findings/F-WP4-008.md",
+    "second-implementation/findings/F-WP4-009.md",
+    "second-implementation/findings/F-WP4-010.md",
+    "second-implementation/findings/F-WP4-011.md",
+    "second-implementation/findings/F-WP4-012.md",
+    "second-implementation/findings/F-WP4-013.md",
     "second-implementation/process_harness.py",
     "second-implementation/raw_preflight_cases.py",
     "second-implementation/rr2.py",
     "second-implementation/test_cross.py",
+    "second-implementation/test_wrapper_hardening.py",
     "second-implementation/verify_artifacts.py",
     "orchestration/REIMPLEMENTERS_GUIDE.md",
 }
 
 
 def _load_json(path: Path):
-    return json.loads(path.read_bytes().decode("utf-8"))
+    return json.loads(_read_regular_bounded(path, None).decode("utf-8"))
 
 
 def _record(failures: list[str], condition: bool, name: str) -> None:
@@ -76,18 +87,22 @@ def _record(failures: list[str], condition: bool, name: str) -> None:
 
 
 def _verify_authority_provenance(failures: list[str]) -> tuple[int, int]:
-    acceptance_raw = SUPPLEMENTAL_ACCEPTANCE_RECEIPT.read_bytes()
+    try:
+        acceptance_raw = _read_regular_bounded(SUPPLEMENTAL_ACCEPTANCE_RECEIPT, None)
+    except (ValueError, OSError):
+        _record(failures, False, "supplemental-acceptance-receipt-read")
+        acceptance_raw = b""
     matches = re.findall(rb'"contract_raw_sha256"\s*:\s*"([A-F0-9]{64})"', acceptance_raw)
     _record(failures, matches == [SUPPLEMENTAL_CONTRACT_SHA256.encode("ascii")], "supplemental-external-digest")
 
-    original_read_bytes = Path.read_bytes
+    original_read_bounded = rr2._read_regular_bounded  # noqa: SLF001
     reads: list[Path] = []
 
-    def logged_read_bytes(path: Path) -> bytes:
+    def logged_read_bounded(path: Path, expected_length: int | None) -> bytes:
         reads.append(path.resolve())
-        return original_read_bytes(path)
+        return original_read_bounded(path, expected_length)
 
-    with mock.patch.object(Path, "read_bytes", logged_read_bytes):
+    with mock.patch.object(rr2, "_read_regular_bounded", logged_read_bounded):
         contracts = Contracts(ROOT)
 
     expected_reads = Counter((ROOT / rel).resolve() for rel in AUTHORITY_PATHS)
@@ -109,9 +124,9 @@ def _verify_authority_provenance(failures: list[str]) -> tuple[int, int]:
         ),
     }
     for rel, (length, digest) in declared.items():
-        raw = (ROOT / rel).read_bytes()
+        raw = _read_regular_bounded(ROOT / rel, length)
         _record(failures, len(raw) == length and sha256_upper(raw) == digest, "declared-authority-pin:" + rel)
-    supplemental_raw = (ROOT / SUPPLEMENTAL_CONTRACT_REL).read_bytes()
+    supplemental_raw = _read_regular_bounded(ROOT / SUPPLEMENTAL_CONTRACT_REL, None)
     _record(failures, sha256_upper(supplemental_raw) == SUPPLEMENTAL_CONTRACT_SHA256, "supplemental-runtime-pin")
     return len(actual_reads), len(declared) + 1
 
@@ -135,7 +150,7 @@ def _verify_imports(failures: list[str]) -> tuple[int, int]:
     _record(failures, imported <= allowed, "non-stdlib-imports:" + ",".join(sorted(imported - allowed)))
 
     runtime_allowed = {
-        "__future__", "base64", "binascii", "hashlib", "json", "pathlib", "re", "rr2", "sys", "typing", "unicodedata"
+        "__future__", "base64", "binascii", "hashlib", "json", "os", "pathlib", "re", "rr2", "stat", "sys", "typing", "unicodedata"
     }
     runtime_imports: set[str] = set()
     for name in ("rr2.py", "cli.py"):
@@ -149,25 +164,66 @@ def _verify_imports(failures: list[str]) -> tuple[int, int]:
     return len(python_files), len(imported)
 
 
-def _verify_receipts(failures: list[str]) -> tuple[int, int]:
-    author = _load_json(AUTHOR_RECEIPT)
-    preflight = _load_json(PREFLIGHT_RECEIPT)
-    coverage = _load_json(COVERAGE_RECEIPT)
+def _verify_receipts(
+    failures: list[str],
+    author_receipt_sha256: str | None,
+) -> tuple[int, int, bool]:
+    author_raw = _read_regular_bounded(AUTHOR_RECEIPT, None)
+    preflight_raw = _read_regular_bounded(PREFLIGHT_RECEIPT, None)
+    coverage_raw = _read_regular_bounded(COVERAGE_RECEIPT, None)
+    author = json.loads(author_raw.decode("utf-8"))
+    preflight = json.loads(preflight_raw.decode("utf-8"))
+    coverage = json.loads(coverage_raw.decode("utf-8"))
+    author_authenticated = (
+        author_receipt_sha256 is not None
+        and sha256_upper(author_raw) == author_receipt_sha256
+    )
+    if author_receipt_sha256 is not None:
+        _record(
+            failures,
+            author_authenticated,
+            "author-receipt-external-pin",
+        )
 
     candidate_rows = author.get("candidate_files", [])
-    candidate_paths = {row.get("path") for row in candidate_rows}
-    _record(failures, candidate_paths == EXPECTED_CANDIDATE_PATHS, "author-candidate-path-set")
-    for row in candidate_rows:
-        path = ROOT / row["path"]
-        _record(failures, path.is_file() and sha256_upper(path.read_bytes()) == row.get("raw_sha256"), "author-file-hash:" + row["path"])
+    rows_valid = isinstance(candidate_rows, list) and all(
+        isinstance(row, dict)
+        and set(row) == {"path", "raw_sha256"}
+        and isinstance(row.get("path"), str)
+        and isinstance(row.get("raw_sha256"), str)
+        and re.fullmatch(r"[A-F0-9]{64}", row["raw_sha256"]) is not None
+        for row in candidate_rows
+    )
+    candidate_path_list = [row["path"] for row in candidate_rows] if rows_valid else []
+    candidate_paths = set(candidate_path_list)
+    path_set_valid = (
+        rows_valid
+        and len(candidate_paths) == len(candidate_path_list)
+        and candidate_paths == EXPECTED_CANDIDATE_PATHS
+    )
+    _record(failures, path_set_valid, "author-candidate-path-set")
+    # Invalid receipt-controlled paths are never resolved, probed, or read.
+    # Only the exact closed allowlist can reach the filesystem.
+    if path_set_valid:
+        for row in candidate_rows:
+            path = ROOT.joinpath(*row["path"].split("/"))
+            try:
+                raw = _read_regular_bounded(path, None)
+            except ValueError:
+                raw = b""
+            _record(
+                failures,
+                bool(raw) and sha256_upper(raw) == row["raw_sha256"],
+                "author-file-hash:" + row["path"],
+            )
 
     subordinate = (
-        ("bounded_raw_preflight_receipt", PREFLIGHT_RECEIPT, preflight),
-        ("coverage_steering_smoke_receipt", COVERAGE_RECEIPT, coverage),
+        ("bounded_raw_preflight_receipt", preflight_raw, preflight),
+        ("coverage_steering_smoke_receipt", coverage_raw, coverage),
     )
-    for key, path, receipt in subordinate:
+    for key, raw, receipt in subordinate:
         binding = author.get(key, {})
-        _record(failures, sha256_upper(path.read_bytes()) == binding.get("raw_sha256"), "author-subreceipt-hash:" + key)
+        _record(failures, sha256_upper(raw) == binding.get("raw_sha256"), "author-subreceipt-hash:" + key)
         _record(failures, receipt.get("divergence_count") == 0 and receipt.get("status") == "PASS", "subreceipt-status:" + key)
 
     stream = hashlib.sha256()
@@ -194,15 +250,36 @@ def _verify_receipts(failures: list[str]) -> tuple[int, int]:
     _record(failures, coverage.get("requested_identities", 50_000) < 50_000, "coverage-smoke-nonqualifying")
     _record(failures, author.get("house_scale_campaign_receipt") is None, "house-campaign-not-launched")
     _record(failures, author.get("official_author_strike_count") == 2, "author-strike-count")
-    return len(candidate_rows), len(names)
+    return len(candidate_rows) if path_set_valid else 0, len(names), author_authenticated
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--author-receipt-sha256")
+    args = parser.parse_args()
     failures: list[str] = []
+    author_pin = args.author_receipt_sha256
+    if author_pin is not None:
+        author_pin = author_pin.upper()
+        _record(
+            failures,
+            re.fullmatch(r"[A-F0-9]{64}", author_pin) is not None,
+            "author-receipt-external-pin-format",
+        )
+        if re.fullmatch(r"[A-F0-9]{64}", author_pin) is None:
+            author_pin = ZERO64
     runtime_reads, authority_pins = _verify_authority_provenance(failures)
     python_files, import_roots = _verify_imports(failures)
-    candidate_files, raw_cases_count = _verify_receipts(failures)
+    candidate_files, raw_cases_count, author_authenticated = _verify_receipts(
+        failures,
+        author_pin,
+    )
     result = {
+        "author_receipt_authentication": (
+            "EXTERNAL_PIN_VERIFIED"
+            if author_authenticated
+            else "UNSEALED_SELF_CONSISTENCY_ONLY"
+        ),
         "authority_pins_verified": authority_pins,
         "candidate_files_verified": candidate_files,
         "failures": failures,

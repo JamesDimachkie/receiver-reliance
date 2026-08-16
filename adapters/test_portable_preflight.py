@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import hashlib
+import importlib.util
 import io
 import json
 import pathlib
 import subprocess
 import sys
 import tempfile
+import types
 import unittest
 from collections import Counter
 from unittest import mock
@@ -49,6 +52,25 @@ def lifecycle_timestamps(*timestamps):
         "family": "LIFECYCLE",
         "native": {"status": "closed"},
         "observations": {"lifecycle_event_timestamps": list(timestamps)},
+    }
+
+
+def scope_record(*, native=None, observations=None):
+    return {
+        "record_id": "REC_SCOPE",
+        "family": "SCOPE",
+        "native": {
+            "claimed_paths": ["src/**"],
+            "result_commit": None,
+            "result_commit_named": False,
+            "status": "closed",
+            **(native or {}),
+        },
+        "observations": {
+            "commit_found": False,
+            "commit_changed_paths": None,
+            **(observations or {}),
+        },
     }
 
 
@@ -338,6 +360,99 @@ class FailClosedBoundaryTests(unittest.TestCase):
 
         self.assertNotEqual(_scope_hash(["a\nb"]), _scope_hash(["a", "b"]))
 
+    def test_scope_globs_are_case_sensitive_and_segment_bounded(self):
+        from adapters.portable_preflight import _in_scope
+
+        self.assertTrue(_in_scope("src/file.py", ["src/*.py"]))
+        self.assertFalse(_in_scope("src/admin/key.py", ["src/*.py"]))
+        self.assertTrue(_in_scope("src/admin/key.py", ["src/**/key.py"]))
+        self.assertTrue(_in_scope("src/key.py", ["src/**/key.py"]))
+        self.assertFalse(_in_scope("SRC/file.py", ["src/*.py"]))
+
+    def test_family_type_is_validated_before_mapping_lookup(self):
+        for family in ([], {}):
+            with self.subTest(family=family):
+                result = preflight(
+                    {
+                        "record_id": "REC_BAD_FAMILY",
+                        "family": family,
+                        "native": {},
+                        "observations": {},
+                    }
+                )
+                self.assertEqual(result.status, REJECTED_INVALID)
+                self.assertEqual(result.issues[0].code, "PREFLIGHT_FAMILY_INVALID")
+
+        bad = json.dumps(
+            {
+                "record_id": "REC_BAD_FAMILY",
+                "family": [],
+                "native": {},
+                "observations": {},
+            }
+        )
+        code, rows = self._run(bad + "\n" + json.dumps(ref_record()) + "\n")
+        self.assertEqual(code, 2)
+        self.assertEqual([row["status"] for row in rows], [REJECTED_INVALID, READY])
+
+    def test_direct_objects_have_a_total_node_bound_before_serialization(self):
+        record = ref_record(
+            native={
+                "referenced_record": "authority.md",
+                "claimed_sha256": HASH_A,
+                "wide": [[None] * 256 for _ in range(17)],
+            }
+        )
+        with mock.patch(
+            "adapters.portable_preflight.json.dumps",
+            side_effect=AssertionError("serialization ran before the node bound"),
+        ):
+            result = preflight(record)
+        self.assertEqual(result.status, REJECTED_INVALID)
+        self.assertEqual(result.issues[0].code, "PREFLIGHT_JSON_DOMAIN_INVALID")
+        self.assertIn("nodes", result.issues[0].message)
+
+    def test_scope_commit_identity_and_lookup_testimony_are_coherent(self):
+        self.assertEqual(preflight(scope_record()).status, READY)
+        self.assertEqual(
+            preflight(
+                scope_record(
+                    native={"result_commit": "abc1234", "result_commit_named": True},
+                    observations={"commit_found": True, "commit_changed_paths": []},
+                )
+            ).status,
+            READY,
+        )
+        cases = (
+            (
+                scope_record(observations={"commit_found": True}),
+                "PREFLIGHT_SCOPE_LOOKUP_CONTRADICTION",
+            ),
+            (
+                scope_record(
+                    native={"result_commit_named": True},
+                    observations={"commit_found": True, "commit_changed_paths": []},
+                ),
+                "PREFLIGHT_SCOPE_COMMIT_IDENTITY_INVALID",
+            ),
+            (
+                scope_record(native={"result_commit": "abc1234"}),
+                "PREFLIGHT_SCOPE_COMMIT_IDENTITY_CONTRADICTION",
+            ),
+        )
+        for record, code in cases:
+            with self.subTest(code=code):
+                result = preflight(record)
+                self.assertEqual(result.status, REJECTED_INVALID)
+                self.assertEqual(result.issues[0].code, code)
+
+    def test_scope_status_must_be_a_bounded_nonempty_string(self):
+        for status in (False, 0, "", [], {}):
+            with self.subTest(status=status):
+                result = preflight(scope_record(native={"status": status}))
+                self.assertEqual(result.status, REJECTED_INVALID)
+                self.assertEqual(result.issues[0].code, "PREFLIGHT_SCOPE_STATUS_INVALID")
+
     def test_type_strict_equality_distinguishes_bool_from_int(self):
         from adapters.portable_preflight import _strict_equal
 
@@ -456,6 +571,116 @@ class TransportDecodeTests(unittest.TestCase):
             )
             codes = {issue["code"] for issue in rows[1]["issues"]}
             self.assertIn("PREFLIGHT_JSONL_INVALID", codes)
+
+    def test_surrogate_text_is_rejected_and_binary_output_stays_utf8(self):
+        ready = json.dumps(ref_record())
+        sink = io.BytesIO()
+        escaped = (
+            '{"record_id":"\\udcff","family":"REF",'
+            '"native":{"referenced_record":"a","claimed_sha256":null},'
+            '"observations":{"referenced_record_found":false}}'
+        )
+        self.assertEqual(
+            process_jsonl(io.StringIO("\udcff\n" + escaped + "\n" + ready + "\n"), sink),
+            2,
+        )
+        raw = sink.getvalue()
+        rows = [json.loads(line) for line in raw.decode("utf-8").splitlines()]
+        self.assertEqual(
+            [row["status"] for row in rows],
+            [REJECTED_INVALID, REJECTED_INVALID, READY],
+        )
+        self.assertIn("UnicodeEncodeError", rows[0]["issues"][0]["message"])
+        self.assertEqual(rows[1]["issues"][0]["code"], "PREFLIGHT_JSON_DOMAIN_INVALID")
+
+
+class PortableCliHardeningTests(unittest.TestCase):
+    class _StandardBinary:
+        def __init__(self, raw=b""):
+            self.buffer = io.BytesIO(raw)
+
+    def _load_cli(self):
+        name = "_portable_cli_hardening_test"
+        sys.modules.pop(name, None)
+        spec = importlib.util.spec_from_file_location(name, REPO / "portable" / "cli.py")
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[name] = module
+        self.addCleanup(sys.modules.pop, name, None)
+        spec.loader.exec_module(module)
+        return module
+
+    def test_undeclared_and_ambient_project_modules_are_not_importable(self):
+        cli = self._load_cli()
+        with self.assertRaisesRegex(RuntimeError, "undeclared"):
+            cli._declared_source("perf/sidecar/verify_bundle.py")
+        source = (REPO / "portable" / "cli.py").read_text(encoding="utf-8")
+        self.assertNotIn("sys.path.insert", source)
+        self.assertNotIn("from adapters.portable_preflight import", source)
+        self.assertNotIn("from rr2 import", source)
+        self.assertNotIn("from rr_sidecar import", source)
+
+    def test_all_runtime_modes_load_declared_repository_bytes(self):
+        cli = self._load_cli()
+        runtime_rows = {}
+        for relpath in (
+            "adapters/portable_preflight.py",
+            "second-implementation/rr2.py",
+            "grounded-0_4/rr_api.py",
+            "grounded-0_4/rr_batch.py",
+        ):
+            raw = REPO.joinpath(*pathlib.PurePosixPath(relpath).parts).read_bytes()
+            row = dict(cli._MANIFEST_ROWS[relpath])
+            row["byte_length"] = len(raw)
+            row["sha256"] = hashlib.sha256(raw).hexdigest().upper()
+            runtime_rows[relpath] = row
+        fake_ambient = types.ModuleType("adapters.portable_preflight")
+        fake_ambient.process_jsonl = lambda *_args: (_ for _ in ()).throw(
+            AssertionError("ambient module executed")
+        )
+        ready = json.dumps(ref_record()).encode("utf-8")
+        stdin = self._StandardBinary(ready + b"\n\xff\n" + ready + b"\n")
+        stdout = self._StandardBinary()
+        stderr = self._StandardBinary()
+        original_path = list(sys.path)
+        with (
+            mock.patch.dict(cli._MANIFEST_ROWS, runtime_rows),
+            mock.patch.dict(sys.modules, {"adapters.portable_preflight": fake_ambient}),
+            mock.patch.object(cli, "verify", return_value=(1, [])),
+            mock.patch.object(sys, "stdin", stdin),
+            mock.patch.object(sys, "stdout", stdout),
+            mock.patch.object(sys, "stderr", stderr),
+        ):
+            self.assertEqual(cli.main(["preflight"]), 2)
+            decision = cli._decision_module()
+            code, output = decision.execute(b"")
+            self.assertIsInstance(code, int)
+            self.assertIsInstance(output, bytes)
+            self.assertEqual(cli._sidecar_module().serve(io.BytesIO(), io.BytesIO()), 0)
+        rows = [json.loads(line) for line in stdout.buffer.getvalue().splitlines()]
+        self.assertEqual([row["status"] for row in rows], [READY, REJECTED_INVALID, READY])
+        self.assertEqual(stderr.buffer.getvalue(), b"")
+        self.assertEqual(sys.path, original_path)
+
+    def test_unsupported_interpreters_are_not_admitted(self):
+        cli = self._load_cli()
+        for identity in (("PyPy", (3, 12)), ("CPython", (3, 11)), ("CPython", (3, 15))):
+            with self.subTest(identity=identity), mock.patch.object(
+                cli, "_runtime_identity", return_value=identity
+            ):
+                self.assertTrue(cli._runtime_failures())
+
+        stdin = self._StandardBinary()
+        stdout = self._StandardBinary()
+        stderr = self._StandardBinary()
+        with (
+            mock.patch.object(cli, "verify", return_value=(1, [])),
+            mock.patch.object(cli, "_runtime_identity", return_value=("PyPy", (3, 12))),
+            mock.patch.object(sys, "stdin", stdin),
+            mock.patch.object(sys, "stdout", stdout),
+            mock.patch.object(sys, "stderr", stderr),
+        ):
+            self.assertEqual(cli.main(["preflight"]), cli.EXIT_STARTUP)
+        self.assertIn(b"requires-CPython-3.12-3.14", stderr.buffer.getvalue())
 
 
 if __name__ == "__main__":

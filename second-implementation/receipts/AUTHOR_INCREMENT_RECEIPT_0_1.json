@@ -9,7 +9,7 @@
       "size": 12
     },
     "path": "second-implementation/receipts/BOUNDED_DEEP_PREFLIGHT_0_1.json",
-    "raw_sha256": "760F4CEE2C0A02E51C39C531B59EF8A7615C4C17993E9070A159BB366B23733A",
+    "raw_sha256": "4DFDB3647C787C725993B60128F7C4CA6899C4B4A6C219DBE7E03DD7751710A7",
     "stream_sha256": "AC64B3DF9DB40755B1B3879B4730EFA214E1CC75FC079A19C6D79640D98B0DC9",
     "surfaces_per_case": 3
   },
@@ -33,7 +33,7 @@
     },
     {
       "path": "second-implementation/cli.py",
-      "raw_sha256": "4C8D7794689435B64A4307497917348B50883807D31F9DC4DE0C4EF0157EDCF9"
+      "raw_sha256": "CA1510DA19F7D4B954F25FFF044C6BE67299DDD012C97B901863BCCFCE3E8EB0"
     },
     {
       "path": "second-implementation/coverage_campaign.py",
@@ -68,6 +68,30 @@
       "raw_sha256": "6A9AA9DF5002DE7FCE08C94541452F081FB8FAA3C00771205B6811C528A73BA3"
     },
     {
+      "path": "second-implementation/findings/F-WP4-008.md",
+      "raw_sha256": "579DE5BA0940311863B1FC643629697CC716F2418FAC1D1D50EB377200F48029"
+    },
+    {
+      "path": "second-implementation/findings/F-WP4-009.md",
+      "raw_sha256": "716BB3607A572121AA2776D8CF7213910D63F719DD527440A7DDA2DBC493E207"
+    },
+    {
+      "path": "second-implementation/findings/F-WP4-010.md",
+      "raw_sha256": "970303D7DCFC8567C8951BAABD39D4AA8DDB79310DBAD1419CEF22BB81C707E6"
+    },
+    {
+      "path": "second-implementation/findings/F-WP4-011.md",
+      "raw_sha256": "F10FCDF58C067585116E2DB5B2B29C81DCCB87F4E18B388C2AB5A34C3F0F2038"
+    },
+    {
+      "path": "second-implementation/findings/F-WP4-012.md",
+      "raw_sha256": "124F16C9978E44F26A2428C14ED1930611D92EC2257F44C591C5C7C521547D6D"
+    },
+    {
+      "path": "second-implementation/findings/F-WP4-013.md",
+      "raw_sha256": "14FED8B0A26DDCC37278D7560178B3232EFDC6CC0DC96D82DC296197F6CF6C18"
+    },
+    {
       "path": "second-implementation/process_harness.py",
       "raw_sha256": "89621CC50982C4D49FAA11F8B9D6A1C111AF5D6FF1AAA904012370D4E3834593"
     },
@@ -77,15 +101,19 @@
     },
     {
       "path": "second-implementation/rr2.py",
-      "raw_sha256": "72B36891017236762E8BCC637E1B121E5E176D56542CD81D3BDD80BED635C9B6"
+      "raw_sha256": "4AA2AFCECEAA62AF10281444A92D73A141785F53BC48D267F5BE6976C13CCD7B"
     },
     {
       "path": "second-implementation/test_cross.py",
       "raw_sha256": "0B52059EDF52CF38379EAE034A93674F490E4F5991FE090C04242D75DF06576B"
     },
     {
+      "path": "second-implementation/test_wrapper_hardening.py",
+      "raw_sha256": "8064BFF52BD0AD13B0B24A9F54B7331A7E1BAE6FB610943B7D994835FB5AB519"
+    },
+    {
       "path": "second-implementation/verify_artifacts.py",
-      "raw_sha256": "CC8D1A776E4C8602F75CB5EABBF9D8A44A1CB0C3E8CFD7BC10AF6631723E9FE9"
+      "raw_sha256": "0C1174146F6D0F4BA0B1864A65BA7E7447B9EFB793ABAE891AC355BC55D20955"
     }
   ],
   "coverage_steering_smoke_receipt": {
@@ -93,7 +121,7 @@
     "edge_set_sha256": "C1AD99B3BE029CC6E543B1D4632560D30D323BD68DC8E487A1F8A588F3683C2F",
     "identity_count": 20,
     "path": "second-implementation/receipts/COVERAGE_STEERING_SMOKE_0_1.json",
-    "raw_sha256": "7F4251C533DDB27338482FB1DA0C2C0D677B959B7578EFDE32837E31E55A63DB",
+    "raw_sha256": "45407C175B05CCC0A7C4961AAED5818CFA6CD57676F6BF06304CF677A4185FB5",
     "reference_unique_branch_edges": 347,
     "steering_code_objects_required": [
       "_dispatch",
@@ -153,7 +181,8 @@
     "The externally accepted supplemental SHA-256 is verified before parsing; authenticated contract bytes then supply the declared primary/packet/projection length and SHA-256 pins. No supplemental byte length is invented.",
     "Receipt verification proves the standard-library import closure and the exact four-file runtime authority read set.",
     "Ignored __pycache__ artifacts from earlier runs were removed; every final parent and child process used -B with a unique empty temporary pycache root and left zero repository bytecode artifacts.",
-    "No >=50000 identity campaign was launched because the charter requires a fresh-context zero-divergence refuter pass first."
+    "No official >=50000 identity campaign has been ADMITTED: the charter requires a fresh-context zero-divergence refuter pass first. Disclosure 2026-08-16: a custodian regeneration mis-invocation LAUNCHED a 50000-identity campaign that stopped after executing 1050 identities at its first divergence (identity 1049, framing class; requested_identities 50000, executed_identities 1050 per the retained receipt); it is NOT admitted as a campaign receipt (house_scale_campaign_receipt remains null). The divergence no longer reproduces on the fixed candidate: the receipt-bound divergence input replays byte-identically against the frozen runner, and a subsequent same-seed 1500-identity run recorded zero divergences (aggregate receipt in the planning record). Corrected account: finding F-WP4-013 (RESOLVED).",
+    "2026-08-16 consolidated evidence-rebind event (James-authorized): candidate rows and subordinate receipt bindings recomputed over the hardening-industry-grade bytes (waves W1-W4). Acceptance state is recorded by the rebind review receipt in the repository history, not asserted here."
   ],
   "official_author_strike_count": 2,
   "status": "AUTHOR_ATTEMPT_3_FINAL_PATH_A_READY_FOR_FRESH_REFUTER"

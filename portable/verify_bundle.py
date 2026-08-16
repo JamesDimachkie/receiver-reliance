@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 import hashlib
 import json
 import os
 import pathlib
+import re
+import stat
 import unicodedata
 from typing import Any
 
@@ -15,6 +18,25 @@ ROOT = HERE.parent
 MANIFEST = HERE / "MANIFEST.json"
 ZERO64 = "0" * 64
 HEX = frozenset("0123456789ABCDEF")
+MAX_MANIFEST_BYTES = 4 * 1024 * 1024
+MAX_INVENTORY_BYTES = 1024 * 1024
+MAX_FILE_BYTES = 64 * 1024 * 1024
+MAX_TOTAL_BYTES = 256 * 1024 * 1024
+MAX_FILES = 4096
+MAX_JSON_DEPTH = 128
+WINDOWS_RESERVED = frozenset(
+    {"CON", "PRN", "AUX", "NUL"}
+    | {f"COM{index}" for index in range(1, 10)}
+    | {f"LPT{index}" for index in range(1, 10)}
+)
+
+
+@dataclass(frozen=True)
+class BundleSnapshot:
+    manifest: dict[str, Any]
+    manifest_raw: bytes
+    inventory_raw: bytes
+    files: tuple[tuple[str, bytes], ...]
 
 
 def _pairs(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
@@ -37,37 +59,187 @@ def _sha(value: Any) -> bool:
     return isinstance(value, str) and len(value) == 64 and all(c in HEX for c in value)
 
 
-def _candidate(root: pathlib.Path, text: Any) -> pathlib.Path:
+def _portable_parts(text: Any, source: str) -> pathlib.PurePosixPath:
     if not isinstance(text, str) or not text:
-        raise ValueError("manifest path must be a non-empty string")
+        raise ValueError(f"{source} path must be a non-empty string")
     if text != unicodedata.normalize("NFC", text) or "\\" in text or ":" in text:
-        raise ValueError(f"unsafe manifest path: {text!r}")
+        raise ValueError(f"unsafe {source} path: {text!r}")
     pure = pathlib.PurePosixPath(text)
-    if pure.is_absolute() or any(part in ("", ".", "..") for part in pure.parts):
-        raise ValueError(f"unsafe manifest path: {text!r}")
-    unresolved = root.joinpath(*pure.parts)
-    cursor = root
+    if (
+        pure.is_absolute()
+        or pure.as_posix() != text
+        or any(part in ("", ".", "..") for part in pure.parts)
+    ):
+        raise ValueError(f"unsafe {source} path: {text!r}")
     for part in pure.parts:
+        if (
+            re.fullmatch(r"[A-Za-z0-9._-]+", part) is None
+            or
+            part.endswith((" ", "."))
+            or any(ord(character) < 0x20 or character in '<>"|?*' for character in part)
+            or part.split(".", 1)[0].upper() in WINDOWS_RESERVED
+        ):
+            raise ValueError(f"nonportable {source} path: {text!r}")
+    return pure
+
+
+def _portable_alias(text: Any, source: str = "manifest") -> str:
+    pure = _portable_parts(text, source)
+    return "/".join(unicodedata.normalize("NFC", part).casefold() for part in pure.parts)
+
+
+def _is_linklike(info: os.stat_result) -> bool:
+    reparse = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0)
+    return stat.S_ISLNK(info.st_mode) or bool(
+        getattr(info, "st_file_attributes", 0) & reparse
+    )
+
+
+def _candidate(root: pathlib.Path, text: Any) -> pathlib.Path:
+    pure = _portable_parts(text, "manifest")
+    root_resolved = root.resolve(strict=True)
+    cursor = root_resolved
+    for index, part in enumerate(pure.parts):
         cursor = cursor / part
-        if cursor.is_symlink():
-            raise ValueError(f"manifest path crosses a symlink: {text}")
-    resolved = unresolved.resolve(strict=True)
-    if os.path.commonpath((str(root.resolve()), str(resolved))) != str(root.resolve()):
+        info = cursor.lstat()
+        if _is_linklike(info):
+            raise ValueError(f"manifest path crosses a link or reparse point: {text}")
+        if index < len(pure.parts) - 1 and not stat.S_ISDIR(info.st_mode):
+            raise ValueError(f"manifest path ancestor is not a directory: {text}")
+    resolved = cursor.resolve(strict=True)
+    if os.path.commonpath((str(root_resolved), str(resolved))) != str(root_resolved):
         raise ValueError(f"manifest path escapes repository: {text}")
-    if not resolved.is_file():
+    if not stat.S_ISREG(resolved.stat().st_mode):
         raise ValueError(f"manifest path is not a regular file: {text}")
     return resolved
 
 
-def verify(root: pathlib.Path = ROOT, manifest_path: pathlib.Path = MANIFEST) -> tuple[int, list[str]]:
+def _file_identity(path: pathlib.Path) -> tuple[object, ...]:
+    info = path.lstat()
+    if _is_linklike(info) or not stat.S_ISREG(info.st_mode):
+        raise ValueError(f"path is not a regular non-link file: {path.name}")
+    if info.st_ino:
+        return (info.st_dev, info.st_ino)
+    return ("path", os.path.normcase(str(path.resolve(strict=True))))
+
+
+def _read_regular(
+    path: pathlib.Path,
+    max_bytes: int,
+    expected_length: int | None = None,
+) -> bytes:
+    before = path.lstat()
+    if (
+        _is_linklike(before)
+        or not stat.S_ISREG(before.st_mode)
+        or before.st_size < 0
+        or before.st_size > max_bytes
+        or (expected_length is not None and before.st_size != expected_length)
+    ):
+        raise ValueError(f"file is not a bounded regular file: {path.name}")
+    flags = os.O_RDONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
+    descriptor = os.open(path, flags)
+    try:
+        opened = os.fstat(descriptor)
+        if (
+            not stat.S_ISREG(opened.st_mode)
+            or opened.st_size != before.st_size
+            or opened.st_dev != before.st_dev
+            or (before.st_ino and opened.st_ino != before.st_ino)
+        ):
+            raise ValueError(f"file identity changed before read: {path.name}")
+        chunks: list[bytes] = []
+        remaining = max_bytes + 1
+        while remaining:
+            chunk = os.read(descriptor, min(64 * 1024, remaining))
+            if not chunk:
+                break
+            chunks.append(chunk)
+            remaining -= len(chunk)
+        raw = b"".join(chunks)
+        after = os.fstat(descriptor)
+        if after.st_size != opened.st_size or len(raw) != opened.st_size or len(raw) > max_bytes:
+            raise ValueError(f"file changed during bounded read: {path.name}")
+        return raw
+    finally:
+        os.close(descriptor)
+
+
+def _json_depth_ok(text: str) -> bool:
+    stack = bytearray()
+    in_string = False
+    escaped = False
+    for character in text:
+        if in_string:
+            if escaped:
+                escaped = False
+            elif character == "\\":
+                escaped = True
+            elif character == '"':
+                in_string = False
+            continue
+        if character == '"':
+            in_string = True
+        elif character in "[{":
+            if len(stack) >= MAX_JSON_DEPTH:
+                return False
+            stack.append(ord(character))
+        elif character in "]}":
+            expected = ord("[") if character == "]" else ord("{")
+            if not stack or stack.pop() != expected:
+                return False
+    return not in_string and not escaped and not stack
+
+
+def _decode_json(raw: bytes, source: str) -> Any:
+    text = raw.decode("utf-8", errors="strict")
+    if not _json_depth_ok(text):
+        raise ValueError(f"{source} JSON exceeds depth or is structurally unbalanced")
+    return json.loads(text, object_pairs_hook=_pairs)
+
+
+def _inventory_declarations(inventory: Any) -> list[tuple[str, str]]:
+    if not isinstance(inventory, dict) or set(inventory) != {"format_version", "files"}:
+        raise ValueError("inventory must contain exactly format_version and files")
+    if inventory["format_version"] != "RR-PORTABLE-INVENTORY-1":
+        raise ValueError("unsupported inventory format")
+    rows = inventory["files"]
+    if not isinstance(rows, list) or not rows or len(rows) > MAX_FILES:
+        raise ValueError("inventory files must be a bounded non-empty array")
+    declarations: list[tuple[str, str]] = []
+    seen_paths: set[str] = set()
+    seen_aliases: set[str] = set()
+    for row in rows:
+        if not isinstance(row, dict) or set(row) != {"path", "role"}:
+            raise ValueError("each inventory row must contain exactly path and role")
+        text = row["path"]
+        role = row["role"]
+        alias = _portable_alias(text, "inventory")
+        if text in {"portable/MANIFEST.json", "portable/inventory.json"}:
+            raise ValueError(f"inventory cannot declare bootstrap path: {text}")
+        if text in seen_paths or alias in seen_aliases:
+            raise ValueError(f"duplicate or aliased inventory path: {text}")
+        if not isinstance(role, str) or not role:
+            raise ValueError("inventory role must be a non-empty string")
+        seen_paths.add(text)
+        seen_aliases.add(alias)
+        declarations.append((text, role))
+    return sorted(declarations)
+
+
+def verify_snapshot(
+    root: pathlib.Path = ROOT,
+    manifest_path: pathlib.Path = MANIFEST,
+) -> tuple[int, BundleSnapshot | None, list[str]]:
     failures: list[str] = []
     try:
-        if manifest_path.is_symlink() or not manifest_path.is_file():
-            raise ValueError("manifest must be a regular nonsymlink file")
-        raw = manifest_path.read_bytes()
-        if len(raw) > 4 * 1024 * 1024:
-            raise ValueError("manifest exceeds 4 MiB")
-        manifest = json.loads(raw.decode("utf-8"), object_pairs_hook=_pairs)
+        root_resolved = root.resolve(strict=True)
+        manifest_relative = manifest_path.absolute().relative_to(root.absolute()).as_posix()
+        manifest_candidate = _candidate(root_resolved, manifest_relative)
+        raw = _read_regular(manifest_candidate, MAX_MANIFEST_BYTES)
+        manifest = _decode_json(raw, "manifest")
+        if raw != _canonical(manifest):
+            raise ValueError("manifest bytes are not canonical")
         required = {
             "files",
             "format_version",
@@ -95,40 +267,80 @@ def verify(root: pathlib.Path = ROOT, manifest_path: pathlib.Path = MANIFEST) ->
         actual_seal = hashlib.sha256(_canonical(sealed)).hexdigest().upper()
         if expected_seal != actual_seal:
             raise ValueError("manifest self-seal mismatch")
-        inventory_path = root / "portable" / "inventory.json"
-        if inventory_path.is_symlink() or not inventory_path.is_file():
-            raise ValueError("inventory must be a regular nonsymlink file")
-        inventory_raw = inventory_path.read_bytes()
+
+        inventory_candidate = _candidate(root_resolved, "portable/inventory.json")
+        inventory_raw = _read_regular(inventory_candidate, MAX_INVENTORY_BYTES)
         if hashlib.sha256(inventory_raw).hexdigest().upper() != manifest["inventory_sha256"]:
             raise ValueError("inventory digest mismatch")
+        inventory = _decode_json(inventory_raw, "inventory")
+        inventory_declarations = _inventory_declarations(inventory)
+
         rows = manifest["files"]
-        if not isinstance(rows, list) or not rows:
-            raise ValueError("manifest files must be a non-empty array")
-        seen: set[str] = set()
+        if not isinstance(rows, list) or not rows or len(rows) > MAX_FILES:
+            raise ValueError("manifest files must be a bounded non-empty array")
+        seen_paths: set[str] = set()
+        seen_aliases: set[str] = set()
         previous = ""
+        manifest_declarations: list[tuple[str, str]] = []
+        total_bytes = 0
         for row in rows:
             if not isinstance(row, dict) or set(row) != {"byte_length", "path", "role", "sha256"}:
                 raise ValueError("manifest file row is not closed")
             text = row["path"]
-            if not isinstance(text, str) or text in seen or text <= previous:
-                raise ValueError("manifest paths are duplicate or not strictly sorted")
-            seen.add(text)
+            alias = _portable_alias(text)
+            if not isinstance(text, str) or text in seen_paths or alias in seen_aliases or text <= previous:
+                raise ValueError("manifest paths are aliased, duplicate, or not strictly sorted")
+            seen_paths.add(text)
+            seen_aliases.add(alias)
             previous = text
             if not isinstance(row["role"], str) or not row["role"]:
                 raise ValueError(f"manifest role is invalid: {text}")
-            if not isinstance(row["byte_length"], int) or isinstance(row["byte_length"], bool) or row["byte_length"] < 0:
+            length = row["byte_length"]
+            if (
+                not isinstance(length, int)
+                or isinstance(length, bool)
+                or length < 0
+                or length > MAX_FILE_BYTES
+            ):
                 raise ValueError(f"manifest byte length is invalid: {text}")
+            total_bytes += length
+            if total_bytes > MAX_TOTAL_BYTES:
+                raise ValueError("manifest total byte length exceeds bundle limit")
             if not _sha(row["sha256"]):
                 raise ValueError(f"manifest file digest is invalid: {text}")
-            path = _candidate(root, text)
-            content = path.read_bytes()
-            if len(content) != row["byte_length"]:
-                failures.append(f"{text}:byte_length")
+            manifest_declarations.append((text, row["role"]))
+        if manifest_declarations != inventory_declarations:
+            raise ValueError("manifest file declarations do not match inventory")
+
+        snapshot_files: list[tuple[str, bytes]] = []
+        seen_identities: set[tuple[object, ...]] = set()
+        for row in rows:
+            text = row["path"]
+            path = _candidate(root_resolved, text)
+            identity = _file_identity(path)
+            if identity in seen_identities:
+                raise ValueError(f"manifest paths resolve to one file identity: {text}")
+            seen_identities.add(identity)
+            content = _read_regular(path, MAX_FILE_BYTES, row["byte_length"])
             if hashlib.sha256(content).hexdigest().upper() != row["sha256"]:
                 failures.append(f"{text}:sha256")
-        return len(rows), failures
-    except (OSError, UnicodeError, ValueError, json.JSONDecodeError) as exc:
-        return 0, [f"manifest:{type(exc).__name__}:{exc}"]
+            snapshot_files.append((text, content))
+        if failures:
+            return len(rows), None, failures
+        snapshot = BundleSnapshot(
+            manifest=manifest,
+            manifest_raw=raw,
+            inventory_raw=inventory_raw,
+            files=tuple(snapshot_files),
+        )
+        return len(rows), snapshot, []
+    except (MemoryError, OSError, RecursionError, UnicodeError, ValueError, json.JSONDecodeError) as exc:
+        return 0, None, [f"manifest:{type(exc).__name__}:{exc}"]
+
+
+def verify(root: pathlib.Path = ROOT, manifest_path: pathlib.Path = MANIFEST) -> tuple[int, list[str]]:
+    count, _, failures = verify_snapshot(root, manifest_path)
+    return count, failures
 
 
 def main() -> int:
