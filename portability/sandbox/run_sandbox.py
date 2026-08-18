@@ -26,7 +26,19 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
 DOCKERFILE = HERE / "Dockerfile"
 BASELINE_SHA = "4e788d21e882a30bdda2aec3f780537161f81644"
-EXPECTED_BRANCH = "main"
+# Release authority stays on ``main``: only a ``main`` run may be cited as
+# release evidence, which is the pin F-MATRIX-014 moved here from a deleted
+# ``sol/*`` branch.  A single-branch equality, though, made the sandbox arm
+# unreachable on the branch under review — and that arm is the one independent
+# check that runs the eleven-command charter gate inside the hardened container.
+# It is why the red gate 3985356 introduced survived four commits: the only
+# other custody program replays recorded stdout.  Verification branches now run
+# and their receipts record the exact branch, so release evidence stays
+# distinguishable without making independent verification impossible.
+RELEASE_BRANCH = "main"
+VERIFICATION_BRANCHES = ("hardening-industry-grade",)
+ADMITTED_BRANCHES = (RELEASE_BRANCH, *VERIFICATION_BRANCHES)
+EXPECTED_BRANCH = RELEASE_BRANCH
 CONTAINER_TIMEOUT_SECONDS = 1800
 CLEANUP_TIMEOUT_SECONDS = 30
 EXPECTED_ENTRYPOINT = [
@@ -121,7 +133,7 @@ EXPECTED_OBSERVED = {
     "lint_gate_meta": {"checks": 9, "failures": 0},
     "grounded_properties": {"checks": 2296, "failures": 0},
     "audit_adversarial": {"checks": 6497, "failures": 0},
-    "synthetic_proof_harness": {"tests": 7, "failures": 0},
+    "synthetic_proof_harness": {"tests": 9, "failures": 0},
     "fuzz_ci_smoke": {"strategies": 31, "completed": 31, "failures": 0},
     "batch_perf": {"checks": 2160, "failures": 0},
     "single_pass_audit_benchmark": {"checks": 1142, "failures": 0},
@@ -1836,12 +1848,15 @@ def main(argv: list[str] | None = None) -> int:
         }
         _emit(receipt, args.receipt)
         return 1
-    if git_state["branch"] and git_state["branch"] != EXPECTED_BRANCH:
+    if git_state["branch"] and git_state["branch"] not in ADMITTED_BRANCHES:
         receipt = {
             "schema": "receiver-reliance/sandbox-host-receipt-1",
             "status": "PREFLIGHT_FAILURE",
             "treatment_exposed": True,
-            "detail": f"unexpected branch {git_state['branch']!r}",
+            "detail": (
+                f"unexpected branch {git_state['branch']!r}; admitted "
+                f"{list(ADMITTED_BRANCHES)!r}"
+            ),
             "git": git_state,
         }
         _emit(receipt, args.receipt)

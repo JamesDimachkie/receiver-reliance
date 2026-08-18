@@ -109,7 +109,7 @@ GATES = (
         "synthetic_proof_harness",
         "/repo",
         ("python", "-B", "proof/test_proof_harness.py"),
-        "unittest_7",
+        "unittest_9",
     ),
     GateSpec(
         "fuzz_ci_smoke",
@@ -493,7 +493,14 @@ def validate_gate_output(validator: str, stdout: bytes, stderr: bytes) -> dict[s
             )
         return {"findings": 0}
 
-    if validator == "unittest_7":
+    unittest_match = re.fullmatch(r"unittest_([0-9]+)", validator)
+    if unittest_match is not None:
+        # The expected count lives in the validator name, as it does for every
+        # ``checks_*`` validator above, so a sealed receipt replays through the
+        # count its own era declared.  ``unittest_7`` is era-legacy: the two
+        # SHA-pinned gate receipts reach it through verify_receipts.py's
+        # LEGACY_GATE_VALIDATORS, and no live GateSpec references it.
+        expected_tests = int(unittest_match.group(1))
         lines = [line.rstrip("\r") for line in combined.splitlines()]
         ran_lines = [
             line for line in lines if re.match(r"^Ran\b", line)
@@ -509,9 +516,16 @@ def validate_gate_output(validator: str, stdout: bytes, stderr: bytes) -> dict[s
             for line in lines
             if re.match(r"^(?:FAILED|ERROR)(?:\s|$)", line)
         ]
-        if len(ran_lines) != 1 or ran != ["7"] or len(ok) != 1 or failed:
-            raise GateFailure("proof harness did not report 7 passing tests")
-        return {"tests": 7, "failures": 0}
+        if (
+            len(ran_lines) != 1
+            or ran != [str(expected_tests)]
+            or len(ok) != 1
+            or failed
+        ):
+            raise GateFailure(
+                f"proof harness did not report {expected_tests} passing tests"
+            )
+        return {"tests": expected_tests, "failures": 0}
 
     if validator == "fuzz_31":
         summaries = re.findall(

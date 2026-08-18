@@ -395,8 +395,25 @@ holds five lanes plus the verifiers that bind their receipts:
   substitutes.
 
 Hosted receipts are committed under `portability/receipts/hosted/` with a
-hash-bound manifest. Two stdlib-only verifiers re-derive the custody chain
-from bytes:
+hash-bound manifest. **Run this one first.** It re-executes the
+eleven-command charter gate at the bytes you have checked out and states
+plainly which evidence it recomputed and which it could only replay:
+
+```bash
+python -B portability/verify_live.py
+```
+
+Expected: `verify-live: gates=11 passed=11 declared_era_divergences=3
+undeclared_divergences=0 failures=0`. The three declared divergences are
+real and deliberate — the sealed close receipt recorded 504 grounded
+checks, 7 lint-gate checks and 7 proof tests, and the current suites have
+517, 9 and 9. Each is declared in `verify_receipts.LEGACY_GATE_VALIDATORS`,
+so the sealed transcripts still replay under their own era while the live
+gate enforces current counts. An *undeclared* divergence is a defect, and
+this program is what turns it into a red exit instead of a silent green.
+
+Then the two custody verifiers, which re-derive the recorded chain from
+bytes:
 
 ```bash
 python -B portability/verify_receipts.py
@@ -406,7 +423,16 @@ python -B portability/verify_receipts.py
 python -B portability/verify_hygiene.py
 ```
 
-Expected: `verify-receipts: checks=193 failures=0`, then `HYGIENE_PASS`.
+Expected: `verify-receipts: checks=228 failures=0`, then `HYGIENE_PASS`.
+Read what these two do and do not establish: they bind committed receipt
+bytes, rehash the sources those receipts name, and re-run recorded
+transcripts through the gate validators. They cannot tell you the artifact
+still passes its own gates, because the transcripts were captured in the
+past. `verify_live.py` exists because that distinction was not merely
+theoretical here: commit `3985356` added two proof-harness tests and left
+the charter gate declaring seven, and the live gate was red for four
+commits while `verify_receipts` reported green — truthfully, on the
+recorded bytes. `ERRATA.md` E13 records it.
 The separated-evidence report is
 [orchestration/PORTABILITY_VALIDATION.md](orchestration/PORTABILITY_VALIDATION.md).
 It records the full hosted chronology — four red runs, each adjudicated

@@ -196,6 +196,13 @@ SANDBOX_DOCKERFILE = REPO / "portability" / "sandbox" / "Dockerfile"
 LEGACY_GATE_VALIDATORS = {
     "grounded_0_4_regression": "checks_504",
     "lint_gate_meta": "checks_7",
+    # 3985356 added two regressions to proof/test_proof_harness.py, taking it
+    # from 7 tests to 9, and left the GateSpec pinned at unittest_7.  The live
+    # charter gate went red at gate 8 of 11 and stayed red for four commits
+    # while this file kept reporting green, because it replays recorded stdout
+    # that says "Ran 7 tests".  The GateSpec now says unittest_9; the sealed
+    # receipts keep their own era's count here.
+    "synthetic_proof_harness": "unittest_7",
 }
 # The committed hosted tree is run 31562391384 at HOSTED_HEAD.  Its rows were
 # never replayed through the matrix's own plan-aware row validator here — only
@@ -212,6 +219,7 @@ HOSTED_ERA_EXPECTATIONS = {
     "verify-committed-receipts": {"checks": [62], "failures": [0]},
     "grounded-0.4-regression": {"checks": [504], "failures": [0]},
     "lint-gate-meta": {"checks": [7], "failures": [0]},
+    "synthetic-proof-harness": {"tests": [7]},
 }
 # The GraalPy row is rejected by the current row validator for a reason that is
 # a defect in the validator rather than in the evidence: it derives a

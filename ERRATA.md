@@ -1,7 +1,7 @@
 # Errata and recorded defects
 
 E1–E7 entered after the 2026-08-10 external review; E8–E9 after the
-2026-08-12 Deep Security Scan (Intake 10); E10–E12 during the hardening
+2026-08-12 Deep Security Scan (Intake 10); E10–E13 during the hardening
 campaign that followed it.
 
 Confirmed against the artifact at cc6f3657 by reproducing the external
@@ -290,6 +290,66 @@ sources. Three must equal their published digests. `ladder.py` is bound to the
 post-erratum digest recorded above, so a second undisclosed move fails the gate
 rather than hiding behind the first. `portability/concurrency/findings/F-CONC-004.md`
 carries the full record.
+
+## E13 — A replay verifier reported green over a red gate for four commits
+
+`3985356` added two regressions to `proof/test_proof_harness.py`, taking it from
+7 tests to 9, and did not migrate the count the eleven-command charter gate
+declares. `portability/sandbox/expanded_gate.py` pinned validator `unittest_7`,
+which requires exactly `Ran 7 tests`, so
+`python -B portability/run_local_expanded_gate.py` exited 1 at gate 8 of 11 and
+gates 9 to 11 never executed. Run by hand they were green; the gate as a whole
+was red.
+
+Two custody programs should have caught it. Neither could.
+
+`portability/verify_receipts.py` reported `checks=193 failures=0` throughout,
+and every one of those checks was true. It replays the stdout recorded in the
+sealed gate receipts, and that recorded stdout says `Ran 7 tests`, so the
+validator it re-runs agreed with the bytes it was given. A replay verifier
+cannot observe a suite that changed after the transcript was captured.
+
+`portability/sandbox/run_sandbox.py` — the arm that runs the same gate inside
+the hardened container, and the one check that would have executed the suite
+rather than a recording — compared the checkout's branch for equality with
+`main` and exited `PREFLIGHT_FAILURE` before touching Docker. On the branch
+where the hardening work was happening it could not run at all.
+
+So the gap was structural, not an oversight: the only program that recomputed
+was unreachable on the branch under review, and the only program that was
+reachable did not recompute.
+
+Repairs, all in the commit carrying this erratum:
+
+- the validator family is parameterized by the count in its name
+  (`unittest_<n>`, matching the existing `checks_<n>` convention) and the live
+  GateSpec declares `unittest_9`. `unittest_7` survives as era-legacy, reached
+  only through `verify_receipts.LEGACY_GATE_VALIDATORS`, so the two SHA-pinned
+  gate receipts still replay under the count their own era declared;
+- the declaration migrated in the same change everywhere it appears:
+  `run_sandbox.EXPECTED_OBSERVED`, `matrix/plan.json`,
+  `verify_receipts.HOSTED_ERA_EXPECTATIONS`, and the historical witness freeze
+  in `test_sandbox.py` that pins seven pre-F015 receipt digests;
+- `run_sandbox.py` keeps `main` as the sole release-authority branch and admits
+  verification branches, which their receipts record by name. Narrow authority
+  did not require unreachable verification;
+- `test_sandbox.py` derives the true test count from
+  `proof/test_proof_harness.py` by parsing it and fails if the declaration
+  disagrees. A declared count that nothing derives from the artifact is a pin
+  waiting to go stale;
+- `portability/verify_live.py` is new and is now the first command the README
+  tells a third party to run. It re-executes all eleven gates at the current
+  bytes, holds the live output against both declared authorities — the gate's
+  own validators and the matrix plan's expectations — and compares it with what
+  the sealed receipt recorded. It prints which evidence it recomputed and which
+  it could only replay, and it exits non-zero on any divergence from the sealed
+  receipt that nobody declared.
+
+Same class as E12, and that is the point. E12 is a pin that stopped describing
+the bytes it names; this is a transcript that stopped describing the suite it
+names. Both were invisible because the verifier over them replays recorded
+evidence. Replay and recompute are different guarantees and this artifact now
+says which one it is offering.
 
 ## Authority census (context for E5)
 

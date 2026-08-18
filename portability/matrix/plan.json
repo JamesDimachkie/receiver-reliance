@@ -347,7 +347,7 @@
         "cwd": ".",
         "argv": ["{python}", "-B", "proof/test_proof_harness.py"],
         "timeout_seconds": 900,
-        "expected": {"tests": [7]}
+        "expected": {"tests": [9]}
       },
       {
         "id": "seeded-fuzz-smoke",

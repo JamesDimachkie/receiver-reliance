@@ -3,17 +3,20 @@
 
 from __future__ import annotations
 
+import ast
 import base64
 import copy
 import hashlib
 import json
 from pathlib import Path, PurePosixPath, PureWindowsPath
+import re
 import sys
 import unittest
 from unittest import mock
 
 
 HERE = Path(__file__).resolve().parent
+REPO = HERE.parents[1]
 sys.path.insert(0, str(HERE))
 
 import expanded_gate  # noqa: E402
@@ -147,6 +150,7 @@ def historical_pass_receipt_before_f015() -> dict[str, object]:
     historical_observed = {
         "grounded_0_4_regression": {"checks": 504, "failures": 0},
         "lint_gate_meta": {"checks": 7, "failures": 0},
+        "synthetic_proof_harness": {"tests": 7, "failures": 0},
     }
     for index, command in enumerate(commands):
         # Preserve the exact discovery-time receipt bytes. Transcript custody
@@ -477,6 +481,90 @@ def exercise_docker_version_probe(
     if len(emitted) != 1:
         raise AssertionError(f"expected one host receipt, observed {len(emitted)}")
     return exit_code, emitted[0], list(mocked_run.call_args_list)
+
+
+class DeclaredCountsMatchTheSuites(unittest.TestCase):
+    """Every count a GateSpec declares must equal what the suite really has.
+
+    3985356 added two regressions to ``proof/test_proof_harness.py`` and left
+    the GateSpec pinned at ``unittest_7``.  The charter gate went red at gate 8
+    of 11 and stayed red for four commits, because the only programs that would
+    have noticed either replay recorded stdout (``verify_receipts.py``) or
+    refuse to run on this branch (``run_sandbox.py``).  A declared count that
+    nothing derives from the artifact is a pin waiting to go stale, so this
+    derives it: parsing rather than importing, so it stays clock-free and
+    side-effect-free.
+    """
+
+    def _declared(self, gate_id: str) -> int:
+        spec = {spec.gate_id: spec for spec in expanded_gate.GATES}[gate_id]
+        match = re.fullmatch(r"unittest_([0-9]+)", spec.validator)
+        self.assertIsNotNone(match, f"{gate_id} is not a unittest_* gate")
+        return int(match.group(1))
+
+    def _test_methods(self, relative: str) -> int:
+        tree = ast.parse((REPO / relative).read_text(encoding="utf-8"))
+        return sum(
+            1
+            for node in ast.walk(tree)
+            if isinstance(node, ast.ClassDef)
+            for child in node.body
+            if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef))
+            and child.name.startswith("test")
+        )
+
+    def test_proof_harness_gate_declares_the_real_test_count(self) -> None:
+        declared = self._declared("synthetic_proof_harness")
+        actual = self._test_methods("proof/test_proof_harness.py")
+        self.assertEqual(
+            declared,
+            actual,
+            "expanded_gate's synthetic_proof_harness validator declares "
+            f"{declared} tests; proof/test_proof_harness.py defines {actual}. "
+            "Migrate the declaration in the same change that moves the suite: "
+            "the GateSpec validator, run_sandbox.EXPECTED_OBSERVED, "
+            "matrix/plan.json, and verify_receipts.LEGACY_GATE_VALIDATORS plus "
+            "HOSTED_ERA_EXPECTATIONS for the sealed era.",
+        )
+
+    def test_host_declaration_agrees_with_the_gate_validator(self) -> None:
+        self.assertEqual(
+            run_sandbox.EXPECTED_OBSERVED["synthetic_proof_harness"],
+            {"tests": self._declared("synthetic_proof_harness"), "failures": 0},
+        )
+
+    def test_unittest_validator_family_binds_the_count_in_its_name(self) -> None:
+        """A sealed era count and the live count must not be interchangeable."""
+
+        seven = b"Ran 7 tests in 0.1s\r\n\r\nOK\r\n"
+        nine = b"Ran 9 tests in 0.1s\r\n\r\nOK\r\n"
+        self.assertEqual(
+            expanded_gate.validate_gate_output("unittest_7", seven, b""),
+            {"tests": 7, "failures": 0},
+        )
+        self.assertEqual(
+            expanded_gate.validate_gate_output("unittest_9", nine, b""),
+            {"tests": 9, "failures": 0},
+        )
+        for validator, stream in (("unittest_7", nine), ("unittest_9", seven)):
+            with self.subTest(validator=validator):
+                with self.assertRaises(expanded_gate.GateFailure):
+                    expanded_gate.validate_gate_output(validator, stream, b"")
+
+
+class BranchAuthorityIsNarrowButReachable(unittest.TestCase):
+    """Release authority is one branch; verification is not blocked to one."""
+
+    def test_release_branch_is_still_main(self) -> None:
+        self.assertEqual(run_sandbox.RELEASE_BRANCH, "main")
+        self.assertEqual(run_sandbox.EXPECTED_BRANCH, "main")
+        self.assertEqual(run_sandbox.ADMITTED_BRANCHES[0], "main")
+
+    def test_verification_branches_are_admitted_and_others_are_not(self) -> None:
+        self.assertIn("hardening-industry-grade", run_sandbox.ADMITTED_BRANCHES)
+        for refused in ("sol/rr-robustness-20260811", "detached", "wip"):
+            with self.subTest(branch=refused):
+                self.assertNotIn(refused, run_sandbox.ADMITTED_BRANCHES)
 
 
 class SandboxSpecTests(unittest.TestCase):
@@ -2842,8 +2930,8 @@ class SandboxSpecTests(unittest.TestCase):
                 b"lint: 1 findings\n",
                 b"lint: nope findings\n",
             ),
-            "unittest_7": (
-                b"Ran 7 tests in 0.123s\r\n\r\nOK\r\n",
+            "unittest_9": (
+                b"Ran 9 tests in 0.123s\r\n\r\nOK\r\n",
                 b"Ran 1 test\nFAILED (failures=1)\n",
                 b"Ran banana tests\n",
             ),
