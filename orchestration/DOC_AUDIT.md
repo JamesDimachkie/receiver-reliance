@@ -10,7 +10,7 @@
 > | grounded regression 504 checks | `checks=517 failures=0` |
 > | lint-gate meta-test 7 checks | `checks=9 failures=0` |
 > | authority census 111 semantic / 64 presence-only | `141 semantic / 34 presence_only` (of 199) |
-> | `verify_receipts` 154 checks | `checks=228 failures=0` |
+> | `verify_receipts` 154 checks | `checks=267 failures=0` |
 >
 > ERRATA `F-WP2-001` records why the authority census moved: 30 dual-use fields
 > had been wrongly subtracted from the semantic count. The rows below are left

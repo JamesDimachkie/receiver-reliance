@@ -423,7 +423,7 @@ python -B portability/verify_receipts.py
 python -B portability/verify_hygiene.py
 ```
 
-Expected: `verify-receipts: checks=228 failures=0`, then `HYGIENE_PASS`.
+Expected: `verify-receipts: checks=267 failures=0`, then `HYGIENE_PASS`.
 Read what these two do and do not establish: they bind committed receipt
 bytes, rehash the sources those receipts name, and re-run recorded
 transcripts through the gate validators. They cannot tell you the artifact

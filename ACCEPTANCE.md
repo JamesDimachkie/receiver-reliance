@@ -210,7 +210,7 @@ implementations. What landed, each with its own evidence record:
   concurrency ladder, hosted CPython 3.12/3.13/3.14 matrix across six
   OS/architecture rows, and a hardened daemon-real Linux container gate,
   with all hosted receipts committed under `portability/receipts/hosted/`
-  and bound by the 228-check `verify_receipts.py`
+  and bound by the 267-check `verify_receipts.py`
   (`orchestration/PORTABILITY_VALIDATION.md`);
 - the blind completeness review's published input bundle (`evidence/`);
 - repository consolidation to a single public `main`, with the first

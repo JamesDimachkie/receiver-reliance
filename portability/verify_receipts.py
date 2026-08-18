@@ -120,6 +120,22 @@ SOURCE_PIN_ERRATA = {
     ),
 }
 
+# Hardening-branch evidence: the clean-tree charter gate re-run after the E13
+# repair, on CURRENT suite counts.  This is the only committed gate receipt whose
+# eleven observations equal what the suites produce today; the two below it
+# record their own eras and replay through LEGACY_GATE_VALIDATORS.  It is bound
+# here so the recompute is custody-tracked, not just asserted in prose.
+HARDENING_GATE_RECEIPT = (
+    REPO / "portability" / "receipts" / "local-expanded-gate-hardening-6776332.json"
+)
+HARDENING_SOURCE_HEAD = "6776332e082c178f196c8745f589b235454483f0"
+HARDENING_GATE_RAW_SHA256 = (
+    "228B1EAC7D87D3A1B8A0718FE58FF40F14645942DB4E5CD9F7D62E2DDAA75439"
+)
+HARDENING_GATE_EMBEDDED_SHA256 = (
+    "EFC61583BDB12BF6721C19E1F658FCE57F4D8010EB29229FFCF0089104A178DC"
+)
+
 # Close evidence: the clean-tree expanded gate at the reconciliation commit.
 CLOSE_SOURCE_HEAD = "8104874a9e4081fca62c1cc142f68988e87751eb"
 CLOSE_GATE_RAW_SHA256 = (
@@ -261,7 +277,16 @@ def _verify_clean_gate_receipt(
     raw_sha: str,
     embedded_sha: str,
     source_head: str,
+    era_validators: bool = True,
 ) -> None:
+    """Re-derive one charter-gate receipt, byte for byte.
+
+    ``era_validators`` selects which law the recorded transcripts replay under.
+    The two portability-era receipts need their own era's counts, which is what
+    LEGACY_GATE_VALIDATORS supplies.  A receipt recorded at current suite counts
+    must NOT get that indulgence: it replays under the live validators, so if a
+    suite moves after it was written, this fails rather than quietly agreeing.
+    """
     raw = path.read_bytes()
     v.check(f"{prefix}.raw_sha256", _sha256_upper(raw) == raw_sha)
     doc = strict_ingest.load_safe(raw)
@@ -302,7 +327,11 @@ def _verify_clean_gate_receipt(
             and len(stderr) == item["stderr_bytes"]
             and _sha256_upper(stderr) == item["stderr_sha256"],
         )
-        validator = LEGACY_GATE_VALIDATORS.get(gate_id, spec.validator)
+        validator = (
+            LEGACY_GATE_VALIDATORS.get(gate_id, spec.validator)
+            if era_validators
+            else spec.validator
+        )
         try:
             observed = expanded_gate.validate_gate_output(validator, stdout, stderr)
             v.check(f"{prefix}.{gate_id}.validator_rerun", observed == item.get("observed"))
@@ -326,6 +355,15 @@ def _verify_gate_receipt(v: _Verifier) -> None:
         CLOSE_GATE_RAW_SHA256,
         CLOSE_GATE_EMBEDDED_SHA256,
         CLOSE_SOURCE_HEAD,
+    )
+    _verify_clean_gate_receipt(
+        v,
+        "hardening_gate",
+        HARDENING_GATE_RECEIPT,
+        HARDENING_GATE_RAW_SHA256,
+        HARDENING_GATE_EMBEDDED_SHA256,
+        HARDENING_SOURCE_HEAD,
+        era_validators=False,
     )
 
 

@@ -168,7 +168,7 @@ class AdoptionIsComplete(unittest.TestCase):
         The count pinned here was 193 when the strict-ingest law was adopted,
         which was the point of the test: adoption itself moved no number.  The
         F-CONC-004 source-pin gate and the era-scoped hosted row replay later
-        added 35 checks deliberately, so the pin migrated with them.  What the
+        added 74 checks deliberately, so the pin migrated with them.  What the
         test still enforces is that every published receipt passes the law with
         zero failures.
         """
@@ -179,7 +179,7 @@ class AdoptionIsComplete(unittest.TestCase):
             capture_output=True, text=True, check=False,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn("checks=228 failures=0", result.stdout)
+        self.assertIn("checks=267 failures=0", result.stdout)
 
 
 if __name__ == "__main__":
