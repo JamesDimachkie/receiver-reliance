@@ -8,10 +8,16 @@ preserved in git history (`a107081`..`15faca2`) as chronology.
 
 Bytes under test (current):
 
-- `portable_preflight.py`: `25DD05F5731FC142ADC4CDDDBCC294354E9119C063FCFF4E506E3098BE280384`
-- `test_portable_preflight.py`: `9272B9D79E8E89FA99DEBED64E768E6E35FE8E62B2A23E92D457041EA4AD4741`
-- `outcome_receipt.py`: `662C9F31E55097DC316DA5353DDC268E009BAC9B7E3D1340CF67EBD855A1A807`
-- `receipts/WP1_OUTCOME_RECEIPT.json`: `86263477F1D1A3BEF6E85C362B1AEBBE58D74E6FD940EFC6C077297F95711804`
+- `portable_preflight.py`: `B1F4F7C20E96AD88DE54402771CC71BEB3BE79BC37A7516EA9547790B5418F07`
+- `test_portable_preflight.py`: `4CB01B0950242875A1AE76A690C14F762F887AC08CC5AFAFFB6C8A8E2EC7843E`
+- `outcome_receipt.py`: `A1CC25FF550F6795FB3E35E1EB34D9B0BBE20611430DA16457F63827FF0102E1`
+- `receipts/WP1_OUTCOME_RECEIPT.json`: `57763213B272DA4B363281D55FFC0881405E7086844EFCFFDCBBF935C9D1FFBD`
+
+> **Re-pinned 2026-08-18.** The four digests above previously named the
+> pre-W3 bytes and matched nothing on disk, so this file claimed multi-runtime
+> evidence for code that no longer existed — the W3 adapters wave rewrote all
+> four without re-pinning here. The commands below were re-executed against the
+> current bytes on all three runtimes before these digests were written.
 
 | runtime | command | result |
 |---|---|---|
@@ -34,7 +40,7 @@ local evidence alone; the paired outcome bar (0 new false holds, 18/18
 detection) is recorded in `receipts/WP1_OUTCOME_RECEIPT.json` and
 `OUTCOME.md`.
 
-Conclusion: local evidence covers CPython 3.12, 3.13, and 3.14 for the
-current bytes. The requested CPython 3.12–3.14 runtime evidence bar is met;
+Conclusion: local evidence covers CPython 3.12.10, 3.13.15, and 3.14.5 for the
+current bytes, re-verified 2026-08-18. The requested CPython 3.12–3.14 runtime evidence bar is met;
 `evidence_bar_met` and `package_complete` are recorded accordingly in the
 regenerated receipt (2026-08-13).

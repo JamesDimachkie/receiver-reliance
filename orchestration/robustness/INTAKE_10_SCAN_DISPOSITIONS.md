@@ -53,6 +53,33 @@ the answers are therefore:
   seal the missing referent (WHICH policy governed), which is the checkable
   half of the concern.
 
+## Closed after the cluster table — the W3-grounded seven
+
+The cluster table above was written on 2026-08-12. Commit `5946e4c`
+(2026-08-13) then closed seven individual findings with code across
+`grounded-0_4/authority_surface.py`, `rr_api.py`, `rr_batch.py` and
+`test_public_surface.py`. Their ids were recorded only in that commit's
+subject line, so this section is the missing disposition. Severity and
+category are the scan's own; each verdict names the mechanism and the check
+that pins it. `python -B grounded-0_4/test_public_surface.py` returns
+`PUBLIC-SURFACE PASS: 38 checks` at the current bytes.
+
+| Finding | Severity / category | Verdict |
+|---|---|---|
+| `csf_2b00e6b7` normal runtime paths trust adjacent policy-root files without independent authentication | low / file-safety | **FIXED** — the runtime authority query and the closure-policy loader authenticate the adjacent register and policy bytes against pinned digests before use. Pinned by `runtime authority query authenticates adjacent register bytes` and `closure policy substitution fails authentication`, which substitute `{}` for each file in a temporary root and require failure. |
+| `csf_68032a42` runtime authority validation accepts unsupported register versions and arbitrary nonempty status values | low / integrity-verification | **FIXED** — register `format_version` and per-field `status` are closed enumerations rather than nonempty-string checks. Pinned by `authority rejects unsupported format_version` and `authority rejects unsupported status`, using `B1-AUTHORITY-REGISTER-999` and `synthetic_open_status`. |
+| `csf_5cb40479` a deeply nested authority register escapes validation as an uncaught RecursionError | low / path-traversal | **FIXED** — register parsing is depth-bounded and fails closed instead of raising. Pinned by `deep authority register fails closed` against a 128-deep array. |
+| `csf_752f72c3` public object APIs canonicalize caller-controlled Python objects before the bounded total wire parser, breaking API/CLI parity | medium / cross-surface-consistency | **FIXED** — object requests are converted by `_bounded_object_wire` and enter the same bounded total parser as CLI bytes, so cyclic, non-string-key, non-finite, lone-surrogate, over-nested and over-member inputs return `ERR_JSON`, `ERR_NUMBER` or `ERR_LIMIT` instead of raising. Pinned by seven checks including `valid object and bytes calls remain byte-identical` and `conformance object path is total too`. |
+| `csf_871e62f4` stable library API can bind ambient same-name modules instead of the intended frozen implementation | low / input-validation | **FIXED** — package import resolves `authority_surface`, `b1_capabilities` and `pcb_runner` by repository path regardless of same-name modules already present. Pinned by three `ambient collision cannot replace ...` checks that pre-poison `sys.modules` with empty stand-ins and then compare resolved `__file__` paths. |
+| `csf_ec4c5438` OBL-30 trusts caller-controlled row and bookkeeping projections that are not bound to the candidate pool | medium / integrity-verification | **FIXED IN THE AUDITED TIER** — three projection closures (R1 candidate/pool record ids, R2 verdict record ids, R3 exclusion record ids) fire `MALFORMED_OR_BOUNDARY` on the audited surface. The sealed 0.4 response still returns `VALID`, which is E5's recorded frozen gap and may not change by charter; each case asserts BOTH halves, `frozen-gap-reproduced` and `audited-fail-closed`, so the gap is now closure-detected rather than only disclosed. |
+| `csf_6dc196be` a never-terminated oversized batch request can monopolize the sidecar indefinitely | medium / denial-of-service | **FIXED** — `rr_batch.serve` gives an unterminated overlimit line a finite work ceiling and fails deterministically with `ERR_BATCH_RECORD_LIMIT`. Pinned by `unterminated overlimit batch work is bounded`, which asserts the exact read count. The sidecar half of the same class is `MAX_DECLARED_REQUEST_BYTES` in F-WP5-006; that finding's bound 4 (an LF-less flood costing bounded memory but unbounded work) is the deliberately-kept limb. |
+
+Effect on the deferred set below: C2's remainder narrows to the peripheral
+loaders — the public decision surface is now behind the one bounded total
+parser, which was C2's stated shape. C1's runtime-authentication limb is
+closed. C6's remainder is unchanged apart from the batch ceiling. No row
+here retires the re-adjudication trigger.
+
 ## Deferred set — recorded, with trigger
 
 Deferred, not dropped. **Trigger:** the first external consumer, or any

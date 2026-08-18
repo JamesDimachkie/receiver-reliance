@@ -1,5 +1,21 @@
 # Documentary consistency audit
 
+> **Superseded counts (annotated 2026-08-17).** This audit is dated 2026-08-10
+> and its verification column records what was live *then*. Four of those
+> numbers have since moved, so this document must not be read as a current
+> validation gate:
+>
+> | Then | Now |
+> |---|---|
+> | grounded regression 504 checks | `checks=517 failures=0` |
+> | lint-gate meta-test 7 checks | `checks=9 failures=0` |
+> | authority census 111 semantic / 64 presence-only | `141 semantic / 34 presence_only` (of 199) |
+> | `verify_receipts` 154 checks | `checks=193 failures=0` |
+>
+> ERRATA `F-WP2-001` records why the authority census moved: 30 dual-use fields
+> had been wrongly subtracted from the semantic count. The rows below are left
+> unedited on purpose — this is a dated observation record, not a dashboard.
+
 Audit date: 2026-08-10
 
 Audited revision: `dfae0c219921919d4d1fe42f536fa01a46477432`

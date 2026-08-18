@@ -19,4 +19,3 @@ requires exactly one duplicate-free JSON line with `PASS`, zero divergences,
 no first divergence, and a positive executed-case count. Output is size
 bounded before decoding; malformed UTF-8, NUL, bare CR, extra lines, duplicate
 members, trailing text, and contradictory evidence all fail the gate.
-

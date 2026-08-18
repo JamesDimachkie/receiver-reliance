@@ -1,5 +1,18 @@
 # Receiver-reliance portability validation — separated evidence report
 
+> **Current re-run values (2026-08-17).** This is a dated report; the inline
+> counts below are as-of its date and several have since moved as later waves
+> added regressions and custody bindings. A third party re-running today should
+> expect: grounded-0.4 regression `checks=517 failures=0`; lint-gate meta-test
+> `checks=9 failures=0`; authority ledger `141 semantic / 34 presence_only /
+> 10 inert_disclosed / 14 inert_registered_debt` of 199 required fields;
+> `verify_receipts.py` `checks=193 failures=0`; `verify_hygiene.py`
+> `HYGIENE_PASS allowed_raw_receipt_warnings=1011 admitted_diagnostics=5
+> unexpected_diagnostics=0 custody_hashes=17/17`. The historical numbers are
+> left in place deliberately — this report is evidence of what was observed on
+> its date, not a live dashboard. ERRATA F-WP2-001 records why the authority
+> census moved (30 dual-use fields had been wrongly subtracted).
+
 Date: 2026-08-11
 
 Branch: `sol/rr-portability-modelcheck-20260810` from baseline

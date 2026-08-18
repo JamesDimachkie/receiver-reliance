@@ -77,8 +77,16 @@ ALLOWED = {
         "E657B67E967A1D646507EE1B1EF09A2F45913E4B77A5DA38814460A39D5B9554",
     ),
     "second-implementation/receipts/AUTHOR_INCREMENT_RECEIPT_0_1.json": (
-        160,
-        "FF22DA0FE9B7326261ED723628B201E69AE3279E9C439D5186299FD7109CA6A7",
+        189,
+        "CB42DDBF8B839B2DAA95D1D8658E1C9644D83798EB6B3C74B5F1C1E7ECC90933",
+    ),
+    "second-implementation/receipts/BOUNDED_DEEP_PREFLIGHT_0_1.json": (
+        1,
+        "4DFDB3647C787C725993B60128F7C4CA6899C4B4A6C219DBE7E03DD7751710A7",
+    ),
+    "second-implementation/receipts/COVERAGE_STEERING_SMOKE_0_1.json": (
+        1,
+        "45407C175B05CCC0A7C4961AAED5818CFA6CD57676F6BF06304CF677A4185FB5",
     ),
 }
 # Error-class diagnostics admitted byte-exactly.  The WP4 author increment
@@ -95,6 +103,21 @@ ALLOWED_DIAGNOSTICS = {
         "new blank line at EOF",
         1,
         "8FF3BE2603A8505D1674D99376B2A1468F69257786ED27E3EC570C350BF1EFE9",
+    ),
+    "second-implementation/findings/F-WP4-010.md": (
+        "new blank line at EOF",
+        1,
+        "970303D7DCFC8567C8951BAABD39D4AA8DDB79310DBAD1419CEF22BB81C707E6",
+    ),
+    "second-implementation/findings/F-WP4-011.md": (
+        "new blank line at EOF",
+        1,
+        "F10FCDF58C067585116E2DB5B2B29C81DCCB87F4E18B388C2AB5A34C3F0F2038",
+    ),
+    "second-implementation/findings/F-WP4-012.md": (
+        "new blank line at EOF",
+        1,
+        "124F16C9978E44F26A2428C14ED1930611D92EC2257F44C591C5C7C521547D6D",
     ),
 }
 WARNING = re.compile(r"^(?P<path>.+):(?P<line>[0-9]+): (?P<kind>.+)\.$")

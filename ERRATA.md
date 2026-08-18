@@ -91,10 +91,56 @@ sealed revision, not implementation defects.
 Every operation demands its full fact profile; a host whose records lack an
 obligation's semantics must fabricate values (and eat false holds — 133 of
 390 clean records, a 34.1% false-hold rate, when OBL-17 was forced onto
-acknowledgment-less lifecycles) or refuse outside the contract. *Status:*
-host-side calibration is specified in `HOST_OBLIGATIONS.md` H4 and measured
-in `proof/`; next sealed generation should admit an explicit
-INAPPLICABLE declaration with its own fixture class.
+acknowledgment-less lifecycles) or refuse outside the contract.
+
+*Status (updated 2026-08-17): the practical gap is closed on the live surface;
+only the contract-level declaration remains deferred.* This entry previously
+read as though no abstention mechanism existed, which understated what ships.
+
+A three-state preflight is exported and reproducible today
+(`adapters/portable_preflight.py`, `adapters/README.md`):
+`READY` (eligibility only, never a pass), `REJECTED_INVALID` (detection), and
+`INSUFFICIENT_EVIDENCE` (abstention). Integration is five lines:
+
+```python
+from adapters import READY, preflight
+
+result = preflight(native_record, optional_host_fact_profile)
+if result.status != READY:
+    record_preflight_result(result.as_dict())
+    do_not_invoke_engine()
+```
+
+Measured against the same 408-record corpus that produced the 34.1% figure
+(`adapters/OUTCOME.md`, reproducible with
+`python -B adapters/outcome_receipt.py --check`):
+
+| arm | new false holds | clean false-hold rate | total detection |
+|---|---:|---:|---:|
+| historical forced arm | 133 | 34.1% | 18/18 |
+| portable fallback | **0** | **0.0%** | **18/18** |
+
+The exact taxonomy is 192 `READY`, 8 `REJECTED_INVALID`, 208
+`INSUFFICIENT_EVIDENCE`. Abstention does not hide defects: **no defective row
+is in the insufficient-evidence bucket**, and detection stays at 18/18 while
+false holds go to zero. So a third-party host no longer has to fabricate values
+or refuse outside the contract — it abstains explicitly and routes those rows
+however it chooses.
+
+Two honest limits. First, the fallback is deliberately narrow: WP1 reached its
+three-strike boundary at `F-WP1-009`, so this is a preflight for native evidence
+plus optional host-produced profiles — **not** a general host adapter, runner,
+transcript verifier, replay store, or effect API. `READY` does not authorize
+invocation by itself; H1–H6 still bind the integration. Second, abstention is
+not free: 208 of 408 rows abstain because timestamps do not establish
+acknowledgment semantics, so a host wanting decisions on those rows must supply
+the missing semantics.
+
+What remains genuinely deferred is the *contract-level* fix, which needs a new
+sealed generation: an explicit `INAPPLICABLE` classification admitted by the
+decision table with its own fixture class, so applicability is expressed inside
+the sealed law rather than in front of it. Host-side calibration remains
+specified at `HOST_OBLIGATIONS.md` H4 and measured in `proof/`.
 
 ## E8 — Audited decisions did not identify their governing policy bytes
 
@@ -137,6 +183,68 @@ yields `AUDIT_INCOMPLETE` (an errored closure might have tightened it);
 sealed defect classes stand, because closures only tighten. *Enforcement:*
 `governance:evaluator-error-fails-closed` regression in
 `grounded-0_4/test_grounded_0_4.py`.
+
+## E10 — Author-increment receipt understates the second-implementation strike count
+
+`second-implementation/receipts/AUTHOR_INCREMENT_RECEIPT_0_1.json` reads
+`status: AUTHOR_ATTEMPT_3_FINAL_PATH_A_READY_FOR_FRESH_REFUTER` with
+`official_author_strike_count: 2`. That contradicts
+`orchestration/refuters/RI5.md`, which is the decisive round **over attempt 4**
+and records "DIVERGENCE FOUND — the candidate does not conform. Third strike;
+the WP4 package falls back," over 592 confirmed divergences in 4,992
+differential probes across five independent mechanisms (binding-pool
+membership under a missing member, canonical registry-row derivation,
+non-finite constant classification, ERR_JSON/ERR_NUMBER precedence order, and
+duplicate keys with lone surrogates).
+
+**Authoritative reading: three strikes, over attempt 4.** `RI5.md` governs; the
+receipt's status string is stale.
+
+Recorded rather than rewritten, for the same reason E2, E4 and E5 are: the
+receipt's raw SHA-256 is pinned in four places —
+`portability/verify_hygiene.py` (`ALLOWED`), `portable/inventory.json`,
+`portable/MANIFEST.json`, and it is consumed by
+`second-implementation/verify_artifacts.py` as `author-file-hash` rows. Editing
+its bytes cascades through all four custody surfaces to correct a status
+string that no verifier reads and no published number depends on. The next
+sealed second-implementation generation should carry the corrected status at
+its own re-bind, when the pins move anyway.
+
+Two related facts remain accurate in the receipt and are **not** stale:
+`campaign_gate` is still
+`DEFERRED_PENDING_FRESH_CONTEXT_REFUTER_ZERO_DIVERGENCE` and
+`house_scale_campaign_receipt` is still `null`. The W3/W4 hardening waves
+(`F-WP4-008` through `F-WP4-013`) were applied to the candidate *after* RI5 and
+have not themselves been re-refuted, so no zero-divergence fresh-context pass
+exists. **No conforming second implementation exists.** That claim, in
+`README.md`, is correct.
+
+## E11 — "Sealed" carries two distinct meanings
+
+Two unrelated senses of "sealed" appear across this artifact, and a reader who
+carries one into the other's documents will misjudge the artifact's standing:
+
+1. **Digest seal (release sense).** Used throughout `README.md`,
+   `ACCEPTANCE.md` and the contracts: fixture packs, receipts and responses
+   carry self-zero SHA-256 seals over RFC 8785 JCS canonical bytes, and
+   "sealed 0.2/0.3 bytes" means those bytes are frozen and digest-pinned. In
+   this sense the artifact is extensively sealed, and that is verifiable here.
+
+2. **Gate 0 capability seal (research-program sense).** Used in the capability
+   floor and its evidence bundle: a `CapabilityRecord` reaches
+   `seal_status = SEALED` only with a complete source-to-obligation-to-fixture
+   chain, an author-separated acceptance, and a bounded gap impact. In that
+   sense **nothing is sealed**: `evidence/A1_CAPABILITY_FLOOR_0_1.md` records
+   all 28 mandatory obligations as `UNSEALED` with `realization =
+   NOT_ATTEMPTED`, `specification = DRAFT`, `test_result = NOT_RUN`, and
+   `sealed_count = 0`.
+
+Both statements are true in their own algebra. Neither implies the other, and
+in particular a digest seal is **not** evidence of capability realization. The
+composed control matrices remain
+`FROZEN_AWAITING_EXTERNAL_ACCEPTANCE_0_3`, and OBL-30's admission is recorded
+as `CONDITIONAL_ON_FRAME_REACHABILITY_M4_DROPPABLE_AT_BLIND_GATE` even though
+the blind completeness gate returned `COMPLETE` with `OBL-30: ADMIT`.
 
 ## Authority census (context for E5)
 

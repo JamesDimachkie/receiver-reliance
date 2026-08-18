@@ -1,5 +1,18 @@
 # Deterministic fuzz campaign report
 
+> **Current re-run values (2026-08-17).** This is a dated report; the inline
+> counts below are as-of its date and several have since moved as later waves
+> added regressions and custody bindings. A third party re-running today should
+> expect: grounded-0.4 regression `checks=517 failures=0`; lint-gate meta-test
+> `checks=9 failures=0`; authority ledger `141 semantic / 34 presence_only /
+> 10 inert_disclosed / 14 inert_registered_debt` of 199 required fields;
+> `verify_receipts.py` `checks=193 failures=0`; `verify_hygiene.py`
+> `HYGIENE_PASS allowed_raw_receipt_warnings=1011 admitted_diagnostics=5
+> unexpected_diagnostics=0 custody_hashes=17/17`. The historical numbers are
+> left in place deliberately — this report is evidence of what was observed on
+> its date, not a live dashboard. ERRATA F-WP2-001 records why the authority
+> census moved (30 dual-use fields had been wrongly subtracted).
+
 ## Verdict
 
 **PASS — the user-authorized 50,000-case reference half is complete.** The
@@ -12,6 +25,20 @@ The current aggregate target is 100,000 cases. Its second, disjoint 50,000-case
 half is intentionally **NOT RUN**: it is reserved for a paired
 batch-vs-isolated campaign after O1 admission. Nothing in this report claims
 that deferred half or the 100,000-case aggregate is complete.
+
+> **Superseded on this point (annotated 2026-08-17).** The deferred half has
+> since been executed as the batch campaign; see `orchestration/BATCH_50K.md`
+> (50 chunks, 50,000 / 50,000 selected requests and responses in order, 50,000
+> unique candidate raw SHA-256 values, zero findings) and
+> `orchestration/FINAL_REPORT.md`. `BATCH_50K.md` also reconciles the two
+> figures that otherwise look contradictory: the aggregate is **100,000
+> scheduled case identities** but **67,599 unique raw byte strings**, because
+> the first half's 50,000 seeded identities collapse to 17,599 unique inputs
+> while the second half contributes 50,000 raw-byte-unique strings disjoint
+> from the first. The "100,000 cases" figure in `README.md` and `ACCEPTANCE.md`
+> is therefore an identity count and is correct; this paragraph's NOT RUN
+> statement was true only on this report's date. Read in isolation it now
+> understates the completed work.
 
 The 20,000-case throughput pilot is reported separately below but, per the
 final user-directed accounting, is included in the 50,000-case reference half.

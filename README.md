@@ -88,6 +88,54 @@ For one concrete handoff decided end to end (the records, the exact
 commands, and byte-pinned responses for a clean, a violated, and an
 unresolved case), see [EXAMPLE.md](EXAMPLE.md).
 
+## Using it on your own records
+
+The engine classifies fact profiles the caller assembles; it does not read your
+records. Two things make that tractable rather than a research exercise.
+
+**Start with the preflight, not the engine.** `adapters/` exports a stdlib-only
+three-state preflight over native evidence plus an optional host-produced fact
+profile:
+
+```python
+from adapters import READY, preflight
+
+result = preflight(native_record, optional_host_fact_profile)
+if result.status != READY:
+    record_preflight_result(result.as_dict())
+    do_not_invoke_engine()
+```
+
+`READY` is eligibility only — never a pass and never an engine decision.
+`REJECTED_INVALID` is detection. `INSUFFICIENT_EVIDENCE` is abstention, which is
+what you want when your records genuinely do not carry an obligation's
+semantics: it is the alternative to fabricating values and eating false holds.
+Measured over the published 408-record corpus, the preflight holds detection at
+18/18 while taking the clean false-hold rate from 34.1% to **0.0%**, abstaining
+on 208 rows rather than guessing (`adapters/OUTCOME.md`; reproduce with
+`python -B adapters/outcome_receipt.py --check`). No defective row lands in the
+abstention bucket.
+
+Be clear about its scope: WP1 stopped at a three-strike boundary
+(`F-WP1-009`), so this is a preflight, **not** a general host adapter, runner,
+transcript verifier, replay store, or effect API. Read
+`adapters/README.md` for the exact taxonomy and `adapters/CALIBRATION.md` for
+the playbook.
+
+**Then satisfy the host contract.** [HOST_OBLIGATIONS.md](HOST_OBLIGATIONS.md)
+is the testable division of labour — state truthfulness, atomicity,
+derive-don't-assert, applicability calibration, input binding, effects. H1–H6
+remain yours regardless of preflight status. For decisions you intend to rely
+on, call `decide_audited` (see the grounded 0.4 layer below), not the frozen
+response path.
+
+Honest status on adoption: `TRUST_MODEL.md` records **zero external or sibling
+code consumers** to date. Nothing here has been load-tested by an integrator
+other than its author, and the applicability limits in `ERRATA.md` E7 are the
+first thing a new consumer should read. What is recorded-and-unfixed between
+this artifact and one you could adopt -- with the treatment and owner for each
+item -- is ledgered in [ADOPTION.md](ADOPTION.md).
+
 ## Design properties worth stealing
 
 - **Everything is digest-pinned.** Fixture packs, receipts, and responses
@@ -279,12 +327,20 @@ conformance engineering and pressed on what conformance cannot prove. Its
 findings were reproduced probe-for-probe and answered additively — zero
 sealed 0.2/0.3 bytes changed:
 
-- `grounded-0_4/rr_api.py` — a library API (`decide`; the recorded proof run
-  measured 2.998 ms in-process vs 104.99 ms via the stdio ABI, see
-  `proof/RESULTS.md`) and an audited surface (`decide_audited`) whose
-  seal binds the request bytes, the decision-input digest, and the frozen
+- `grounded-0_4/rr_api.py` — the audited decision surface `decide_audited`,
+  whose seal binds the request bytes, the decision-input digest, and the frozen
   receipt, and which carries the matched-predicate witness trace and derived
-  record references the sealed response lacks. The current audit format
+  record references the sealed response lacks. In-process calling is
+  substantially cheaper than the stdio ABI: the recorded proof run measured
+  2.998 ms in-process against 104.99 ms via the ABI (`proof/RESULTS.md`).
+  A bare `decide` export previously reached the frozen response path directly;
+  it is **WITHDRAWN** (ERRATA E2, deep-scan `csf_abbd6848`) because that route
+  returned sealed responses which do not bind the decision input. Use
+  `decide_audited` for any decision you intend to rely on. Frozen execution
+  survives only as the explicitly non-evidentiary
+  `receiver_reliance.conformance.execute`, and
+  `grounded-0_4/test_public_surface.py` pins the absence of `decide` so the
+  route cannot silently return. The current audit format
   (`B1-AUDITED-DECISION-0.4.1`, ERRATA E8/E9) additionally seals the
   governing closure-policy, authority-register, and engine-source digests
   into every audit, discloses record-reference truncation explicitly, and
