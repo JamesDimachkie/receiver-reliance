@@ -1,7 +1,7 @@
 # Errata and recorded defects
 
 E1–E7 entered after the 2026-08-10 external review; E8–E9 after the
-2026-08-12 Deep Security Scan (Intake 10); E10–E13 during the hardening
+2026-08-12 Deep Security Scan (Intake 10); E10–E14 during the hardening
 campaign that followed it.
 
 Confirmed against the artifact at cc6f3657 by reproducing the external
@@ -350,6 +350,43 @@ the bytes it names; this is a transcript that stopped describing the suite it
 names. Both were invisible because the verifier over them replays recorded
 evidence. Replay and recompute are different guarantees and this artifact now
 says which one it is offering.
+
+## E14 — Seven receipt provenance pins went stale and the verifier failed undisclosed
+
+Both admitted WP5 receipts carry a `source_sha256` map recording the bytes that
+produced their profiling run. The hardening campaign changed four of those
+sources, so seven pin rows across the two receipts stopped matching the current
+bytes: `grounded-0_4/rr_api.py` (W1 withdrew the bare `decide` route, W3 added
+runtime byte-authentication), `grounded-0_4/authority_surface.py` (W3 register
+nesting and vocabulary authentication), `grounded-0_4/rr_batch.py` (W3 batch
+overlimit cap and OBL-30 R1–R3 pool bindings), and
+`perf/sidecar/profile_robustness.py` (the W3-adapters/W4 rebind). Every other
+pin in both receipts still matches exactly, including all frozen contract,
+fixture and engine bytes.
+
+`python -B perf/sidecar/verify_receipts.py` therefore exited 1 with
+`checks=126 failures=7`, and nothing surfaced it. `perf/SIDECAR.md` listed the
+command under "Verification" with no caveat, and `portable/gate.py` carried the
+same failure as `sidecar-receipts exit=1`, holding that gate at
+`checks=9 failures=1`. Two red gates at tip, undisclosed, for the same reason in
+different places.
+
+The pins are not rebound. They record which bytes produced a recorded run, and
+rewriting them would assert that the hardened sources produced the 2026-08-12
+numbers; no run at current bytes has been recorded. They also could not be
+rewritten without breaking custody, because they live inside receipt bodies whose
+raw digests are pinned by the verifier's own `ADMITTED` table, by the 60-file
+portable manifest, and by each receipt's self-zero seal.
+
+Enforcement: `SOURCE_PIN_ERRATA` in `perf/sidecar/verify_receipts.py` declares
+each drifted (receipt, source) pair with both digests. Each such row now yields
+two checks — the erratum must quote the digest the receipt still publishes, and
+the current bytes must equal the recorded post-erratum digest — so the historical
+pin cannot be quietly rewritten and a further undisclosed move fails. The command
+reports `checks=133 failures=0`. `perf/sidecar/findings/F-WP5-008.md` carries the
+record and `perf/SIDECAR.md` now states the command's scope.
+
+Same class as E12 and E13.
 
 ## Authority census (context for E5)
 

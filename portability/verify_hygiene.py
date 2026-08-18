@@ -68,13 +68,16 @@ ALLOWED = {
         146,
         "AC0D43543BA6376F180053A6FCEE521CD603F797CEC463B92A4CBB6D3DAA679D",
     ),
+    # Both re-bound by the ERRATA E14 disposition: the WP5 verifier gained the
+    # stale-provenance-pin table and SIDECAR.md stopped presenting a red command
+    # as verification.  CRLF custody terms are unchanged.
     "perf/SIDECAR.md": (
-        133,
-        "64915A8199D4EDDFD9DC3EAC925B6EB6A5864C8E74265782377C59431E9932AE",
+        154,
+        "68081C3FB6A614286263D5A8B3ABDA887B870BAC3A8369060BF5E12CF7CA9CD3",
     ),
     "perf/sidecar/verify_receipts.py": (
-        228,
-        "E657B67E967A1D646507EE1B1EF09A2F45913E4B77A5DA38814460A39D5B9554",
+        316,
+        "690B363B9A4598B4E3F1D8541AA0451C7925A5BC25068D68CB3C5FF29F3F0A21",
     ),
     "second-implementation/receipts/AUTHOR_INCREMENT_RECEIPT_0_1.json": (
         189,

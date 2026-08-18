@@ -109,6 +109,27 @@ python -B perf/sidecar/test_sidecar.py
 python -B perf/sidecar/verify_receipts.py
 ```
 
+Expected: `sidecar parity: checks=728 failures=0 fixtures=124`, then
+`wp5 receipt verification: checks=133 failures=0`.
+
+**Read the second command's scope before relying on it.** It verifies recorded
+evidence, not current behaviour: raw receipt digests, self-zero seals, the
+traced-versus-pinned input closure, and the provenance pins each receipt carries.
+Seven of those pins are stale by design and carry ERRATA E14, because the
+hardening campaign changed `grounded-0_4/rr_api.py`,
+`grounded-0_4/authority_surface.py`, `grounded-0_4/rr_batch.py` and
+`perf/sidecar/profile_robustness.py` after the 2026-08-12 run these receipts
+record. Those pins are not rebound — rewriting them would claim the hardened
+bytes produced the recorded numbers — so the verifier holds them against the
+erratum, which also pins the current bytes so a further undisclosed move fails.
+`findings/F-WP5-008.md` carries the record. Between 3985356 and the commit
+carrying that finding this command exited 1 with `checks=126 failures=7` while
+this section listed it as verification with no caveat.
+
+The receipts themselves are historical. Reproducing the profiling numbers at
+current bytes would need a fresh run on a comparable host, and none has been
+recorded.
+
 The admitted attempt-10 receipt records 728 passing checks: byte parity for all
 124 committed semantic fixtures under one stable PID; a 16 MiB+1 engine
 overlimit request; pre-, mid-, and post-write unsolicited output; a child that

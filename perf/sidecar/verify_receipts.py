@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Verify the two admitted WP5 receipts, raw pins, seals, and source pins."""
+"""Verify the two admitted WP5 receipts, raw pins, seals, and source pins.
+
+Seven source pins are stale by design and carry ERRATA E14: the receipts record
+which bytes produced a 2026-08-12 profiling run, and the hardening campaign
+deliberately changed four of those files afterwards.  Those rows verify against
+the erratum instead of being rebound, so the receipts keep an honest historical
+provenance pin while a FURTHER undisclosed move of any of the four fails here.
+``perf/sidecar/findings/F-WP5-008.md`` carries the record.
+"""
 from __future__ import annotations
 
 import json
@@ -21,6 +29,69 @@ ADMITTED = {
         "90A2F0BA3FB344FB500F7C600B3D7824F233E44EBA027D49544DF11C809B8D1F",
     "perf/receipts/robustness/sidecar-parity-windows-cpython-3.12-20260812-attempt10.json":
         "7295C40565B09405333C173CC136B7CBF8BE83DA106E7F1A63C3CC03BDB73904",
+}
+
+# ERRATA E14.  Each admitted receipt carries a ``source_sha256`` map recording
+# the bytes that produced its recorded profiling run.  The hardening campaign
+# deliberately changed four of those sources, so seven pin rows across the two
+# receipts no longer equal the current bytes:
+#
+#   grounded-0_4/rr_api.py             W1 withdrew the bare decide route and W3
+#                                      added runtime byte-authentication of
+#                                      every governing input.
+#   grounded-0_4/authority_surface.py  W3 added register nesting and vocabulary
+#                                      authentication.
+#   grounded-0_4/rr_batch.py           W3 added the batch overlimit cap and the
+#                                      OBL-30 R1-R3 pool bindings.
+#   perf/sidecar/profile_robustness.py the W3-adapters/W4 evidence rebind.
+#
+# The pins are NOT rebound, and could not be even if that were the right call:
+# they live inside the receipt bodies, whose raw digests are pinned in ADMITTED
+# above, in the 60-file portable manifest, and by the receipts' own self-zero
+# seals.  What they bind is provenance -- which bytes produced a recorded run --
+# so rewriting them would assert that today's hardened sources produced the
+# 2026-08-12 profiling numbers.  They did not.
+#
+# Failing seven checks silently was no better: perf/SIDECAR.md listed this
+# command under "Verification" with no caveat while it exited 1.  Each drifted
+# row is now declared with the digest of the current bytes, so the receipt keeps
+# its honest historical pin and a FURTHER undisclosed move of any of these four
+# files fails here.
+# (receipt label, source label) -> (digest the receipt pins, current digest)
+_HARDENED_AUTHORITY_SURFACE = (
+    "44BA458B93416B48404AAEF19335EA558106A83CA3DD4A65C3F6EE0EDB5ACAA6",
+    "62B689D964CA906C2E3F8376047E0DDD14C78364432B1A7EA8499C8FF7E8C5DD",
+)
+_HARDENED_RR_API = (
+    "7774AA7BCCD0251DFCFA5A6B0A8ADD40D356359756DA3DABA3C1E70DEF5AFF80",
+    "EE7B66F813E4AAD6D9EB725318D588E065A3CB30EF44817CDF9343F6FAB47099",
+)
+_HARDENED_RR_BATCH = (
+    "BF38779E9A568C45EA8FA7315FCBFE58B62C0FE1742F5F2497D7603B3F983B1C",
+    "B271C6DBADC050DC0302B30EFEDD050608146881DB974D6C369BBAB781307870",
+)
+_HARDENED_PROFILE_ROBUSTNESS = (
+    "1DD4E53E9E3A2260255AB393825A0DB64184F558148D05681D3EB68F326FB1E9",
+    "71B0CD8829421842686F7B5379398017EBB3D254C7AF903A8490FA3E9280E660",
+)
+_PROFILE_ATTEMPT7 = (
+    "perf/receipts/robustness/profile-windows-cpython-3.12-20260812-attempt7.json"
+)
+_PARITY_ATTEMPT10 = (
+    "perf/receipts/robustness/"
+    "sidecar-parity-windows-cpython-3.12-20260812-attempt10.json"
+)
+SOURCE_PIN_ERRATA = {
+    (_PROFILE_ATTEMPT7, "grounded-0_4/authority_surface.py"):
+        _HARDENED_AUTHORITY_SURFACE,
+    (_PROFILE_ATTEMPT7, "grounded-0_4/rr_api.py"): _HARDENED_RR_API,
+    (_PROFILE_ATTEMPT7, "grounded-0_4/rr_batch.py"): _HARDENED_RR_BATCH,
+    (_PROFILE_ATTEMPT7, "perf/sidecar/profile_robustness.py"):
+        _HARDENED_PROFILE_ROBUSTNESS,
+    (_PARITY_ATTEMPT10, "grounded-0_4/authority_surface.py"):
+        _HARDENED_AUTHORITY_SURFACE,
+    (_PARITY_ATTEMPT10, "grounded-0_4/rr_api.py"): _HARDENED_RR_API,
+    (_PARITY_ATTEMPT10, "grounded-0_4/rr_batch.py"): _HARDENED_RR_BATCH,
 }
 
 
@@ -111,12 +182,29 @@ def main() -> int:
         for source_label, expected_source in pins.items():
             source = REPO / source_label
             check(f"{label}:{source_label}:exists", source.is_file())
-            if source.is_file():
+            if not source.is_file():
+                continue
+            actual_source = sha256(source.read_bytes())
+            errata = SOURCE_PIN_ERRATA.get((label, source_label))
+            if errata is None:
                 check(
                     f"{label}:{source_label}:sha256",
-                    sha256(source.read_bytes()) == expected_source,
-                    sha256(source.read_bytes()),
+                    actual_source == expected_source,
+                    actual_source,
                 )
+                continue
+            pinned_at_run, current_bytes = errata
+            check(
+                f"{label}:{source_label}:errata-matches-receipt",
+                pinned_at_run == expected_source,
+                "the erratum must quote the digest the receipt still pins; "
+                f"receipt={expected_source} erratum={pinned_at_run}",
+            )
+            check(
+                f"{label}:{source_label}:errata-current-sha256",
+                actual_source == current_bytes,
+                f"erratum={current_bytes} actual={actual_source}",
+            )
 
         if doc.get("schema") == "receiver-reliance/wp5-profile-receipt-3":
             evidence = doc.get("accepted_single_pass_equivalence") or {}
