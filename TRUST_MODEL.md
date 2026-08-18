@@ -43,7 +43,7 @@ means a VALID class could not be certified by a complete closure pass (E9).
 | Host evidence → preflight | Attested, not authenticated | Three-state fail-closed preflight detects internal inconsistency; it cannot prove a lying observer (H1) |
 | Repository/bundle bytes → verifiers | Trusted **after** commit-root authentication | Digest pins detect drift; they do not authenticate an untrusted directory |
 | Supervisor ↔ sidecar child | Child output untrusted until correlated | Versioned envelope binding sequence + request-byte digest to a completely written request; no replay |
-| Harness/tooling → receipts | Operator's own machine (trusted OS assumption) | Receipts scope their claims to the recorded host; ambient-authority residue is a recorded caveat, not a defended boundary |
+| Harness/tooling → receipts | Operator's own machine (trusted OS assumption) | Receipts scope their claims to the recorded host; ambient-authority residue is a recorded caveat, not a defended boundary. **Demonstrated, not hypothetical:** a forged `git` placed earlier on `PATH` made `verify_hygiene` report `HYGIENE_PASS` with custody 17/17 while a planted modification was still on disk, and made a receipt gate report `PASS` against a forged HEAD. `shutil.which` resolves to the same forged binary, so it is not a defence. `portability/pinned_tools.py` lets an operator move the trust root from `PATH` to an administrator-write-only directory via `RR_TOOL_DIR`; that narrows this boundary and does not close it, because `subprocess` cannot launch from an already-verified handle on either platform. **A receipt is not evidence that the host producing it was sound.** |
 
 ## Who consumes this, today
 
