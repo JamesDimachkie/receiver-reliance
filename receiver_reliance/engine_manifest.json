@@ -1,0 +1,63 @@
+{
+  "file_count": 11,
+  "files": [
+    {
+      "byte_length": 19051,
+      "path": "access/A2_SHARED_DOMAIN_VOCABULARY_BASELINE_PROJECTION_0_1.schema.json",
+      "sha256": "1449369AE3CC4458F3F904ADCF0F24B0685E86C65EAC2AE656F7A3E4AD946460"
+    },
+    {
+      "byte_length": 513384,
+      "path": "access/SANITIZED_PRIMARY_BASELINE_IMPLEMENTER_PACKET_0_1.json",
+      "sha256": "73A4FF4DD8ABA41D0F68414CB754EFCDF9807FAE73354F1959420B16C5F359F3"
+    },
+    {
+      "byte_length": 321451,
+      "path": "baseline-run/control/B1_PRIMARY_IMPLEMENTER_CONTRACT_0_1.json",
+      "sha256": "DCFCB0714E1A7E677548057987F604D227F791F3FC3E0EA89BE5ED932447F48E"
+    },
+    {
+      "byte_length": 50314,
+      "path": "baseline-run/implementation-output-0.3/b1_capabilities.py",
+      "sha256": "4D9FA1C9CCB60B980BCE1739FE8FDC10E84AEFC03D4C20E2AA1A8B0BBE2D18FC"
+    },
+    {
+      "byte_length": 19327,
+      "path": "baseline-run/implementation-output-0.3/pcb_runner.py",
+      "sha256": "83319385C8B6D28965F4683B8C0689FB70158E86ED35D54E7467E8E3DF076E09"
+    },
+    {
+      "byte_length": 35399,
+      "path": "grounded-0_4/authority_register_0_4.json",
+      "sha256": "C3414FC751C3B5ECA43A4932C694641D801A21F2CF53C42BE3A8C87C234CF499"
+    },
+    {
+      "byte_length": 8634,
+      "path": "grounded-0_4/authority_surface.py",
+      "sha256": "62B689D964CA906C2E3F8376047E0DDD14C78364432B1A7EA8499C8FF7E8C5DD"
+    },
+    {
+      "byte_length": 2329,
+      "path": "grounded-0_4/closures_0_4.json",
+      "sha256": "EBA198726DE960E9F59ACE5A7E1BDB701BFBA5B1BD09BC59FF4540F2B14E8F9C"
+    },
+    {
+      "byte_length": 26980,
+      "path": "grounded-0_4/rr_api.py",
+      "sha256": "EE7B66F813E4AAD6D9EB725318D588E065A3CB30EF44817CDF9343F6FAB47099"
+    },
+    {
+      "byte_length": 25976,
+      "path": "supplemental-0_3/control/B1_COMPOSED_CAPABILITY_MATRIX_0_3.json",
+      "sha256": "B369777E51B2A64DC2C304C5949F38E13956353B496BABA8B6E488451F8C5B98"
+    },
+    {
+      "byte_length": 159277,
+      "path": "supplemental-0_3/control/B1_SUPPLEMENTAL_COMPARATOR_CONTRACT_0_3.json",
+      "sha256": "6B2CAD02DDE7388D63D66E4863E5233CFBD1DC413575D9D260DB9799C7023A12"
+    }
+  ],
+  "format_version": "RR-ENGINE-MANIFEST-1",
+  "manifest_sha256": "56BD2D5054FD581CAEDB98BA1A91993C46BFFF17F73B3516870C84DAC3237412",
+  "total_byte_length": 1182122
+}

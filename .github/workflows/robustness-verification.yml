@@ -1,7 +1,11 @@
 name: robustness-verification
 
-# Branch-scoped hosted verification for the robustness program
-# (sol/rr-robustness-20260811). Moves the program's heavy verification off
+# Hosted verification for the robustness program. Retargeted 2026-08-18 from
+# the retired sol/rr-robustness-20260811 branch, which no longer exists locally
+# or on the remote, so this workflow could only be reached by manual dispatch.
+# main is the only push trigger because portability/sandbox/run_sandbox.py pins
+# EXPECTED_BRANCH = "main" and refuses any other branch; pre-merge runs go
+# through workflow_dispatch. Moves the program's heavy verification off
 # operator hardware onto hosted runners with live, reviewable logs:
 # every program suite across three operating systems and CPython
 # 3.12/3.13/3.14, plus the WP4 coverage-guided differential campaign at
@@ -13,7 +17,7 @@ name: robustness-verification
 on:
   push:
     branches:
-      - sol/rr-robustness-20260811
+      - main
   workflow_dispatch:
     inputs:
       campaign_identities:

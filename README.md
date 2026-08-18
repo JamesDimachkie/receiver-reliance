@@ -439,8 +439,15 @@ re-verify what is here, run the conformance suite (both modes), then
 re-derive every seal per the RUNBOOK, then, from the repository root, run
 `python -B grounded-0_4/test_grounded_0_4.py`,
 `python -B grounded-0_4/lint_contract.py --gate`,
-`python -B grounded-0_4/test_lint_gate.py`, and the two custody verifiers
-in "Cross-platform validation" above. What is deliberately not
+`python -B grounded-0_4/test_lint_gate.py`,
+`python -B receiver_reliance/generate_engine_manifest.py --check`,
+`python -B receiver_reliance/test_engine_manifest.py`, and the two custody
+verifiers in "Cross-platform validation" above. The engine manifest is the
+package's own integrity gate: importing `receiver_reliance` verifies all
+eleven engine files by byte length and SHA-256 before executing any of them
+and refuses to import on drift, so a checkout or a distribution that does
+not hold the published bytes fails at import rather than producing decisions
+from unknown code. What is deliberately not
 published, and why, is ledgered in [WITHHELD.md](WITHHELD.md); the blind
 completeness review's input bundle is published and verifiable under
 [evidence/](evidence/README.md).
