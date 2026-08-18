@@ -424,6 +424,23 @@ python -B portability/verify_hygiene.py
 ```
 
 Expected: `verify-receipts: checks=267 failures=0`, then `HYGIENE_PASS`.
+
+The conformance surface has its own authority gate, because the frozen manifest
+emitters write `failures: 0` and `result: "PASS"` as literals without running
+anything (`ERRATA.md` E16):
+
+```bash
+python -B baseline-run/verify_conformance_authority.py
+```
+
+Expected: `conformance-authority: checks=32 failures=0 declared_divergences=4`.
+It executes both suites and requires the declared counts to equal the observed
+ones, refuses bytecode that would execute in place of a manifested source,
+compares the supplemental fixture packs' authority pins against the sealed
+control bytes, and refuses to call the subprocess mode available unless a
+digest-verified toolchain is present. The four declared divergences are the two
+pack pins that genuinely disagree, in both packs; E16 states why neither side can
+move.
 Read what these two do and do not establish: they bind committed receipt
 bytes, rehash the sources those receipts name, and re-run recorded
 transcripts through the gate validators. They cannot tell you the artifact

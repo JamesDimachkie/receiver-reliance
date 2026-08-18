@@ -1,7 +1,7 @@
 # Errata and recorded defects
 
 E1–E7 entered after the 2026-08-10 external review; E8–E9 after the
-2026-08-12 Deep Security Scan (Intake 10); E10–E15 during the hardening
+2026-08-12 Deep Security Scan (Intake 10); E10–E16 during the hardening
 campaign that followed it.
 
 Confirmed against the artifact at cc6f3657 by reproducing the external
@@ -437,6 +437,61 @@ durable receipts today are `run_local_expanded_gate.py` (redacted here),
 `portability/matrix/receipt.py` and `portability/sandbox/run_sandbox.py` (both
 record argv from a plan whose entries are repository-relative), and
 `adapters/outcome_receipt.py`.
+
+## E16 — The frozen conformance surface declares four things it never checks
+
+Four scan findings land inside `baseline-run/implementation-output-*`. Those
+bytes are the accepted implementation and its recorded evidence and never change,
+so each is dispositioned with an additive external gate,
+`baseline-run/verify_conformance_authority.py`, which reports
+`checks=32 failures=0 declared_divergences=4`.
+
+**The emitters synthesize PASS-shaped evidence** (`csf_9237eb71`). Both
+`emit_manifest_0_2.py` and `emit_manifest_0_3.py` write `check_counts`,
+`failures: 0` and `result: "PASS"` as literals and never invoke a conformance
+runner — the only mentions of `run_conformance` are a path string and a hash of
+the harness file. A changed or broken implementation can therefore be hashed into
+freshly generated artifacts that still say PASS. The gate executes both suites and
+requires the declared numbers to equal the observed ones. Read the scope exactly:
+this makes the declaration *checkable*, it does not make the emitters safe to run
+on their own, and an emitter run without the gate proves nothing about
+conformance.
+
+**Bytecode can execute in place of manifested source** (`csf_56621d97`). The
+implementation manifests enumerate `b1_capabilities.py` and `pcb_runner.py` and
+nothing else, while `-B` suppresses bytecode *writes* and not *reads*. A
+`__pycache__` entry whose recorded mtime and size match the source is accepted by
+CPython, so it can execute without either manifested digest changing. The gate
+compiles each manifested source and requires any acceptable cached bytecode to
+round-trip to the same code object. Proved by planting a forged `.pyc` that
+matched the source's mtime and size and carried different code: the gate exits 1
+and names the file to remove.
+
+**Fixture authority is loaded but never compared** (`csf_a68931d8`). The runners
+load the supplemental packs and base success on replay failures without ever
+checking the packs' own `authority_pins`. Comparing them shows two rows really do
+disagree: both packs pin
+`contract_raw_sha256 = 0FA31FD9…` and `matrix_raw_sha256 = 5A750006…`, while the
+current sealed supplemental control bytes are `6B2CAD02…` and `B369777E…`. The
+pins date from an earlier draft of the supplemental generation. Neither side can
+move — packs and control JSONs are both frozen sealed bytes, and the packs'
+digests are pinned in turn by the implementation manifest, the 60-file portable
+manifest and the WP5 receipts — so the divergence is declared with both exact
+values and enforced, and a third value on either side now fails. The packet and
+projection pins do match, and the gate also asserts the pack cardinality the
+runners never assert, so a pack cannot be emptied while printed counts fall and
+exit status stays zero.
+
+**The subprocess toolchain is executed unverified** (`csf_b7bc7ed8`).
+`--subprocess` launches `baseline-run/toolchain/python.exe` with no digest check
+at invocation; the RUNBOOK documents a manual download-and-hash step, and nothing
+enforces it. At these bytes the directory does not exist, so the mode cannot run
+at all and no unverified interpreter can be launched — the gate reports that
+absence explicitly instead of skipping quietly. If a toolchain is ever placed
+there, the gate requires a digest manifest and verifies every file against it
+before the mode may be called available. The code path inside the frozen runner is
+unchanged and still performs no check of its own; that residual is the reason this
+is a disposition and not a repair.
 
 ## Authority census (context for E5)
 
