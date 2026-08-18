@@ -104,21 +104,45 @@ def emit(family: str, native: dict, observations: dict, defect_types: list[str],
 
 
 def resolve_named(name: str) -> pathlib.Path | None:
-    base = pathlib.Path(name).name
+    reference = pathlib.PurePosixPath(name)
+    if (
+        reference.is_absolute()
+        or not reference.parts
+        or any(part in {"", ".", ".."} for part in reference.parts)
+    ):
+        return None
+
+    workspace = WORKSPACE.resolve()
+
+    def admitted(candidate: pathlib.Path) -> pathlib.Path | None:
+        try:
+            resolved = candidate.resolve(strict=True)
+            resolved.relative_to(workspace)
+        except (OSError, ValueError):
+            return None
+        return resolved if resolved.is_file() else None
+
+    # A citation carrying directory components names exactly one
+    # workspace-relative path. Never discard those components and substitute a
+    # preferred-directory basename.
+    if len(reference.parts) > 1:
+        return admitted(WORKSPACE.joinpath(*reference.parts))
+
+    base = reference.name
     candidates = [
         EPI / base,
         EPI / "gate-0-spec" / base,
-        WORKSPACE / name,
         HANDOFFS / base,
         HANDOFFS / "archive" / base,
+        *EPI.rglob(base),
     ]
-    for cand in candidates:
-        if cand.is_file():
-            return cand
-    for cand in EPI.rglob(base):
-        if cand.is_file():
-            return cand
-    return None
+    matches = {
+        resolved
+        for candidate in candidates
+        if (resolved := admitted(candidate)) is not None
+    }
+    # A basename-only citation is admissible only when it is unambiguous.
+    return next(iter(matches)) if len(matches) == 1 else None
 
 
 ref_count = 0

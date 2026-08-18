@@ -107,6 +107,87 @@ def load_jsonl(path: pathlib.Path) -> list[dict]:
 
 
 class SyntheticCorpusTests(unittest.TestCase):
+    def test_extractor_preserves_cited_relative_path(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="rr-proof-resolve-") as tmp:
+            root = pathlib.Path(tmp)
+            workspace = root / "workspace"
+            epi = workspace / "planning" / "epistemic-handoff"
+            (workspace / ".agent-tasks").mkdir(parents=True)
+            (workspace / ".claude" / "handoffs").mkdir(parents=True)
+            (workspace / "sub").mkdir(parents=True)
+            epi.mkdir(parents=True)
+            correct = b"correct cited bytes\n"
+            wrong = b"wrong basename bytes\n"
+            (workspace / "sub" / "target.md").write_bytes(correct)
+            (epi / "target.md").write_bytes(wrong)
+            claimed = __import__("hashlib").sha256(correct).hexdigest().upper()
+            (epi / "SOURCE.md").write_text(
+                f"`sub/target.md`, SHA-256 `{claimed}`\n",
+                encoding="utf-8",
+            )
+            run_dir = root / "extract"
+            run_dir.mkdir()
+            shutil.copyfile(HERE / "extract_corpus.py", run_dir / "extract_corpus.py")
+            environment = dict(__import__("os").environ)
+            environment["RR_SOURCE_WORKSPACE"] = str(workspace)
+            result = subprocess.run(
+                [sys.executable, "-B", str(run_dir / "extract_corpus.py")],
+                cwd=run_dir,
+                env=environment,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            rows = load_jsonl(run_dir / "corpus.jsonl")
+            reference = next(row for row in rows if row["family"] == "REF")
+            self.assertEqual(reference["observations"]["observed_sha256"], claimed)
+
+    def test_score_rejects_duplicate_and_extra_ids(self) -> None:
+        cases = {
+            "duplicate": [
+                {"record_id": "A", "hold": False, "reasons": []},
+                {"record_id": "A", "hold": False, "reasons": []},
+            ],
+            "extra": [
+                {"record_id": "A", "hold": False, "reasons": []},
+                {"record_id": "EXTRA", "hold": True, "reasons": []},
+            ],
+        }
+        for name, verdicts in cases.items():
+            with self.subTest(name=name), tempfile.TemporaryDirectory(
+                prefix="rr-proof-score-"
+            ) as tmp:
+                root = pathlib.Path(tmp)
+                shutil.copyfile(HERE / "score.py", root / "score.py")
+                (root / "corpus.jsonl").write_text(
+                    json.dumps({"record_id": "A", "family": "F"}) + "\n",
+                    encoding="utf-8",
+                )
+                (root / "truth.jsonl").write_text(
+                    json.dumps(
+                        {
+                            "record_id": "A",
+                            "defective": False,
+                            "defect_types": [],
+                            "provenance": "test",
+                        }
+                    )
+                    + "\n",
+                    encoding="utf-8",
+                )
+                rendered = "".join(json.dumps(row) + "\n" for row in verdicts)
+                for filename in ("verdicts_baseline.jsonl", "verdicts_b1.jsonl"):
+                    (root / filename).write_text(rendered, encoding="utf-8")
+                result = subprocess.run(
+                    [sys.executable, "-B", str(root / "score.py")],
+                    cwd=root,
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+                self.assertNotEqual(result.returncode, 0)
+
     def test_checked_in_bytes_match_recorded_seed(self) -> None:
         records, truths = synthetic.build(synthetic.SEED)
         self.assertEqual(synthetic.SEED, 0x20260810)

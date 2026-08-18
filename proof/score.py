@@ -15,7 +15,25 @@ def load(name: str) -> dict[str, dict]:
     path = HERE / name
     if not path.exists():
         return {}
-    return {row["record_id"]: row for row in (json.loads(l) for l in open(path, encoding="utf-8"))}
+    rows: dict[str, dict] = {}
+    with path.open(encoding="utf-8") as stream:
+        for line_number, line in enumerate(stream, 1):
+            row = json.loads(line)
+            record_id = row.get("record_id") if isinstance(row, dict) else None
+            if not isinstance(record_id, str) or not record_id:
+                raise ValueError(f"{name}:{line_number}: record_id must be a nonempty string")
+            if record_id in rows:
+                raise ValueError(f"{name}:{line_number}: duplicate record_id {record_id!r}")
+            rows[record_id] = row
+    return rows
+
+
+def require_exact_ids(name: str, rows: dict[str, dict], expected: set[str]) -> None:
+    actual = set(rows)
+    if actual != expected:
+        missing = sorted(expected - actual)
+        extra = sorted(actual - expected)
+        raise ValueError(f"{name}: record_id set mismatch; missing={missing} extra={extra}")
 
 
 corpus = load("corpus.jsonl")
@@ -25,6 +43,13 @@ calibrated = load("verdicts_b1_calibrated.jsonl")
 if calibrated:
     arms["b1_calibrated"] = calibrated
 b1_sub = load("verdicts_b1_subprocess.jsonl")
+
+truth_ids = set(truth)
+require_exact_ids("corpus.jsonl", corpus, truth_ids)
+for name, rows in arms.items():
+    require_exact_ids(f"verdicts_{name}.jsonl", rows, truth_ids)
+if (HERE / "verdicts_b1_subprocess.jsonl").exists():
+    require_exact_ids("verdicts_b1_subprocess.jsonl", b1_sub, truth_ids)
 
 families = sorted({r["family"] for r in corpus.values()})
 defect_types = sorted({d for t in truth.values() for d in t["defect_types"]})
