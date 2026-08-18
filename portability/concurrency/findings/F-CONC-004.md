@@ -20,16 +20,26 @@ The gap was not hypothetical. Measured at this revision:
 
 | Role | Source | Published | Current |
 |---|---|---|---|
-| harness | `../ladder.py` | `B5436C85…` | `D40F692A…` |
+| harness | `../ladder.py` | `B5436C85…` | `7CF10CC6…` |
 | focused tests | `../test_ladder.py` | `926D75C5…` | `926D75C5…` |
 | clean oracle implementation | `../../oracle/oracle.py` | `2148F0C9…` | `2148F0C9…` |
 | clean oracle public API | `../../oracle/__init__.py` | `747CF137…` | `747CF137…` |
 
-`4ea69dc` bound the receipts. `ca1ccfe` — the only commit to touch `ladder.py`
-since — changed one line, `AUDITED_FORMAT_VERSION` `0.4` to `0.4.1`, as the
-F-MATRIX-016 response-era migration. `verify_receipts` continued to report
-`checks=193 failures=0` throughout, truthfully, because none of its 193 checks
-covered the source table.
+`4ea69dc` bound the receipts. `ca1ccfe` changed one line,
+`AUDITED_FORMAT_VERSION` `0.4` to `0.4.1`, as the F-MATRIX-016 response-era
+migration, taking the digest to `D40F692A…`. `verify_receipts` continued to
+report `checks=193 failures=0` throughout, truthfully, because none of its 193
+checks covered the source table.
+
+A second move followed, and it is the useful part of this record. The
+`pinned_tools` adoption replaced the ladder's bare `git` argv with
+`pinned_tools.git()`, taking the digest to `7CF10CC6…`. That change could not
+land silently: the guard installed by this finding failed
+`source_pin.errata_current` on the first run, so the move had to be disclosed or
+reverted. `ladder.py` was adopted rather than exempted because its `git`
+invocation is provenance evidence for these very receipts, and exempting it
+would have left the one harness whose source is a published receipt binding
+resolving its authority from the ambient `PATH`.
 
 ## Why the pin is not refreshed
 

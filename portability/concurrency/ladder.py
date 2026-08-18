@@ -60,6 +60,19 @@ if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 if str(GROUND) not in sys.path:
     sys.path.insert(0, str(GROUND))
+if str(REPO / "portability") not in sys.path:
+    sys.path.insert(0, str(REPO / "portability"))
+
+# Ambient tool resolution is the trust root for every provenance claim this
+# file makes: a PATH- or current-directory-prepositioned `git` (or `docker`)
+# can forge the clean status and HEAD that authorize the evidence, and a
+# verification lane demonstrated exactly that (TRUST_MODEL.md).
+# portability/pinned_tools.py was landed to close it and then adopted nowhere,
+# which left a control outside the decision path. With RR_TOOL_DIR unset
+# resolve() returns the bare name, so the argv is byte-identical to before and
+# no receipt digest moves; with it set, tools resolve inside a directory an
+# unprivileged process cannot write and never fall back to PATH.
+import pinned_tools  # noqa: E402
 
 import rr_batch  # noqa: E402  (accepted implementation, read-only)
 from portability.oracle import (  # noqa: E402
@@ -1616,10 +1629,16 @@ def _run_paired_level(
 
 def _git_receipt() -> dict[str, Any]:
     head = subprocess.run(
-        ["git", "rev-parse", "HEAD"], cwd=REPO, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        [pinned_tools.git(), "rev-parse", "HEAD"],
+        cwd=REPO,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
     )
     status = subprocess.run(
-        ["git", "status", "--short"], cwd=REPO, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        [pinned_tools.git(), "status", "--short"],
+        cwd=REPO,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
     )
     return {
         "head": head.stdout.decode("ascii", errors="replace").strip() if head.returncode == 0 else None,

@@ -106,17 +106,22 @@ CONCURRENCY_SOURCE_PINS = {
     ),
 }
 # ERRATA E12.  ``ladder.py``'s published digest is its bytes at 4ea69dc, the
-# commit that bound the clean v3 receipts.  ca1ccfe then changed one line —
-# ``AUDITED_FORMAT_VERSION`` 0.4 to 0.4.1, the F-MATRIX-016 migration — which
-# moved the bytes.  The pin is deliberately NOT refreshed: rewriting it would
-# assert that today's bytes produced the recorded 213.937-second run, which is
-# false.  The erratum records both digests instead, so the stale pin stays
-# honest and a SECOND undisclosed move cannot hide behind the first.
+# commit that bound the clean v3 receipts.  The pin is deliberately NOT
+# refreshed: rewriting it would assert that today's bytes produced the recorded
+# 213.937-second run, which is false.  The erratum records the published digest
+# and the digest of the current bytes instead, so the stale pin stays honest and
+# no undisclosed move can hide behind a disclosed one.  Two changes have moved
+# the file since the binding, both recorded in ERRATA E12:
+#   ca1ccfe  AUDITED_FORMAT_VERSION 0.4 -> 0.4.1, the F-MATRIX-016 migration
+#            (digest D40F692A...).
+#   the pinned_tools adoption, which replaced the ladder's bare ``git`` argv
+#            with pinned_tools.git() (digest 7CF10CC6...).  This guard is what
+#            forced that second move to be disclosed rather than absorbed.
 # path -> (digest published in STATUS.md, digest of the current bytes).
 SOURCE_PIN_ERRATA = {
     "portability/concurrency/ladder.py": (
         "B5436C851C849CFB2B39A7EC2B35C258E501E3171A2ECD6BE6AF913329CC27E6",
-        "D40F692AEC6197C005E74F12BE996C860A4FF1A5FF821E828B84CFA1585E044A",
+        "7CF10CC692FCF938CD69D831FA74C9AD94994073212ACBB75B3F61E57701E798",
     ),
 }
 
@@ -236,6 +241,12 @@ HOSTED_ERA_EXPECTATIONS = {
     "grounded-0.4-regression": {"checks": [504], "failures": [0]},
     "lint-gate-meta": {"checks": [7], "failures": [0]},
     "synthetic-proof-harness": {"tests": [7]},
+    # Both moved by the W6 zero-cascade regressions: the matrix suite gained six
+    # ambiguity cases and the sandbox suite seven.  The hosted run recorded 48
+    # and 77, and this gate is what caught the plan.json migration leaving the
+    # era declaration behind.
+    "matrix-receipt-tests": {"tests": [48]},
+    "sandbox-spec-tests": {"tests": [77]},
 }
 # The GraalPy row is rejected by the current row validator for a reason that is
 # a defect in the validator rather than in the evidence: it derives a

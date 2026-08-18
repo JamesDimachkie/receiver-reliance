@@ -13,11 +13,13 @@ from __future__ import annotations
 
 import os
 import pathlib
+import re
 import sys
 import tempfile
 import unittest
 
 HERE = pathlib.Path(__file__).resolve().parent
+REPO = HERE.parent
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 
@@ -104,6 +106,52 @@ class NoReceiptSurfaceIsTouched(unittest.TestCase):
         source = (HERE / "pinned_tools.py").read_text(encoding="utf-8")
         for forbidden in ("open(", "write_text", "write_bytes", "json.dump"):
             self.assertNotIn(forbidden, source, f"{forbidden} would give this module a write surface")
+
+
+class AdoptionIsReal(unittest.TestCase):
+    """A control that no consumer calls is not a control.
+
+    csf_d5b39499, csf_16f2cc06 and csf_211167ec all name bare ``git``/``docker``
+    resolution in evidence harnesses.  pinned_tools was landed to close them and
+    then called from nowhere, so all three stayed live at the call sites while the
+    module and its own tests were green.  These cases fail if any harness goes
+    back to a bare name.
+    """
+
+    ADOPTED = (
+        "portability/verify_hygiene.py",
+        "portability/run_local_expanded_gate.py",
+        "portability/concurrency/ladder.py",
+        "portability/matrix/receipt.py",
+        "portability/sandbox/run_sandbox.py",
+    )
+
+    def test_every_evidence_harness_imports_the_module(self) -> None:
+        for relative in self.ADOPTED:
+            with self.subTest(module=relative):
+                source = (REPO / relative).read_text(encoding="utf-8")
+                self.assertIn("import pinned_tools", source)
+
+    def test_no_harness_invokes_a_bare_tool_name(self) -> None:
+        bare = re.compile(r"\[\s*\"(git|docker)\"\s*,")
+        for relative in self.ADOPTED:
+            with self.subTest(module=relative):
+                source = (REPO / relative).read_text(encoding="utf-8")
+                self.assertEqual(
+                    bare.findall(source),
+                    [],
+                    f"{relative} still builds an argv from a bare tool name",
+                )
+
+    def test_unset_default_keeps_argv_byte_identical(self) -> None:
+        """The property that made adoption possible without moving a receipt."""
+        saved = os.environ.pop(pinned_tools.TOOL_DIR_ENV, None)
+        try:
+            self.assertEqual(pinned_tools.git(), "git")
+            self.assertEqual(pinned_tools.docker(), "docker")
+        finally:
+            if saved is not None:
+                os.environ[pinned_tools.TOOL_DIR_ENV] = saved
 
 
 if __name__ == "__main__":

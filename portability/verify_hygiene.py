@@ -30,6 +30,20 @@ import subprocess
 import sys
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
+if str(REPO / "portability") not in sys.path:
+    sys.path.insert(0, str(REPO / "portability"))
+
+# Ambient tool resolution is the trust root for every provenance claim this
+# file makes: a PATH- or current-directory-prepositioned `git` can forge the
+# clean status and HEAD that authorize the evidence, and a verification lane
+# demonstrated exactly that (TRUST_MODEL.md). portability/pinned_tools.py was
+# landed to close it and then adopted nowhere, which made it a control that
+# was not in the decision path. With RR_TOOL_DIR unset resolve() returns the
+# bare name, so the argv here is byte-identical to before and no receipt
+# digest moves; with it set, tools resolve inside an administrator-write-only
+# directory and never fall back to PATH.
+import pinned_tools  # noqa: E402
+
 BASE = "4e788d21e882a30bdda2aec3f780537161f81644"
 ALLOWED = {
     "portability/model/receipts/N48-postF3-attempt1.memsample.txt": (
@@ -136,7 +150,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--end")
     args = parser.parse_args(argv)
 
-    command = ["git", "diff", "--check", args.base]
+    command = [pinned_tools.git(), "diff", "--check", args.base]
     if args.end:
         command.append(args.end)
     completed = subprocess.run(

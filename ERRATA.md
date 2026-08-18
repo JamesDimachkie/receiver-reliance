@@ -256,14 +256,28 @@ One of the four no longer matches.
 
 `4ea69dc` bound the clean v3 normative and smoke receipts, with
 `portability/concurrency/ladder.py` at
-`B5436C851C849CFB2B39A7EC2B35C258E501E3171A2ECD6BE6AF913329CC27E6`. `ca1ccfe`
-then changed exactly one line of that file — `AUDITED_FORMAT_VERSION` from
-`B1-AUDITED-DECISION-0.4` to `B1-AUDITED-DECISION-0.4.1`, the F-MATRIX-016
-migration — and the file now hashes to
-`D40F692AEC6197C005E74F12BE996C860A4FF1A5FF821E828B84CFA1585E044A`. It is the
-only commit that has touched `ladder.py` since the binding. The other three
-pins — `test_ladder.py`, `oracle/oracle.py`, `oracle/__init__.py` — still equal
-their published digests.
+`B5436C851C849CFB2B39A7EC2B35C258E501E3171A2ECD6BE6AF913329CC27E6`. Two changes have moved it
+since:
+
+1. `ca1ccfe` changed exactly one line — `AUDITED_FORMAT_VERSION` from
+   `B1-AUDITED-DECISION-0.4` to `B1-AUDITED-DECISION-0.4.1`, the F-MATRIX-016
+   migration — taking the digest to
+   `D40F692AEC6197C005E74F12BE996C860A4FF1A5FF821E828B84CFA1585E044A`.
+2. The `pinned_tools` adoption replaced the ladder's bare `git` argv with
+   `pinned_tools.git()`, taking it to
+   `7CF10CC692FCF938CD69D831FA74C9AD94994073212ACBB75B3F61E57701E798`.
+
+The second move is worth stating plainly: the guard this erratum installed is
+what surfaced it. The adoption commit ran `verify_receipts`, which failed
+`source_pin.errata_current`, so the change could not land without either
+disclosing the move or reverting it. That is the difference between a
+disposition and a note. `ladder.py` was adopted rather than exempted because its
+`git` invocation is provenance evidence for the concurrency receipts, and an
+exemption would have left the one harness whose source is published as a receipt
+binding resolving its authority from the ambient `PATH`.
+
+The other three pins — `test_ladder.py`, `oracle/oracle.py`,
+`oracle/__init__.py` — still equal their published digests exactly.
 
 **The pin is not refreshed.** Rewriting it to the current digest would assert
 that these bytes produced the recorded 242,400-envelope, 213.937-second run.

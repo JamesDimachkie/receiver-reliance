@@ -25,6 +25,19 @@ import expanded_gate
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
 DOCKERFILE = HERE / "Dockerfile"
+if str(REPO / "portability") not in sys.path:
+    sys.path.insert(0, str(REPO / "portability"))
+
+# Ambient tool resolution is the trust root for every provenance claim this
+# file makes: a PATH- or current-directory-prepositioned `git` (or `docker`)
+# can forge the clean status and HEAD that authorize the evidence, and a
+# verification lane demonstrated exactly that (TRUST_MODEL.md).
+# portability/pinned_tools.py was landed to close it and then adopted nowhere,
+# which left a control outside the decision path. With RR_TOOL_DIR unset
+# resolve() returns the bare name, so the argv is byte-identical to before and
+# no receipt digest moves; with it set, tools resolve inside a directory an
+# unprivileged process cannot write and never fall back to PATH.
+import pinned_tools  # noqa: E402
 BASELINE_SHA = "4e788d21e882a30bdda2aec3f780537161f81644"
 # Release authority stays on ``main``: only a ``main`` run may be cited as
 # release evidence, which is the pin F-MATRIX-014 moved here from a deleted
@@ -967,7 +980,7 @@ def docker_create_args(
         else repository_source
     )
     return [
-        "docker",
+        pinned_tools.docker(),
         "create",
         "--read-only",
         # F-SANDBOX-027 review correction: the CLI leaves HostConfig.Init nil
@@ -1027,14 +1040,14 @@ def docker_create_args(
 
 
 def _git_receipt() -> dict[str, Any]:
-    head = run(["git", "rev-parse", "HEAD"], cwd=REPO)
-    branch = run(["git", "branch", "--show-current"], cwd=REPO)
+    head = run([pinned_tools.git(), "rev-parse", "HEAD"], cwd=REPO)
+    branch = run([pinned_tools.git(), "branch", "--show-current"], cwd=REPO)
     status = run(
-        ["git", "status", "--porcelain=v1", "--untracked-files=all"],
+        [pinned_tools.git(), "status", "--porcelain=v1", "--untracked-files=all"],
         cwd=REPO,
     )
     ancestor = run(
-        ["git", "merge-base", "--is-ancestor", BASELINE_SHA, "HEAD"],
+        [pinned_tools.git(), "merge-base", "--is-ancestor", BASELINE_SHA, "HEAD"],
         cwd=REPO,
     )
     if (
@@ -1612,7 +1625,7 @@ def _cleanup_container(container_id: str | None) -> dict[str, Any]:
             "timeout_seconds": CLEANUP_TIMEOUT_SECONDS,
         }
 
-    command = ["docker", "rm", "--force", container_id]
+    command = [pinned_tools.docker(), "rm", "--force", container_id]
     cleanup: dict[str, Any] = {
         "status": "FAILURE",
         "attempted": True,
@@ -1692,7 +1705,7 @@ def _plan(image: str) -> dict[str, Any]:
     return {
         "schema": "receiver-reliance/sandbox-plan-1",
         "build": [
-            "docker",
+            pinned_tools.docker(),
             "build",
             "--pull",
             "--network=none",
@@ -1781,7 +1794,10 @@ def main(argv: list[str] | None = None) -> int:
     image_identity = {"tag": image, "dockerfile_sha256": dockerfile_sha}
 
     try:
-        probe = run(["docker", "version", "--format", "{{json .}}"], timeout=20)
+        probe = run(
+            [pinned_tools.docker(), "version", "--format", "{{json .}}"],
+            timeout=20,
+        )
     except (FileNotFoundError, subprocess.TimeoutExpired) as exc:
         _emit(
             _infra_receipt(
@@ -1923,7 +1939,9 @@ def main(argv: list[str] | None = None) -> int:
     }
     exit_code = 1
     try:
-        image_inspected = run(["docker", "image", "inspect", image], timeout=30)
+        image_inspected = run(
+            [pinned_tools.docker(), "image", "inspect", image], timeout=30
+        )
         if image_inspected.returncode != 0:
             raise RuntimeError(
                 "docker image inspect failed: " + error_text(image_inspected)[-2000:]
@@ -1947,7 +1965,9 @@ def main(argv: list[str] | None = None) -> int:
         created_container_id = _created_container_id(created.stdout)
         container_id = created_container_id
 
-        inspected = run(["docker", "inspect", container_id], timeout=30)
+        inspected = run(
+            [pinned_tools.docker(), "inspect", container_id], timeout=30
+        )
         if inspected.returncode != 0:
             raise RuntimeError("docker inspect failed: " + error_text(inspected)[-2000:])
         raw_inspect = _parse_docker_inspect(
@@ -1966,7 +1986,7 @@ def main(argv: list[str] | None = None) -> int:
         started_ns = time.monotonic_ns()
         try:
             started = run(
-                ["docker", "start", "--attach", container_id],
+                [pinned_tools.docker(), "start", "--attach", container_id],
                 timeout=CONTAINER_TIMEOUT_SECONDS,
             )
         except subprocess.TimeoutExpired as exc:

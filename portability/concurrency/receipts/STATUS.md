@@ -57,10 +57,11 @@ and requires a new receipt; prose-only changes do not rewrite the recorded
 run.
 
 **ERRATA E12 — the `../ladder.py` digest above is stale, and stays stale.**
-`4ea69dc` bound these receipts; `ca1ccfe` then changed one line of `ladder.py`
-(`AUDITED_FORMAT_VERSION` `B1-AUDITED-DECISION-0.4` to `0.4.1`, the F-MATRIX-016
-migration), so the file now hashes to
-`D40F692AEC6197C005E74F12BE996C860A4FF1A5FF821E828B84CFA1585E044A`. The pin is
+`4ea69dc` bound these receipts. Two changes have moved `ladder.py` since:
+`ca1ccfe` (`AUDITED_FORMAT_VERSION` `B1-AUDITED-DECISION-0.4` to `0.4.1`, the
+F-MATRIX-016 migration) and the `pinned_tools` adoption, which replaced its bare
+`git` argv. The file now hashes to
+`7CF10CC692FCF938CD69D831FA74C9AD94994073212ACBB75B3F61E57701E798`. The pin is
 not refreshed, because refreshing it would assert that the current bytes
 produced the recorded run. What that invalidates and what it does not is set out
 in [`../findings/F-CONC-004.md`](../findings/F-CONC-004.md) and `ERRATA.md` E12.

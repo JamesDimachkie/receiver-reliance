@@ -20,7 +20,21 @@ SANDBOX = REPO / "portability" / "sandbox"
 if str(SANDBOX) not in sys.path:
     sys.path.insert(0, str(SANDBOX))
 
+PORTABILITY = REPO / "portability"
+if str(PORTABILITY) not in sys.path:
+    sys.path.insert(0, str(PORTABILITY))
+
 import expanded_gate  # noqa: E402
+# Ambient tool resolution is the trust root for every provenance claim this
+# file makes: a PATH- or current-directory-prepositioned `git` can forge the
+# clean status and HEAD that authorize the evidence, and a verification lane
+# demonstrated exactly that (TRUST_MODEL.md). portability/pinned_tools.py was
+# landed to close it and then adopted nowhere, which made it a control that
+# was not in the decision path. With RR_TOOL_DIR unset resolve() returns the
+# bare name, so the argv here is byte-identical to before and no receipt
+# digest moves; with it set, tools resolve inside an administrator-write-only
+# directory and never fall back to PATH.
+import pinned_tools  # noqa: E402
 
 
 HOME_MARKER = "<HOME>"
@@ -58,7 +72,7 @@ def _sha256(value: bytes) -> str:
 
 def _git(command: list[str]) -> bytes:
     return subprocess.run(
-        ["git", *command],
+        [pinned_tools.git(), *command],
         cwd=REPO,
         stdin=subprocess.DEVNULL,
         stdout=subprocess.PIPE,
