@@ -126,14 +126,14 @@ SOURCE_PIN_ERRATA = {
 # record their own eras and replay through LEGACY_GATE_VALIDATORS.  It is bound
 # here so the recompute is custody-tracked, not just asserted in prose.
 HARDENING_GATE_RECEIPT = (
-    REPO / "portability" / "receipts" / "local-expanded-gate-hardening-6776332.json"
+    REPO / "portability" / "receipts" / "local-expanded-gate-hardening-7d1c6cb.json"
 )
-HARDENING_SOURCE_HEAD = "6776332e082c178f196c8745f589b235454483f0"
+HARDENING_SOURCE_HEAD = "7d1c6cb3a0611a375b119cbeb3f397d5ce291ee9"
 HARDENING_GATE_RAW_SHA256 = (
-    "228B1EAC7D87D3A1B8A0718FE58FF40F14645942DB4E5CD9F7D62E2DDAA75439"
+    "A122F5E2063E6A3242563A988B3DB269E5A098569C3644A04F55899093E3A327"
 )
 HARDENING_GATE_EMBEDDED_SHA256 = (
-    "EFC61583BDB12BF6721C19E1F658FCE57F4D8010EB29229FFCF0089104A178DC"
+    "DF145DA8A9BA94224A4D53F73BA90661B4B2AE1ED7AD16DBC138765C3E05ECFD"
 )
 
 # Close evidence: the clean-tree expanded gate at the reconciliation commit.
