@@ -5,3 +5,7 @@ __pycache__/
 # receiver_reliance/generate_engine_manifest.py --stage and governed by
 # receiver_reliance/engine_manifest.json, so it is never committed.
 receiver_reliance/_engine/
+# setuptools build residue. Written into the source tree by a wheel build; it is
+# not part of the artifact and its presence breaks verify_hygiene, which reads
+# `git diff --check` over tracked files.
+*.egg-info/
