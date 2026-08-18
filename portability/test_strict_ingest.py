@@ -182,5 +182,52 @@ class AdoptionIsComplete(unittest.TestCase):
         self.assertIn("checks=267 failures=0", result.stdout)
 
 
+class ReceiptSuppliedNamesStayInCustody(unittest.TestCase):
+    """csf_f1c9c558: a receipt's own source names reached the filesystem."""
+
+    def setUp(self) -> None:
+        spec = importlib.util.spec_from_file_location(
+            "rr_verify_receipts_under_test", HERE / "verify_receipts.py"
+        )
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = module
+        spec.loader.exec_module(module)
+        self.module = module
+        self.model = REPO / "portability" / "model"
+
+    def test_traversal_and_absolute_names_are_refused(self) -> None:
+        roots = (self.model, self.model / "receipts")
+        for name in (
+            "../../../ERRATA.md",
+            "../EXPECTED_COUNTS.json/../../../README.md",
+            "/etc/passwd",
+            "C:/Windows/win.ini",
+            "..\\..\\README.md",
+            "",
+            " EXPECTED_COUNTS.json",
+        ):
+            with self.subTest(name=name):
+                self.assertIsNone(self.module._contained_source(name, *roots))
+
+    def test_legitimate_names_still_resolve(self) -> None:
+        roots = (self.model, self.model / "receipts")
+        resolved = self.module._contained_source("EXPECTED_COUNTS.json", *roots)
+        self.assertIsNotNone(resolved)
+        self.assertEqual(resolved.name, "EXPECTED_COUNTS.json")
+        nested = self.module._contained_source(
+            "N48-postF3-attempt1.stdout.txt", *roots
+        )
+        self.assertIsNotNone(nested)
+        self.assertTrue(nested.is_file())
+
+    def test_every_published_refuter_name_is_admissible(self) -> None:
+        raw = self.module.REFUTER_RECEIPT.read_bytes()
+        document = strict_ingest.load_safe(raw)
+        roots = (self.model, self.model / "receipts")
+        for name in sorted(document["source_sha256"]):
+            with self.subTest(name=name):
+                self.assertIsNotNone(self.module._contained_source(name, *roots))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

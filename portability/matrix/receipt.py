@@ -122,6 +122,14 @@ MAX_JSON_EXPONENT = 1_000_000
 MAX_JSON_INPUT_BYTES = 16 * 1024 * 1024
 MAX_JSON_OUTPUT_BYTES = 64 * 1024 * 1024
 MAX_JSON_NESTING_DEPTH = 64
+# Nesting alone is not a resource bound.  A wide, shallow document well under the
+# byte cap decodes fully before any exact-shape validation runs, and relying on
+# MemoryError to stop it is not a bound at all once allocation pressure is severe
+# (csf_92622f9b).  This caps structural nodes -- container members and array
+# items -- counted lexically in the same finite-state pass as nesting.  The
+# ceiling is far above any real receipt: the largest committed hosted receipt has
+# well under ten thousand.
+MAX_JSON_STRUCTURAL_NODES = 1_000_000
 
 
 def _parse_json_integer(value: str) -> int:
@@ -176,6 +184,7 @@ def _preflight_json_structure(text: str) -> None:
     delimiters: list[str] = []
     in_string = False
     escaped = False
+    nodes = 0
     pairs = {"}": "{", "]": "["}
     for character in text:
         if in_string:
@@ -190,6 +199,7 @@ def _preflight_json_structure(text: str) -> None:
             in_string = True
         elif character in "{[":
             delimiters.append(character)
+            nodes += 1
             if len(delimiters) > MAX_JSON_NESTING_DEPTH:
                 raise ValueError(
                     "JSON structural nesting exceeds the finite parser domain "
@@ -199,10 +209,36 @@ def _preflight_json_structure(text: str) -> None:
             if not delimiters or delimiters[-1] != pairs[character]:
                 raise ValueError("JSON structural delimiters are mismatched")
             delimiters.pop()
+        elif character in ",:":
+            nodes += 1
+        if nodes > MAX_JSON_STRUCTURAL_NODES:
+            raise ValueError(
+                "JSON structural node count exceeds the finite parser domain "
+                f"of {MAX_JSON_STRUCTURAL_NODES}"
+            )
     if in_string:
         raise ValueError("JSON document contains an unterminated string")
     if delimiters:
         raise ValueError("JSON document contains unclosed structural delimiters")
+
+
+def _reject_duplicate_members(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    """Refuse a repeated object member rather than collapsing it last-wins.
+
+    Matrix plans and downloaded hosted receipts both reach the decoder here, and
+    the implementation treats hosted artifacts as hostile.  Default decoding
+    erases the first of two conflicting ``entry_id``, ``outcome``, ``git``,
+    ``environment`` or ``status`` members before any closed-shape, identity or
+    binding check sees them, so the same bytes could mean different things to
+    different consumers (csf_3df8c8b0).  Deterministic rejection is the only
+    reading that keeps durable evidence consumer-independent.
+    """
+    seen: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in seen:
+            raise ValueError(f"duplicate JSON member {key!r} is ambiguous evidence")
+        seen[key] = value
+    return seen
 
 
 def _json_load(path: pathlib.Path) -> dict[str, Any]:
@@ -224,6 +260,7 @@ def _json_load(path: pathlib.Path) -> dict[str, Any]:
         _preflight_json_structure(text)
         value = json.loads(
             text,
+            object_pairs_hook=_reject_duplicate_members,
             parse_constant=reject_constant,
             parse_float=_parse_json_decimal,
             parse_int=_parse_json_integer,
@@ -604,11 +641,24 @@ def _expand_argument(value: str, entry: dict[str, Any] | None = None) -> str:
 
 
 def parse_suite_counts(stdout: bytes, stderr: bytes) -> dict[str, Any]:
+    # Replacement decoding keeps this function total over arbitrary child output,
+    # but a line that needed replacement is not evidence: U+FFFD means the bytes
+    # were not what the suite claims to have printed, and such a line could still
+    # match a count pattern and contribute to an expected total (csf_95727c25).
+    # Those lines are dropped, so they read as absent output rather than as
+    # authorization.  The drop is deliberately not reported in the return value:
+    # this dict IS the receipt's suite_counts shape, validated field-for-field by
+    # _suite_counts_validation_error against every committed receipt, so adding a
+    # key here would move every one of them.
     text = (stdout + b"\n" + stderr).decode("utf-8", "replace")
+    text = "\n".join(line for line in text.splitlines() if "�" not in line)
     count_totals = []
     for match in re.finditer(r"counts=(\{[^\r\n]+?\})(?=\s+[a-z_]+=|\s*$)", text):
         try:
-            value = json.loads(match.group(1))
+            # Duplicate count names must not collapse into an expected total.
+            value = json.loads(
+                match.group(1), object_pairs_hook=_reject_duplicate_members
+            )
         except (json.JSONDecodeError, ValueError):
             continue
         if isinstance(value, dict) and all(

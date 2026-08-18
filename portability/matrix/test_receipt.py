@@ -15,6 +15,8 @@ from unittest import mock
 
 import receipt
 
+REPO = pathlib.Path(__file__).resolve().parents[2]
+
 
 class MatrixPlanTests(unittest.TestCase):
     @classmethod
@@ -65,7 +67,7 @@ class MatrixPlanTests(unittest.TestCase):
             for item in receipt.profile_commands(self.plan, "focused")
         }
         deterministic_test_counts = {
-            "matrix-receipt-tests": 48,
+            "matrix-receipt-tests": 54,
             "independent-oracle-tests": 35,
             "concurrency-tests": 15,
         }
@@ -154,6 +156,65 @@ class MatrixPlanTests(unittest.TestCase):
                         completed.stderr.decode("utf-8", "replace"),
                     )
                     self.assertTrue(completed.stdout or completed.stderr)
+
+
+class AmbiguousEvidenceIsRefused(unittest.TestCase):
+    """Downloaded receipts are hostile input; ambiguity must not resolve."""
+
+    def _load(self, raw: bytes):
+        with tempfile.TemporaryDirectory() as directory:
+            path = pathlib.Path(directory) / "receipt.json"
+            path.write_bytes(raw)
+            return receipt._json_load(path)
+
+    def test_duplicate_member_is_rejected_not_collapsed(self) -> None:
+        # csf_3df8c8b0: default decoding keeps the LAST value, so a sender could
+        # make the verifier read an outcome the receipt also contradicts.
+        with self.assertRaises(ValueError) as caught:
+            self._load(b'{"entry_id":"a","outcome":"FAIL","outcome":"PASS"}')
+        self.assertIn("duplicate JSON member", str(caught.exception))
+        self.assertEqual(
+            self._load(b'{"entry_id":"a","outcome":"PASS"}')["outcome"], "PASS"
+        )
+
+    def test_duplicate_member_is_rejected_at_any_depth(self) -> None:
+        with self.assertRaises(ValueError):
+            self._load(b'{"a":{"b":[{"git":1,"git":2}]}}')
+
+    def test_flat_structural_node_budget_is_enforced(self) -> None:
+        # csf_92622f9b: a wide shallow document under the byte cap decoded fully
+        # before any shape validation, with MemoryError as the only backstop.
+        wide = (
+            b'{"a":['
+            + b",".join(b"0" for _ in range(receipt.MAX_JSON_STRUCTURAL_NODES + 2))
+            + b"]}"
+        )
+        self.assertLess(len(wide), receipt.MAX_JSON_INPUT_BYTES)
+        with self.assertRaises(ValueError) as caught:
+            self._load(wide)
+        self.assertIn("structural node count", str(caught.exception))
+
+    def test_real_receipts_stay_well_inside_the_node_budget(self) -> None:
+        hosted = REPO / "portability" / "receipts" / "hosted"
+        for path in sorted(hosted.glob("receipt-*.json")):
+            with self.subTest(receipt=path.name):
+                receipt._json_load(path)
+
+    def test_undecodable_count_lines_cannot_authorize(self) -> None:
+        # csf_95727c25: replacement decoding let malformed bytes match a count
+        # pattern and contribute to an expected total.
+        good = b"grounded-0.4 regression: checks=517 failures=0\n"
+        forged = b"grounded-0.4 regression: checks=517 \xff\xfe failures=0\n"
+        self.assertEqual(receipt.parse_suite_counts(good, b"")["checks"], [517])
+        self.assertEqual(receipt.parse_suite_counts(forged, b"")["checks"], [])
+
+    def test_duplicate_count_names_cannot_reach_an_expected_total(self) -> None:
+        honest = b'mode=in-process counts={"a": 800} failures=0\n'
+        forged = b'mode=in-process counts={"a": 1, "a": 800} failures=0\n'
+        self.assertEqual(
+            receipt.parse_suite_counts(honest, b"")["count_totals"], [800]
+        )
+        self.assertEqual(receipt.parse_suite_counts(forged, b"")["count_totals"], [])
 
 
 class ReceiptParsingTests(unittest.TestCase):

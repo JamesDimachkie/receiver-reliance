@@ -362,11 +362,30 @@ def _unique_summary_line(
     return match
 
 
+def _reject_duplicate_members(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    """Refuse a repeated member instead of resolving it last-value-wins.
+
+    This is the authoritative summary parser: its result decides whether a gate
+    passes.  Default JSON decoding collapses ``{"a":1,"a":800}`` to 800, so a
+    subprocess could print contradictory raw evidence and still sum to the
+    expected total (csf_0d1df8c6).  Rejection is the only defensible reading of
+    a document that says two different things.
+    """
+    seen: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in seen:
+            raise ValueError(f"duplicate JSON member {key!r}")
+        seen[key] = value
+    return seen
+
+
 def _count_object(raw: str, description: str) -> dict[str, int]:
     try:
-        value = json.loads(raw)
+        value = json.loads(raw, object_pairs_hook=_reject_duplicate_members)
     except (json.JSONDecodeError, ValueError) as error:
-        raise GateFailure(f"{description} counts are not valid JSON") from error
+        raise GateFailure(
+            f"{description} counts are not valid unambiguous JSON"
+        ) from error
     if (
         not isinstance(value, dict)
         or not value

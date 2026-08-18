@@ -552,6 +552,50 @@ class DeclaredCountsMatchTheSuites(unittest.TestCase):
                     expanded_gate.validate_gate_output(validator, stream, b"")
 
 
+class SandboxCountsRefuseAmbiguity(unittest.TestCase):
+    def test_duplicate_count_member_cannot_authorize_the_gate(self) -> None:
+        # csf_0d1df8c6: the authoritative summary parser resolved a repeated
+        # count name last-wins, so contradictory raw evidence could still sum to
+        # the expected total.
+        honest = b'mode=in-process counts={"all": 800} failures=0\n'
+        self.assertEqual(
+            expanded_gate.validate_gate_output("core_800", honest, b""),
+            {"total": 800, "failures": 0, "counts": {"all": 800}},
+        )
+        forged = b'mode=in-process counts={"all": 1, "all": 800} failures=0\n'
+        with self.assertRaises(expanded_gate.GateFailure) as caught:
+            expanded_gate.validate_gate_output("core_800", forged, b"")
+        self.assertIn("unambiguous", str(caught.exception))
+
+    def test_committed_gate_transcripts_still_replay(self) -> None:
+        """The refusal must not reject any stream this repository publishes."""
+        receipts = (
+            REPO / "portability" / "receipts" / "local-expanded-gate-close.json",
+            REPO
+            / "portability"
+            / "receipts"
+            / "local-expanded-gate-release-audit.json",
+        )
+        legacy = {"grounded_0_4_regression": "checks_504", "lint_gate_meta": "checks_7",
+                  "synthetic_proof_harness": "unittest_7"}
+        specs = {spec.gate_id: spec for spec in expanded_gate.GATES}
+        replayed = 0
+        for path in receipts:
+            document = json.loads(path.read_text(encoding="utf-8"))
+            for item in document["commands"]:
+                gate_id = item["gate_id"]
+                validator = legacy.get(gate_id, specs[gate_id].validator)
+                stdout = base64.b64decode(item["stdout_b64"], validate=True)
+                stderr = base64.b64decode(item["stderr_b64"], validate=True)
+                with self.subTest(receipt=path.name, gate=gate_id):
+                    self.assertEqual(
+                        expanded_gate.validate_gate_output(validator, stdout, stderr),
+                        item["observed"],
+                    )
+                replayed += 1
+        self.assertEqual(replayed, 22)
+
+
 class BranchAuthorityIsNarrowButReachable(unittest.TestCase):
     """Release authority is one branch; verification is not blocked to one."""
 

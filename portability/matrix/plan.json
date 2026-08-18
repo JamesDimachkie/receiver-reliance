@@ -234,7 +234,7 @@
         "cwd": ".",
         "argv": ["{python}", "-B", "portability/matrix/test_receipt.py"],
         "timeout_seconds": 900,
-        "expected": {"tests": [48]}
+        "expected": {"tests": [54]}
       },
       {
         "id": "finite-model-focused-tests",
@@ -275,7 +275,7 @@
         "cwd": ".",
         "argv": ["{python}", "-B", "portability/sandbox/test_sandbox.py"],
         "timeout_seconds": 900,
-        "expected": {"tests": [77]}
+        "expected": {"tests": [84]}
       },
       {
         "id": "portable-bundle-gate",

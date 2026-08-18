@@ -384,9 +384,48 @@ def _verify_rejected(v: _Verifier) -> None:
         )
 
 
+def _contained_source(name: str, *roots: pathlib.Path) -> pathlib.Path | None:
+    """Resolve a receipt-supplied source name inside one of the custody roots.
+
+    The name comes from inside a receipt, so it is lower-trust input even after
+    the receipt's raw digest matched.  Before this check it was joined straight
+    onto ``portability/model`` and then probed and read, so a name carrying
+    ``..`` or an absolute spelling reached the filesystem outside custody
+    (csf_f1c9c558).  Returns None when the name is not admissible; the caller
+    turns that into a recorded failure rather than a dereference.
+    """
+    if not name or name != name.strip():
+        return None
+    pure = pathlib.PurePosixPath(name)
+    if pure.is_absolute() or any(
+        part in ("", ".", "..") for part in pure.parts
+    ):
+        return None
+    if "\\" in name or ":" in name:
+        return None
+    for root in roots:
+        candidate = root / pure
+        try:
+            resolved = candidate.resolve(strict=False)
+            resolved.relative_to(root.resolve())
+        except (OSError, ValueError):
+            continue
+        if resolved.is_file():
+            return resolved
+    return None
+
+
 def _verify_model_receipts(v: _Verifier) -> None:
     raw = REFUTER_RECEIPT.read_bytes()
-    v.check("refuter.raw_sha256", _sha256_upper(raw) == REFUTER_RAW_SHA256)
+    raw_bound = _sha256_upper(raw) == REFUTER_RAW_SHA256
+    v.check("refuter.raw_sha256", raw_bound)
+    if not raw_bound:
+        # A receipt whose bytes do not match its published digest is not
+        # evidence, and its contents must not steer further filesystem work.
+        # Before this guard every subsequent check kept consuming the mismatched
+        # document, including the source names it supplies (csf_f1c9c558).
+        v.check("refuter.mismatch_halts_dereference", False, "raw digest mismatch")
+        return
     doc = strict_ingest.load_safe(raw)
     v.check(
         "refuter.verdict",
@@ -399,13 +438,14 @@ def _verify_model_receipts(v: _Verifier) -> None:
         "refuter.alias_accounting",
         doc["inadmissible_alias_edges"] == CURRENT_REJECTED_ALIAS_EDGES,
     )
+    model_root = REPO / "portability" / "model"
     for name, recorded in sorted(doc["source_sha256"].items()):
-        candidate = REPO / "portability" / "model" / name
-        if not candidate.exists():
-            candidate = REPO / "portability" / "model" / "receipts" / name
+        candidate = _contained_source(name, model_root, model_root / "receipts")
         v.check(
             f"refuter.source_binding.{name}",
-            candidate.exists() and _sha256_upper(candidate.read_bytes()) == recorded,
+            candidate is not None
+            and _sha256_upper(candidate.read_bytes()) == recorded,
+            "name escapes the model custody roots" if candidate is None else "",
         )
     capture_raw = N48_CAPTURE.read_bytes()
     capture = doc["expected_capture"]
