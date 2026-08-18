@@ -1,0 +1,48 @@
+{
+  "format_version": "B1-CLOSURE-TABLE-0.4",
+  "law": "Closures are TIGHTEN-ONLY: evaluated after the frozen decision table, they may move VALID to a defect class and may never weaken or reorder a frozen classification. Each closure states the caller-supplied consistency it enforces. Operators are the frozen predicate vocabulary plus PROJECTION_NE and DERIVED_DIFF_NE (defined in rr_api.py).",
+  "closures_by_obligation": {
+    "OBL-30": [
+      {
+        "closure_id": "OBL-30-C1-verdict-projection-agreement-compatible",
+        "statement": "compatible_record_ids must equal the set of record_ids whose supplied compatibility verdict is true; a projection that contradicts its own verdict rows is a conflict, not a valid selection basis.",
+        "tightens_to": "BINDING_OR_CONFLICT",
+        "predicate": {
+          "op": "PROJECTION_NE",
+          "rows_path": "/facts/compatibility_verdicts",
+          "key": "record_id",
+          "flag": "compatible",
+          "flag_value": true,
+          "set_path": "/facts/compatible_record_ids"
+        }
+      },
+      {
+        "closure_id": "OBL-30-C2-verdict-projection-agreement-incompatible",
+        "statement": "incompatible_record_ids must equal the set of record_ids whose supplied compatibility verdict is false.",
+        "tightens_to": "BINDING_OR_CONFLICT",
+        "predicate": {
+          "op": "PROJECTION_NE",
+          "rows_path": "/facts/compatibility_verdicts",
+          "key": "record_id",
+          "flag": "compatible",
+          "flag_value": false,
+          "set_path": "/facts/incompatible_record_ids"
+        }
+      },
+      {
+        "closure_id": "OBL-30-C3-derived-disposition-exhaustiveness",
+        "statement": "undispositioned_compatible_record_ids must equal compatible_record_ids minus selected_record_ids minus excluded_record_ids — derived, never trusted: a stale selected set can no longer pass with empty caller-asserted bookkeeping.",
+        "tightens_to": "OMISSION_OR_INCOMPLETE",
+        "predicate": {
+          "op": "DERIVED_DIFF_NE",
+          "base_path": "/facts/compatible_record_ids",
+          "subtract_paths": [
+            "/facts/selected_record_ids",
+            "/facts/excluded_record_ids"
+          ],
+          "equals_path": "/facts/undispositioned_compatible_record_ids"
+        }
+      }
+    ]
+  }
+}

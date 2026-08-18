@@ -14,7 +14,14 @@ authors = [{ name = "James Dimachkie" }]
 [tool.setuptools]
 packages = ["receiver_reliance"]
 
+[tool.setuptools.package-data]
+# engine_manifest.json is the integrity gate; _engine/ is the derived copy a
+# self-contained wheel carries. Stage it first:
+#   python -B receiver_reliance/generate_engine_manifest.py --stage
+receiver_reliance = ["engine_manifest.json", "_engine/**/*"]
+
 # Supported integration mode today: editable install from a repo checkout
 # (`pip install -e .`). The package locates the frozen engine and contracts
 # relative to the checkout; a self-contained wheel (bundling the sealed
-# contract/fixture data) is future work, tracked as row A7 of ADOPTION.md.
+# contract/fixture data) is produced by staging the engine into the package
+# and building normally; see row A7 of ADOPTION.md.

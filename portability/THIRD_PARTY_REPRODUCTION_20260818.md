@@ -57,6 +57,35 @@ Re-run at this commit on all three, same clone:
 
 All exit 0.
 
+## Self-contained distribution
+
+The package previously required a repository checkout beside it. It now builds a
+wheel that carries the engine and proves it holds the published bytes.
+
+```bash
+python -B receiver_reliance/generate_engine_manifest.py --check
+python -B receiver_reliance/generate_engine_manifest.py --stage
+python -B receiver_reliance/generate_engine_manifest.py --verify-stage
+python -m pip wheel . --no-build-isolation --no-deps -w dist
+```
+
+Observed: a 161,426-byte wheel with 21 members — all eleven engine files under
+`receiver_reliance/_engine/`, `engine_manifest.json`, and no fixture packs.
+Installed into a virtual environment with no checkout anywhere near it:
+
+| Check | Observed |
+|---|---|
+| files verified at import | 11, totalling 1,182,122 bytes |
+| `ENGINE_MANIFEST_SHA256` | `56BD2D5054FD581CAEDB98BA1A91993C46BFFF17F73B3516870C84DAC3237412`, identical to the repository's |
+| checkout present beside the package | no |
+| `decide_audited(examples/handoff-clean.json)` | `audited_behavior_class VALID`, sealed `VALID`, 4 governing authorities pinned, 0 closures fired |
+| one appended byte in `_engine/grounded-0_4/closures_0_4.json` | `ImportError: engine drift`, naming the file and both the expected and found length and digest |
+| that byte reverted | imports again, same manifest digest |
+
+The staged copy is never committed: `.gitignore` excludes
+`receiver_reliance/_engine/`, so the repository remains the one authority and the
+distribution is a derived copy whose only claim is that it matches the manifest.
+
 ## What this does and does not establish
 
 It establishes that at `af0caf7`, from published bytes alone, on three

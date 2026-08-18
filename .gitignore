@@ -1,2 +1,7 @@
 __pycache__/
 *.pyc
+# Derived engine copy for self-contained distributions. The repository is the
+# authority; this is staged at build time by
+# receiver_reliance/generate_engine_manifest.py --stage and governed by
+# receiver_reliance/engine_manifest.json, so it is never committed.
+receiver_reliance/_engine/
