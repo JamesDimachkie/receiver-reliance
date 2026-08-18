@@ -38,8 +38,12 @@ REPO = pathlib.Path(__file__).resolve().parents[1]
 SANDBOX = REPO / "portability" / "sandbox"
 if str(SANDBOX) not in sys.path:
     sys.path.insert(0, str(SANDBOX))
+PORTABILITY = REPO / "portability"
+if str(PORTABILITY) not in sys.path:
+    sys.path.insert(0, str(PORTABILITY))
 
 import expanded_gate  # noqa: E402
+import strict_ingest  # noqa: E402
 
 GATE_RECEIPT = REPO / "portability" / "receipts" / "local-expanded-gate-release-audit.json"
 CLOSE_GATE_RECEIPT = REPO / "portability" / "receipts" / "local-expanded-gate-close.json"
@@ -185,7 +189,7 @@ def _verify_clean_gate_receipt(
 ) -> None:
     raw = path.read_bytes()
     v.check(f"{prefix}.raw_sha256", _sha256_upper(raw) == raw_sha)
-    doc = json.loads(raw)
+    doc = strict_ingest.load_safe(raw)
     embedded = doc.pop("receipt_sha256")
     v.check(
         f"{prefix}.self_zeroed_hash",
@@ -257,7 +261,7 @@ def _verify_rejected(v: _Verifier) -> None:
     ):
         raw = path.read_bytes()
         v.check(f"{label}.raw_sha256", _sha256_upper(raw) == raw_sha)
-        doc = json.loads(raw)
+        doc = strict_ingest.load_safe(raw)
         last = doc["commands"][-1]
         v.check(
             f"{label}.quarantined",
@@ -270,7 +274,7 @@ def _verify_rejected(v: _Verifier) -> None:
 def _verify_model_receipts(v: _Verifier) -> None:
     raw = REFUTER_RECEIPT.read_bytes()
     v.check("refuter.raw_sha256", _sha256_upper(raw) == REFUTER_RAW_SHA256)
-    doc = json.loads(raw)
+    doc = strict_ingest.load_safe(raw)
     v.check(
         "refuter.verdict",
         doc["status"] == "PASS"
@@ -298,7 +302,7 @@ def _verify_model_receipts(v: _Verifier) -> None:
         and len(capture_raw) == capture["bytes"]
         and _sha256_upper(capture_raw) == capture["sha256"],
     )
-    body = json.loads(capture_raw.rstrip(b"\r\n").decode("ascii"))
+    body = strict_ingest.load_safe(capture_raw.rstrip(b"\r\n"), label="model.capture")
     embedded = body.pop("receipt_sha256")
     v.check(
         "model.capture_self_zeroed_hash",
@@ -312,7 +316,7 @@ def _verify_model_receipts(v: _Verifier) -> None:
         "model.expected_counts_raw_sha256",
         _sha256_upper(counts_raw) == EXPECTED_COUNTS_RAW_SHA256,
     )
-    expected_counts = json.loads(counts_raw)
+    expected_counts = strict_ingest.load_safe(counts_raw)
     v.check(
         "model.expected_counts_binding",
         expected_counts.get("final_receipt_sha256") == MODEL_RECEIPT_SHA256,
@@ -326,14 +330,14 @@ def _verify_concurrency(v: _Verifier) -> None:
     ):
         raw = path.read_bytes()
         v.check(f"{label}.raw_sha256", _sha256_upper(raw) == raw_sha)
-        doc = json.loads(raw)
+        doc = strict_ingest.load_safe(raw)
         v.check(
             f"{label}.clean_source_binding",
             doc["status"] == "PASS"
             and doc["git"]["clean"] is True
             and doc["git"]["head"] == CLEAN_SOURCE_HEAD,
         )
-    normative = json.loads(CONC_NORMATIVE.read_bytes())
+    normative = strict_ingest.load_safe(CONC_NORMATIVE.read_bytes())
     runs = 0
     envelopes = 0
     for section in list(normative["levels"]) + list(normative["soaks"]):
@@ -349,7 +353,7 @@ def _verify_concurrency(v: _Verifier) -> None:
 def _verify_hosted(v: _Verifier) -> None:
     raw = HOSTED_MANIFEST.read_bytes()
     v.check("hosted.manifest_raw_sha256", _sha256_upper(raw) == HOSTED_MANIFEST_RAW_SHA256)
-    manifest = json.loads(raw)
+    manifest = strict_ingest.load_safe(raw)
     v.check(
         "hosted.manifest_identity",
         manifest["schema"] == "receiver-reliance/hosted-receipt-manifest-1"
@@ -376,7 +380,7 @@ def _verify_hosted(v: _Verifier) -> None:
             and _sha256_upper(data) == entry["sha256"].upper(),
         )
 
-    summary = json.loads((HOSTED_DIR / "matrix-summary.json").read_bytes())
+    summary = strict_ingest.load_safe((HOSTED_DIR / "matrix-summary.json").read_bytes())
     v.check("hosted.summary_counts", summary["counts"] == HOSTED_SUMMARY_COUNTS)
     v.check(
         "hosted.summary_gating",
@@ -406,7 +410,7 @@ def _verify_hosted(v: _Verifier) -> None:
             git["github_sha"] == HOSTED_HEAD and bound,
         )
 
-    sandbox = json.loads((HOSTED_DIR / "sandbox-receipt.json").read_bytes())
+    sandbox = strict_ingest.load_safe((HOSTED_DIR / "sandbox-receipt.json").read_bytes())
     v.check(
         "hosted.sandbox_verdict",
         sandbox["status"] == "PASS"
@@ -420,7 +424,7 @@ def _verify_hosted(v: _Verifier) -> None:
         == _sha256_upper(SANDBOX_DOCKERFILE.read_bytes()),
     )
 
-    gate = json.loads(
+    gate = strict_ingest.load_safe(
         (HOSTED_DIR / "receipt-expanded-gate-cpython-3-12-ubuntu-latest-x64.json").read_bytes()
     )
     v.check(
