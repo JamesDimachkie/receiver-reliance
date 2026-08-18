@@ -61,7 +61,10 @@ attention card, so experiment arms can control for ceremony.
 ## Quickstart
 
 Requires CPython 3.12 or newer; 3.12, 3.13, and 3.14 are validated on the
-hosted matrix (see "Cross-platform validation" below). From `baseline-run/`:
+hosted matrix (see "Cross-platform validation" below), and re-run against a
+clean clone at the current commit in
+[portability/THIRD_PARTY_REPRODUCTION_20260818.md](portability/THIRD_PARTY_REPRODUCTION_20260818.md).
+From `baseline-run/`:
 
 ```bash
 python -B implementation-output-0.2/run_conformance_0_2.py
