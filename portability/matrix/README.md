@@ -25,11 +25,20 @@ is `ADMITTED` from its separate local N=48 run and fresh refuter verdict; the
 matrix neither admits nor substitutes that separately scoped full-model
 evidence. This keeps the matrix executable without turning one
 finite enumeration into fifteen redundant long-running jobs.
-Every scheduled normative row also verifies and executes the exact checked-in
+`plan.json` schedules `portable-bundle-gate` on every normative row, so every
+row run from the current plan verifies and executes the exact checked-in
 portable bundle. That gate covers the three-way host preflight, independent
 total runtime, raw-boundary probes, correlated sidecar transport, receipt
 bindings, and deterministic archive construction. A local bundle hash is not
-substituted for any hosted row.
+substituted for any hosted row. **The committed hosted evidence under
+`../receipts/hosted/` predates that command.** Run 31562391384 executed the
+17-command manifest of its own era; `portable-bundle-gate` was added afterwards
+and F-MATRIX-015 migrated the planned count from 17 to 18 in the same change.
+`portability/verify_receipts.py` declares that era explicitly
+(`HOSTED_ERA_ABSENT_COMMANDS`, `HOSTED_ERA_EXPECTATIONS`) and replays all 25
+committed rows through the current row validator against it, so the difference
+between what the plan now schedules and what the committed receipts prove is
+enforced rather than assumed.
 Concurrency v3 keeps its proof layers separate: concurrent physical bytes are
 compared with isolated grounded transport bytes, while each inner
 `sealed_response` is compared with the independent semantic oracle. That

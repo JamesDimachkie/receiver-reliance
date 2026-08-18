@@ -1,7 +1,8 @@
 # Errata and recorded defects
 
 E1–E7 entered after the 2026-08-10 external review; E8–E9 after the
-2026-08-12 Deep Security Scan (Intake 10).
+2026-08-12 Deep Security Scan (Intake 10); E10–E12 during the hardening
+campaign that followed it.
 
 Confirmed against the artifact at cc6f3657 by reproducing the external
 review's probes (conformance 800+107 green; OBL-08/OBL-30 mutation probes;
@@ -245,6 +246,50 @@ composed control matrices remain
 `FROZEN_AWAITING_EXTERNAL_ACCEPTANCE_0_3`, and OBL-30's admission is recorded
 as `CONDITIONAL_ON_FRAME_REACHABILITY_M4_DROPPABLE_AT_BLIND_GATE` even though
 the blind completeness gate returned `COMPLETE` with `OBL-30: ADMIT`.
+
+## E12 — A published source pin refers to bytes that have since moved
+
+`portability/concurrency/receipts/STATUS.md` publishes four raw SHA-256 values
+under "Raw source binding for the current clean v3 receipts" and states that any
+change to one of those files invalidates the binding and requires a new receipt.
+One of the four no longer matches.
+
+`4ea69dc` bound the clean v3 normative and smoke receipts, with
+`portability/concurrency/ladder.py` at
+`B5436C851C849CFB2B39A7EC2B35C258E501E3171A2ECD6BE6AF913329CC27E6`. `ca1ccfe`
+then changed exactly one line of that file — `AUDITED_FORMAT_VERSION` from
+`B1-AUDITED-DECISION-0.4` to `B1-AUDITED-DECISION-0.4.1`, the F-MATRIX-016
+migration — and the file now hashes to
+`D40F692AEC6197C005E74F12BE996C860A4FF1A5FF821E828B84CFA1585E044A`. It is the
+only commit that has touched `ladder.py` since the binding. The other three
+pins — `test_ladder.py`, `oracle/oracle.py`, `oracle/__init__.py` — still equal
+their published digests.
+
+**The pin is not refreshed.** Rewriting it to the current digest would assert
+that these bytes produced the recorded 242,400-envelope, 213.937-second run.
+They did not. A stale pin with a disposition is honest; a refreshed pin is a
+false provenance claim.
+
+What this does not invalidate: the two receipt files are byte-unchanged and
+still bind to their published raw digests, their recorded clean-source HEAD
+`8a525b16` is unchanged, and the worker-run and audited-envelope totals still
+recompute from the receipts. The oracle projection, the physical cache binding
+and the R-CONC-4 refutation all rest on the three unmoved pins.
+
+What it does invalidate: the claim that the *current* `ladder.py` bytes are the
+bytes that produced those receipts. Anyone re-running the ladder at this
+revision is running the 0.4.1 auditor, not the 0.4 auditor the receipts
+recorded. F-MATRIX-016 establishes why the change was required — the 0.4.1
+envelope keeps the frozen six-field surface, so the auditor's seal recompute and
+oracle projection hold unchanged over it — but that is an argument about
+equivalence, not evidence of re-execution. No re-run receipt exists at these
+bytes.
+
+Enforcement: `portability/verify_receipts.py` now hashes all four published
+sources. Three must equal their published digests. `ladder.py` is bound to the
+post-erratum digest recorded above, so a second undisclosed move fails the gate
+rather than hiding behind the first. `portability/concurrency/findings/F-CONC-004.md`
+carries the full record.
 
 ## Authority census (context for E5)
 

@@ -56,6 +56,18 @@ and smoke receipts. Any change to one of these files invalidates that binding
 and requires a new receipt; prose-only changes do not rewrite the recorded
 run.
 
+**ERRATA E12 — the `../ladder.py` digest above is stale, and stays stale.**
+`4ea69dc` bound these receipts; `ca1ccfe` then changed one line of `ladder.py`
+(`AUDITED_FORMAT_VERSION` `B1-AUDITED-DECISION-0.4` to `0.4.1`, the F-MATRIX-016
+migration), so the file now hashes to
+`D40F692AEC6197C005E74F12BE996C860A4FF1A5FF821E828B84CFA1585E044A`. The pin is
+not refreshed, because refreshing it would assert that the current bytes
+produced the recorded run. What that invalidates and what it does not is set out
+in [`../findings/F-CONC-004.md`](../findings/F-CONC-004.md) and `ERRATA.md` E12.
+`portability/verify_receipts.py` now enforces all four rows of this table: the
+other three must equal the current bytes exactly, and `ladder.py` is bound to
+the post-erratum digest, so a second undisclosed move fails the gate.
+
 ## Current clean v3 evidence
 
 ### Normative

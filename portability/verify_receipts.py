@@ -42,7 +42,12 @@ PORTABILITY = REPO / "portability"
 if str(PORTABILITY) not in sys.path:
     sys.path.insert(0, str(PORTABILITY))
 
+MATRIX = REPO / "portability" / "matrix"
+if str(MATRIX) not in sys.path:
+    sys.path.insert(0, str(MATRIX))
+
 import expanded_gate  # noqa: E402
+import receipt as matrix_receipt  # noqa: E402
 import strict_ingest  # noqa: E402
 
 GATE_RECEIPT = REPO / "portability" / "receipts" / "local-expanded-gate-release-audit.json"
@@ -79,6 +84,41 @@ CONC_NORMATIVE_RAW_SHA256 = "B1782A43E4E4615569948953FFC45659BF0A820BEB67136F73F
 CONC_SMOKE_RAW_SHA256 = "8CBA926DFB61B2C729C5CEAB95FF89350B99AFAF03809CBDDEAF6B8AC7719030"
 CONC_WORKER_RUNS = 32
 CONC_AUDITED_ENVELOPES = 242400
+CONC_STATUS = REPO / "portability" / "concurrency" / "receipts" / "STATUS.md"
+
+# Source pins published by ``portability/concurrency/receipts/STATUS.md``.  That
+# table says any change to one of these files invalidates the receipt binding
+# and requires a new receipt.  Nothing enforced it: ``_verify_concurrency``
+# binds the receipt bytes and recomputes the run totals, but never rehashed the
+# sources the receipts name.  Keys are repository-relative POSIX paths.
+CONCURRENCY_SOURCE_PINS = {
+    "portability/concurrency/ladder.py": (
+        "B5436C851C849CFB2B39A7EC2B35C258E501E3171A2ECD6BE6AF913329CC27E6"
+    ),
+    "portability/concurrency/test_ladder.py": (
+        "926D75C5C64A3D44D18FB40D85CA59CE3AC0BF2600C12ACE2BCBF749EF364630"
+    ),
+    "portability/oracle/oracle.py": (
+        "2148F0C9C4ED38692B9C6658EC48CDD9628688E6C1708345C89A44AB91A05F17"
+    ),
+    "portability/oracle/__init__.py": (
+        "747CF1373F63C6DFB7F1A01744EB0B9A9D91FED17F127FFD0C510AF924AA3BFF"
+    ),
+}
+# ERRATA E12.  ``ladder.py``'s published digest is its bytes at 4ea69dc, the
+# commit that bound the clean v3 receipts.  ca1ccfe then changed one line —
+# ``AUDITED_FORMAT_VERSION`` 0.4 to 0.4.1, the F-MATRIX-016 migration — which
+# moved the bytes.  The pin is deliberately NOT refreshed: rewriting it would
+# assert that today's bytes produced the recorded 213.937-second run, which is
+# false.  The erratum records both digests instead, so the stale pin stays
+# honest and a SECOND undisclosed move cannot hide behind the first.
+# path -> (digest published in STATUS.md, digest of the current bytes).
+SOURCE_PIN_ERRATA = {
+    "portability/concurrency/ladder.py": (
+        "B5436C851C849CFB2B39A7EC2B35C258E501E3171A2ECD6BE6AF913329CC27E6",
+        "D40F692AEC6197C005E74F12BE996C860A4FF1A5FF821E828B84CFA1585E044A",
+    ),
+}
 
 # Close evidence: the clean-tree expanded gate at the reconciliation commit.
 CLOSE_SOURCE_HEAD = "8104874a9e4081fca62c1cc142f68988e87751eb"
@@ -156,6 +196,33 @@ SANDBOX_DOCKERFILE = REPO / "portability" / "sandbox" / "Dockerfile"
 LEGACY_GATE_VALIDATORS = {
     "grounded_0_4_regression": "checks_504",
     "lint_gate_meta": "checks_7",
+}
+# The committed hosted tree is run 31562391384 at HOSTED_HEAD.  Its rows were
+# never replayed through the matrix's own plan-aware row validator here — only
+# through hardcoded manifest, count and outcome constants — so this file could
+# accept stale custody as proof of the current cross-platform gate.  The rows do
+# replay, but only against the command manifest of their own era, on the same
+# principle as LEGACY_GATE_VALIDATORS above.  Two things differed at that run:
+# the plan had no ``portable-bundle-gate`` command (added later; F-MATRIX-015
+# migrated the planned count 17 to 18 in the same change), and three suite
+# expectations have since moved.  Declaring the era in code keeps the drift
+# visible instead of leaving the evidence unvalidated.
+HOSTED_ERA_ABSENT_COMMANDS = ("portable-bundle-gate",)
+HOSTED_ERA_EXPECTATIONS = {
+    "verify-committed-receipts": {"checks": [62], "failures": [0]},
+    "grounded-0.4-regression": {"checks": [504], "failures": [0]},
+    "lint-gate-meta": {"checks": [7], "failures": [0]},
+}
+# The GraalPy row is rejected by the current row validator for a reason that is
+# a defect in the validator rather than in the evidence: it derives a
+# CPython-style prerelease suffix from ``version_info`` and requires it at the
+# start of ``sys.version``, which truthful GraalPy metadata does not satisfy
+# (``full_version`` starts "3.10.13", ``version_info`` says alpha).  Recorded
+# and declared here rather than silently skipped.
+HOSTED_ERA_ROW_EXCEPTIONS = {
+    "off-contract-graalpy-24-0-ubuntu-latest-x64": (
+        "runtime full_version disagrees with version_info release metadata"
+    ),
 }
 
 
@@ -350,6 +417,85 @@ def _verify_concurrency(v: _Verifier) -> None:
     v.check("concurrency.audited_envelopes", envelopes == CONC_AUDITED_ENVELOPES)
 
 
+def _verify_source_pins(v: _Verifier) -> None:
+    """Bind the sources the concurrency receipts name, not just the receipts.
+
+    Three of the four published digests must equal the current bytes exactly.
+    The fourth carries ERRATA E12: its published digest stays as recorded, and
+    the current bytes are bound to the erratum's second digest, so the file
+    cannot move again without failing here.
+    """
+    status = CONC_STATUS.read_text(encoding="utf-8")
+    for rel, published in sorted(CONCURRENCY_SOURCE_PINS.items()):
+        v.check(
+            f"source_pin.published.{rel}",
+            published in status,
+            "STATUS.md no longer publishes this digest",
+        )
+        source = REPO / pathlib.PurePosixPath(rel)
+        actual = _sha256_upper(source.read_bytes()) if source.is_file() else ""
+        errata = SOURCE_PIN_ERRATA.get(rel)
+        if errata is None:
+            v.check(
+                f"source_pin.binds.{rel}",
+                actual == published,
+                f"published={published} actual={actual}",
+            )
+            continue
+        recorded_published, recorded_current = errata
+        v.check(
+            f"source_pin.errata_matches_status.{rel}",
+            recorded_published == published,
+            "the erratum must quote the digest STATUS.md still publishes",
+        )
+        v.check(
+            f"source_pin.errata_current.{rel}",
+            actual == recorded_current,
+            f"errata={recorded_current} actual={actual}",
+        )
+    v.check(
+        "source_pin.errata_disclosed",
+        "ERRATA E12" in status,
+        "STATUS.md must carry the E12 cross-reference beside the stale pin",
+    )
+
+
+def _hosted_era_plan() -> dict[str, Any]:
+    """Today's matrix plan, restated as the command manifest of the hosted run."""
+    plan = matrix_receipt._json_load(MATRIX / "plan.json")
+    for profile, commands in plan["profiles"].items():
+        era: list[dict[str, Any]] = []
+        for command in commands:
+            if command["id"] in HOSTED_ERA_ABSENT_COMMANDS:
+                continue
+            expected = HOSTED_ERA_EXPECTATIONS.get(command["id"])
+            era.append({**command, "expected": expected} if expected else command)
+        plan["profiles"][profile] = era
+    return plan
+
+
+def _verify_hosted_rows_against_plan(v: _Verifier) -> None:
+    """Replay every committed hosted row through the matrix row validator."""
+    plan = _hosted_era_plan()
+    for path in sorted(HOSTED_DIR.glob("receipt-*.json")):
+        row = strict_ingest.load_safe(path.read_bytes(), label=path.name)
+        entry_id = row.get("entry_id")
+        try:
+            entry = matrix_receipt.find_entry(plan, entry_id)
+            error = matrix_receipt._receipt_validation_error(row, entry, plan)
+        except Exception as failure:  # noqa: BLE001 - report, never abort
+            error = f"{type(failure).__name__}: {failure}"
+        expected_error = HOSTED_ERA_ROW_EXCEPTIONS.get(entry_id)
+        if expected_error is None:
+            v.check(f"hosted.row_validation.{entry_id}", error is None, str(error))
+        else:
+            v.check(
+                f"hosted.row_validation_declared_exception.{entry_id}",
+                error == expected_error,
+                f"expected={expected_error!r} actual={error!r}",
+            )
+
+
 def _verify_hosted(v: _Verifier) -> None:
     raw = HOSTED_MANIFEST.read_bytes()
     v.check("hosted.manifest_raw_sha256", _sha256_upper(raw) == HOSTED_MANIFEST_RAW_SHA256)
@@ -458,7 +604,9 @@ def main() -> int:
     _verify_rejected(verifier)
     _verify_model_receipts(verifier)
     _verify_concurrency(verifier)
+    _verify_source_pins(verifier)
     _verify_hosted(verifier)
+    _verify_hosted_rows_against_plan(verifier)
     print(
         f"verify-receipts: checks={verifier.checks} "
         f"failures={len(verifier.failures)}"
