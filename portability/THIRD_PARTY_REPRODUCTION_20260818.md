@@ -1,5 +1,19 @@
 # Third-party reproduction from a clean clone — 2026-08-18
 
+> **Dated record; four numbers have since moved (annotated 2026-08-18, later
+> the same day).** Everything below was measured at `72efd11` and is left as
+> measured. Since then: the eleven-command charter gate was repaired and now runs
+> green (`ERRATA.md` E13), `verify_receipts` moved from `193` checks to `267` as
+> the source-pin and hosted-row gates landed, `perf/sidecar/verify_receipts.py`
+> went from `126/7` to `133/0` (E14), and `portable/gate.py` from `9/1` to `9/0`.
+> The command a third party should run first is now
+> `python -B portability/verify_live.py`, which recomputes rather than replays.
+> The reproduction columns below — conformance, grounded, public surface and the
+> engine manifest — are unchanged by all of that. The recorded wheel size will
+> not reproduce either: `pyproject.toml` embeds `README.md` in the wheel
+> metadata, and the README has changed. Rebuilt at this revision the wheel is
+> 161,988 bytes; its eleven engine files and their digests are identical.
+
 The repository claims every published result is re-derivable from published
 bytes. This is that claim executed the way a third party would execute it,
 rather than asserted.
@@ -59,7 +73,8 @@ Same clone, same commit, four interpreter/OS combinations:
 | Linux amd64 | CPython 3.12.4 | `failures=0` | `800/0` + `107/0` | `517/0` | 38 checks | `193/0` | 11 files, 1,182,122 B |
 
 All exit 0. The Linux runs executed inside a container built from the
-digest-pinned `python@sha256:a074fac6…` image, with the clone mounted
+digest-pinned
+`python@sha256:a074fac67aa01841fee592d00bae14d25dcaf98ef6e12a683ecceb7e0147e2d1` image, with the clone mounted
 **read-only**, `--network none`, and a tmpfs `/tmp` — so they also establish that
 no suite needs to write into the repository or reach the network. `verify_hygiene`
 is absent from the Linux column because it shells out to `git`, which that image
@@ -78,8 +93,17 @@ wheel that carries the engine and proves it holds the published bytes.
 python -B receiver_reliance/generate_engine_manifest.py --check
 python -B receiver_reliance/generate_engine_manifest.py --stage
 python -B receiver_reliance/generate_engine_manifest.py --verify-stage
-python -m pip wheel . --no-build-isolation --no-deps -w dist
+python -m pip wheel . --no-deps -w dist
 ```
+
+The reproduction run used `--no-build-isolation`, which is why this record
+originally published that flag. It only worked because setuptools happened to
+be installed in that environment: `pyproject.toml` declares
+`requires = ["setuptools>=68"]`, and without isolation nothing installs it, so
+a clean interpreter fails with `BackendUnavailable: Cannot import
+'setuptools.build_meta'`. The flag is dropped above; build isolation installs
+the declared backend. To build offline, keep the flag and install setuptools
+first.
 
 Observed: a 161,426-byte `py3-none-any` wheel with 21 members — all eleven engine
 files under `receiver_reliance/_engine/`, `engine_manifest.json`, and no fixture
@@ -95,9 +119,22 @@ no checkout anywhere near it:
 | one appended byte in `_engine/grounded-0_4/closures_0_4.json` inside `site-packages` | `ImportError: engine drift`, naming the file with expected `2329` bytes / `EBA19872…` and found `2330` / `B3464DE4…` | same message, same digests |
 | that byte reverted | imports again, same manifest digest | — |
 
-The staged copy is never committed: `.gitignore` excludes
-`receiver_reliance/_engine/`, so the repository remains the one authority and the
-distribution is a derived copy whose only claim is that it matches the manifest.
+The repository is the one authority and the distribution is a derived copy whose
+only claim is that it matches the manifest. `.gitignore` excludes
+`receiver_reliance/_engine/`, so the staging destination is never committed.
+
+**Correction.** This section previously said the staged copy is never committed,
+full stop, and that was false. `72efd11` committed `build/`, which contained a
+second copy of all eleven engine files under
+`build/lib/receiver_reliance/_engine/` — 16 tracked files in total. `59819ba`
+untracked `*.egg-info/` and missed it. The consequence is demonstrable: a wheel
+could be built from a clean clone without running `--stage` at all, and tampering
+with only the committed copy produced a manifest-violating wheel while
+`generate_engine_manifest.py --check` still exited 0, because `--check` compares
+the repository against the manifest and never looks at `build/`. The import gate
+did catch it, loudly — `ImportError: engine drift` — so this was claim
+correctness and build hygiene, not silent corruption. `build/` and `dist/` are
+now both untracked and gitignored.
 
 ## What this does and does not establish
 

@@ -23,6 +23,31 @@ if str(SANDBOX) not in sys.path:
 import expanded_gate  # noqa: E402
 
 
+HOME_MARKER = "<HOME>"
+
+
+def _redact(value: str) -> str:
+    """Remove the operator's home directory from a path recorded in evidence.
+
+    Published receipts in this repository carry the maintainer's home directory
+    inside ``runtime.executable`` and every ``executed_argv``. On a public
+    artifact that is a leak with no evidentiary purpose: the interpreter identity
+    that matters is the implementation, version and build, all recorded
+    separately, and the account name carries none of it. The sealed receipts
+    cannot be corrected without breaking their digests, so this stops new ones
+    from repeating it. Path structure below the home directory is preserved.
+    """
+
+    home = str(pathlib.Path.home())
+    if not home:
+        return value
+    for spelling in (home, home.replace("\\", "/")):
+        for candidate in (spelling, spelling.replace("/", "\\")):
+            if candidate and candidate in value:
+                value = value.replace(candidate, HOME_MARKER)
+    return value
+
+
 def _canonical(value: Any) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":")).encode("ascii")
 
@@ -132,7 +157,7 @@ def main(argv: list[str] | None = None) -> int:
             "version": platform.python_version(),
             "machine": platform.machine(),
             "platform": platform.platform(),
-            "executable": sys.executable,
+            "executable": _redact(sys.executable),
         },
         "commands": [],
     }
@@ -150,6 +175,7 @@ def main(argv: list[str] | None = None) -> int:
     for spec in expanded_gate.GATES:
         cwd = REPO / pathlib.PurePosixPath(spec.cwd).relative_to("/repo")
         executed = [sys.executable, *spec.argv[1:]]
+        recorded_argv = [_redact(item) for item in executed]
         before = time.monotonic_ns()
         timed_out = False
         try:
@@ -175,7 +201,7 @@ def main(argv: list[str] | None = None) -> int:
             "gate_id": spec.gate_id,
             "cwd": spec.cwd,
             "declared_argv": list(spec.argv),
-            "executed_argv": executed,
+            "executed_argv": recorded_argv,
             "exit_code": command_exit,
             "timed_out": timed_out,
             "elapsed_ms": round((time.monotonic_ns() - before) / 1_000_000),

@@ -9,3 +9,14 @@ receiver_reliance/_engine/
 # not part of the artifact and its presence breaks verify_hygiene, which reads
 # `git diff --check` over tracked files.
 *.egg-info/
+# The same class, and both were missed once. build/ was committed by 72efd11,
+# which put a second copy of the staged engine under version control and
+# falsified the claim that the staged copy is never committed: a wheel could then
+# be built from a clean clone without --stage, and tampering with only the
+# committed copy produced a manifest-violating wheel while --check still exited 0
+# (the import gate did catch it). dist/ is where the documented wheel build
+# writes, so leaving it untracked-but-not-ignored made the charter gate fail for
+# anyone who followed the distribution steps: the gate requires a clean tree
+# including untracked files.
+build/
+dist/

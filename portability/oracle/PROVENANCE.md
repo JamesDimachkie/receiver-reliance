@@ -16,7 +16,7 @@ excluded proof-workspace data was read.
 
 | Source | SHA-256 |
 |---|---|
-| `C:/Users/james/New folder/AGENTS.md` | `A7F955E227533FE5557133AD9B75C23C5C8AA76BD7FCC5E2037EBF47A5091934` |
+| `<workspace>/AGENTS.md` (outside this repository) | `A7F955E227533FE5557133AD9B75C23C5C8AA76BD7FCC5E2037EBF47A5091934` |
 | `planning/epistemic-handoff/MASTER_PROMPT_RR_PORTABILITY_20260810.md` | `154A9E5397D5D5B5422FD5D7053E7D1E6C6544C5D0152866598E6DC990F9C478` |
 
 ## Permitted specification and frozen-data reads

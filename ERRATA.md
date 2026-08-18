@@ -1,7 +1,7 @@
 # Errata and recorded defects
 
 E1–E7 entered after the 2026-08-10 external review; E8–E9 after the
-2026-08-12 Deep Security Scan (Intake 10); E10–E14 during the hardening
+2026-08-12 Deep Security Scan (Intake 10); E10–E15 during the hardening
 campaign that followed it.
 
 Confirmed against the artifact at cc6f3657 by reproducing the external
@@ -387,6 +387,42 @@ reports `checks=133 failures=0`. `perf/sidecar/findings/F-WP5-008.md` carries th
 record and `perf/SIDECAR.md` now states the command's scope.
 
 Same class as E12 and E13.
+
+## E15 — Published receipts contain the maintainer's home directory
+
+Ten tracked files in this public repository record an absolute path under the
+maintainer's home directory. The leak is an account name, not a secret, and it
+has no evidentiary purpose — the interpreter identity that matters is the
+implementation, version and build, each recorded in its own field — but a
+published receipt that names someone's home directory undermines the artifact it
+is meant to support.
+
+Where it is, and what can be done about each:
+
+| File | Content | Disposition |
+|---|---|---|
+| `perf/receipts/robustness/profile-windows-*.json` (seven receipts) | profiler stack frames naming the interpreter's stdlib path | **Frozen.** Two are digest-pinned by `perf/sidecar/verify_receipts.py::ADMITTED`, by the 60-file portable manifest and by their own self-zero seals; all seven are recorded profiling evidence. Cannot be edited without destroying what they attest. |
+| `portability/model/receipts/N48-independent-refuter-20260811.json` | the repository path of the refuted tree | **Frozen.** `REFUTER_RAW_SHA256` pins its raw bytes. |
+| `portability/receipts/local-expanded-gate-close.json` | `runtime.executable`, all eleven `executed_argv`, and an absolute scratchpad `receipt_path` | **Frozen.** `CLOSE_GATE_RAW_SHA256` and its embedded self-zeroed hash pin it. |
+| `second-implementation/PROVENANCE.md` | the repository path | **Frozen.** One of the 25 `candidate_files` of the author-increment receipt, verified by `verify_artifacts.py` as `author-file-hash`. |
+| `portability/oracle/PROVENANCE.md` | a workspace path outside the repository, in a digest table | **Corrected** in the commit carrying this erratum: relabelled `<workspace>/AGENTS.md`. The digest is unchanged, because the label was never part of it. |
+
+The new charter-gate receipt this campaign produced repeated the defect, which is
+how the class was confirmed rather than assumed:
+`portability/run_local_expanded_gate.py` recorded `sys.executable` verbatim into
+`runtime.executable` and into every `executed_argv`. The runner now redacts the
+home directory to `<HOME>`, preserving path structure below it, and the receipt
+was regenerated rather than shipped with the leak.
+
+Nothing enforces this, and that is a deliberate limit rather than an oversight.
+A repository-wide scan would have to admit ten frozen exceptions, which makes it
+a table of known values rather than a control; `verify_hygiene` already refuses
+any change to the frozen receipts by digest. The residual is that a future
+evidence generator could introduce a new instance. The generators that write
+durable receipts today are `run_local_expanded_gate.py` (redacted here),
+`portability/matrix/receipt.py` and `portability/sandbox/run_sandbox.py` (both
+record argv from a plan whose entries are repository-relative), and
+`adapters/outcome_receipt.py`.
 
 ## Authority census (context for E5)
 
