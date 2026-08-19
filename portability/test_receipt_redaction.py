@@ -21,6 +21,7 @@ because a copied pattern can agree with a leak the real gate would catch.
 from __future__ import annotations
 
 import json
+import os
 import pathlib
 import subprocess
 import sys
@@ -275,6 +276,34 @@ class TheGateStillSeesThisFile(unittest.TestCase):
     def test_the_shared_module_is_not_itself_an_instance(self) -> None:
         source = (REPO / "portability" / "receipt_paths.py").read_text(encoding="utf-8")
         self.assertIsNone(e15.HOME_PATH.search(source))
+
+
+class HomelessEnvironmentIsIdentity(unittest.TestCase):
+    """The hosted-Windows failure shape: no USERPROFILE means no redaction,
+    never an exception.  All six hosted Windows normative cells failed on
+    Path.home() raising inside scrubbed matrix children before this arm
+    existed; POSIX cells never saw it because expanduser falls back to the
+    pwd database there."""
+
+    def test_no_home_variables_means_identity_not_raise(self) -> None:
+        saved = {
+            name: os.environ.pop(name, None)
+            for name in ("USERPROFILE", "HOMEDRIVE", "HOMEPATH", "HOME")
+        }
+        try:
+            resolved = receipt_paths.home()
+            probe = {"path": 'C:\\Users\\someone\\repo\\file.py', "n": 1}
+            out = receipt_paths.redact_tree(probe)
+            if resolved == "":
+                self.assertEqual(out, probe)
+            else:
+                # A platform that still resolves a home (POSIX pwd fallback)
+                # must simply not raise; identity is not required there.
+                self.assertIsInstance(out, dict)
+        finally:
+            for name, value in saved.items():
+                if value is not None:
+                    os.environ[name] = value
 
 
 if __name__ == "__main__":

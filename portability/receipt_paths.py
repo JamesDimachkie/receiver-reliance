@@ -52,8 +52,21 @@ HOME_MARKER = "<HOME>"
 
 
 def home() -> str:
-    """The home directory this process would redact, as a string."""
-    return str(pathlib.Path.home())
+    """The home directory this process would redact, as a string.
+
+    Total by design.  A process whose environment names no home directory --
+    hosted Windows runners hand matrix children a scrubbed environment with
+    no ``USERPROFILE`` -- has nothing to redact, so this returns ``""`` and
+    every redaction below degrades to the identity.  Raising here would turn
+    an absent environment variable into a failed receipt writer, which is
+    ERRATA E17's ambient-variable class approached from the other side: the
+    first hosted run of this module failed all six Windows normative cells
+    on exactly that ``RuntimeError`` while every POSIX cell stayed green.
+    """
+    try:
+        return str(pathlib.Path.home())
+    except (RuntimeError, KeyError):
+        return ""
 
 
 def _spellings(base: str) -> tuple[str, ...]:
