@@ -180,6 +180,217 @@ first thing a new consumer should read. What is recorded-and-unfixed between
 this artifact and one you could adopt -- with the treatment and owner for each
 item -- is ledgered in [ADOPTION.md](ADOPTION.md).
 
+## The supported surface
+
+`grounded-0_4/test_public_surface.py` is this artifact's operative definition
+of what it supports: 38 checks pinning the withdrawal of the bare decision
+route, fact binding on the audited surface, closure authority over the frozen
+verdict, authenticated authority-register and closure-policy bytes, and the
+batch transport's finite work ceiling. What that suite pins is supported. What
+it does not pin is reachable, not promised. This section states the callable
+surface, the exceptions, the response shape, and the value domains, so an
+integrator does not have to read source to find them.
+[TRUST_MODEL.md](TRUST_MODEL.md) remains canonical for what any of it may be
+read as claiming; nothing here adds a guarantee.
+
+### What you may call
+
+| Import surface | Names |
+|---|---|
+| `receiver_reliance` | `__all__` is exactly `decide_audited`, `closure_findings`, `derive_record_references`, `AUDIT_FORMAT`, `ENGINE_MANIFEST_SHA256`. Also public and outside `__all__`: `ENGINE_MANIFEST` — the parsed `engine_manifest.json`, keys `format_version` (`RR-ENGINE-MANIFEST-1`), `file_count` (11), `total_byte_length`, `manifest_sha256`, `files` — and `__version__`. |
+| `receiver_reliance.conformance` | `execute` only. Explicitly non-evidentiary; see "What is not supported". |
+| `adapters` | `__all__` is exactly these ten: `preflight`, `process_jsonl`, `PreflightResult`, `PreflightIssue`, `READY`, `REJECTED_INVALID`, `INSUFFICIENT_EVIDENCE`, `RESULT_STATUSES`, `RESULT_FORMAT_VERSION`, `FACT_PROFILE_FORMAT_VERSION`. Also public and outside `__all__`: the `portable_preflight` submodule. |
+| `grounded-0_4/rr_api.py` | No `__all__`. Public names: `decide_audited`, `closure_findings`, `derive_record_references`, `conformance_execute`, `authority_for_operation`, `AUDIT_FORMAT`, `GOVERNING_AUTHORITIES`, `RuntimeIntegrityError`, plus the loaded-module handles `authority_surface`, `b1`, and `pcb_runner`. The three handles are the byte-verified engine internals: reachable by construction, deliberately not an API. |
+| `grounded-0_4/rr_batch.py` | `serve(source, sink)`, `response_bytes(raw_line)`, `main()`, `BatchRecordLimitError`. |
+
+`AUDIT_FORMAT` is the audit envelope's `format_version` string.
+`ENGINE_MANIFEST_SHA256` is `ENGINE_MANIFEST["manifest_sha256"]` — the digest
+of the manifest that gated the import, which is what a third party compares
+against the repository's. The literal value is deliberately not repeated here:
+any engine change rotates it, and a stale digest in this README would be a new
+claim gap of exactly the kind this section exists to close. It is pinned in
+[portability/THIRD_PARTY_REPRODUCTION_20260818.md](portability/THIRD_PARTY_REPRODUCTION_20260818.md).
+
+`decide_audited(request)` takes a Python object **or** exact wire bytes and
+returns the audited envelope described below. `bytes` is the wire form; a
+`bytearray` or `memoryview` is not, and takes the object path, where it is
+refused as `ERR_JSON`. An object is canonicalized under the frozen wire limits
+— 16,777,216 request bytes, 128 nesting levels, 100,000 aggregate members or
+items, integers within the IEEE-754 safe range — and a request that cannot be
+canonicalized is refused rather than truncated or coerced.
+
+`closure_findings(obligation_id, decision_input)` returns the tighten-only
+findings for one obligation without running a decision. Its surface is narrow
+by construction: `closures_0_4.json` defines closures for OBL-30 alone, so
+every other obligation ID returns an empty list — and an unknown obligation ID
+returns an empty list as well, indistinguishably. It does not validate the ID.
+
+`derive_record_references(facts)` returns the sorted, deduplicated,
+64-item-capped record identifiers present in a fact profile. Its signature
+carries a second parameter, `prefix`, which the implementation accepts and
+never reads; passing it changes nothing. Treat the function as single-argument
+until that parameter is either removed or given meaning.
+
+`authority_for_operation(operation)` takes an obligation ID or an operation
+handle and returns the register row set for it, where each field carries a
+`status` of exactly one of four values: `semantic`, `presence_only`,
+`inert_disclosed`, `inert_registered_debt`. The register is re-read and
+re-authenticated on every call.
+
+`rr_batch.serve(source, sink)` is a supported transport, not merely a file
+with recorded bounds. It reads one request per physical line from a binary
+source, writes exactly one JCS response plus LF per line, and flushes each one.
+Every line goes through the same `decide_audited` path and is sealed
+identically, so a malformed line is a per-request protocol error rather than a
+stream failure.
+
+### What you may catch
+
+- **`ImportError`**, from `import receiver_reliance`, when any of the eleven
+  manifested engine files does not match `engine_manifest.json` by byte length
+  and SHA-256. The message names the path, the expected length and digest, and
+  the found ones. This fires before any engine byte executes.
+- **`RuntimeIntegrityError`** (subclass of `RuntimeError`), defined in
+  `grounded-0_4/rr_api.py` and not re-exported by the package. It is what the
+  grounded layer raises when a pinned file fails byte authentication. Through
+  the package you will not see it for those eleven files, because the manifest
+  gate raises `ImportError` first; you see it when `grounded-0_4/rr_api.py` is
+  imported directly, which is what `rr_batch.py` does. That it is not on the
+  package's export list is a gap in the surface, not a claim that the exception
+  is private.
+- **`AuthorityRegisterError`** (subclass of `ValueError`), plus `KeyError` for
+  an unknown operation selector and `TypeError` for a non-string one, from
+  `authority_for_operation`.
+- **`ValueError`** from constructing a `PreflightResult` with a status outside
+  `RESULT_STATUSES`.
+- **`BatchRecordLimitError`** is exported but does not cross the transport
+  boundary: `serve` catches it and converts it into a sealed
+  `ERR_BATCH_RECORD_LIMIT` response.
+
+`decide_audited` and `preflight` return rather than raise for caller data.
+Across the inputs exercised here — wire bytes, `bytearray`, `memoryview`,
+`str`, `int`, `float`, `None`, list, empty dict, `set`, a self-referential
+dict, and a dict nested past the depth ceiling — every call produced an
+envelope or a result. That is measured totality over those inputs, not a proof
+of totality.
+
+### What you get back
+
+`decide_audited` returns an **audit envelope** wrapping the frozen engine's
+**sealed response**. They are different objects with different authority: the
+sealed response is the frozen engine's verbatim output and is preserved
+byte-for-byte; the envelope's `audited_behavior_class` is the 0.4 surface's
+verdict, which closures may tighten but never loosen. Six keys, always present:
+
+| Key | Value domain |
+|---|---|
+| `format_version` | Exactly `AUDIT_FORMAT`. Closed. |
+| `sealed_response` | The frozen response object, verbatim. Two shapes; see below. |
+| `exit_code` | The frozen engine's exit status: `0`, `1`, `2`, or `3`. |
+| `audited_behavior_class` | Closed six-value set: `VALID`, `MALFORMED_OR_BOUNDARY`, `BINDING_OR_CONFLICT`, `OMISSION_OR_INCOMPLETE`, `AUDIT_INCOMPLETE`, `PROTOCOL_ERROR`. A consumer switching on this field must handle all six ([TRUST_MODEL.md](TRUST_MODEL.md)). |
+| `audit` | The audit object; keys below. |
+| `audit_sha256` | 64 uppercase hex: the self-zero seal recomputed over the whole envelope with this field zeroed. |
+
+The `audit` object. Four keys are unconditional on every path; the rest are
+path-conditional, and their absence is meaningful:
+
+| Key | When present | Value domain |
+|---|---|---|
+| `request_raw_sha256` | Always | 64 uppercase hex over the exact request bytes, or null when no request bytes existed — an object that failed canonicalization, or a batch record that never terminated. |
+| `engine_generation` | Always | Exactly `composed-0.3-frozen`. Closed. |
+| `governing_authorities` | Always | Closed four keys, each 64 uppercase hex: `closure_policy_sha256`, `authority_register_sha256`, `engine_capabilities_sha256`, `engine_runner_sha256`. These are the bytes that governed this decision (`ERRATA.md` E8). The grounded evaluator's own bytes are **not** among them; they are authenticated by the commit root alone. |
+| `decision_input_sha256` | Always | 64 uppercase hex over the JCS bytes of `decision_input`, or null when the request never reached classification. |
+| `object_request_error` | Only when a Python object could not be canonicalized | Closed: `ERR_JSON`, `ERR_NUMBER`, `ERR_LIMIT`. Its presence means refusal, not classification. |
+| `errors` | Only when the sealed response is not `ok` | The sealed error array, each entry `{code, pointer, message, precedence}`. One error per response, by the deterministic error law. |
+| `first_match_predicates` | Only when the sealed response is `ok` | Closed three keys — the three defect classes — with boolean values. **At most one is true.** This is the short-circuited evaluation order: after a match, later classes read false because they were not evaluated. It is not the same field as a fixture entry's `first_match_predicates`, where more than one can be true (`baseline-run/RUNBOOK.md`); do not read one as the other. |
+| `matched_class_witness` | Only when the sealed response is `ok` | Array of atoms from the matched class predicate: `{op, pointers}`, or `{op: "not", of: ...}`. Empty when the **sealed** class is `VALID`, there being no matched predicate to witness — including when a closure then tightened the audited class to a defect, because the witness traces the frozen predicate table and not the closures. That evidence is in `closure_findings`. |
+| `record_references` | Only when the sealed response is `ok` | `derive_record_references` over `decision_input.facts`: sorted, deduplicated, at most 64 strings. This is the derived list the sealed response lacks. |
+| `record_references_truncated` | Only when the sealed response is `ok` | Boolean; true exactly when the derived set exceeded the 64-item cap, so the cap is disclosed rather than silent. |
+| `closure_findings` | Only when the sealed response is `ok` | Array, empty when nothing fired. A fired entry is `{closure_id, fired, tightens_to, statement}`; an errored entry is `{closure_id, fired, evaluator_error}` with the error string truncated. Six closure IDs exist, all OBL-30. An errored closure on an otherwise-`VALID` decision makes the class `AUDIT_INCOMPLETE` (`ERRATA.md` E9). |
+| `transport_error`, `request_prefix_sha256`, `request_prefix_bytes` | Only from `rr_batch`, and only when a record crossed the physical-line ceiling without terminating | `transport_error` is `ERR_BATCH_RECORD_LIMIT`. The prefix fields report the digest of the bytes actually consumed and that count, so the refusal names what it saw without claiming a digest of a request it never received in full. |
+
+The sealed response has two shapes, distinguished by its own `format_version`.
+The **core** shape (`PCB-RUNNER-RESPONSE-0.2`) carries `format_version`,
+`request_id`, `ok`, `result`, `errors`, `output`, `exit_code`,
+`receipt_sha256`; `output` is null on a protocol error and otherwise carries
+the class at `result_object.behavior_class`. The **wrapper** shape
+(`B1-WRAPPER-SEMANTIC-RESPONSE-0.2`) additionally carries `configuration`
+(`B1` or `B1-ATTENTION`), `operation_handle`, and `obligation_id` at top level,
+seals under `response_sha256` rather than `receipt_sha256`, and puts the class
+at `output.payload.behavior_class`. In both shapes `result` is `PASS`, `FAIL`,
+or `INCOMPLETE`.
+
+### Exit codes
+
+The frozen engine's status appears in three places and means the same thing:
+`exit_code` in the audit envelope, the second element of `conformance.execute`'s
+tuple, and the process status of the stdio runner. `0` is `VALID`; `1` is any of
+the three defect classes; `2` is a protocol error; `3` is reserved for
+`ERR_INTERNAL`. The fuzz campaign's invariant is that process and response exit
+codes agree and lie in `{0,1,2,3}` (`fuzz/README.md`). **The audited class is not
+derivable from the exit code:** a closure that tightens `VALID` to a defect
+leaves `exit_code` at `0`, because the sealed response is preserved verbatim.
+
+`rr_batch` is framing, not a gate. Its process status is `0` after a normally
+consumed stream, including a stream whose every line was a protocol error; each
+request's status lives in that request's envelope. It returns nonzero only for a
+transport failure.
+
+The adapters CLI is a gate, and has exactly two statuses: `0` when every emitted
+result is `READY`, `2` otherwise. An empty or blank-only stream is `2`, with one
+`INSUFFICIENT_EVIDENCE` row carrying `PREFLIGHT_STREAM_EMPTY`, so an exit-status
+check can never read "no evidence supplied" as "all records READY".
+
+### The preflight result, and its issue codes
+
+`preflight(record, fact_profile=None)` returns a `PreflightResult`: `status`,
+`record_id`, `family`, `obligation_id`, `native_evidence_sha256`,
+`profile_checked`, `issues`. `as_dict()` adds `format_version` and renders
+`issues` as objects. `status` is one of the three values in `RESULT_STATUSES`,
+resolved by the fail-closed precedence law — `REJECTED_INVALID` over
+`INSUFFICIENT_EVIDENCE` over `READY` — across every control layer that ran, so
+`issues` may mix layers and a code does not by itself determine the status. A
+`READY` result carries no issues. `profile_checked` is true only when profile
+validation actually ran, never merely because a profile was supplied.
+
+Each `PreflightIssue` is `{code, pointer, message, remediation,
+evidence_pointers}`. Only `code` is a stable machine surface; `message` and
+`remediation` are prose. The code set holds **57** values today, grouped by the
+four calibrated record families (`REF`/OBL-02, `SCOPE`/OBL-03,
+`SUPERSEDE`/OBL-15, `LIFECYCLE`/OBL-17) plus the shared envelope, stream, and
+fact-profile layers: 11 envelope/stream/family, 11 `REF`, 11 `SCOPE`, 6
+`SUPERSEDE`, 8 `LIFECYCLE`, 10 profile. The authoritative list is the string
+constants in `adapters/portable_preflight.py`.
+
+Closed today does not mean frozen: unlike the sealed 0.2/0.3 bytes, this list is
+live-surface code and a calibration change may extend it. It is not a contract;
+it is what the current bytes emit. `adapters/CALIBRATION.md` is the playbook for
+the mappings behind it, and those mappings cover only the four families —
+everything else abstains as `PREFLIGHT_FAMILY_UNCALIBRATED`.
+
+### What is not supported
+
+- **A bare `decide` route.** Withdrawn (`ERRATA.md` E2/E5). The package exports
+  no `decide` and `grounded-0_4/rr_api.py` defines none; the public-surface
+  suite pins both absences so the route cannot silently return.
+- **`receiver_reliance.conformance`.** `execute(request)` runs one request
+  through the frozen engine and returns `(response, exit_code)` byte-faithful to
+  the stdio runner. It exists so the conformance suites, the perf harnesses, and
+  ports can reproduce frozen behavior. Its sealed response binds no decision
+  facts and applies no 0.4 closure, so it is not evidence of a decision — the
+  namespace is named for reproduction on purpose.
+- **Anything the public-surface suite does not pin.** The engine-internal module
+  handles on `rr_api` (`b1`, `pcb_runner`, `authority_surface`), every
+  underscore-prefixed name, and the harness, verifier, and record trees under
+  `orchestration/`, `portability/`, `perf/`, `proof/` and `fuzz/` are reachable
+  and are not an integration API.
+- **`continuation-specs/`.** Proposed drafts: not adopted, not implemented, not
+  evidence. Fields named only there describe a generation that does not exist in
+  this release.
+- **Any surface as adversarial-grade.** `TRUST_MODEL.md` records zero external or
+  sibling code consumers to date. Nothing above is a security, interoperability,
+  or efficacy claim; it is a description of what the current bytes expose.
+
 ## Design properties worth stealing
 
 - **Everything is digest-pinned.** Fixture packs, receipts, and responses
