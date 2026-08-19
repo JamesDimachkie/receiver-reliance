@@ -5,7 +5,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import importlib.util
-import json
 import os
 import pathlib
 import re
@@ -26,7 +25,13 @@ def _load_verify_bundle():
     return module
 
 
-verify = _load_verify_bundle().verify
+_verify_bundle = _load_verify_bundle()
+verify = _verify_bundle.verify
+# ADOPTION A4: one law, resolved once.  The verifier already binds
+# portability/strict_ingest.py by path and caches it under a single module
+# name, so the gate reuses that handle rather than resolving the law a second
+# way -- there is no second copy to drift.
+strict_ingest = _verify_bundle.strict_ingest
 
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -86,15 +91,6 @@ def _unittest_success(raw: bytes, expected_tests: int) -> bool:
         trailer,
     )
     return match is not None and int(match.group(1)) == expected_tests
-
-
-def _strict_pairs(pairs):
-    value = {}
-    for key, item in pairs:
-        if key in value:
-            raise ValueError("duplicate JSON member")
-        value[key] = item
-    return value
 
 
 def _run_bounded(
@@ -183,11 +179,16 @@ def _summary(command_id: str, stdout: bytes, stderr: bytes) -> bool:
         if stderr != b"" or text is None or not text.startswith(prefix) or not text.endswith(suffix):
             return False
         try:
-            counts = json.loads(
-                text[len(prefix):-len(suffix)],
-                object_pairs_hook=_strict_pairs,
+            # ADOPTION A4: subprocess stdout is bytes this gate did not
+            # produce, so it is admitted under the shared law.  The text was
+            # already strict-UTF-8 decoded by _text, so the re-encode is
+            # lossless; IngestError subclasses ValueError, so this site still
+            # fails closed to False exactly as before.
+            counts = strict_ingest.load_safe(
+                text[len(prefix):-len(suffix)].encode("utf-8"),
+                label="independent-runtime counts",
             )
-        except (ValueError, json.JSONDecodeError):
+        except ValueError:
             return False
         return (
             isinstance(counts, dict)
@@ -199,8 +200,10 @@ def _summary(command_id: str, stdout: bytes, stderr: bytes) -> bool:
             text = _text(stdout)
             if stderr != b"" or text is None or not text.endswith("\n") or text.count("\n") != 1:
                 return False
-            row = json.loads(text, object_pairs_hook=_strict_pairs)
-        except (ValueError, json.JSONDecodeError):
+            row = strict_ingest.load_safe(
+                text.encode("utf-8"), label="raw-boundary-preflight row"
+            )
+        except ValueError:
             return False
         required = {
             "candidate_cli_flags",

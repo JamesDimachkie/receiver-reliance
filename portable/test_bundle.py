@@ -108,7 +108,116 @@ class PortableBundleTests(unittest.TestCase):
             manifest = portable / "MANIFEST.json"
             manifest.write_text('{"format_version":"x","format_version":"y"}', encoding="utf-8")
             failures = verify_bundle.verify(root, manifest)[1]
-            self.assertTrue(any("duplicate JSON member" in failure for failure in failures), failures)
+            # ADOPTION A4: the shared law owns this dimension now, so the
+            # message is the law's rather than a local hook's.
+            self.assertTrue(any("duplicate object key" in failure for failure in failures), failures)
+
+    def test_shared_ingest_law_is_the_one_the_frozen_core_bounds(self) -> None:
+        # A4: the bundle executes the shared law, never a copy of its numbers.
+        self.assertIs(verify_bundle.strict_ingest, gate.strict_ingest)
+        core = verify_bundle.strict_ingest.CORE_PATH
+        self.assertTrue(core.is_file(), core)
+        self.assertEqual(
+            core.relative_to(verify_bundle.ROOT).as_posix(),
+            "baseline-run/implementation-output-0.3/b1_capabilities.py",
+        )
+        self.assertEqual(
+            verify_bundle.MAX_JSON_DEPTH, verify_bundle.strict_ingest.MAX_NESTING
+        )
+        declared = {
+            row["path"]
+            for row in verify_bundle._decode_json(
+                (verify_bundle.ROOT / "portable" / "inventory.json").read_bytes(),
+                "inventory",
+            )["files"]
+        }
+        # Self-containment: the law AND the frozen core it reads its bounds
+        # from are both declared bundle files, so an unpacked bundle resolves
+        # the law without a checkout beside it.
+        self.assertIn("portability/strict_ingest.py", declared)
+        self.assertIn(
+            "baseline-run/implementation-output-0.3/b1_capabilities.py", declared
+        )
+
+    def test_law_rejections_reach_the_bundle_verifier(self) -> None:
+        # Negative arm: every defect the law adds is refused by verify_bundle.
+        # This verifier accepted the non-finite, surrogate and over-ceiling
+        # cases before A4 phase 2 -- its local hook saw duplicate keys only.
+        # Each case must fail, and the control case must still reach the
+        # manifest checks, or the law is not in the decision path.
+        members = verify_bundle.strict_ingest.MAX_MEMBERS_OR_ITEMS + 1
+        cases = [
+            (b'{"format_version":NaN}', "non-finite"),
+            (b'{"format_version":"\\ud800"}', "lone surrogate"),
+            (b'{"format_version":"x","format_version":"y"}', "duplicate object key"),
+            # Not a law addition: this file's own strict decode already
+            # rejected invalid UTF-8 and still runs first.  Present so the
+            # adoption cannot silently weaken it.
+            (b'{"format_version":"\xff"}', "UnicodeDecodeError"),
+            (
+                ("[" + ",".join("0" for _ in range(members)) + "]").encode("ascii"),
+                "items",
+            ),
+        ]
+        with tempfile.TemporaryDirectory(prefix="rr-bundle-test-") as temp:
+            root = pathlib.Path(temp)
+            portable = root / "portable"
+            portable.mkdir(parents=True)
+            (portable / "inventory.json").write_text("{}", encoding="utf-8")
+            manifest = portable / "MANIFEST.json"
+            for raw, expected in cases:
+                with self.subTest(expected=expected):
+                    manifest.write_bytes(raw)
+                    count, failures = verify_bundle.verify(root, manifest)
+                    self.assertEqual(count, 0)
+                    self.assertTrue(
+                        any(expected in failure for failure in failures),
+                        (expected, failures),
+                    )
+            # Control: well-formed bytes still get past ingest and fail on the
+            # manifest's own terms, so the cases above are not passing merely
+            # because everything fails.
+            manifest.write_bytes(b'{"format_version":"x"}\n')
+            failures = verify_bundle.verify(root, manifest)[1]
+            self.assertTrue(
+                any("top-level members are not closed" in failure for failure in failures),
+                failures,
+            )
+
+    def test_cli_refuses_a_bootstrap_law_the_manifest_does_not_declare(self) -> None:
+        # Negative arm for the one ordering exception A4 phase 2 introduced.
+        # cli.py must execute the shared ingest law before it can read the
+        # manifest index, so the law is the single pre-index bootstrap; it is
+        # re-checked against its declared row the moment the index exists.
+        # Tampering with the law must stop the process at import, and the
+        # control below must get PAST that check, so the tamper case cannot be
+        # passing because the stripped tree fails for some other reason.
+        law = "portability/strict_ingest.py"
+        core = "baseline-run/implementation-output-0.3/b1_capabilities.py"
+        carried = ("portable/cli.py", "portable/MANIFEST.json", "portable/inventory.json", law, core)
+        with tempfile.TemporaryDirectory(prefix="rr-bundle-test-") as temp:
+            root = pathlib.Path(temp)
+            for relative in carried:
+                target = root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes((verify_bundle.ROOT / relative).read_bytes())
+            control = subprocess.run(
+                [sys.executable, "-I", "-B", str(root / "portable" / "cli.py"), "verify"],
+                cwd=root, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                check=False, timeout=120,
+            )
+            self.assertNotEqual(control.returncode, 0)
+            self.assertNotIn(b"bootstrap module failed byte authentication", control.stderr)
+            self.assertIn(b"runtime module is unavailable", control.stderr)
+            (root / law).write_bytes((verify_bundle.ROOT / law).read_bytes() + b"\n# tamper\n")
+            tampered = subprocess.run(
+                [sys.executable, "-I", "-B", str(root / "portable" / "cli.py"), "verify"],
+                cwd=root, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                check=False, timeout=120,
+            )
+            self.assertNotEqual(tampered.returncode, 0)
+            self.assertIn(b"bootstrap module failed byte authentication", tampered.stderr)
+            self.assertIn(law.encode("ascii"), tampered.stderr)
 
     def test_manifest_self_seal_is_required(self) -> None:
         with tempfile.TemporaryDirectory(prefix="rr-bundle-test-") as temp:
@@ -262,7 +371,7 @@ class PortableBundleTests(unittest.TestCase):
                 self.assertEqual(archive.read("portable/inventory.json"), b"inventory-snapshot\n")
 
     def test_gate_rejects_contradictory_or_trailing_output(self) -> None:
-        success = b"portable manifest: files=60 drift=0\n"
+        success = b"portable manifest: files=61 drift=0\n"
         self.assertTrue(gate._summary("portable-manifest", success, b""))
         self.assertFalse(
             gate._summary(

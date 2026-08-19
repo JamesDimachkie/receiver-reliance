@@ -871,7 +871,7 @@ the recorded stdout it replays says `Ran 7 tests`.
 |---|---|---|
 | **Replay** | `portability/verify_receipts.py` (`checks=267`), `perf/sidecar/verify_receipts.py` (`checks=133`), `second-implementation/verify_artifacts.py` | The committed receipt bytes are intact, the sources they name still hash as recorded, and the transcripts they recorded still satisfy the validators of their own era. **Nothing was executed.** |
 | **Recompute** | `portability/verify_live.py` (`gates=11`), `baseline-run/verify_conformance_authority.py` (`checks=32`, four declared divergences), `portability/test_home_path_disclosure.py`, `receiver_reliance/generate_engine_manifest.py --check` plus the package's import-time check over eleven engine files, `portable/gate.py` | The artifact at the bytes you have checked out was executed, and its live output was held against the declarations. |
-| **Pin surfaces** | `portable/MANIFEST.json` (60 files — 21 runtime, 13 gate, 11 authority, 9 document, 5 receipt, 1 version), `receiver_reliance/engine_manifest.json` (11 files, self-zero sealed), each receipt's `source_sha256` map | Inventory bindings. They detect drift; they do not authenticate — see C1. |
+| **Pin surfaces** | `portable/MANIFEST.json` (61 files — 22 runtime, 13 gate, 11 authority, 9 document, 5 receipt, 1 version), `receiver_reliance/engine_manifest.json` (11 files, self-zero sealed), each receipt's `source_sha256` map | Inventory bindings. They detect drift; they do not authenticate — see C1. |
 
 `portable/gate.py` is the row worth a second look, because it sits on the recompute side for a
 reason and still does not close E13's shape. It runs eight suites as subprocesses at current bytes —
@@ -898,7 +898,7 @@ contains a `subprocess` reference). `portable/gate.py` `COMMANDS` (eight entries
 `README.md` §"Cross-platform validation": `verify-live: gates=11 passed=11
 declared_era_divergences=3 undeclared_divergences=0 failures=0`; `verify-receipts: checks=267
 failures=0`; `conformance-authority: checks=32 failures=0 declared_divergences=4`.
-`portable/MANIFEST.json` (60 rows, `role` field) and `portable/build_manifest.py` (derived from
+`portable/MANIFEST.json` (61 rows, `role` field) and `portable/build_manifest.py` (derived from
 `portable/inventory.json`, not from a tree walk). `receiver_reliance/engine_manifest.json`
 (`file_count: 11`).
 

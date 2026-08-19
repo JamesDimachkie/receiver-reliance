@@ -170,14 +170,21 @@ class AdoptionIsComplete(unittest.TestCase):
     # module itself and test files are out of scope by construction.
     ADOPTED = ("portability/live/", "portability/matrix/", "portable/")
     ADOPTED_FILES = ("portability/verify_receipts.py",)
-    # portable/* is the offline bundle: adopting the shared law there moves
-    # the bundle's file set (inventory + MANIFEST re-bind), so it is staged
-    # as A4's next event, not exempted forever.  A stale exemption fails.
-    EXEMPT = {
-        "portable/cli.py": "offline bundle; A4 phase 2 needs the inventory re-bind",
-        "portable/gate.py": "offline bundle; A4 phase 2 needs the inventory re-bind",
-        "portable/verify_bundle.py": "offline bundle; A4 phase 2 needs the inventory re-bind",
-    }
+    # A4 phase 2 closed the last three exemptions (portable/cli.py, gate.py and
+    # verify_bundle.py) by declaring the law itself in the bundle inventory, so
+    # nothing is exempt.  A future entry here is a disclosure, not a hiding
+    # place: test_every_exemption_is_still_needed fails the moment one stops
+    # describing the file it names.
+    EXEMPT: dict[str, str] = {}
+
+    # The three files A4 phase 2 adopted last.  Named so the enumeration cannot
+    # quietly stop seeing them -- the A5 failure shape is a guard whose subject
+    # silently emptied, and an empty EXEMPT set makes that invisible otherwise.
+    PORTABLE_BUNDLE_SOURCES = (
+        "portable/cli.py",
+        "portable/gate.py",
+        "portable/verify_bundle.py",
+    )
 
     @classmethod
     def _adopted_production_sources(cls) -> list[str]:
@@ -227,6 +234,28 @@ class AdoptionIsComplete(unittest.TestCase):
                     source,
                     f"{rel} no longer contains a bare ingest; delete its exemption",
                 )
+
+    def test_the_portable_bundle_is_inside_the_enumerated_subject(self) -> None:
+        """A4 phase 2: the last three adopters are enumerated, not assumed."""
+        selected = set(self._adopted_production_sources())
+        for rel in self.PORTABLE_BUNDLE_SOURCES:
+            with self.subTest(path=rel):
+                self.assertIn(rel, selected)
+                self.assertNotIn(rel, self.EXEMPT)
+
+    def test_the_bundle_declares_the_law_it_now_executes(self) -> None:
+        """Self-containment: adoption did not make the bundle need a checkout.
+
+        The bundle resolves the law from its own declared files, and the law
+        reads its bounds from the frozen core, so both must be declared.  A row
+        going missing means an unpacked bundle would import from outside itself.
+        """
+        raw = (REPO / "portable" / "inventory.json").read_bytes()
+        declared = {row["path"] for row in strict_ingest.load_safe(raw)["files"]}
+        self.assertIn("portability/strict_ingest.py", declared)
+        self.assertIn(
+            strict_ingest.CORE_PATH.relative_to(REPO).as_posix(), declared
+        )
 
     def test_the_enumeration_sees_its_subject(self) -> None:
         """Negative arm: the scan detects the thing it exists to detect."""

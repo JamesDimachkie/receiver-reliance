@@ -4,11 +4,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import hashlib
+import importlib.util
 import json
 import os
 import pathlib
 import re
 import stat
+import sys
 import unicodedata
 from typing import Any
 
@@ -23,7 +25,40 @@ MAX_INVENTORY_BYTES = 1024 * 1024
 MAX_FILE_BYTES = 64 * 1024 * 1024
 MAX_TOTAL_BYTES = 256 * 1024 * 1024
 MAX_FILES = 4096
-MAX_JSON_DEPTH = 128
+
+
+def _load_shared_law():
+    """Load ADOPTION A4's one ingest law from the path the bundle declares.
+
+    Path-bound for the same reason the gate binds this verifier by path: the
+    law is always the declared file beside the bundle, never an ambient
+    same-name module, and the load survives isolated-mode spawning that strips
+    the script directory from sys.path.  The module is cached under a single
+    name so the bundle executes one law, not one copy per importer.
+    """
+    name = "rr_strict_ingest"
+    cached = sys.modules.get(name)
+    if cached is not None:
+        return cached
+    spec = importlib.util.spec_from_file_location(
+        name, ROOT / "portability" / "strict_ingest.py"
+    )
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    try:
+        spec.loader.exec_module(module)
+    except BaseException:
+        sys.modules.pop(name, None)
+        raise
+    return module
+
+
+strict_ingest = _load_shared_law()
+
+# Read from the shared law, never restated.  The lexical scan below and the
+# law's own value-walk measure the same ceiling in two places, so a copied
+# literal here is the C2 defect A4 exists to remove.
+MAX_JSON_DEPTH = strict_ingest.MAX_NESTING
 WINDOWS_RESERVED = frozenset(
     {"CON", "PRN", "AUX", "NUL"}
     | {f"COM{index}" for index in range(1, 10)}
@@ -37,15 +72,6 @@ class BundleSnapshot:
     manifest_raw: bytes
     inventory_raw: bytes
     files: tuple[tuple[str, bytes], ...]
-
-
-def _pairs(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
-    result: dict[str, Any] = {}
-    for key, value in pairs:
-        if key in result:
-            raise ValueError(f"duplicate JSON member: {key}")
-        result[key] = value
-    return result
 
 
 def _canonical(value: Any) -> bytes:
@@ -192,10 +218,21 @@ def _json_depth_ok(text: str) -> bool:
 
 
 def _decode_json(raw: bytes, source: str) -> Any:
+    """Admit bundle JSON under the shared law, keeping this file's own preflight.
+
+    ADOPTION A4: duplicate keys, non-finite constants, lone surrogates, strict
+    UTF-8 and the frozen core's nesting/member ceilings are the shared law's
+    (`strict_ingest.load_safe`), which is strictly stronger than the local hook
+    it replaced.  The lexical scan stays in front of it because it is stronger
+    in a dimension the law does not cover: it bounds depth and rejects
+    structurally unbalanced text before the parser allocates anything, the same
+    reason the matrix verifier kept its own preflight.  `IngestError` subclasses
+    `ValueError`, so every caller's fail-closed contract is unchanged.
+    """
     text = raw.decode("utf-8", errors="strict")
     if not _json_depth_ok(text):
         raise ValueError(f"{source} JSON exceeds depth or is structurally unbalanced")
-    return json.loads(text, object_pairs_hook=_pairs)
+    return strict_ingest.load_safe(raw, label=source)
 
 
 def _inventory_declarations(inventory: Any) -> list[tuple[str, str]]:

@@ -25,6 +25,23 @@ The boundary has five parts:
 5. `cli.py` provides the stable `verify`, `doctor`, `preflight`, `decide`, and
    `sidecar` command surface.
 
+All of them read JSON through one law. `portability/strict_ingest.py` is the
+repository's single bounded-ingest law (ADOPTION A4): duplicate object keys,
+non-finite constants, lone surrogates, strict UTF-8, and the frozen core's
+nesting and member ceilings, with the ceilings read from that core rather than
+restated. The law is a declared bundle file and so is the core it reads
+(`baseline-run/implementation-output-0.3/b1_capabilities.py`), so an unpacked
+bundle resolves the law from its own bytes. Each surface keeps whatever it was
+already stronger in — `verify_bundle.py` its lexical depth-and-balance scan
+ahead of the parser, `cli.py` its pre-allocation manifest ceiling.
+
+`cli.py` is the one place where order matters. The manifest index is what
+byte-authenticates every declared module, and the index is itself admitted under
+the law, so the law's own bytes are the single bootstrap the index cannot cover.
+They are re-checked against their declared manifest rows as soon as the index
+exists — before any other repository module loads and before any command runs —
+so a substituted law stops the process at import.
+
 From any checkout root:
 
 ```text

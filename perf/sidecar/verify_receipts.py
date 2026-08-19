@@ -47,7 +47,7 @@ ADMITTED = {
 #
 # The pins are NOT rebound, and could not be even if that were the right call:
 # they live inside the receipt bodies, whose raw digests are pinned in ADMITTED
-# above, in the 60-file portable manifest, and by the receipts' own self-zero
+# above, in the 61-file portable manifest, and by the receipts' own self-zero
 # seals.  What they bind is provenance -- which bytes produced a recorded run --
 # so rewriting them would assert that today's hardened sources produced the
 # 2026-08-12 profiling numbers.  They did not.

@@ -60,6 +60,13 @@ _core = _load_core()
 MAX_NESTING: int = _core.MAX_NESTING
 MAX_MEMBERS_OR_ITEMS: int = _core.MAX_MEMBERS_OR_ITEMS
 
+#: The frozen core whose bounds this module enforces, named publicly so a
+#: self-contained distribution can DECLARE and byte-authenticate that file
+#: instead of restating its path.  ADOPTION A4 phase 2 uses it: the portable
+#: bundle ships this law, and `portable/cli.py` authenticates both files
+#: against the bundle manifest.  One statement of the dependency, here.
+CORE_PATH: pathlib.Path = _CORE
+
 
 class IngestError(ValueError):
     """Raised for any input the shared law refuses. Never a bare exception.

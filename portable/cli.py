@@ -18,19 +18,11 @@ VERSION_FILE = HERE / "VERSION"
 MANIFEST_PATH = HERE / "MANIFEST.json"
 MAX_MANIFEST_BYTES = 4 * 1024 * 1024
 MAX_RUNTIME_MODULE_BYTES = 16 * 1024 * 1024
+SHARED_INGEST_LAW = "portability/strict_ingest.py"
 ZERO64 = "0" * 64
 HEX = frozenset("0123456789ABCDEF")
 SUPPORTED_IMPLEMENTATION = "CPython"
 SUPPORTED_PYTHON_VERSIONS = frozenset({(3, 12), (3, 13), (3, 14)})
-
-
-def _pairs(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
-    result: dict[str, Any] = {}
-    for key, value in pairs:
-        if key in result:
-            raise RuntimeError(f"duplicate manifest member: {key}")
-        result[key] = value
-    return result
 
 
 def _sha(value: Any) -> bool:
@@ -44,17 +36,69 @@ def _canonical_manifest(value: Any) -> bytes:
     ).encode("utf-8")
 
 
-def _read_manifest_index() -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
-    """Authenticate the manifest index before any repository module executes."""
+def _read_bounded(path: pathlib.Path, max_bytes: int, label: str) -> bytes:
+    """Read a regular nonsymlink file with a pre-allocation byte ceiling."""
 
-    if MANIFEST_PATH.is_symlink() or not MANIFEST_PATH.is_file():
-        raise RuntimeError("portable manifest must be a regular nonsymlink file")
-    with MANIFEST_PATH.open("rb") as stream:
-        raw = stream.read(MAX_MANIFEST_BYTES + 1)
-    if len(raw) > MAX_MANIFEST_BYTES:
-        raise RuntimeError("portable manifest exceeds 4 MiB")
+    if path.is_symlink() or not path.is_file():
+        raise RuntimeError(f"{label} must be a regular nonsymlink file")
+    with path.open("rb") as stream:
+        raw = stream.read(max_bytes + 1)
+    if len(raw) > max_bytes:
+        raise RuntimeError(f"{label} exceeds {max_bytes} bytes")
+    return raw
+
+
+def _bootstrap_shared_law() -> tuple[types.ModuleType, dict[str, bytes]]:
+    """Execute ADOPTION A4's one ingest law, the sole pre-index bootstrap.
+
+    The manifest index is what byte-authenticates every other declared module,
+    and A4 requires the index itself to be admitted under the shared law, so the
+    law's own bytes are the one thing the index cannot cover before it exists.
+    They are not left unchecked: `_authenticate_bootstrap` re-checks every byte
+    executed here against its declared manifest row as soon as the index is
+    built -- before any other repository module loads and before any command
+    runs -- so an undeclared or altered law stops this process at import.
+
+    The law names the frozen core it reads its bounds from (`CORE_PATH`), so the
+    core's path is read from the law rather than restated here.
+    """
+
+    name = "rr_strict_ingest"
+    executed: dict[str, bytes] = {}
+    module = sys.modules.get(name)
+    if module is None:
+        pure = pathlib.PurePosixPath(SHARED_INGEST_LAW)
+        path = ROOT.joinpath(*pure.parts)
+        raw = _read_bounded(path, MAX_RUNTIME_MODULE_BYTES, "shared ingest law")
+        module = types.ModuleType(name)
+        module.__file__ = str(path)
+        module.__spec__ = importlib.util.spec_from_loader(
+            name, loader=None, origin=str(path)
+        )
+        sys.modules[name] = module
+        try:
+            exec(compile(raw, str(path), "exec", dont_inherit=True), module.__dict__)
+        except BaseException:
+            sys.modules.pop(name, None)
+            raise
+        executed[SHARED_INGEST_LAW] = raw
+    core = pathlib.Path(module.CORE_PATH)
     try:
-        manifest = json.loads(raw.decode("utf-8"), object_pairs_hook=_pairs)
+        core_relative = core.relative_to(ROOT.resolve()).as_posix()
+    except ValueError as exc:
+        raise RuntimeError(f"shared ingest law reads a core outside the bundle: {core}") from exc
+    executed[core_relative] = _read_bounded(
+        core, MAX_RUNTIME_MODULE_BYTES, "frozen ingest core"
+    )
+    return module, executed
+
+
+def _read_manifest_index() -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
+    """Authenticate the manifest index before any decision module executes."""
+
+    raw = _read_bounded(MANIFEST_PATH, MAX_MANIFEST_BYTES, "portable manifest")
+    try:
+        manifest = _STRICT_INGEST.load_safe(raw, label="portable manifest")
     except (UnicodeError, ValueError) as exc:
         raise RuntimeError(f"portable manifest is invalid: {exc}") from exc
     required = {
@@ -98,7 +142,23 @@ def _read_manifest_index() -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
     return manifest, index
 
 
+def _authenticate_bootstrap() -> None:
+    """Bind the pre-index bootstrap bytes to the index they were used to read."""
+
+    for relpath, raw in sorted(_BOOTSTRAP_BYTES.items()):
+        row = _MANIFEST_ROWS.get(relpath)
+        if row is None:
+            raise RuntimeError(f"bootstrap module is undeclared: {relpath}")
+        if (
+            len(raw) != row["byte_length"]
+            or hashlib.sha256(raw).hexdigest().upper() != row["sha256"]
+        ):
+            raise RuntimeError(f"bootstrap module failed byte authentication: {relpath}")
+
+
+_STRICT_INGEST, _BOOTSTRAP_BYTES = _bootstrap_shared_law()
 _MANIFEST, _MANIFEST_ROWS = _read_manifest_index()
+_authenticate_bootstrap()
 
 
 def _declared_source(relpath: str) -> tuple[pathlib.Path, bytes]:

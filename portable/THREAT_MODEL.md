@@ -30,6 +30,15 @@ The selected CPython runtime and operating system are trusted dependencies.
 5. **Artifact → host effects.** The engine decides; the host owns effect policy,
    idempotency, reconciliation, logging, and retry.
 
+The bundle's own bootstrap is stated rather than assumed. `cli.py` executes
+`portability/strict_ingest.py`, and through it the frozen core that supplies the
+ingest ceilings, before the manifest index exists — the index is now admitted
+under that same law, so the law cannot be authenticated by it first. Both files
+are declared bundle rows, and both are byte-authenticated against those rows
+immediately after the index is built, before any other repository module loads
+and before any command runs. A substituted law therefore stops the process at
+import instead of deciding what the manifest says.
+
 ## Threats and controls
 
 | Threat | Control | Residual boundary |
