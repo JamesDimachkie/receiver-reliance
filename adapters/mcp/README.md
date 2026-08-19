@@ -144,6 +144,15 @@ used here. Two consequences are worth stating rather than leaving to a reader:
   `unbound`. What is displayed is therefore the predicate that governed *that*
   decision, not whichever bytes happen to be on disk now.
 
+One control a host may already have turned on does **not** sit in this path.
+[`deployment/`](../../deployment/README.md)'s admission profile is a pre-engine
+bound over raw request *bytes*, applied by a host at its own transport seam. This
+gate hands `decide_audited` a Python object it built from a fixture template, so
+an operator who set `RR_ADMISSION_MAX_REQUEST_BYTES` has bounded their own
+transport and has not bounded this one. Nothing here is oversized — the templated
+requests are a few kilobytes — but a host should not read that variable as
+covering this seam.
+
 ## The audit line
 
 Every decision — including preflight rejections and abstentions — appends one
