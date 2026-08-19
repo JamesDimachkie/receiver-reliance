@@ -81,7 +81,10 @@ bindings and the R-CONC-4 refutation all rest on the three unmoved pins.
 
 Affected: the claim that the ladder source *at this revision* is the source that
 produced those receipts. It is not. Anyone re-running the ladder here runs the
-0.4.2 auditor.
+0.4.2 auditor — and one has: the 2026-08-19 regeneration receipt
+(`normative-regeneration-head-2f29e6b-attempt1.json`) reproduces the recorded
+totals exactly at the fourth-move bytes, so the equivalence argument now has a
+re-execution witness beside it.
 
 ## Enforcement
 

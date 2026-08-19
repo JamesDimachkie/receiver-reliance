@@ -57,17 +57,23 @@ and requires a new receipt; prose-only changes do not rewrite the recorded
 run.
 
 **ERRATA E12 — the `../ladder.py` digest above is stale, and stays stale.**
-`4ea69dc` bound these receipts. Two changes have moved `ladder.py` since:
-`ca1ccfe` (`AUDITED_FORMAT_VERSION` `B1-AUDITED-DECISION-0.4` to `0.4.1`, the
-F-MATRIX-016 migration) and the `pinned_tools` adoption, which replaced its bare
-`git` argv. The file now hashes to
-`7CF10CC692FCF938CD69D831FA74C9AD94994073212ACBB75B3F61E57701E798`. The pin is
+`4ea69dc` bound these receipts. Four changes have moved `ladder.py` since:
+`ca1ccfe` (the F-MATRIX-016 format migration), the `pinned_tools` adoption,
+the 0.4.2 count-migration completion, and the shared receipt-path redaction.
+The file now hashes to
+`CD725088C497E36BA9906DB49104F451ECBB7AA1DCF3C2E3F9627722B81050E3`. The pin is
 not refreshed, because refreshing it would assert that the current bytes
 produced the recorded run. What that invalidates and what it does not is set out
 in [`../findings/F-CONC-004.md`](../findings/F-CONC-004.md) and `ERRATA.md` E12.
-`portability/verify_receipts.py` now enforces all four rows of this table: the
+`portability/verify_receipts.py` enforces all four rows of this table: the
 other three must equal the current bytes exactly, and `ladder.py` is bound to
-the post-erratum digest, so a second undisclosed move fails the gate.
+the newest disclosed digest, so a further undisclosed move fails the gate.
+**The re-execution gap is closed (2026-08-19):**
+`normative-regeneration-head-2f29e6b-attempt1.json` reproduces the recorded
+totals exactly — 32 worker runs, 242,400 audited envelopes — at the
+fourth-move bytes, with a smoke sibling, both bound in
+`portability/verify_receipts.py`. The v3 receipts remain the sealed
+chronology; the regeneration pair is the current-bytes witness.
 
 ## Current clean v3 evidence
 

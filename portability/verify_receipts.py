@@ -86,6 +86,29 @@ CONC_WORKER_RUNS = 32
 CONC_AUDITED_ENVELOPES = 242400
 CONC_STATUS = REPO / "portability" / "concurrency" / "receipts" / "STATUS.md"
 
+# Event B (2026-08-19): the re-execution witness E12 and F-CONC-004 named as
+# absent since the first disclosed move.  A full normative ladder run at the
+# fourth-move bytes reproduced the sealed run's totals exactly -- 32 worker
+# runs, 242,400 audited envelopes -- and a smoke sibling matches the v3
+# shape.  Each is bound to its own recorded clean head; the v3 receipts above
+# stay sealed chronology.
+RECONC_NORMATIVE = (
+    REPO / "portability" / "concurrency" / "receipts"
+    / "normative-regeneration-head-2f29e6b-attempt1.json"
+)
+RECONC_SMOKE = (
+    REPO / "portability" / "concurrency" / "receipts"
+    / "smoke-regeneration-head-93a659f-attempt1.json"
+)
+RECONC_NORMATIVE_RAW_SHA256 = (
+    "609AB7983085B14EFF78BCF68A4F327FB6B00C4332D5F8E2705C9A62CF781484"
+)
+RECONC_SMOKE_RAW_SHA256 = (
+    "069F6072023DD1258215620E780CC54F8B8764B0BE807DAEFA8AAFF9F7438BB7"
+)
+RECONC_NORMATIVE_HEAD = "2f29e6b3ae3e5daaf95052ce24edf9a60ea1eb6c"
+RECONC_SMOKE_HEAD = "93a659fa4163b9b4d7c8c35c2444abd6abcbe713"
+
 # Source pins published by ``portability/concurrency/receipts/STATUS.md``.  That
 # table says any change to one of these files invalidates the receipt binding
 # and requires a new receipt.  Nothing enforced it: ``_verify_concurrency``
@@ -642,6 +665,44 @@ def _verify_concurrency(v: _Verifier) -> None:
                 envelopes += participants * run["requests_per_caller"]
     v.check("concurrency.worker_runs", runs == CONC_WORKER_RUNS)
     v.check("concurrency.audited_envelopes", envelopes == CONC_AUDITED_ENVELOPES)
+    # The regeneration pair: same recompute, each bound to its own clean head.
+    for label, path, raw_sha, head in (
+        (
+            "concurrency.regeneration.normative",
+            RECONC_NORMATIVE,
+            RECONC_NORMATIVE_RAW_SHA256,
+            RECONC_NORMATIVE_HEAD,
+        ),
+        (
+            "concurrency.regeneration.smoke",
+            RECONC_SMOKE,
+            RECONC_SMOKE_RAW_SHA256,
+            RECONC_SMOKE_HEAD,
+        ),
+    ):
+        raw = path.read_bytes()
+        v.check(f"{label}.raw_sha256", _sha256_upper(raw) == raw_sha)
+        doc = strict_ingest.load_safe(raw)
+        v.check(
+            f"{label}.clean_source_binding",
+            doc["status"] == "PASS"
+            and doc["git"]["clean"] is True
+            and doc["git"]["head"] == head,
+        )
+    regen = strict_ingest.load_safe(RECONC_NORMATIVE.read_bytes())
+    runs = 0
+    envelopes = 0
+    for section in list(regen["levels"]) + list(regen["soaks"]):
+        participants = section["participants"]
+        for mode in section["modes"]:
+            for run in mode["runs"]:
+                runs += 1
+                envelopes += participants * run["requests_per_caller"]
+    v.check("concurrency.regeneration.worker_runs", runs == CONC_WORKER_RUNS)
+    v.check(
+        "concurrency.regeneration.audited_envelopes",
+        envelopes == CONC_AUDITED_ENVELOPES,
+    )
 
 
 def _verify_source_pins(v: _Verifier) -> None:

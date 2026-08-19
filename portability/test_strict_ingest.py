@@ -283,7 +283,7 @@ class AdoptionIsComplete(unittest.TestCase):
             capture_output=True, text=True, check=False,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn("checks=291 failures=0", result.stdout)
+        self.assertIn("checks=297 failures=0", result.stdout)
 
 
 class ReceiptSuppliedNamesStayInCustody(unittest.TestCase):

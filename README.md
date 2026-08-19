@@ -795,7 +795,7 @@ python -B portability/verify_receipts.py
 python -B portability/verify_hygiene.py
 ```
 
-Expected: `verify-receipts: checks=291 failures=0`, then `HYGIENE_PASS`.
+Expected: `verify-receipts: checks=297 failures=0`, then `HYGIENE_PASS`.
 
 The conformance surface has its own authority gate, because the frozen manifest
 emitters write `failures: 0` and `result: "PASS"` as literals without running

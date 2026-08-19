@@ -361,8 +361,13 @@ revision is running the 0.4.2 auditor, not the 0.4 auditor the receipts
 recorded. F-MATRIX-016 establishes why such migrations are required — the 0.4.1
 and 0.4.2 envelopes keep the frozen six-field surface, so the auditor's seal
 recompute and oracle projection hold unchanged over them — but that is an argument about
-equivalence, not evidence of re-execution. No re-run receipt exists at these
-bytes.
+equivalence, not evidence of re-execution. **That gap closed on 2026-08-19:**
+`normative-regeneration-head-2f29e6b-attempt1.json` is a full re-run at the
+fourth-move bytes reproducing the recorded totals exactly (32 worker runs,
+242,400 audited envelopes), bound with its smoke sibling in
+`portability/verify_receipts.py`. The 4ea69dc pin above still stays as
+published — it describes which bytes produced the *v3* receipts, and no
+re-run changes that.
 
 Enforcement: `portability/verify_receipts.py` now hashes all four published
 sources. Three must equal their published digests. `ladder.py` is bound to the
