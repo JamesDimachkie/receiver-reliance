@@ -203,9 +203,9 @@ class AmbiguousEvidenceIsRefused(unittest.TestCase):
     def test_undecodable_count_lines_cannot_authorize(self) -> None:
         # csf_95727c25: replacement decoding let malformed bytes match a count
         # pattern and contribute to an expected total.
-        good = b"grounded-0.4 regression: checks=517 failures=0\n"
-        forged = b"grounded-0.4 regression: checks=517 \xff\xfe failures=0\n"
-        self.assertEqual(receipt.parse_suite_counts(good, b"")["checks"], [517])
+        good = b"grounded-0.4 regression: checks=521 failures=0\n"
+        forged = b"grounded-0.4 regression: checks=521 \xff\xfe failures=0\n"
+        self.assertEqual(receipt.parse_suite_counts(good, b"")["checks"], [521])
         self.assertEqual(receipt.parse_suite_counts(forged, b"")["checks"], [])
 
     def test_duplicate_count_names_cannot_reach_an_expected_total(self) -> None:

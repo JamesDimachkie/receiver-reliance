@@ -91,7 +91,7 @@ ALLOWED = {
     ),
     "perf/sidecar/verify_receipts.py": (
         316,
-        "690B363B9A4598B4E3F1D8541AA0451C7925A5BC25068D68CB3C5FF29F3F0A21",
+        "8085DAB77B6804BE25CB84D438B110CB371D8013EFD6E2473C297ACD8B733A8F",
     ),
     "second-implementation/receipts/AUTHOR_INCREMENT_RECEIPT_0_1.json": (
         189,

@@ -130,6 +130,12 @@ _AUTHORITY_REGISTER_RAW = _read_pinned_bytes(
     "C3414FC751C3B5ECA43A4932C694641D801A21F2CF53C42BE3A8C87C234CF499",
     "grounded authority register",
 )
+_PRIMARY_CONTRACT_RAW = _read_pinned_bytes(
+    _HERE.parent / "baseline-run" / "control" / "B1_PRIMARY_IMPLEMENTER_CONTRACT_0_1.json",
+    321451,
+    "DCFCB0714E1A7E677548057987F604D227F791F3FC3E0EA89BE5ED932447F48E",
+    "accepted 0.2 decision-table contract",
+)
 _SUPPLEMENTAL_CONTRACT_RAW = _read_pinned_bytes(
     _SUPPLEMENTAL_CONTRACT,
     159277,
@@ -164,7 +170,7 @@ if b1.jcs_bytes(b1.authority_documents()["contract"]) != b1.jcs_bytes(
 ):
     raise RuntimeIntegrityError("composed authority contract changed during loading")
 
-AUDIT_FORMAT = "B1-AUDITED-DECISION-0.4.1"
+AUDIT_FORMAT = "B1-AUDITED-DECISION-0.4.2"
 
 _CLOSURES: dict[str, list[dict]] = json.loads(_CLOSURE_POLICY_RAW)[
     "closures_by_obligation"
@@ -172,14 +178,31 @@ _CLOSURES: dict[str, list[dict]] = json.loads(_CLOSURE_POLICY_RAW)[
 
 # The exact bytes that govern every audited decision this process produces.
 # Sealing these digests into each audit makes decisions produced under
-# different closure policies, authority registers, or engine sources
-# distinguishable by seal (ERRATA E8); the repository commit remains the
-# trust root that authenticates the digests themselves (TRUST_MODEL.md).
+# different closure policies, authority registers, engine sources, OR DECISION
+# TABLES distinguishable by seal; the repository commit remains the trust root
+# that authenticates the digests themselves (TRUST_MODEL.md).
+#
+# The last of those was missing until 0.4.2, and its absence was the point of
+# the field. E8 introduced `governing_authorities` so that decisions produced
+# under different governing bytes would be distinguishable by seal -- and then
+# sealed the closure policy, the authority register and the two engine SOURCE
+# files, but not the contract holding the thirty rows and every predicate atom
+# the engine executes. Two parties running different decision tables therefore
+# produced byte-identical `governing_authorities`, so a recipient holding an
+# envelope could not tell which law decided it. That is provable by
+# construction rather than by attack: the digests were computed from four files,
+# none of which was a contract, so changing the table could not change the seal.
+# A local tamper was still caught, because both contracts are engine-manifest
+# rows and `import receiver_reliance` verifies them -- the gap was never local
+# forgery, it was cross-party identification, which is exactly what an audit
+# envelope is for.
 GOVERNING_AUTHORITIES: dict[str, str] = {
     "closure_policy_sha256": hashlib.sha256(_CLOSURE_POLICY_RAW).hexdigest().upper(),
     "authority_register_sha256": hashlib.sha256(_AUTHORITY_REGISTER_RAW).hexdigest().upper(),
     "engine_capabilities_sha256": "4D9FA1C9CCB60B980BCE1739FE8FDC10E84AEFC03D4C20E2AA1A8B0BBE2D18FC",
     "engine_runner_sha256": "83319385C8B6D28965F4683B8C0689FB70158E86ED35D54E7467E8E3DF076E09",
+    "decision_table_contract_sha256": hashlib.sha256(_PRIMARY_CONTRACT_RAW).hexdigest().upper(),
+    "composed_contract_sha256": hashlib.sha256(_SUPPLEMENTAL_CONTRACT_RAW).hexdigest().upper(),
 }
 
 _CLASS_ORDER = ("MALFORMED_OR_BOUNDARY", "BINDING_OR_CONFLICT", "OMISSION_OR_INCOMPLETE")

@@ -1,5 +1,5 @@
 {"step":0,"action":"write","bytes_b64":"eAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4CngKeAp4Cg==","barrier":"batch-written"}
 {"step":1,"action":"pause","barrier":"backpressure-observed"}
 {"step":2,"action":"resume","barrier":"reader-resumed"}
-{"step":3,"action":"read","range":[0,158772],"barrier":"buffered-responses-read"}
+{"step":3,"action":"read","range":[0,184186],"barrier":"buffered-responses-read"}
 {"step":4,"action":"close_half","barrier":"input-half-closed"}

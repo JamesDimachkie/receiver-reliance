@@ -79,7 +79,7 @@ GATES = (
         "grounded_0_4_regression",
         "/repo",
         ("python", "-B", "grounded-0_4/test_grounded_0_4.py"),
-        "checks_517",
+        "checks_521",
     ),
     GateSpec(
         "contract_lint",
@@ -480,7 +480,7 @@ def validate_gate_output(validator: str, stdout: bytes, stderr: bytes) -> dict[s
         return observed
 
     count_validators = {
-        "checks_517": 517,
+        "checks_521": 521,
         "checks_9": 9,
         "checks_2296": 2296,
         "checks_6497": 6497,
@@ -490,6 +490,7 @@ def validate_gate_output(validator: str, stdout: bytes, stderr: bytes) -> dict[s
         # replay through these via verify_receipts.py; no live GateSpec
         # references them.
         "checks_504": 504,
+        "checks_517": 517,
         "checks_7": 7,
     }
     if validator in count_validators:

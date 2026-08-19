@@ -163,6 +163,8 @@ check(
         "authority_register_sha256",
         "engine_capabilities_sha256",
         "engine_runner_sha256",
+        "decision_table_contract_sha256",
+        "composed_contract_sha256",
     },
     str(sorted(gov)),
 )
@@ -177,19 +179,37 @@ for gov_key, gov_path in (
         "engine_runner_sha256",
         REPO / "baseline-run" / "implementation-output-0.3" / "pcb_runner.py",
     ),
+    (
+        "decision_table_contract_sha256",
+        REPO / "baseline-run" / "control" / "B1_PRIMARY_IMPLEMENTER_CONTRACT_0_1.json",
+    ),
+    (
+        "composed_contract_sha256",
+        REPO / "supplemental-0_3" / "control" / "B1_SUPPLEMENTAL_COMPARATOR_CONTRACT_0_3.json",
+    ),
 ):
     check(
         f"governance:{gov_key}-matches-disk",
         gov[gov_key] == b1.sha256_upper(gov_path.read_bytes()),
         gov[gov_key],
     )
-check("governance:format-bumped", clean["format_version"] == "B1-AUDITED-DECISION-0.4.1")
+check("governance:format-bumped", clean["format_version"] == "B1-AUDITED-DECISION-0.4.2")
 gov_mut = copy.deepcopy(clean)
 gov_mut["audit"]["governing_authorities"]["closure_policy_sha256"] = "0" * 64
 check(
     "governance:seal-covers-governing-digests",
     b1.self_zero_sha256(gov_mut, "audit_sha256") != clean["audit_sha256"],
 )
+# 0.4.2: the law itself is sealed. Before this, two parties running different
+# decision tables produced byte-identical governing_authorities, so an envelope
+# could not identify the law that decided it.
+for _new_key in ("decision_table_contract_sha256", "composed_contract_sha256"):
+    _law_mut = copy.deepcopy(clean)
+    _law_mut["audit"]["governing_authorities"][_new_key] = "0" * 64
+    check(
+        f"governance:seal-covers-{_new_key}",
+        b1.self_zero_sha256(_law_mut, "audit_sha256") != clean["audit_sha256"],
+    )
 _obl30_rows = rr_api._CLOSURES.get("OBL-30", [])
 _broken_row = {
     "closure_id": "TEST-BROKEN-EVALUATOR",

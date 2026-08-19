@@ -215,6 +215,11 @@ SANDBOX_DOCKERFILE = REPO / "portability" / "sandbox" / "Dockerfile"
 # evidence; their streams replay through the validators that governed that
 # era, not the current-tree pins.
 LEGACY_GATE_VALIDATORS = {
+    # 0.4.2 sealed the decision table into governing_authorities, which added
+    # four mutation arms to the grounded suite: 517 -> 521.  The GateSpec now
+    # says checks_521; every sealed receipt keeps its own era's count here.
+    # Same law as checks_504 below and unittest_7 further down -- a pinned
+    # program-era truth moves in the same change as the truth (F-MATRIX-013..017).
     "grounded_0_4_regression": "checks_504",
     "lint_gate_meta": "checks_7",
     # 3985356 added two regressions to proof/test_proof_harness.py, taking it
