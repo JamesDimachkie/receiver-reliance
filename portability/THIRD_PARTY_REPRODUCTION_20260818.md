@@ -149,10 +149,13 @@ column rests on the hosted receipt set under `portability/receipts/hosted/`, whi
 is pinned and mechanically re-checkable — `verify_receipts.py` covers it — but
 historical: it was produced in the `6ad8b21` era, not at this commit. Bringing it
 current needs a hosted run, which is row A2 of [ADOPTION.md](../ADOPTION.md); the
-workflow trigger that made that impossible has now been repaired, so the run
-happens when the branch reaches `main`.
+workflow trigger that made that impossible has been repaired to fire on `main`,
+which the branch has now reached. No hosted multi-OS run at these bytes is
+recorded yet, so that half of A2 stays open until one is.
 
-It also does not establish anything a clone of the published default branch can
-reach: this commit is ahead of `origin/main`, so a third party cloning today still
-gets a different artifact. That is row A1, and it is the one remaining thing
-between this evidence and a third party being able to see it.
+It also did not, when written, establish anything a clone of the published
+default branch could reach: this commit was ahead of `origin/main`, so a third
+party cloning that day still got a different artifact. That was row A1.
+**Closed 2026-08-18:** the branch was merged fast-forward into `main` and
+published at tag `v1.2.1`, so a clone of the default branch now carries the
+bytes this record was made against.

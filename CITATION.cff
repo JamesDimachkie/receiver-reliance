@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use or cite this artifact, please cite it as below."
+title: "Receiver-reliance baseline: conformance suite and reference implementation"
+abstract: >-
+  A deterministic, auditable comparator for the decision a receiving agent makes
+  about records handed to it by another agent. Ships a frozen 28-operation
+  decision engine, a supplemental 2-operation generation closing its reviewed
+  capability gaps, both conformance fixture suites, reference implementations
+  that reproduce them byte-for-byte, and an audited decision surface whose
+  results are mechanically re-derivable from published bytes.
+type: software
+authors:
+  - given-names: James
+    family-names: Dimachkie
+repository-code: "https://github.com/JimGHTB12/receiver-reliance"
+license: Apache-2.0
+version: "1.2.1"
+date-released: "2026-08-18"
+keywords:
+  - agent-security
+  - ai-safety
+  - multi-agent-systems
+  - conformance-testing
+  - reproducible-research
