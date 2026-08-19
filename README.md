@@ -201,7 +201,7 @@ read as claiming; nothing here adds a guarantee.
 
 | Import surface | Names |
 |---|---|
-| `receiver_reliance` | `__all__` is exactly `decide_audited`, `verify_audit_seal`, `closure_findings`, `derive_record_references`, `AUDIT_FORMAT`, `ENGINE_MANIFEST_SHA256`. Also public and outside `__all__`: `ENGINE_MANIFEST` — the parsed `engine_manifest.json`, keys `format_version` (`RR-ENGINE-MANIFEST-1`), `file_count` (11), `total_byte_length`, `manifest_sha256`, `files` — and `__version__`. |
+| `receiver_reliance` | `__all__` is exactly `decide_audited`, `decide_audited_observed`, `response_bytes_observed`, `verify_audit_seal`, `closure_findings`, `derive_record_references`, `AUDIT_FORMAT`, `DecisionObservation`, `ENGINE_MANIFEST_SHA256`. Also public and outside `__all__`: `ENGINE_MANIFEST` — the parsed `engine_manifest.json`, keys `format_version` (`RR-ENGINE-MANIFEST-1`), `file_count` (11), `total_byte_length`, `manifest_sha256`, `files` — and `__version__`. |
 | `receiver_reliance.conformance` | `execute` only. Explicitly non-evidentiary; see "What is not supported". |
 | `adapters` | `__all__` is exactly these ten: `preflight`, `process_jsonl`, `PreflightResult`, `PreflightIssue`, `READY`, `REJECTED_INVALID`, `INSUFFICIENT_EVIDENCE`, `RESULT_STATUSES`, `RESULT_FORMAT_VERSION`, `FACT_PROFILE_FORMAT_VERSION`. Also public and outside `__all__`: the `portable_preflight` submodule. |
 | `grounded-0_4/rr_api.py` | No `__all__`. Public names: `decide_audited`, `closure_findings`, `derive_record_references`, `conformance_execute`, `authority_for_operation`, `AUDIT_FORMAT`, `GOVERNING_AUTHORITIES`, `RuntimeIntegrityError`, plus the loaded-module handles `authority_surface`, `b1`, and `pcb_runner`. The three handles are the byte-verified engine internals: reachable by construction, deliberately not an API. |
@@ -252,6 +252,88 @@ facts it judged were true. Nothing here is signed, deliberately
 author its seal. This detects corruption and tampering in transit; it is not
 authentication, and `receiver_reliance/test_audit_seal.py` pins that limit with
 a re-forging test that must succeed.
+
+`decide_audited_observed(request, observer=None)` and
+`response_bytes_observed(request, observer=None)` are `decide_audited` and the
+transport's response line with one measurement handed to a caller-supplied
+`observer` after the result exists. The observer is an **argument**: there is no
+install call, no module-level slot, and no environment variable that turns one
+on, so two callers in one process cannot instrument each other and a caller that
+passes none is not instrumented at all. `observer=None` is the default and is a
+passthrough — one identity test, then the same call, no clock read taken
+(measured at 24 ns on Windows/CPython 3.12).
+
+**Observability here is a property of the wrapper, not of the engine.** No
+sealed envelope records that an observer was attached, because no part of a
+decision depends on one: the same request yields the same envelope bytes and the
+same `audit_sha256`, observed or not. An envelope is not evidence about who was
+watching, and `receiver_reliance/test_observe.py` is the proof rather than the
+assertion — it re-decides `examples/`, all 124 committed semantic fixtures in
+both wire and object form, seven protocol-error surfaces, six object-refusal
+surfaces and 155 deterministic `fuzz/fuzz.py` cases, with and without observers,
+and compares JCS bytes. This is the second attempt at this seam. The first was
+refuted by its own byte test: its observer *returned* the envelope, a host added
+a correlation id, and the response moved from 1,774 bytes to 1,799.
+
+**What an observer sees.** One `DecisionObservation` per decision — a
+`NamedTuple` whose every field is an `int`, a `str` or `None`: `decision_class`
+and `exit_code` (the envelope's own), `request_bytes` and `response_bytes`,
+and four spans, `ingest_ns`, `decide_ns`, `serialize_ns`, `wall_ns`, plus
+`cpu_ns`. It holds no reference to the envelope, the response bytes, or the
+request, so an observer that keeps records keeps no request content.
+
+**What an observer cannot see.** Request or response content, obligation,
+operation handle, record identifiers, digests, closure findings, witness trace
+— none of it is in the record, and none of it is reachable from one. Nor can it
+see inside the frozen engine: `ingest_ns` is the wrapper's own pre-engine work
+and nothing more, because decoding, canonicalization and the size ceiling all
+happen behind `decide_audited`. Today the wrapper admits nothing, so `ingest_ns`
+is the cost of reading a length. `serialize_ns` and `response_bytes` are `None`
+from `decide_audited_observed`, which forms no response bytes. `cpu_ns` is
+process-wide, and its granularity is the platform's: measured on
+Windows/CPython 3.12 the process-CPU clock advances once per 15,625,000 ns
+against a decision of roughly 2.8–3.5 ms, so nearly every record on that host
+reports zero — while `time.get_clock_info("process_time").resolution` there
+*declares* 100 ns. No constant is published for this, because the declared one
+is the number that is wrong; `test_observe.py` measures the effective tick
+wherever it runs and prints it.
+
+**What an observer cannot do.** Alter control flow, or change a byte. Its
+return value is discarded, so it cannot substitute a decision by returning one.
+Every exception it raises is discarded, of any class — including
+`KeyboardInterrupt` and `SystemExit` — so that "an observer cannot change a
+decision" is total rather than true for the classes someone remembered. Two
+consequences, disclosed rather than hidden: a broken observer is invisible to
+the caller and must carry its own error channel, and an interrupt delivered
+while the observer runs is swallowed with it, a window an observer widens by
+blocking. Engine exceptions are **not** caught: the suppression covers the
+observer and nothing else. Nothing here writes a file, opens a socket, or reads
+the environment (`ERRATA.md` E17).
+
+**What this is not.** A sandbox. One frame above an observer there is nothing
+but the record and the observer itself — the wrapper releases the envelope
+before the call, and the suite pins that — but an observer that walks `f_back`
+reaches the wrapper and the decision it holds. That is not a hole this seam
+opened: a host able to pass an observer was already able to rebind
+`decide_audited` outright. The guarantee is that the seam hands over no
+reference and takes no authority, not that Python withholds authority the caller
+already had, and `test_observe.py` pins the limit with a frame-walking observer
+that must **succeed** — the same shape as the re-forging test above. An
+untrusted observer belongs in another process. Nor is it a budget: a blocking
+observer delays its caller and nothing here bounds it.
+
+**Why it exists, and what is deliberately absent.** This artifact prices a
+decision by request length, and that proxy under-charges 43 of the 136 requests
+in its own measured corpus at p50 (measurement phase, 2026-08-19). An admission
+bound built on a proxy that is wrong a third of the time is a bound on paper, so
+the measuring lands first and alone. Absent by decision, not oversight: no
+counters, no histograms, no ring buffer, no aggregation, no emitter, no
+per-predicate tracing, no memory profiling, no sampling policy, no observed
+`serve` loop — a host that wants an observed stream calls
+`response_bytes_observed` once per line. The instrumented path costs 1,165 ns
+per decision on Windows/CPython 3.12 with a no-op observer, which is 0.033% of a
+3.5 ms decision; the observer's own work is the host's, and is not in that
+number.
 
 `rr_batch.serve(source, sink)` is a supported transport, not merely a file
 with recorded bounds. It reads one request per physical line from a binary
@@ -774,6 +856,8 @@ skipping it), then re-derive every seal per the RUNBOOK, then, from the reposito
 `python -B receiver_reliance/generate_engine_manifest.py --check`,
 `python -B receiver_reliance/test_engine_manifest.py`,
 `python -B receiver_reliance/test_audit_seal.py`,
+`python -B receiver_reliance/test_observe.py` (which re-decides every
+committed corpus with and without an observer and compares JCS bytes),
 `python -B portability/test_home_path_disclosure.py` (which recomputes
 `ERRATA.md` E15's disclosure against current bytes),
 `python -B deployment/test_admission.py` (25 tests over the off-by-default

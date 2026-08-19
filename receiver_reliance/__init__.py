@@ -35,6 +35,8 @@ import importlib.util
 import json
 import pathlib
 import sys
+import time
+from typing import Callable, NamedTuple
 
 _HERE = pathlib.Path(__file__).resolve().parent
 _ENGINE_ENTRY = "grounded-0_4/rr_api.py"
@@ -182,14 +184,234 @@ def verify_audit_seal(envelope: object) -> bool:
     return recomputed == recorded.upper()
 
 
+# --- observability -------------------------------------------------------
+#
+# An observer is an ARGUMENT. There is no install call here, no module-level
+# slot holding one, and no environment variable that turns one on, so two
+# callers in one process cannot silently instrument each other and a caller
+# that passes none is not instrumented at all.
+#
+# Observability here is a property of the WRAPPER, not of the engine. No
+# sealed envelope records that an observer was attached, because no part of a
+# decision depends on one: the same request yields the same envelope bytes and
+# the same audit seal, observed or not. An envelope is therefore not evidence
+# about who was watching and cannot be read as any.
+#
+# Why the seam exists at all: this artifact prices a decision by request
+# length, and that proxy under-charges 43 of the 136 requests in its own
+# measured corpus at p50 (2026-08-19 measurement phase; the same run put the
+# probe body at well under a thousandth of a decision). An admission bound
+# built on a proxy that is wrong a third of the time is a bound on paper.
+# Measuring precedes bounding, so the measuring lands first and alone.
+
+class DecisionObservation(NamedTuple):
+    """What an observer is handed: one decision's outcome and cost, as scalars.
+
+    Every field is an ``int``, a ``str`` or ``None``. The record holds no
+    reference to the envelope, to the response bytes, or to the request, so an
+    observer that keeps one cannot reach the decision through it, and a host
+    may retain it without retaining request content.
+
+    ``decision_class`` and ``exit_code`` are the envelope's own
+    ``audited_behavior_class`` and ``exit_code``. ``request_bytes`` is the
+    request's length when the request was exact wire bytes and ``None``
+    otherwise: an object has no wire length until the engine canonicalizes it,
+    and this wrapper does not canonicalize on the engine's behalf to obtain
+    one. ``response_bytes`` is the serialized response's length, and is
+    ``None`` from ``decide_audited_observed``, which forms no response bytes.
+
+    The three spans partition the wrapper's wall time. ``ingest_ns`` is the
+    wrapper's own pre-engine work and nothing else -- decoding, duplicate-key
+    rejection, canonicalization and the size ceiling all happen inside the
+    frozen engine behind ``decide_audited``, where a wrapper cannot see them.
+    Today the wrapper admits nothing, so ``ingest_ns`` is the cost of reading a
+    length; that is the honest report, and it is the number that would move
+    first if an admission bound were ever added at this seam. ``decide_ns`` is
+    the ``decide_audited`` call. ``serialize_ns`` is JCS serialization plus the
+    terminating LF, and is ``None`` when nothing was serialized. ``wall_ns``
+    spans the whole wrapper and is not the sum of the three: it also covers the
+    wrapper's own bookkeeping between them.
+
+    ``cpu_ns`` is process CPU time over that same span, from
+    ``time.process_time_ns``. Two limits, both real. It is process-wide, so in
+    a threaded host it counts other threads' work as well. And its granularity
+    is the platform's: where a tick is coarser than a decision, ``cpu_ns`` is a
+    tick counter rather than a measurement. Measured on Windows/CPython 3.12,
+    the effective tick is 15,625,000 ns against a decision of roughly 2.8 ms,
+    so nearly every record on that host reports zero -- while
+    ``time.get_clock_info("process_time").resolution`` there *declares* 100 ns.
+    No constant is published for this, because the interpreter's declared value
+    is the one number that would be wrong. ``test_observe.py`` measures the
+    effective tick on whatever host runs it and prints it; read that, not a
+    declaration, before believing this field.
+    """
+
+    decision_class: str
+    exit_code: int
+    request_bytes: int | None
+    response_bytes: int | None
+    ingest_ns: int
+    decide_ns: int
+    serialize_ns: int | None
+    wall_ns: int
+    cpu_ns: int
+
+
+def _notify(
+    observer: Callable[[DecisionObservation], object],
+    envelope: dict,
+    request_bytes: int | None,
+    response_bytes: int | None,
+    ingest_ns: int,
+    decide_ns: int,
+    serialize_ns: int | None,
+    wall_ns: int,
+    cpu_ns: int,
+) -> None:
+    """Build one record and hand it over, after the result already exists.
+
+    The observer's return value is discarded, so an observer cannot substitute
+    a decision by returning one -- the shape that refuted the first attempt at
+    this seam, where an observer returned the envelope and a host that added a
+    correlation id to it moved the response from 1,774 bytes to 1,799.
+
+    Every exception it raises is discarded too, of any class, so that "an
+    observer cannot change a decision" is total rather than true for the
+    exception classes someone remembered. Two consequences, disclosed rather
+    than hidden: a broken observer is invisible to the caller and has to carry
+    its own error channel, and a ``KeyboardInterrupt`` delivered while the
+    observer is running is swallowed with it -- a window an observer widens by
+    blocking. Constructing the record happens inside the same protected region,
+    so a defect in this function cannot reach the caller either.
+
+    What this does not do is sandbox. One frame above an observer there is
+    nothing but the record and the observer itself -- the envelope is released
+    before the call, and the suite pins that -- but an observer that walks
+    ``f_back`` reaches the wrapper and the decision it is holding. That is not
+    a hole this seam opened: a host able to pass an observer was already able
+    to rebind ``decide_audited`` outright. The guarantee is that the seam hands
+    over no reference and takes no authority, not that Python withholds
+    authority the caller already had. ``receiver_reliance/test_observe.py``
+    pins the limit with a frame-walking observer that must SUCCEED. An
+    untrusted observer belongs in another process.
+    """
+    try:
+        observation = DecisionObservation(
+            decision_class=envelope["audited_behavior_class"],
+            exit_code=envelope["exit_code"],
+            request_bytes=request_bytes,
+            response_bytes=response_bytes,
+            ingest_ns=ingest_ns,
+            decide_ns=decide_ns,
+            serialize_ns=serialize_ns,
+            wall_ns=wall_ns,
+            cpu_ns=cpu_ns,
+        )
+        # Load-bearing, not tidiness: without it this frame still holds the
+        # envelope, and an observer reading one frame up would be handed the
+        # decision after all. Extraction stays inside the protected region.
+        del envelope
+        observer(observation)
+    except BaseException:
+        return
+
+
+def decide_audited_observed(
+    request: object,
+    observer: Callable[[DecisionObservation], object] | None = None,
+) -> dict:
+    """``decide_audited``, with one observation handed over after it returns.
+
+    Returns what ``decide_audited(request)`` returns: equal as an object and
+    byte-identical under JCS, for every input either accepts, with any observer
+    or none. ``observer=None`` is the default and is a passthrough -- one
+    identity test, then the same call, with no clock read taken and no record
+    built. An observer is called exactly once per decision, never before the
+    envelope is complete, and never on the passthrough.
+
+    ``receiver_reliance/test_observe.py`` is the proof: ``examples/``, the 124
+    committed semantic fixtures in both object and wire form, the
+    protocol-error and object-refusal surfaces, and a deterministic
+    ``fuzz/fuzz.py`` sample, each decided with and without observers and
+    compared byte-for-byte.
+    """
+    if observer is None:
+        return decide_audited(request)
+    start_wall = time.perf_counter_ns()
+    start_cpu = time.process_time_ns()
+    request_bytes = len(request) if type(request) is bytes else None
+    ingest_end = time.perf_counter_ns()
+    envelope = decide_audited(request)
+    decide_end = time.perf_counter_ns()
+    end_cpu = time.process_time_ns()
+    _notify(
+        observer,
+        envelope,
+        request_bytes,
+        None,
+        ingest_end - start_wall,
+        decide_end - ingest_end,
+        None,
+        decide_end - start_wall,
+        end_cpu - start_cpu,
+    )
+    return envelope
+
+
+def response_bytes_observed(
+    request: object,
+    observer: Callable[[DecisionObservation], object] | None = None,
+) -> bytes:
+    """One NDJSON response line, with one observation handed over after it exists.
+
+    For exact wire bytes this returns what ``grounded-0_4/rr_batch.py``'s
+    ``response_bytes`` returns -- the JCS envelope and a terminating LF -- and
+    the proof suite pins that equality across the corpus rather than asserting
+    it. It accepts the same input domain as ``decide_audited``, so an object
+    request is answered with the line the engine would produce for its
+    canonical bytes.
+
+    This is the only route on which ``serialize_ns`` and ``response_bytes`` can
+    be observed, because it is the only one where the wrapper forms response
+    bytes. It reads and writes no stream: ``rr_batch.serve`` remains the
+    transport, and a host wanting an observed stream calls this once per line.
+    """
+    if observer is None:
+        return _module.b1.jcs_bytes(decide_audited(request)) + b"\n"
+    start_wall = time.perf_counter_ns()
+    start_cpu = time.process_time_ns()
+    request_bytes = len(request) if type(request) is bytes else None
+    ingest_end = time.perf_counter_ns()
+    envelope = decide_audited(request)
+    decide_end = time.perf_counter_ns()
+    response = _module.b1.jcs_bytes(envelope) + b"\n"
+    serialize_end = time.perf_counter_ns()
+    end_cpu = time.process_time_ns()
+    _notify(
+        observer,
+        envelope,
+        request_bytes,
+        len(response),
+        ingest_end - start_wall,
+        decide_end - ingest_end,
+        serialize_end - decide_end,
+        serialize_end - start_wall,
+        end_cpu - start_cpu,
+    )
+    return response
+
+
 ENGINE_MANIFEST_SHA256 = ENGINE_MANIFEST["manifest_sha256"]
 
 __all__ = [
     "decide_audited",
+    "decide_audited_observed",
+    "response_bytes_observed",
     "verify_audit_seal",
     "closure_findings",
     "derive_record_references",
     "AUDIT_FORMAT",
+    "DecisionObservation",
     "ENGINE_MANIFEST_SHA256",
 ]
 __version__ = "1.2.1"
