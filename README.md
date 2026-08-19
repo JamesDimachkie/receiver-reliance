@@ -63,7 +63,7 @@ attention card, so experiment arms can control for ceremony.
 
 Requires CPython 3.12 or newer; 3.12, 3.13, and 3.14 are validated on the
 hosted matrix (see "Cross-platform validation" below), and re-run against a
-clean clone at `72efd11`, twenty-two commits into this release, in
+clean clone at `72efd11`, the tenth commit of this release, in
 [portability/THIRD_PARTY_REPRODUCTION_20260818.md](portability/THIRD_PARTY_REPRODUCTION_20260818.md).
 From `baseline-run/`:
 
@@ -306,7 +306,7 @@ path-conditional, and their absence is meaningful:
 | `matched_class_witness` | Only when the sealed response is `ok` | Array of atoms from the matched class predicate: `{op, pointers}`, or `{op: "not", of: ...}`. Empty when the **sealed** class is `VALID`, there being no matched predicate to witness — including when a closure then tightened the audited class to a defect, because the witness traces the frozen predicate table and not the closures. That evidence is in `closure_findings`. |
 | `record_references` | Only when the sealed response is `ok` | `derive_record_references` over `decision_input.facts`: sorted, deduplicated, at most 64 strings. This is the derived list the sealed response lacks. |
 | `record_references_truncated` | Only when the sealed response is `ok` | Boolean; true exactly when the derived set exceeded the 64-item cap, so the cap is disclosed rather than silent. |
-| `closure_findings` | Only when the sealed response is `ok` | Array, empty when nothing fired. A fired entry is `{closure_id, fired, tightens_to, statement}`; an errored entry is `{closure_id, fired, evaluator_error}` with the error string truncated. Six closure IDs exist, all OBL-30. An errored closure on an otherwise-`VALID` decision makes the class `AUDIT_INCOMPLETE` (`ERRATA.md` E9). |
+| `closure_findings` | Only when the sealed response is `ok` | Array, empty when nothing fired. A fired entry is `{closure_id, fired, tightens_to, statement}`; an errored entry is `{closure_id, fired, evaluator_error}` with the error string truncated. **Three** closure IDs reach a caller here — `OBL-30-C1`, `-C2`, `-C3` — because the sealed `closures_0_4.json` defines closures for OBL-30 alone and `closure_findings` returns exactly those. Three further OBL-30 identifiers, `-R1` through `-R3`, exist as runtime bindings inside the evaluator and are **not** enumerated by the sealed closure-policy digest; that gap is a disclosed residual, not a fourth-to-sixth closure you can call. An errored closure on an otherwise-`VALID` decision makes the class `AUDIT_INCOMPLETE` (`ERRATA.md` E9). |
 | `transport_error`, `request_prefix_sha256`, `request_prefix_bytes` | Only from `rr_batch`, and only when a record crossed the physical-line ceiling without terminating | `transport_error` is `ERR_BATCH_RECORD_LIMIT`. The prefix fields report the digest of the bytes actually consumed and that count, so the refusal names what it saw without claiming a digest of a request it never received in full. |
 
 The sealed response has two shapes, distinguished by its own `format_version`.
@@ -716,9 +716,11 @@ finite bounds, and nowhere else.
 ## Contributing / re-verification
 
 The highest-value additions are adversarial, and both invited classes now
-have recorded first attempts. A deterministic seeded campaign (100,000
-case identities, 67,599 unique raw byte strings, zero findings) ran on
-2026-08-10 (`fuzz/`, `orchestration/FUZZ_CAMPAIGN.md`). A coverage-guided
+have recorded first attempts. A deterministic seeded campaign ran on
+2026-08-10 across two harnesses: `fuzz/fuzz.py` contributed 50,000 case
+identities and `perf/batch_campaign.py` the other 50,000, for a
+100,000-identity aggregate with 67,599 unique raw byte strings and zero
+findings (`orchestration/FUZZ_CAMPAIGN.md`, `orchestration/BATCH_50K.md`). A coverage-guided
 differential campaign now has a recorded first run (hosted, 2026-08-13):
 steering on reference branch coverage, it refuted the then-current
 second-implementation candidate at identity 588

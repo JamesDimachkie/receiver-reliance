@@ -480,7 +480,7 @@ pattern in roughly eighty blobs across fifty-five paths, including
 `portability/receipts/local-expanded-gate-hardening-6776332.json`, the leaked
 charter-gate receipt this erratum describes as regenerated. It was regenerated
 and removed from the tip — it was not removed from history, and the honest
-release posture is the full 24-commit history unsquashed. So the sentence above
+release posture is the full release history unsquashed. So the sentence above
 means the leak is not in what you check out; it does not mean the leak is not in
 what you cloned. Filtering history is not planned: it would rewrite published
 commits, which this project does not do.
@@ -518,7 +518,12 @@ fifty-two, because nothing currently tracked needed the looser rule.
 the pattern is account-specific, so a generator running under a POSIX `/home`, a
 different account name, or a display-name home directory introduces an instance
 this gate does not see; it decodes UTF-8 with `errors="ignore"`, so a UTF-16 or
-other non-UTF-8 file is effectively skipped (none is tracked today, checked); it
+other non-UTF-8 file is effectively skipped (none is tracked today, checked);
+it matches literal text only, so an encoded representation is invisible — this
+repository's own receipts store captured subprocess output base64-encoded in
+`stdout_b64`/`stderr_b64`, so a locally-generated receipt whose captured output
+named the home directory would pass (every base64 run of forty characters or
+more in every tracked file was decoded and scanned: zero instances today); it
 reads the worktree rather than the index; and **it is not yet wired into any
 hosted workflow**, so today it runs when a person runs it — which is the same
 "control outside the decision path" shape that reopened `ADOPTION.md` A5, and it

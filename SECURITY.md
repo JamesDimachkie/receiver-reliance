@@ -39,8 +39,10 @@ repository is built so that one is possible for everything in scope above.
 Three exceptions are already ledgered and are not oversights: the `proof/` arm
 scripts need an operator-only extractor (`WITHHELD.md`), the sealed
 subprocess-ABI conformance mode pins a Windows interpreter that is not
-distributed ([ADOPTION.md](ADOPTION.md)), and `portability/verify_hygiene.py`
-shells `git`, so it needs a real clone rather than an unpacked archive.
+distributed ([ADOPTION.md](ADOPTION.md)), and every verifier that shells `git` for
+custody or provenance — `verify_hygiene.py`, `test_home_path_disclosure.py`,
+`run_local_expanded_gate.py`, and the concurrency, matrix and sandbox harnesses
+— needs a real clone rather than an unpacked archive.
 
 ## What to expect
 

@@ -120,8 +120,8 @@ record, or fetches it, and evaluates again.
 | `VALID` / `SATISFIED` | 0 | Proceed with the action the profile describes. |
 | `MALFORMED_OR_BOUNDARY` or `BINDING_OR_CONFLICT` / `VIOLATED` | 1 | Refuse, or repair the named defect and re-evaluate. |
 | `OMISSION_OR_INCOMPLETE` / `UNRESOLVED` | 1 | Ask the sender or fetch the missing basis, then re-evaluate. |
-| `INCOMPLETE` (protocol error — the request never reached classification) | 2 | Fix the request; nothing was judged. |
-| `INCOMPLETE` (`ERR_INTERNAL`) | 3 | Report it; the engine refused rather than guessed. |
+| *(none — `output` is `null`, top-level `result` is `INCOMPLETE`)* protocol error | 2 | Fix the request; nothing was judged. |
+| *(none — as above)* `ERR_INTERNAL` | 3 | Report it; the engine refused rather than guessed. |
 
 The proceed / refuse / ask policy belongs to the host. The engine
 classifies and seals. It never acts.

@@ -144,6 +144,13 @@ class AdoptionIsReal(unittest.TestCase):
     # reason is part of the assertion, so removing the blocker without
     # migrating leaves a stale sentence a reader can check.
     EXEMPT = {
+        "proof/extract_corpus.py": (
+            "adopts the law when it can reach it, but is deliberately relocatable "
+            "-- test_proof_harness.py copies it to a scratch directory and runs it "
+            "standalone -- so it falls back to the bare name outside the "
+            "repository. Operator-only, writes no receipt, nothing published "
+            "depends on which git it found"
+        ),
         "perf/sidecar/_evidence.py": (
             "writes the git provenance block into both admitted WP5 receipts, "
             "and its own bytes are pinned by seven perf receipts and by "
@@ -168,7 +175,18 @@ class AdoptionIsReal(unittest.TestCase):
         a table of known values is a control only when a program compares it
         against current bytes.
         """
-        bare = re.compile(r"\[\s*\"(?:git|docker)\"\s*,")
+        # Two shapes, because the first revision of this detector saw only the
+        # first: an argv literal `["git", ...]`, and a bare tool NAME produced
+        # for an argv some other way -- a `return "git"` fallback, a module
+        # constant. The second shape was introduced by the same commit that
+        # wrote this class and the detector could not see it, which is the
+        # failure this whole gate exists to prevent.
+        bare = re.compile(
+            r"\[\s*\"(?:git|docker)\"\s*,"
+            r"|return\s+\"(?:git|docker)\"\s*$"
+            r"|=\s*\"(?:git|docker)\"\s*$",
+            re.MULTILINE,
+        )
         # Scope: production harnesses only. A `test_*.py` file is excluded by
         # rule, with the reason recorded here rather than left implicit -- those
         # files assert on the argv SHAPE the harness under test produces
