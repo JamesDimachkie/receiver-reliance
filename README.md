@@ -310,7 +310,7 @@ path-conditional, and their absence is meaningful:
 |---|---|---|
 | `request_raw_sha256` | Always | 64 uppercase hex over the exact request bytes, or null when no request bytes existed — an object that failed canonicalization, or a batch record that never terminated. |
 | `engine_generation` | Always | Exactly `composed-0.3-frozen`. Closed. |
-| `governing_authorities` | Always | Closed four keys, each 64 uppercase hex: `closure_policy_sha256`, `authority_register_sha256`, `engine_capabilities_sha256`, `engine_runner_sha256`. These are the bytes that governed this decision (`ERRATA.md` E8). The grounded evaluator's own bytes are **not** among them; they are authenticated by the commit root alone. |
+| `governing_authorities` | Always | Closed six keys, each 64 uppercase hex: `closure_policy_sha256`, `authority_register_sha256`, `engine_capabilities_sha256`, `engine_runner_sha256`, `decision_table_contract_sha256`, `composed_contract_sha256`. These are the bytes that governed this decision (`ERRATA.md` E8, E18). The grounded evaluator's own bytes are **not** among them; they are authenticated by the commit root alone. |
 | `decision_input_sha256` | Always | 64 uppercase hex over the JCS bytes of `decision_input`, or null when the request never reached classification. |
 | `object_request_error` | Only when a Python object could not be canonicalized | Closed: `ERR_JSON`, `ERR_NUMBER`, `ERR_LIMIT`. Its presence means refusal, not classification. |
 | `errors` | Only when the sealed response is not `ok` | The sealed error array, each entry `{code, pointer, message, precedence}`. One error per response, by the deterministic error law. |

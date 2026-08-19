@@ -23,10 +23,11 @@ The frozen engine remains the single classification authority for the 0.2/0.3
 surface: the sealed response embedded in every audited result is byte-identical
 to what the frozen runner emits.
 
-The 0.4.1 audit format additionally binds the governing policy bytes: every
+The 0.4.2 audit format additionally binds the governing law bytes: every
 audited decision carries ``governing_authorities`` (closure-policy, authority-
-register, and engine-source digests) inside the sealed audit, so decisions
-produced under different policies are distinguishable by seal (ERRATA E8).
+register, engine-source, and decision-table contract digests) inside the
+sealed audit, so decisions produced under different policies or decision
+tables are distinguishable by seal (ERRATA E8, E18).
 A closure evaluator error on a VALID decision yields ``AUDIT_INCOMPLETE``
 instead of silently certifying VALID (ERRATA E9); sealed defect classes
 stand, because closures only tighten. 0.4 audit objects remain verifiable
