@@ -52,6 +52,46 @@ def _engine_root() -> pathlib.Path:
     )
 
 
+def _reject_duplicate_keys(pairs: list) -> dict:
+    """A duplicate member is ambiguous evidence, so refuse it rather than pick one.
+
+    `json.loads` keeps the LAST value for a repeated key. A manifest carrying the
+    real eleven rows followed by eleven forged ones therefore passes a
+    `len(records) == file_count` check while the loader verifies engine bytes
+    against the forged digests -- and a human reading the file, or any tool that
+    takes the first value, sees the real ones. That is the ambiguous-evidence
+    class `portability/strict_ingest.py` exists to close; this is the same law,
+    restated here because the package ships in a wheel that does not carry
+    `portability/`.
+    """
+    seen: dict = {}
+    for key, value in pairs:
+        if key in seen:
+            raise ValueError(f"duplicate object key: {key!r}")
+        seen[key] = value
+    return seen
+
+
+def _strict_json_object(text: str) -> dict:
+    value = json.loads(text, object_pairs_hook=_reject_duplicate_keys)
+    if not isinstance(value, dict):
+        raise ValueError("engine manifest is not a JSON object")
+    return value
+
+
+def _jcs(value: object) -> bytes:
+    """Byte-identical to `generate_engine_manifest.jcs`, which produced the seal."""
+    return json.dumps(
+        value, ensure_ascii=False, allow_nan=False, separators=(",", ":"), sort_keys=True
+    ).encode("utf-8")
+
+
+def _self_zero(value: dict, field: str) -> str:
+    probe = dict(value)
+    probe[field] = "0" * 64
+    return hashlib.sha256(_jcs(probe)).hexdigest().upper()
+
+
 def _verify_engine(root: pathlib.Path) -> dict:
     """Refuse to import an engine whose bytes are not the published ones.
 
@@ -62,7 +102,18 @@ def _verify_engine(root: pathlib.Path) -> dict:
     manifest_path = _HERE / "engine_manifest.json"
     if not manifest_path.is_file():
         raise ImportError(f"receiver_reliance engine manifest absent: {manifest_path}")
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    try:
+        manifest = _strict_json_object(manifest_path.read_text(encoding="utf-8"))
+    except ValueError as exc:
+        raise ImportError(f"receiver_reliance engine manifest is malformed: {exc}") from None
+    recorded_seal = manifest.get("manifest_sha256")
+    if not isinstance(recorded_seal, str) or len(recorded_seal) != 64:
+        raise ImportError("receiver_reliance engine manifest carries no self-seal")
+    if _self_zero(manifest, "manifest_sha256") != recorded_seal.upper():
+        raise ImportError(
+            "receiver_reliance engine manifest self-seal does not match its own "
+            "contents; the manifest has been edited since it was generated"
+        )
     records = manifest.get("files")
     if not isinstance(records, list) or len(records) != manifest.get("file_count"):
         raise ImportError("receiver_reliance engine manifest is malformed")

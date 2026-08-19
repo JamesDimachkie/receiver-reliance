@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import pathlib
+import hashlib
 import shutil
 import subprocess
 import sys
@@ -194,6 +195,97 @@ class EngineManifestTests(unittest.TestCase):
             set(),
             "the manifest verifies files the engine never opens",
         )
+
+
+class ManifestIsAmbiguityProof(unittest.TestCase):
+    """The manifest is the gate's own input; a drifted manifest must not pass.
+
+    Until v1.2.2 this gate parsed the manifest with a bare `json.loads` and never
+    recomputed its self-seal. `json.loads` keeps the LAST value for a repeated
+    key, so a manifest carrying the real eleven rows followed by eleven forged
+    ones satisfied `len(records) == file_count` and the loader then verified
+    engine bytes against the forged digests -- while a human reading the file saw
+    the real ones. Each arm below fails without its corresponding repair.
+    """
+
+    def _staged(self, root: pathlib.Path) -> pathlib.Path:
+        stage(root)
+        return root / "receiver_reliance" / "engine_manifest.json"
+
+    def test_a_duplicate_member_is_refused(self) -> None:
+        real = json.loads((HERE / "engine_manifest.json").read_text(encoding="utf-8"))
+        forged = [
+            {"path": f["path"], "byte_length": 1, "sha256": "0" * 64}
+            for f in real["files"]
+        ]
+        blob = (
+            '{"file_count": %d, "files": %s, "files": %s, "format_version": %s, '
+            '"manifest_sha256": %s, "total_byte_length": %d}'
+            % (
+                real["file_count"],
+                json.dumps(real["files"]),
+                json.dumps(forged),
+                json.dumps(real["format_version"]),
+                json.dumps(real["manifest_sha256"]),
+                real["total_byte_length"],
+            )
+        )
+        with tempfile.TemporaryDirectory() as raw:
+            root = pathlib.Path(raw)
+            self._staged(root).write_text(blob, encoding="utf-8")
+            result = import_in_subprocess(root)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("duplicate object key", result.stdout + result.stderr)
+
+    def test_an_edited_manifest_fails_its_own_self_seal(self) -> None:
+        real = json.loads((HERE / "engine_manifest.json").read_text(encoding="utf-8"))
+        edited = dict(real)
+        edited["files"] = [
+            {"path": f["path"], "byte_length": 1, "sha256": "0" * 64}
+            for f in real["files"]
+        ]
+        with tempfile.TemporaryDirectory() as raw:
+            root = pathlib.Path(raw)
+            self._staged(root).write_text(json.dumps(edited), encoding="utf-8")
+            result = import_in_subprocess(root)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("self-seal does not match", result.stdout + result.stderr)
+
+    def test_a_resealed_forgery_still_fails_on_the_engine_bytes(self) -> None:
+        """Defence in depth: a forger who reseals correctly still loses on bytes."""
+        real = json.loads((HERE / "engine_manifest.json").read_text(encoding="utf-8"))
+        forged = dict(real)
+        forged["files"] = [
+            {"path": f["path"], "byte_length": 1, "sha256": "0" * 64}
+            for f in real["files"]
+        ]
+        probe = dict(forged)
+        probe["manifest_sha256"] = "0" * 64
+        forged["manifest_sha256"] = hashlib.sha256(
+            json.dumps(
+                probe,
+                ensure_ascii=False,
+                allow_nan=False,
+                separators=(",", ":"),
+                sort_keys=True,
+            ).encode("utf-8")
+        ).hexdigest().upper()
+        with tempfile.TemporaryDirectory() as raw:
+            root = pathlib.Path(raw)
+            self._staged(root).write_text(json.dumps(forged), encoding="utf-8")
+            result = import_in_subprocess(root)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("engine drift", result.stdout + result.stderr)
+
+    def test_an_absent_self_seal_is_refused(self) -> None:
+        real = json.loads((HERE / "engine_manifest.json").read_text(encoding="utf-8"))
+        stripped = {k: v for k, v in real.items() if k != "manifest_sha256"}
+        with tempfile.TemporaryDirectory() as raw:
+            root = pathlib.Path(raw)
+            self._staged(root).write_text(json.dumps(stripped), encoding="utf-8")
+            result = import_in_subprocess(root)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("no self-seal", result.stdout + result.stderr)
 
 
 if __name__ == "__main__":
