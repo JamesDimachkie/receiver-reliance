@@ -14,8 +14,8 @@ The parser and decision paths that consume untrusted wire bytes
 `adapters/`, the sidecar transport in `perf/sidecar/`, the bundle verifier in
 `portable/`, and the custody verifiers in `portability/`. A report that a
 verifier reports green over bytes it never checked is the most valuable kind
-here; `ERRATA.md` E13 and E14 are two we found ourselves, and
-`portability/verify_live.py` exists because of them.
+here; `ERRATA.md` E13 is one we found ourselves, and
+`portability/verify_live.py` exists because of it.
 
 Out of scope, because they are declared rather than defended: the trust root is
 the authenticated repository commit, nothing is signed, and an in-repo digest is
@@ -26,9 +26,12 @@ TRUST_MODEL.md rather than fixed.
 
 ## How to report
 
-Use GitHub. If the report should not be public, send it through the
-repository's **Security** tab (*Report a vulnerability*), which is private to
-the maintainer; otherwise open an issue. Both reach the same person.
+Use GitHub. For anything you would rather not post publicly, the
+repository's **Security** tab has *Report a vulnerability*, which is private to
+the maintainer. If that option is not showing for you, open an ordinary issue
+saying only that you have something to report privately and asking for a
+channel — do not put the detail in it. Everything else: open an issue. There is
+no security mailing list and no PGP key.
 
 Include the commit you tested, the exact command, and the observed output. A
 reproduction from a clean clone is worth more than a description, and this

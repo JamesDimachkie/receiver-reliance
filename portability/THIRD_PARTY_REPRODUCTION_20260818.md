@@ -157,5 +157,7 @@ It also did not, when written, establish anything a clone of the published
 default branch could reach: this commit was ahead of `origin/main`, so a third
 party cloning that day still got a different artifact. That was row A1.
 **Closed 2026-08-18:** the branch was merged fast-forward into `main` and
-published at tag `v1.2.1`, so a clone of the default branch now carries the
-bytes this record was made against.
+published at tag `v1.2.1`, so a clone of the default branch now reaches this
+evidence. It does not carry the exact bytes measured here — `v1.2.1` is several
+commits past `72efd11`, and the banner at the top of this file names what moved.
+Run `python -B portability/verify_live.py` on the clone for current values.

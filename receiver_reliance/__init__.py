@@ -105,4 +105,4 @@ __all__ = [
     "AUDIT_FORMAT",
     "ENGINE_MANIFEST_SHA256",
 ]
-__version__ = "1.2.0.dev0"
+__version__ = "1.2.1"
