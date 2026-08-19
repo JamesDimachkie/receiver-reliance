@@ -117,6 +117,8 @@ process history that claims elsewhere cite.
 | `portability/` | harness | Five validation lanes — a finite behavioral model, an independent no-read oracle, deterministic live transports, a bounded concurrency ladder, and the hosted matrix with its container sandbox — plus the custody verifiers and `verify_live.py`, the recompute gate this README tells you to run first. |
 | `perf/` | harness | Cost model, profiling campaigns, and the sidecar supervisor with its transport envelope, adversarial child, and receipt verifier. |
 | `proof/` | harness | The applicability arms, the synthetic corpus and truth set, and the scoring harness behind `proof/RESULTS.md`. |
+| `law/` | harness | The machine-checked coherence of the sealed decision law itself, as distinct from any implementation's conformance to it: 872 properties over the composed 30 operations, each labelled proven over the full schema domain or proven only over a stated finite abstraction. Its `refuted=1` is [ERRATA.md](ERRATA.md) E6's third non-closure, rediscovered by search with a universal certificate. |
+| `replay-corpus/` | harness | Twelve publicly documented agent-system failures adapted into fact profiles and replayed through the real preflight and the real audited API, 27 records against pinned classifications. It demonstrates classification, not efficacy: no incident claims RR would have altered its source event. |
 | `fuzz/` | harness | The deterministic seeded campaign. It contributes 50,000 of the 100,000-identity aggregate; the other half ran as the batch campaign (`perf/batch_campaign.py`, `orchestration/BATCH_50K.md`). Together: 67,599 unique raw byte strings, zero findings. |
 | `orchestration/` | records | Ledgers, the standing criticism-adjudication protocol, the external-validation and portability-validation reports, the minimized refuter reports, and `REIMPLEMENTERS_GUIDE.md`. |
 | `continuation-specs/` | drafts | Proposed generation-0.5 core and semantic drafts. **Not adopted, not implemented, not evidence** — each carries that banner at the top, and nothing in this release depends on them. |
@@ -822,6 +824,68 @@ into a pinned harness finding, before the green one — and the exact claim
 scope: validation holds within the executed environments and declared
 finite bounds, and nowhere else.
 
+## The decision law itself: what is proven, and what is not
+
+Everything above establishes that implementations match the contract. It says
+nothing about whether the **contract** is coherent. [law/](law/README.md) checks
+that directly, against the sealed contract bytes rather than any
+implementation's behaviour: `python -B law/verify_law.py` reports
+
+```text
+verify-law: obligations=30 properties=872 proven=766 bounded=105 refuted=1 errors=0
+```
+
+Every property carries exactly one status word, and the difference is the whole
+point. **PROVEN** means over the full schema domain: positive results are
+witnesses that validate against the sealed `decision_input_schema` branch and
+evaluate true in two independent shipped engines, and structural results are
+arguments whose every premise was machine-checked from sealed bytes. So proven,
+for all 30 composed operations: classification is total and terminating with no
+fall-through to an undeclared default; error selection is a strict total order
+over ten distinct precedences and UTF-8 pointer order; no closure row names
+`VALID` as its target, so the closure layer cannot emit `VALID` for any input;
+90 defect rows and 149 of 150 disjuncts carry an executed witness; 20
+contract-structure invariants hold, including the pin tying the loaded 0.2 bytes
+to the digest the 0.3 supplement names as its inheritance base; and both shipped
+engines agreed on all 40,907,363 evaluations.
+
+**PROVEN-BOUNDED** means over a stated finite abstraction, and 105 results are
+that rather than proven. Behavioural closure monotonicity and "no unclassified
+input" are sampled through the real `decide_audited`, not universally argued.
+Where a witness search came up empty the report says "no witness found", never
+"unreachable". None of it reaches the wire layer, the parser, effect receipts,
+transcripts or wrapper parity, which are outside the model and named as outside
+it — and none of it is evidence of efficacy, security or novelty. A coherent
+decision law is not a useful one, and [TRUST_MODEL.md](TRUST_MODEL.md) still
+governs what any of this may be read as claiming.
+
+The `refuted=1` is the expected steady state, not a failure. The checker
+independently flagged OBL-30 / `MALFORMED_OR_BOUNDARY` disjunct #12 as
+unreachable and produced a universal certificate: `NOT_FUNCTIONAL_BY` needs two
+items of `/facts/excluded_records` that share `record_id` and differ on
+`exclusion_reason`, and the sealed schema fixes that field to a one-member enum.
+That is [ERRATA.md](ERRATA.md) E6's third recorded non-closure, reached by search
+over 150 disjuncts rather than by reading the errata — 149 produced witnesses,
+one did not, and the certificate machinery upgraded that single negative to a
+proof. It is self-maintaining: extend the enum in a future sealed revision and
+the certificate stops applying and the count drops to 0 on its own. Any other
+move off `refuted=1` is a new dead row.
+
+The full run takes about eight minutes and needs `jsonschema`, so what sits in
+the matrix is `law/verify_law.py --structural-only`: the 26 table-level
+properties that need neither, which double as a drift detector over the eleven
+sealed files the lane pins.
+
+Alongside it, [replay-corpus/](replay-corpus/README.md) adapts twelve publicly
+documented agent-system failures — eight from Anthropic's August 2026 risk
+report, two from AgentDojo, two from MAST — into fact profiles and replays 27
+records through the real preflight and the real audited API against pinned
+classifications (`python -B replay-corpus/replay_incidents.py`). Read its claim
+narrowly: it demonstrates that RR *classifies* an adapted record a particular
+way. No incident claims RR would have prevented, detected or altered its source
+event, ten of the twelve fabricate at least one schema-required field, and each
+`METHOD.md` states exactly where judgment entered.
+
 ## Contributing / re-verification
 
 The highest-value additions are adversarial, and both invited classes now
@@ -862,7 +926,9 @@ committed corpus with and without an observer and compares JCS bytes),
 `ERRATA.md` E15's disclosure against current bytes),
 `python -B deployment/test_admission.py` (25 tests over the off-by-default
 admission profile, including the arm that proves enabling it rejects a request
-the frozen engine seals `ok`), and the two custody
+the frozen engine seals `ok`),
+`python -B law/verify_law.py --structural-only`,
+`python -B replay-corpus/replay_incidents.py`, and the two custody
 verifiers in "Cross-platform validation" above. The engine manifest is the
 package's own integrity gate: importing `receiver_reliance` verifies all
 eleven engine files by byte length and SHA-256 before executing any of them

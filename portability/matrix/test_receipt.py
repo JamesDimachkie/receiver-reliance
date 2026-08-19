@@ -57,7 +57,7 @@ class MatrixPlanTests(unittest.TestCase):
     def test_expanded_profile_adds_only_two_performance_commands(self) -> None:
         focused = receipt.profile_commands(self.plan, "focused")
         expanded = receipt.profile_commands(self.plan, "expanded")
-        self.assertEqual(len(focused), 18)
+        self.assertEqual(len(focused), 20)
         self.assertEqual(len(expanded), 11)
         self.assertEqual(expanded[0]["id"], "accepted-0.2")
         self.assertEqual(
@@ -65,7 +65,7 @@ class MatrixPlanTests(unittest.TestCase):
             ["batch-performance-gate", "single-pass-benchmark"],
         )
         free_threaded = receipt.profile_commands(self.plan, "free_threaded")
-        self.assertEqual(len(free_threaded), 19)
+        self.assertEqual(len(free_threaded), 21)
         self.assertEqual(free_threaded[-1]["id"], "free-threaded-concurrency-p-le-8")
 
     def test_focused_profile_uses_bounded_entrypoints(self) -> None:
@@ -604,7 +604,7 @@ class SummaryTests(unittest.TestCase):
             )
         )
         self.assertTrue(all(row["infra_evidence"] for row in macos_13))
-        self.assertTrue(all(len(row["commands_planned"]) == 18 for row in macos_13))
+        self.assertTrue(all(len(row["commands_planned"]) == 20 for row in macos_13))
 
     def test_exact_deep_hostile_receipt_cli_persists_deterministic_red_summary(self) -> None:
         target = next(
@@ -1599,7 +1599,7 @@ class SummaryTests(unittest.TestCase):
             row = json.loads(output.read_text(encoding="utf-8"))
         self.assertEqual(exit_code, 0)
         self.assertEqual(row["outcome"], "INFRA_UNAVAILABLE")
-        self.assertEqual(len(row["commands_planned"]), 18)
+        self.assertEqual(len(row["commands_planned"]), 20)
         for field in (
             "git",
             "environment",

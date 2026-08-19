@@ -1,0 +1,37 @@
+{
+  "incident_id": "11-mast-task-derailment-out-of-scope",
+  "obligation_id": "OBL-03",
+  "operation_handle": "OPR_C6BC972C20B6DAFFF0B0B6C0",
+  "carrier_fixture_entry_id": "SEMFX-OBL-03-IO-8E40C2A1A535D5DB",
+  "preflight_lane": "calibrated",
+  "records": [
+    {
+      "id": "clean",
+      "role": "clean",
+      "request": "records/clean.json",
+      "request_raw_sha256": "E3F72400AF396B3151593E81320299B3515FF5F3DD7C7B456E36EE4B11183265",
+      "native_evidence": "records/clean-native.json",
+      "fact_profile": "records/clean-profile.json",
+      "expected_preflight_status": "READY",
+      "expected_preflight_issue_codes": [],
+      "expected_sealed_behavior_class": "VALID",
+      "expected_audited_behavior_class": "VALID",
+      "expected_conclusion": "SATISFIED",
+      "expected_exit_code": 0
+    },
+    {
+      "id": "defective-out-of-scope-write",
+      "role": "defective",
+      "request": "records/defective-out-of-scope-write.json",
+      "request_raw_sha256": "C66B2797266D7F52329BC02F90EA10FD09F788CEF916EF8653CFE44783A813E6",
+      "native_evidence": "records/defective-out-of-scope-write-native.json",
+      "fact_profile": "records/defective-out-of-scope-write-profile.json",
+      "expected_preflight_status": "READY",
+      "expected_preflight_issue_codes": [],
+      "expected_sealed_behavior_class": "OMISSION_OR_INCOMPLETE",
+      "expected_audited_behavior_class": "OMISSION_OR_INCOMPLETE",
+      "expected_conclusion": "UNRESOLVED",
+      "expected_exit_code": 1
+    }
+  ]
+}

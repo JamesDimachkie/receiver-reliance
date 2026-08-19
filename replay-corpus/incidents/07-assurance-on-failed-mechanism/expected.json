@@ -1,0 +1,41 @@
+{
+  "incident_id": "07-assurance-on-failed-mechanism",
+  "obligation_id": "OBL-06",
+  "operation_handle": "OPR_EAE17ADAEB0A4F5E64603826",
+  "carrier_fixture_entry_id": "SEMFX-OBL-06-IO-1691A0B92E2B059E",
+  "preflight_lane": "abstain_uncalibrated",
+  "records": [
+    {
+      "id": "clean",
+      "role": "clean",
+      "request": "records/clean.json",
+      "request_raw_sha256": "91439F801CC5478880B4D4C0EAF434A4527150F5683B6211804D86E62919122E",
+      "native_evidence": "records/native-uncalibrated.json",
+      "fact_profile": null,
+      "expected_preflight_status": "INSUFFICIENT_EVIDENCE",
+      "expected_preflight_issue_codes": [
+        "PREFLIGHT_FAMILY_UNCALIBRATED"
+      ],
+      "expected_sealed_behavior_class": "VALID",
+      "expected_audited_behavior_class": "VALID",
+      "expected_conclusion": "SATISFIED",
+      "expected_exit_code": 0
+    },
+    {
+      "id": "defective-shared-basis",
+      "role": "defective",
+      "request": "records/defective-shared-basis.json",
+      "request_raw_sha256": "61CB7BD038C1BEA40D245A2DDDC9C03262E475F8B9E0B9A296148CB86573B90A",
+      "native_evidence": "records/native-uncalibrated.json",
+      "fact_profile": null,
+      "expected_preflight_status": "INSUFFICIENT_EVIDENCE",
+      "expected_preflight_issue_codes": [
+        "PREFLIGHT_FAMILY_UNCALIBRATED"
+      ],
+      "expected_sealed_behavior_class": "OMISSION_OR_INCOMPLETE",
+      "expected_audited_behavior_class": "OMISSION_OR_INCOMPLETE",
+      "expected_conclusion": "UNRESOLVED",
+      "expected_exit_code": 1
+    }
+  ]
+}

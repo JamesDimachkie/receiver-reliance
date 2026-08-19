@@ -1,0 +1,57 @@
+{
+  "incident_id": "12-mast-verification-without-basis",
+  "obligation_id": "OBL-27",
+  "operation_handle": "OPR_0FBCA8E91BDEF7697BE4D088",
+  "carrier_fixture_entry_id": "SEMFX-OBL-27-IO-86AAE8F77726F3BF",
+  "preflight_lane": "abstain_uncalibrated",
+  "records": [
+    {
+      "id": "clean",
+      "role": "clean",
+      "request": "records/clean.json",
+      "request_raw_sha256": "A4AD6AC90B95FFA773264F46F31B512AF5ABA20931A44007714C05BE707F52AA",
+      "native_evidence": "records/native-uncalibrated.json",
+      "fact_profile": null,
+      "expected_preflight_status": "INSUFFICIENT_EVIDENCE",
+      "expected_preflight_issue_codes": [
+        "PREFLIGHT_FAMILY_UNCALIBRATED"
+      ],
+      "expected_sealed_behavior_class": "VALID",
+      "expected_audited_behavior_class": "VALID",
+      "expected_conclusion": "SATISFIED",
+      "expected_exit_code": 0
+    },
+    {
+      "id": "defective-no-verification-transition",
+      "role": "defective",
+      "request": "records/defective-no-verification-transition.json",
+      "request_raw_sha256": "BF58FEAA63C5359A764A3F1A9B0038826539751B60E6E21CEBFD58A8566359E5",
+      "native_evidence": "records/native-uncalibrated.json",
+      "fact_profile": null,
+      "expected_preflight_status": "INSUFFICIENT_EVIDENCE",
+      "expected_preflight_issue_codes": [
+        "PREFLIGHT_FAMILY_UNCALIBRATED"
+      ],
+      "expected_sealed_behavior_class": "BINDING_OR_CONFLICT",
+      "expected_audited_behavior_class": "BINDING_OR_CONFLICT",
+      "expected_conclusion": "VIOLATED",
+      "expected_exit_code": 1
+    },
+    {
+      "id": "defective-receipt-pins-superseded-version",
+      "role": "defective",
+      "request": "records/defective-receipt-pins-superseded-version.json",
+      "request_raw_sha256": "77BF1DE97929C60BC3C1785F8576252B86509AD78D3FC764E27C3DF1AFD379D9",
+      "native_evidence": "records/native-uncalibrated.json",
+      "fact_profile": null,
+      "expected_preflight_status": "INSUFFICIENT_EVIDENCE",
+      "expected_preflight_issue_codes": [
+        "PREFLIGHT_FAMILY_UNCALIBRATED"
+      ],
+      "expected_sealed_behavior_class": "OMISSION_OR_INCOMPLETE",
+      "expected_audited_behavior_class": "OMISSION_OR_INCOMPLETE",
+      "expected_conclusion": "UNRESOLVED",
+      "expected_exit_code": 1
+    }
+  ]
+}

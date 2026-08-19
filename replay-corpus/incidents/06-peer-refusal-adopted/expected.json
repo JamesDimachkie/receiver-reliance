@@ -1,0 +1,41 @@
+{
+  "incident_id": "06-peer-refusal-adopted",
+  "obligation_id": "OBL-23",
+  "operation_handle": "OPR_60F3672F648865577D64EC8F",
+  "carrier_fixture_entry_id": "SEMFX-OBL-23-IO-6A859602AC15D167",
+  "preflight_lane": "abstain_uncalibrated",
+  "records": [
+    {
+      "id": "clean",
+      "role": "clean",
+      "request": "records/clean.json",
+      "request_raw_sha256": "D2D79FC7CEA7D3B1A905BD2EAC94FD3E04D4B8E23F5089182E6EE819055723C0",
+      "native_evidence": "records/native-uncalibrated.json",
+      "fact_profile": null,
+      "expected_preflight_status": "INSUFFICIENT_EVIDENCE",
+      "expected_preflight_issue_codes": [
+        "PREFLIGHT_FAMILY_UNCALIBRATED"
+      ],
+      "expected_sealed_behavior_class": "VALID",
+      "expected_audited_behavior_class": "VALID",
+      "expected_conclusion": "SATISFIED",
+      "expected_exit_code": 0
+    },
+    {
+      "id": "defective-repetition-promotes-support",
+      "role": "defective",
+      "request": "records/defective-repetition-promotes-support.json",
+      "request_raw_sha256": "56AAAB00320F05194716FC13292A3D492A27F7BF03C8F1CF54FE351664CF221F",
+      "native_evidence": "records/native-uncalibrated.json",
+      "fact_profile": null,
+      "expected_preflight_status": "INSUFFICIENT_EVIDENCE",
+      "expected_preflight_issue_codes": [
+        "PREFLIGHT_FAMILY_UNCALIBRATED"
+      ],
+      "expected_sealed_behavior_class": "OMISSION_OR_INCOMPLETE",
+      "expected_audited_behavior_class": "OMISSION_OR_INCOMPLETE",
+      "expected_conclusion": "UNRESOLVED",
+      "expected_exit_code": 1
+    }
+  ]
+}

@@ -87,6 +87,28 @@ missing semantic re-derivation step, and the unreachable OBL-30 MALFORMED
 disjunct stand as recorded. They are contract-design items for the next
 sealed revision, not implementation defects.
 
+**Independent rediscovery of the third item, with a certificate.** The decision-law
+checker in `law/` reached the unreachable OBL-30 disjunct on its own, by search
+over all 150 row disjuncts rather than by reading this entry: 149 produced
+concrete witnesses, one did not, and the certificate machinery then upgraded that
+single empty search to a universal proof. It reports
+`OBL-30/MALFORMED_OR_BOUNDARY#12` under certificate `SINGLETON_VALUE_MEMBER` —
+`NOT_FUNCTIONAL_BY` fires only when two items of `/facts/excluded_records` share
+`record_id` and differ on `exclusion_reason`, and the sealed schema fixes
+`exclusion_reason` to the one-member domain `['INTENT_INCOMPATIBLE']`, so no
+schema-valid input can satisfy it at any array length. That is PROVEN over the
+full schema domain, not bounded, and it matches this entry including its
+conditionality on the enum size.
+
+Two consequences worth stating. First, `refuted=1` is the checker's expected
+steady state, so it is the *only* refutation the lane may carry silently: any
+further move off `refuted=1` is either a new dead row or this one resolved by a
+versioned enum extension, at which point the certificate stops applying and the
+count falls to 0 without anyone editing a pin. Second, the disposition is
+unchanged — this remains a contract-design item, inert within the admitted input
+space, misclassifying nothing. `law/README.md` and `law/PROOF_REPORT.md` carry
+the derivation.
+
 ## E7 — No applicability/abstention mechanism
 
 Every operation demands its full fact profile; a host whose records lack an

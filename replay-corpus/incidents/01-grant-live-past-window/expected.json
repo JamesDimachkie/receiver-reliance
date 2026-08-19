@@ -1,0 +1,57 @@
+{
+  "incident_id": "01-grant-live-past-window",
+  "obligation_id": "OBL-26",
+  "operation_handle": "OPR_2B12C8F8D4240FDA61CDA198",
+  "carrier_fixture_entry_id": "SEMFX-OBL-26-IO-B6C9BC87CBC54DD6",
+  "preflight_lane": "abstain_uncalibrated",
+  "records": [
+    {
+      "id": "clean",
+      "role": "clean",
+      "request": "records/clean.json",
+      "request_raw_sha256": "B6DF29BD2028580A4A6AF7DDDB25049D0E700E13967D8CE032C187F583A7B5A2",
+      "native_evidence": "records/native-uncalibrated.json",
+      "fact_profile": null,
+      "expected_preflight_status": "INSUFFICIENT_EVIDENCE",
+      "expected_preflight_issue_codes": [
+        "PREFLIGHT_FAMILY_UNCALIBRATED"
+      ],
+      "expected_sealed_behavior_class": "VALID",
+      "expected_audited_behavior_class": "VALID",
+      "expected_conclusion": "SATISFIED",
+      "expected_exit_code": 0
+    },
+    {
+      "id": "defective-window-overrun",
+      "role": "defective",
+      "request": "records/defective-window-overrun.json",
+      "request_raw_sha256": "B6507BA1CDB069FBD6B45E89796876EC4FDA1E49F52747D5636034D08819A063",
+      "native_evidence": "records/native-uncalibrated.json",
+      "fact_profile": null,
+      "expected_preflight_status": "INSUFFICIENT_EVIDENCE",
+      "expected_preflight_issue_codes": [
+        "PREFLIGHT_FAMILY_UNCALIBRATED"
+      ],
+      "expected_sealed_behavior_class": "MALFORMED_OR_BOUNDARY",
+      "expected_audited_behavior_class": "MALFORMED_OR_BOUNDARY",
+      "expected_conclusion": "VIOLATED",
+      "expected_exit_code": 1
+    },
+    {
+      "id": "defective-revocation-unchecked",
+      "role": "defective",
+      "request": "records/defective-revocation-unchecked.json",
+      "request_raw_sha256": "D7AF5D8DA39A6BF12B83A040DFC976B5B06E6981D8F71CC3524E0A75B0F348B1",
+      "native_evidence": "records/native-uncalibrated.json",
+      "fact_profile": null,
+      "expected_preflight_status": "INSUFFICIENT_EVIDENCE",
+      "expected_preflight_issue_codes": [
+        "PREFLIGHT_FAMILY_UNCALIBRATED"
+      ],
+      "expected_sealed_behavior_class": "BINDING_OR_CONFLICT",
+      "expected_audited_behavior_class": "BINDING_OR_CONFLICT",
+      "expected_conclusion": "VIOLATED",
+      "expected_exit_code": 1
+    }
+  ]
+}

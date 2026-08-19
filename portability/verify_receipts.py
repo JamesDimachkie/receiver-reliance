@@ -249,7 +249,17 @@ LEGACY_GATE_VALIDATORS = {
 # migrated the planned count 17 to 18 in the same change), and three suite
 # expectations have since moved.  Declaring the era in code keeps the drift
 # visible instead of leaving the evidence unvalidated.
-HOSTED_ERA_ABSENT_COMMANDS = ("portable-bundle-gate",)
+#
+# The decision-law and incident-replay lanes landed later still and moved the
+# planned count 18 to 20.  The hosted rows could not have executed either
+# command, so they join the same era declaration rather than being validated
+# against a manifest that postdates them.  This gate is what caught the
+# addition: adding the two plan rows alone took it to 23 failures.
+HOSTED_ERA_ABSENT_COMMANDS = (
+    "portable-bundle-gate",
+    "decision-law-structural",
+    "incident-replay-corpus",
+)
 HOSTED_ERA_EXPECTATIONS = {
     "verify-committed-receipts": {"checks": [62], "failures": [0]},
     "grounded-0.4-regression": {"checks": [504], "failures": [0]},

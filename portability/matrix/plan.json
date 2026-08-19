@@ -290,6 +290,23 @@
         "argv": ["{python}", "-B", "portability/verify_receipts.py"],
         "timeout_seconds": 300,
         "expected": {"checks": [267], "failures": [0]}
+      },
+      {
+        "id": "decision-law-structural",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "law/verify_law.py", "--structural-only", "--quiet"],
+        "timeout_seconds": 300,
+        "expected": {"checks": [26], "failures": [0]}
+      },
+      {
+        "id": "incident-replay-corpus",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "replay-corpus/replay_incidents.py"],
+        "timeout_seconds": 900,
+        "expected": {
+          "checks": [27],
+          "failures": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        }
       }
     ],
     "baseline_nonperformance": [

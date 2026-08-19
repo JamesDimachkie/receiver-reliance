@@ -1,0 +1,37 @@
+{
+  "incident_id": "02-superseded-threshold-copied",
+  "obligation_id": "OBL-02",
+  "operation_handle": "OPR_3A4599E3E3125ED732D36DE3",
+  "carrier_fixture_entry_id": "SEMFX-OBL-02-IO-240A61327FBD9401",
+  "preflight_lane": "calibrated",
+  "records": [
+    {
+      "id": "clean",
+      "role": "clean",
+      "request": "records/clean.json",
+      "request_raw_sha256": "02198CE69D88B3A02D0D061BABFD7B761B649C86DB47542DB0281792074EB14A",
+      "native_evidence": "records/clean-native.json",
+      "fact_profile": "records/clean-profile.json",
+      "expected_preflight_status": "READY",
+      "expected_preflight_issue_codes": [],
+      "expected_sealed_behavior_class": "VALID",
+      "expected_audited_behavior_class": "VALID",
+      "expected_conclusion": "SATISFIED",
+      "expected_exit_code": 0
+    },
+    {
+      "id": "defective-superseded-value",
+      "role": "defective",
+      "request": "records/defective-superseded-value.json",
+      "request_raw_sha256": "19FBC2B78302AFB86E8A3DC364F66DACD6E79B6F5D44C9CC102DF4A706264C52",
+      "native_evidence": "records/defective-superseded-value-native.json",
+      "fact_profile": "records/defective-superseded-value-profile.json",
+      "expected_preflight_status": "READY",
+      "expected_preflight_issue_codes": [],
+      "expected_sealed_behavior_class": "OMISSION_OR_INCOMPLETE",
+      "expected_audited_behavior_class": "OMISSION_OR_INCOMPLETE",
+      "expected_conclusion": "UNRESOLVED",
+      "expected_exit_code": 1
+    }
+  ]
+}

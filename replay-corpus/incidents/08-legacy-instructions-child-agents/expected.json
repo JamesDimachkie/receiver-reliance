@@ -1,0 +1,41 @@
+{
+  "incident_id": "08-legacy-instructions-child-agents",
+  "obligation_id": "OBL-10",
+  "operation_handle": "OPR_38663FABE27CFF68828572D4",
+  "carrier_fixture_entry_id": "SEMFX-OBL-10-IO-3585BCFFEE4F7E0F",
+  "preflight_lane": "abstain_uncalibrated",
+  "records": [
+    {
+      "id": "clean",
+      "role": "clean",
+      "request": "records/clean.json",
+      "request_raw_sha256": "BC622182AB24CF5DEF2023BE4F6ABF8B611D0FF63162A840431C241339205226",
+      "native_evidence": "records/native-uncalibrated.json",
+      "fact_profile": null,
+      "expected_preflight_status": "INSUFFICIENT_EVIDENCE",
+      "expected_preflight_issue_codes": [
+        "PREFLIGHT_FAMILY_UNCALIBRATED"
+      ],
+      "expected_sealed_behavior_class": "VALID",
+      "expected_audited_behavior_class": "VALID",
+      "expected_conclusion": "SATISFIED",
+      "expected_exit_code": 0
+    },
+    {
+      "id": "defective-widened-child-authority",
+      "role": "defective",
+      "request": "records/defective-widened-child-authority.json",
+      "request_raw_sha256": "66377F7FC47F02A74668E4CCED95081732828D84B25DD69E94AB528535193B29",
+      "native_evidence": "records/native-uncalibrated.json",
+      "fact_profile": null,
+      "expected_preflight_status": "INSUFFICIENT_EVIDENCE",
+      "expected_preflight_issue_codes": [
+        "PREFLIGHT_FAMILY_UNCALIBRATED"
+      ],
+      "expected_sealed_behavior_class": "OMISSION_OR_INCOMPLETE",
+      "expected_audited_behavior_class": "OMISSION_OR_INCOMPLETE",
+      "expected_conclusion": "UNRESOLVED",
+      "expected_exit_code": 1
+    }
+  ]
+}

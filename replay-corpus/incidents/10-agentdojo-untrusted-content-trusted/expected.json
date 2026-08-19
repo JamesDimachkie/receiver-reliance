@@ -1,0 +1,57 @@
+{
+  "incident_id": "10-agentdojo-untrusted-content-trusted",
+  "obligation_id": "OBL-22",
+  "operation_handle": "OPR_6C9B73604E3164661F153E15",
+  "carrier_fixture_entry_id": "SEMFX-OBL-22-IO-DAD4A8E7F774CC46",
+  "preflight_lane": "abstain_uncalibrated",
+  "records": [
+    {
+      "id": "clean",
+      "role": "clean",
+      "request": "records/clean.json",
+      "request_raw_sha256": "6F7F56CC70683F3430B2DD2FBE6DBB3BEA5FEEDCD9A4CA9E33731D1C0357CCAD",
+      "native_evidence": "records/native-uncalibrated.json",
+      "fact_profile": null,
+      "expected_preflight_status": "INSUFFICIENT_EVIDENCE",
+      "expected_preflight_issue_codes": [
+        "PREFLIGHT_FAMILY_UNCALIBRATED"
+      ],
+      "expected_sealed_behavior_class": "VALID",
+      "expected_audited_behavior_class": "VALID",
+      "expected_conclusion": "SATISFIED",
+      "expected_exit_code": 0
+    },
+    {
+      "id": "defective-trusted-without-passing-validation",
+      "role": "defective",
+      "request": "records/defective-trusted-without-passing-validation.json",
+      "request_raw_sha256": "E8CE7A6C93CC808ED3AB2500C8E9C157F0363246309F2921132956594F4096C9",
+      "native_evidence": "records/native-uncalibrated.json",
+      "fact_profile": null,
+      "expected_preflight_status": "INSUFFICIENT_EVIDENCE",
+      "expected_preflight_issue_codes": [
+        "PREFLIGHT_FAMILY_UNCALIBRATED"
+      ],
+      "expected_sealed_behavior_class": "OMISSION_OR_INCOMPLETE",
+      "expected_audited_behavior_class": "OMISSION_OR_INCOMPLETE",
+      "expected_conclusion": "UNRESOLVED",
+      "expected_exit_code": 1
+    },
+    {
+      "id": "defective-validation-never-completed",
+      "role": "defective",
+      "request": "records/defective-validation-never-completed.json",
+      "request_raw_sha256": "2E826EDD1D58BB91A9C8397B61B81DABDC59557ED9C19B9FFA29EB9CB4BD1E8B",
+      "native_evidence": "records/native-uncalibrated.json",
+      "fact_profile": null,
+      "expected_preflight_status": "INSUFFICIENT_EVIDENCE",
+      "expected_preflight_issue_codes": [
+        "PREFLIGHT_FAMILY_UNCALIBRATED"
+      ],
+      "expected_sealed_behavior_class": "MALFORMED_OR_BOUNDARY",
+      "expected_audited_behavior_class": "MALFORMED_OR_BOUNDARY",
+      "expected_conclusion": "VIOLATED",
+      "expected_exit_code": 1
+    }
+  ]
+}

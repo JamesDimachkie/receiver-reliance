@@ -1,0 +1,1 @@
+{"family":"SCOPE","native":{"claimed_paths":["src/auth/session.ts","src/auth/tokens.ts"],"result_commit":"COMMIT_SUBAGENT_DERAILED","result_commit_named":true,"status":"COMPLETE"},"observations":{"commit_changed_paths":["src/auth/session.ts","infra/deploy/prod.tf"],"commit_found":true},"record_id":"REC_SUBAGENT_SCOPE_CLAIM_DERAILED"}
