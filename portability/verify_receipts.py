@@ -581,17 +581,32 @@ def _hosted_era_plan() -> dict[str, Any]:
     return plan
 
 
+def _hosted_row_error(plan: dict[str, Any], row: dict[str, Any]) -> str | None:
+    """Validate one hosted row under the hosted era own binding authority.
+
+    The committed hosted tree is run 31562391384 at HOSTED_HEAD.  That commit,
+    not whatever commit the verifying process happens to sit on, is the run
+    these receipts must belong to -- the law LEGACY_GATE_VALIDATORS already
+    applies to sealed transcripts, moved to the row validator.  This is the
+    single site that supplies the authority; RunCurrencyAuthorityTests in
+    portability/matrix/test_receipt.py calls this function with a forged
+    foreign-run row and requires rejection, so dropping the argument here goes
+    red there.
+    """
+    try:
+        entry = matrix_receipt.find_entry(plan, row.get("entry_id"))
+        return matrix_receipt._receipt_validation_error(row, entry, plan, HOSTED_HEAD)
+    except Exception as failure:  # noqa: BLE001 - report, never abort
+        return f"{type(failure).__name__}: {failure}"
+
+
 def _verify_hosted_rows_against_plan(v: _Verifier) -> None:
     """Replay every committed hosted row through the matrix row validator."""
     plan = _hosted_era_plan()
     for path in sorted(HOSTED_DIR.glob("receipt-*.json")):
         row = strict_ingest.load_safe(path.read_bytes(), label=path.name)
         entry_id = row.get("entry_id")
-        try:
-            entry = matrix_receipt.find_entry(plan, entry_id)
-            error = matrix_receipt._receipt_validation_error(row, entry, plan)
-        except Exception as failure:  # noqa: BLE001 - report, never abort
-            error = f"{type(failure).__name__}: {failure}"
+        error = _hosted_row_error(plan, row)
         expected_error = HOSTED_ERA_ROW_EXCEPTIONS.get(entry_id)
         if expected_error is None:
             v.check(f"hosted.row_validation.{entry_id}", error is None, str(error))

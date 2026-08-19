@@ -1454,7 +1454,7 @@ def _environment_binding_error(
     return None
 
 
-def _runnable_git_binding_error(value: Any) -> str | None:
+def _runnable_git_binding_error(value: Any, expected_sha: str | None) -> str | None:
     if not isinstance(value, dict):
         return "runnable receipt lacks git evidence"
     if value.get("github_sha") is None:
@@ -1463,9 +1463,17 @@ def _runnable_git_binding_error(value: Any) -> str | None:
         return "runnable receipt git sha does not match GITHUB_SHA"
     if value.get("clean") is not True or value.get("status_line_count") != 0:
         return "runnable receipt was not captured from a clean checkout"
-    workflow_sha = os.environ.get("GITHUB_SHA")
-    if workflow_sha is not None and value.get("sha") != workflow_sha:
-        return "runnable receipt sha does not match the summary workflow GITHUB_SHA"
+    # Run currency.  The commit a receipt must belong to is supplied by the
+    # caller -- the workflow SHA for a live summary, HOSTED_HEAD for the sealed
+    # hosted replay -- and is never read from this process environment.  A
+    # validator whose verdict depends on an ambient variable is green where the
+    # variable is unset and red where it is set; that is ERRATA E17.
+    # expected_sha has no default, so no caller can drop the authority by
+    # omission; passing None is an explicit statement that the caller holds no
+    # external authority, and asserts nothing beyond the self-consistency
+    # already required above.
+    if expected_sha is not None and value.get("sha") != expected_sha:
+        return "runnable receipt sha does not match the expected workflow sha"
     return None
 
 
@@ -1775,7 +1783,10 @@ def _command_validation_error(
 
 
 def _receipt_validation_error(
-    row: dict[str, Any], entry: dict[str, Any], plan: dict[str, Any]
+    row: dict[str, Any],
+    entry: dict[str, Any],
+    plan: dict[str, Any],
+    expected_sha: str | None = None,
 ) -> str | None:
     top_level_fields = {
         "schema",
@@ -1825,7 +1836,7 @@ def _receipt_validation_error(
         # runtime/setup absence, must belong to the workflow SHA and a clean
         # checkout.  Otherwise a stale or locally forged INFRA_UNAVAILABLE
         # receipt can suppress a normative row without executing it.
-        git_binding_error = _runnable_git_binding_error(row.get("git"))
+        git_binding_error = _runnable_git_binding_error(row.get("git"), expected_sha)
         if git_binding_error:
             return git_binding_error
         if outcome in {"PASS", "DIVERGENCE", "OBSERVED_DIVERGENCE"}:
@@ -1956,6 +1967,8 @@ def summarize(
     receipts_dir: pathlib.Path,
     output: pathlib.Path,
     upstream_job_results: dict[str, str] | None = None,
+    *,
+    workflow_sha: str | None = None,
 ) -> int:
     expected = {entry["id"]: entry for entry in all_entries(plan)}
     expected_by_filename = {
@@ -2022,7 +2035,7 @@ def summarize(
                 continue
             try:
                 validation_error = _receipt_validation_error(
-                    receipt, expected[entry_id], plan
+                    receipt, expected[entry_id], plan, workflow_sha
                 )
             except Exception as exc:
                 # Artifact contents are hostile.  A validator bug or an
@@ -2121,6 +2134,7 @@ def _parser() -> argparse.ArgumentParser:
     summary = subparsers.add_parser("summarize")
     summary.add_argument("--receipts-dir", type=pathlib.Path, required=True)
     summary.add_argument("--output-name", required=True)
+    summary.add_argument("--workflow-sha", required=False)
     summary.add_argument("--normative-job-result", required=False)
     summary.add_argument("--expanded-gate-job-result", required=False)
     return parser
@@ -2134,6 +2148,19 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     output = _output_path(args.output_name)
     if args.command == "summarize":
+        # The one place this program consults the process environment.  Below
+        # this line the expected commit travels as an argument, so no
+        # validator verdict can depend on the shell it was invoked from.  An
+        # empty GITHUB_SHA counts as absent rather than as a SHA that no
+        # receipt can match.
+        workflow_sha = args.workflow_sha or os.environ.get("GITHUB_SHA") or None
+        if workflow_sha is None:
+            print(
+                "summarize requires the commit its receipts must belong to: "
+                "pass --workflow-sha or set GITHUB_SHA",
+                file=sys.stderr,
+            )
+            return 2
         return summarize(
             plan,
             args.receipts_dir,
@@ -2142,6 +2169,7 @@ def main(argv: list[str] | None = None) -> int:
                 "normative_matrix": args.normative_job_result,
                 "expanded_gate": args.expanded_gate_job_result,
             },
+            workflow_sha=workflow_sha,
         )
     entry = find_entry(plan, args.entry)
     if args.command == "run":

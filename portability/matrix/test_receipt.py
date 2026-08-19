@@ -17,6 +17,13 @@ import receipt
 
 REPO = pathlib.Path(__file__).resolve().parents[2]
 
+# Every synthesized receipt binds to this literal commit.  ERRATA E17: a test
+# fixture that reads GITHUB_SHA silently agrees with a validator that reads
+# GITHUB_SHA, and the pair stays green in both environments while the property
+# under test is unbound.
+FIXTURE_WORKFLOW_SHA = "a" * 40
+FOREIGN_RUN_SHA = "b" * 40
+
 
 class MatrixPlanTests(unittest.TestCase):
     @classmethod
@@ -67,7 +74,7 @@ class MatrixPlanTests(unittest.TestCase):
             for item in receipt.profile_commands(self.plan, "focused")
         }
         deterministic_test_counts = {
-            "matrix-receipt-tests": 54,
+            "matrix-receipt-tests": 60,
             "independent-oracle-tests": 35,
             "concurrency-tests": 15,
         }
@@ -416,10 +423,11 @@ class SummaryTests(unittest.TestCase):
             "steps.setup.outcome=failure",
         )
         # Summary tests synthesize hosted artifacts even when the development
-        # worktree is dirty and GITHUB_SHA is absent.  Rebind that fixture to
-        # one internally consistent clean workflow SHA before validation.
+        # worktree is dirty.  Rebind that fixture to one internally consistent
+        # clean workflow SHA before validation.  The SHA is a literal, never
+        # os.environ["GITHUB_SHA"] -- see FIXTURE_WORKFLOW_SHA.
         row = json.loads(path.read_text(encoding="utf-8"))
-        sha = os.environ.get("GITHUB_SHA", "a" * 40)
+        sha = FIXTURE_WORKFLOW_SHA
         row["git"] = {
             "sha": sha,
             "github_sha": sha,
@@ -444,7 +452,7 @@ class SummaryTests(unittest.TestCase):
         self, entry: dict[str, object], planned: list[dict[str, object]]
     ) -> dict[str, object]:
         row = receipt._base_receipt(self.plan, entry)
-        sha = os.environ.get("GITHUB_SHA", "a" * 40)
+        sha = FIXTURE_WORKFLOW_SHA
         empty_hash = hashlib.sha256(b"").hexdigest()
         row["git"] = {
             "sha": sha,
@@ -622,6 +630,10 @@ class SummaryTests(unittest.TestCase):
                     str(receipts_dir),
                     "--output-name",
                     "matrix-summary.json",
+                    # Explicit, so this subprocess's verdict does not depend on
+                    # whether the invoking shell exports GITHUB_SHA (E17).
+                    "--workflow-sha",
+                    FIXTURE_WORKFLOW_SHA,
                     "--normative-job-result",
                     "success",
                     "--expanded-gate-job-result",
@@ -1617,6 +1629,87 @@ class SummaryTests(unittest.TestCase):
         self.assertEqual(exit_code, 1)
         self.assertEqual(summary["normative_failures"], [entry["id"]])
 
+    def test_summarize_cli_resolves_the_authority_and_passes_it_down(self) -> None:
+        # E17: main() is the one place GITHUB_SHA is read.  This is the end of
+        # that wire -- if the CLI stops passing the resolved commit down, or
+        # starts accepting an absent or empty one, an arm here goes red.
+        cases = (
+            (["--workflow-sha", FIXTURE_WORKFLOW_SHA], None, 0),
+            (["--workflow-sha", FOREIGN_RUN_SHA], None, 1),
+            ([], FIXTURE_WORKFLOW_SHA, 0),
+            ([], FOREIGN_RUN_SHA, 1),
+            ([], None, 2),
+            ([], "", 2),
+        )
+        for extra, ambient, expected_code in cases:
+            with self.subTest(extra=extra, ambient=ambient), \
+                    mock.patch.dict(os.environ, {}, clear=False), \
+                    tempfile.TemporaryDirectory() as directory:
+                os.environ.pop("GITHUB_SHA", None)
+                if ambient is not None:
+                    os.environ["GITHUB_SHA"] = ambient
+                root = pathlib.Path(directory)
+                os.environ["RUNNER_TEMP"] = str(root)
+                receipts_dir = root / "receipts"
+                receipts_dir.mkdir()
+                self._write_all_runnable_normative(receipts_dir)
+                exit_code = receipt.main(
+                    [
+                        "summarize",
+                        "--receipts-dir",
+                        str(receipts_dir),
+                        "--output-name",
+                        "matrix-summary.json",
+                    ]
+                    + extra
+                )
+                self.assertEqual(exit_code, expected_code)
+                if expected_code == 2:
+                    self.assertFalse((root / "matrix-summary.json").exists())
+
+    def test_summary_binds_every_receipt_to_the_run_it_summarizes(self) -> None:
+        # ERRATA E17.  The forgery this clause exists to stop is a receipt
+        # retained from an older green run and re-uploaded as this run's
+        # artifact.  It is internally consistent -- sha == github_sha, clean
+        # checkout, empty status -- so every other git check passes, and an
+        # INFRA_UNAVAILABLE outcome then suppresses a normative row that was
+        # never executed.  The only thing that catches it is the commit the
+        # caller says this summary is about.  Vary the ambient GITHUB_SHA
+        # across all three states: if this authority is ever read from the
+        # environment again, or dropped from summarize's internal call, one of
+        # these six arms goes red.
+        for ambient in (None, FIXTURE_WORKFLOW_SHA, FOREIGN_RUN_SHA):
+            for authority, expected_code in (
+                (FIXTURE_WORKFLOW_SHA, 0),
+                (FOREIGN_RUN_SHA, 1),
+            ):
+                with self.subTest(ambient=ambient, authority=authority), \
+                        mock.patch.dict(os.environ, {}, clear=False), \
+                        tempfile.TemporaryDirectory() as directory:
+                    os.environ.pop("GITHUB_SHA", None)
+                    if ambient is not None:
+                        os.environ["GITHUB_SHA"] = ambient
+                    root = pathlib.Path(directory)
+                    self._write_all_runnable_normative(root)
+                    output = root / "summary.json"
+                    exit_code = receipt.summarize(
+                        self.plan, root, output, workflow_sha=authority
+                    )
+                    summary = json.loads(output.read_text(encoding="utf-8"))
+                    self.assertEqual(exit_code, expected_code)
+                    if expected_code:
+                        self.assertTrue(summary["normative_failures"])
+                        self.assertTrue(
+                            any(
+                                "does not match the expected workflow sha" in error
+                                for error in summary["errors"]
+                            ),
+                            summary["errors"][:3],
+                        )
+                    else:
+                        self.assertEqual(summary["normative_failures"], [])
+
+
 
 class WorkflowDefinitionTests(unittest.TestCase):
     @classmethod
@@ -1767,6 +1860,127 @@ class LocalGateRunnerTests(unittest.TestCase):
             "FAIL",
         )
         self.assertEqual(runner.receipt_status(0, start, end, gates - 1), "FAIL")
+
+
+class RunCurrencyAuthorityTests(unittest.TestCase):
+    """ERRATA E17: run currency is an argument, never an ambient variable.
+
+    `_runnable_git_binding_error` used to compare a receipt's recorded sha to
+    os.environ["GITHUB_SHA"].  That variable is not an artifact, so the same
+    bytes produced different verdicts in different shells: the clause was
+    silent everywhere the variable was unset -- every local run, the README's
+    third-party command, and every matrix child, because SAFE_ENV_KEYS strips
+    it -- and unsatisfiable where it was set against sealed historical
+    evidence.  These tests hold the receipt fixed and vary the environment,
+    which is the axis the rest of this suite deliberately does not vary.
+    """
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.plan = receipt._json_load(receipt.DEFAULT_PLAN)
+
+    @staticmethod
+    def _clean_git(sha: str) -> dict[str, object]:
+        return {
+            "sha": sha,
+            "github_sha": sha,
+            "clean": True,
+            "status_sha256": hashlib.sha256(b"").hexdigest(),
+            "status_line_count": 0,
+        }
+
+    def test_run_currency_authority_has_no_default(self) -> None:
+        # Omission must be a TypeError at the call site.  A default would let a
+        # future caller drop the authority and stay green.
+        with self.assertRaises(TypeError):
+            receipt._runnable_git_binding_error(
+                self._clean_git(FIXTURE_WORKFLOW_SHA)
+            )
+
+    def test_binding_verdict_is_a_function_of_its_argument_only(self) -> None:
+        git = self._clean_git(FIXTURE_WORKFLOW_SHA)
+        rejection = "runnable receipt sha does not match the expected workflow sha"
+        for ambient in (None, FIXTURE_WORKFLOW_SHA, FOREIGN_RUN_SHA):
+            with self.subTest(ambient=ambient), \
+                    mock.patch.dict(os.environ, {}, clear=False):
+                os.environ.pop("GITHUB_SHA", None)
+                if ambient is not None:
+                    os.environ["GITHUB_SHA"] = ambient
+                self.assertIsNone(
+                    receipt._runnable_git_binding_error(git, None)
+                )
+                self.assertIsNone(
+                    receipt._runnable_git_binding_error(git, FIXTURE_WORKFLOW_SHA)
+                )
+                self.assertEqual(
+                    receipt._runnable_git_binding_error(git, FOREIGN_RUN_SHA),
+                    rejection,
+                )
+
+    def test_hosted_replay_binds_rows_to_the_hosted_run(self) -> None:
+        # The committed hosted tree is evidence about HOSTED_HEAD, so that is
+        # the commit its rows must name.  This calls the single site that
+        # supplies the authority, `verify_receipts._hosted_row_error`, so
+        # dropping the argument there turns this red rather than leaving a
+        # tautology behind.
+        portability_dir = str(REPO / "portability")
+        if portability_dir not in sys.path:
+            sys.path.insert(0, portability_dir)
+        import verify_receipts
+
+        plan = verify_receipts._hosted_era_plan()
+        accepted = None
+        for path in sorted(verify_receipts.HOSTED_DIR.glob("receipt-*.json")):
+            row = json.loads(path.read_text(encoding="utf-8"))
+            entry = receipt.find_entry(plan, row.get("entry_id"))
+            if not entry.get("runnable", True):
+                continue
+            if verify_receipts._hosted_row_error(plan, row) is None:
+                accepted = row
+                break
+        self.assertIsNotNone(
+            accepted, "no committed runnable hosted row is currently accepted"
+        )
+        self.assertEqual(accepted["git"]["sha"], verify_receipts.HOSTED_HEAD)
+        forged = dict(accepted)
+        forged["git"] = {
+            **accepted["git"],
+            "sha": FOREIGN_RUN_SHA,
+            "github_sha": FOREIGN_RUN_SHA,
+        }
+        self.assertEqual(
+            verify_receipts._hosted_row_error(plan, forged),
+            "runnable receipt sha does not match the expected workflow sha",
+        )
+
+    def test_committed_receipt_verdict_does_not_depend_on_github_sha(self) -> None:
+        # The command README gives third parties must return the same verdict
+        # in a shell where GITHUB_SHA is set as in one where it is not.  This
+        # asserts equality, not success: whether the committed evidence is
+        # green is `verify-committed-receipts`' job in the same plan profile.
+        verifier = REPO / "portability" / "verify_receipts.py"
+        results = {}
+        for label, ambient in (("absent", None), ("present", FOREIGN_RUN_SHA)):
+            environment = dict(os.environ)
+            environment.pop("GITHUB_SHA", None)
+            if ambient is not None:
+                environment["GITHUB_SHA"] = ambient
+            results[label] = subprocess.run(
+                [sys.executable, "-B", str(verifier)],
+                cwd=REPO,
+                env=environment,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+        absent, present = results["absent"], results["present"]
+        self.assertEqual(
+            absent.returncode, present.returncode, present.stdout[-600:]
+        )
+        self.assertEqual(
+            absent.stdout.strip().splitlines()[-1],
+            present.stdout.strip().splitlines()[-1],
+        )
 
 
 if __name__ == "__main__":

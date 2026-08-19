@@ -234,7 +234,7 @@
         "cwd": ".",
         "argv": ["{python}", "-B", "portability/matrix/test_receipt.py"],
         "timeout_seconds": 900,
-        "expected": {"tests": [54]}
+        "expected": {"tests": [60]}
       },
       {
         "id": "finite-model-focused-tests",
