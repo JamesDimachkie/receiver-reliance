@@ -447,7 +447,7 @@ which is why the correct number of redactions in this release is zero and why
 that is a disposition rather than an omission.
 
 The forward half is a real fix and was made when the class was confirmed. The
-new charter-gate receipt this campaign produced repeated the defect — 
+new charter-gate receipt this campaign produced repeated the defect —
 `portability/run_local_expanded_gate.py` recorded `sys.executable` verbatim into
 `runtime.executable` and into every `executed_argv` — so the runner now redacts
 the home directory to `<HOME>`, preserving path structure below it, and the
