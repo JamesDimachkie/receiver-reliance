@@ -13,6 +13,10 @@ The versioned result taxonomy has exactly three values:
 | `REJECTED_INVALID` | evidence or profile assertions are malformed or contradictory | detection; never a pass |
 | `INSUFFICIENT_EVIDENCE` | required host semantics are unavailable | abstention; never a pass |
 
+[DIAGRAMS.md](../DIAGRAMS.md#a4--the-preflight-and-the-calibration-cliff)
+draws why the status is not an early-exit chain and why `READY` is
+unreachable for an uncalibrated family.
+
 Python use is deliberately small:
 
 ```python

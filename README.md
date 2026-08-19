@@ -129,7 +129,9 @@ how each is enforced; [ADOPTION.md](ADOPTION.md) is the recorded-and-unfixed
 list with a treatment and an owner per row; [ACCEPTANCE.md](ACCEPTANCE.md)
 records what was accepted and under which protocol; [WITHHELD.md](WITHHELD.md)
 ledgers what is deliberately not published and why; [EXAMPLE.md](EXAMPLE.md) is
-one handoff decided end to end; [SECURITY.md](SECURITY.md) is how to report a
+one handoff decided end to end; [DIAGRAMS.md](DIAGRAMS.md) draws the
+boundary, the decision law, the request path and the evidence chain as
+eleven diagrams; [SECURITY.md](SECURITY.md) is how to report a
 defect.
 
 ## Using it on your own records
@@ -158,7 +160,8 @@ Measured over the published 408-record corpus, the preflight holds detection at
 18/18 while taking the clean false-hold rate from 34.1% to **0.0%**, abstaining
 on 208 rows rather than guessing (`adapters/OUTCOME.md`; reproduce with
 `python -B adapters/outcome_receipt.py --check`). No defective row lands in the
-abstention bucket.
+abstention bucket. The calibration cliff this creates is drawn in
+[DIAGRAMS.md](DIAGRAMS.md#a4--the-preflight-and-the-calibration-cliff).
 
 Be clear about its scope: WP1 stopped at a three-strike boundary
 (`F-WP1-009`), so this is a preflight, **not** a general host adapter, runner,

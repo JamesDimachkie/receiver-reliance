@@ -6,6 +6,8 @@ effects — belongs to the host. The external review correctly observed that
 this division was implicit and its cost undisclosed; this document makes it
 explicit and testable. Each obligation carries a conformance check an
 integrator can run against their own host.
+[DIAGRAMS.md](DIAGRAMS.md#a1--the-division-of-labour-and-the-paths-that-do-not-exist)
+draws this division, including the three things the engine never touches.
 
 ## H1. State truthfulness
 

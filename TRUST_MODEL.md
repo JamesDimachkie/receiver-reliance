@@ -18,6 +18,9 @@ repository is signed; there is no key infrastructure, deliberately. A party
 who can rewrite the repository can rewrite any in-repo pin along with it, so
 an in-repo digest is drift detection, not authentication
 (`portable/THREAT_MODEL.md` states the same rule for the bundle manifest).
+[DIAGRAMS.md](DIAGRAMS.md#c1--one-trust-root-and-everything-that-hangs-off-it)
+draws every evidence class descending from that one root, with the absent
+signature edge.
 
 ## What each evidence class proves
 
@@ -45,7 +48,11 @@ of which is a class the law assigns. `AUDIT_INCOMPLETE` is the fail-closed
 outcome of a closure evaluator error, and it fires precisely where the law said
 `VALID` — the audited surface refuses to certify what it could not completely
 check. `PROTOCOL_ERROR` is what a request that never reached classification
-returns. Totality is intact; "exactly one of
+returns.
+[DIAGRAMS.md](DIAGRAMS.md#a3--six-answers-from-two-different-authorities)
+draws the six values and their two origins, and
+[B2](DIAGRAMS.md#b2--what-the-envelope-binds-and-the-one-thing-it-does-not)
+what the seal reaches. Totality is intact; "exactly one of
 four" is a statement about the law, not about the envelope, and a consumer
 switching on `audited_behavior_class` must handle all six. One in-repo consumer does not:
 `portability/concurrency/ladder.py` pins a five-member set omitting
