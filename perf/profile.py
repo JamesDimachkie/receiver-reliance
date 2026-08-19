@@ -29,6 +29,15 @@ from typing import Any, Callable
 
 
 REPO = pathlib.Path(__file__).resolve().parent.parent
+if str(REPO / "portability") not in sys.path:
+    sys.path.insert(0, str(REPO / "portability"))
+
+# This file writes HEAD into profile receipts, so the program answering
+# "which commit is this?" must not be whichever `git` the ambient PATH
+# resolves first (TRUST_MODEL.md's harness boundary; a forged git was
+# demonstrated to move a receipt gate from FAIL to PASS). With RR_TOOL_DIR
+# unset the argv stays byte-identical, so no recorded digest moves.
+import pinned_tools  # noqa: E402
 IMPL = REPO / "baseline-run" / "implementation-output-0.3"
 GROUNDED = REPO / "grounded-0_4"
 RUNNER = IMPL / "pcb_runner.py"
@@ -585,7 +594,7 @@ def ratio_samples(numerator: list[float], denominator: list[float]) -> list[floa
 
 def git_head() -> str | None:
     result = subprocess.run(
-        ["git", "rev-parse", "HEAD"],
+        [pinned_tools.git(), "rev-parse", "HEAD"],
         cwd=REPO,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,

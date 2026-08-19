@@ -94,8 +94,12 @@ promotes this set to blocking (TRUST_MODEL.md, "Re-adjudication trigger").
   reporting) or receipt-language reduction to what was actually verified.
 - C6 remainder: process-tree containment, deadline totality, and buffer
   bounds as protocol obligations for every long-lived harness.
-- CI hardening items (mutable action tags, credential persistence) at the
-  next workflow edit, which is James-gated.
+- ~~CI hardening items (mutable action tags, credential persistence) at the
+  next workflow edit, which is James-gated.~~ **Landed 2026-08-15 (`4be4691`,
+  owner-authorized, ManagedCodex lane).** All three workflows pin every action
+  to a 40-hex SHA and set `persist-credentials: false`; scan finding
+  `csf_676003e1` is named in that commit. Struck rather than deleted so the
+  deferred set stays a record of what was deferred and what became of it.
 
 ## Findings the scan itself scoped down
 

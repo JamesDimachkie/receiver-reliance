@@ -39,6 +39,13 @@ EPI = WORKSPACE / "planning" / "epistemic-handoff"
 TASKS = WORKSPACE / ".agent-tasks"
 HANDOFFS = WORKSPACE / ".claude" / "handoffs"
 OUT_DIR = pathlib.Path(__file__).resolve().parent
+REPO = OUT_DIR.parent
+if str(REPO / "portability") not in sys.path:
+    sys.path.insert(0, str(REPO / "portability"))
+
+# Provenance this script records must not depend on whichever `git` the
+# ambient PATH resolves first (TRUST_MODEL.md's harness boundary).
+import pinned_tools  # noqa: E402
 
 HEX64 = re.compile(r"\b[A-F0-9]{64}\b")
 # `NAME.md`, SHA-256 `HASH`  (the epistemic-handoff citation convention)
@@ -60,7 +67,10 @@ def sha256_file(path: pathlib.Path) -> str | None:
 def git(repo: pathlib.Path, *args: str) -> str | None:
     try:
         proc = subprocess.run(
-            ["git", "-C", str(repo), *args], capture_output=True, text=True, timeout=30
+            [pinned_tools.git(), "-C", str(repo), *args],
+            capture_output=True,
+            text=True,
+            timeout=30,
         )
     except Exception:
         return None

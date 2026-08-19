@@ -14,6 +14,7 @@ from __future__ import annotations
 import os
 import pathlib
 import re
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -24,6 +25,16 @@ if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 
 import pinned_tools  # noqa: E402
+
+
+def _tracked_python_files() -> list[str]:
+    """Every tracked .py path, resolved through the pinned tool the module owns."""
+    out = subprocess.run(
+        [pinned_tools.git(), "-C", str(REPO), "ls-files", "-z", "*.py"],
+        capture_output=True,
+        check=True,
+    ).stdout
+    return [q.decode("utf-8") for q in out.split(b"\0") if q]
 
 
 class DefaultIsUnchanged(unittest.TestCase):
@@ -124,7 +135,22 @@ class AdoptionIsReal(unittest.TestCase):
         "portability/concurrency/ladder.py",
         "portability/matrix/receipt.py",
         "portability/sandbox/run_sandbox.py",
+        "perf/profile.py",
+        "proof/extract_corpus.py",
     )
+
+    # Files that still build a bare argv, each with the reason it may. A file is
+    # allowed here ONLY while a recorded blocker prevents the migration; the
+    # reason is part of the assertion, so removing the blocker without
+    # migrating leaves a stale sentence a reader can check.
+    EXEMPT = {
+        "perf/sidecar/_evidence.py": (
+            "writes the git provenance block into both admitted WP5 receipts, "
+            "and its own bytes are pinned by seven perf receipts and by "
+            "portable/MANIFEST.json, so migrating it moves recorded evidence "
+            "and belongs to an evidence-regeneration event, not an inline edit"
+        ),
+    }
 
     def test_every_evidence_harness_imports_the_module(self) -> None:
         for relative in self.ADOPTED:
@@ -132,16 +158,44 @@ class AdoptionIsReal(unittest.TestCase):
                 source = (REPO / relative).read_text(encoding="utf-8")
                 self.assertIn("import pinned_tools", source)
 
-    def test_no_harness_invokes_a_bare_tool_name(self) -> None:
-        bare = re.compile(r"\[\s*\"(git|docker)\"\s*,")
-        for relative in self.ADOPTED:
-            with self.subTest(module=relative):
-                source = (REPO / relative).read_text(encoding="utf-8")
-                self.assertEqual(
-                    bare.findall(source),
-                    [],
-                    f"{relative} still builds an argv from a bare tool name",
-                )
+    def test_no_tracked_file_invokes_a_bare_tool_name(self) -> None:
+        """Recompute from the tree; never trust a hand-kept adopted list.
+
+        The first revision of this class iterated ADOPTED only, so a harness
+        that never migrated was invisible to it -- and three were. That is the
+        same defect ADOPTION A5 was reopened for ("landing a control is not
+        adopting it") and the same shape ERRATA E15's gate was built to end:
+        a table of known values is a control only when a program compares it
+        against current bytes.
+        """
+        bare = re.compile(r"\[\s*\"(?:git|docker)\"\s*,")
+        # Scope: production harnesses only. A `test_*.py` file is excluded by
+        # rule, with the reason recorded here rather than left implicit -- those
+        # files assert on the argv SHAPE the harness under test produces
+        # (`["docker", "start", ...]`), and asserting on a shape executes
+        # nothing. Excluding them by name is a real narrowing, so it is stated:
+        # a future harness named test_*.py that actually resolves a tool would
+        # not be seen by this gate.
+        offenders = {}
+        for relative in _tracked_python_files():
+            if pathlib.PurePosixPath(relative).name.startswith("test_"):
+                continue
+            source = (REPO / relative).read_text(encoding="utf-8", errors="ignore")
+            if bare.search(source):
+                offenders[relative] = source
+        unexpected = sorted(set(offenders) - set(self.EXEMPT))
+        self.assertEqual(
+            unexpected,
+            [],
+            "tracked files build an argv from a bare tool name and are not "
+            f"declared exempt: {unexpected}",
+        )
+        stale = sorted(set(self.EXEMPT) - set(offenders))
+        self.assertEqual(
+            stale,
+            [],
+            f"declared exempt but no longer builds a bare argv: {stale}",
+        )
 
     def test_unset_default_keeps_argv_byte_identical(self) -> None:
         """The property that made adoption possible without moving a receipt."""
