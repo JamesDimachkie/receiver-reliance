@@ -72,16 +72,16 @@ modeled.
 
 ## Admitted receipt custody
 
-- `perf/receipts/robustness/profile-windows-cpython-3.12-20260812-attempt7.json`
+- `perf/receipts/robustness/profile-windows-cpython-3.12-20260819-attempt8.json`
   — raw SHA-256
-  **90A2F0BA3FB344FB500F7C600B3D7824F233E44EBA027D49544DF11C809B8D1F**;
+  **088BF9FED9E29D960CF304124D8568DE6F0068BAC142DC2D0A4370052027FC63**;
   embedded pre-seal SHA-256
-  `202C4F6822772771075AC2B689D7A9FECCFE9E3ED348A4E7BA35A2303EC61EA7`.
-- `perf/receipts/robustness/sidecar-parity-windows-cpython-3.12-20260812-attempt10.json`
+  `2558DA2B1113BB4120F3A936BB85E6C58C1F49D8F0AF0107F007EBB8403446EE`.
+- `perf/receipts/robustness/sidecar-parity-windows-cpython-3.12-20260819-attempt11.json`
   — raw SHA-256
-  **7295C40565B09405333C173CC136B7CBF8BE83DA106E7F1A63C3CC03BDB73904**;
+  **29ECC8D4E74CDA6BB63869BFE7FEA06469036E5A5DECA7EC66A9BA90FAE71C71**;
   embedded pre-seal SHA-256
-  `BB93274443F4F214EF73E341664DC19DB49D3F3CC857FEAB526FED03C3FB4535`.
+  `E0CDB2E98163ECDF12498E8FEEEF1B1C207A5D2BA4F3EFD67D465F2108E29AA2`.
 
 The profile pins the Python-audit-visible repository inputs across its full
 traced child set; the sidecar receipt (728 checks) pins its own traced set.
@@ -90,18 +90,17 @@ Exact traced-set/pin-set equality is verified by
 for repository regular files in the traced Python process tree, not native
 or OS-wide I/O provenance.
 
-**Pin time changed, and both receipts above predate the change.** Pins used to
-record file bytes at manifest time, after the run, so a file mutated mid-run was
-pinned at its post-run content (F-WP5-006 bound 5). Every recorded read now
-carries the digest of the bytes it opened, and collection fails on a read with
-no pin, on two reads of one path that disagree, and on a path whose
-manifest-time bytes differ from its read-time pin. The manifest schema is
-`receiver-reliance/wp5-complete-execution-input-manifest-2`. Both receipts named
-above declare `…-manifest-1` and were produced under the older, weaker rule, so
-their custody scope is the manifest-time one described in the previous
-paragraph; `perf/sidecar/verify_receipts.py` fails their `manifest-complete`
-check until the evidence-regeneration event replaces them. `perf/SIDECAR.md`
-enumerates that red.
+**Pin time changed, and both receipts above record the new rule.** Pins used
+to record file bytes at manifest time, after the run, so a file mutated
+mid-run was pinned at its post-run content (F-WP5-006 bound 5). Every
+recorded read now carries the digest of the bytes it opened, and collection
+fails on a read with no pin, on two reads of one path that disagree, and on
+a path whose manifest-time bytes differ from its read-time pin. The manifest
+schema is `receiver-reliance/wp5-complete-execution-input-manifest-2`, and
+both admitted receipts declare it — they were recorded by the 2026-08-19
+regeneration event at the repaired bytes. The superseded `20260812` pair
+(attempt7 raw `90A2F0BA…`, attempt10 raw `7295C405…`) declared `-1` under
+the older, weaker rule and stays on disk as chronology.
 
 Both receipts bind their actual `sys.orig_argv`, including `--receipt` and the
 immutable target path. `verify_receipts.py` pins their raw bytes, embedded

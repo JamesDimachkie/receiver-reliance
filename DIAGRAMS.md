@@ -869,16 +869,15 @@ the recorded stdout it replays says `Ran 7 tests`.
 
 | Class | Programs | What a green line means |
 |---|---|---|
-| **Replay** | `portability/verify_receipts.py` (`checks=291`), `perf/sidecar/verify_receipts.py` (`checks=133`, currently `failures=7` — see below), `second-implementation/verify_artifacts.py` | The committed receipt bytes are intact, the sources they name still hash as recorded, and the transcripts they recorded still satisfy the validators of their own era. **Nothing was executed.** |
+| **Replay** | `portability/verify_receipts.py` (`checks=291`), `perf/sidecar/verify_receipts.py` (`checks=134`), `second-implementation/verify_artifacts.py` | The committed receipt bytes are intact, the sources they name still hash as recorded, and the transcripts they recorded still satisfy the validators of their own era. **Nothing was executed.** |
 | **Recompute** | `portability/verify_live.py` (`gates=19`), `baseline-run/verify_conformance_authority.py` (`checks=32`, four declared divergences), `portability/test_home_path_disclosure.py`, `receiver_reliance/generate_engine_manifest.py --check` plus the package's import-time check over eleven engine files, `portable/gate.py` | The artifact at the bytes you have checked out was executed, and its live output was held against the declarations. |
 | **Pin surfaces** | `portable/MANIFEST.json` (61 files — 22 runtime, 13 gate, 11 authority, 9 document, 5 receipt, 1 version), `receiver_reliance/engine_manifest.json` (11 files, self-zero sealed), each receipt's `source_sha256` map | Inventory bindings. They detect drift; they do not authenticate — see C1. |
 
-`perf/sidecar/verify_receipts.py` is red on purpose right now, and a table that only defined what
-green means would hide that. The F-WP5-006 supervision repairs moved three sources both admitted WP5
-receipts pin, and read-time input pinning moved the execution-input manifest schema those receipts
-declare, so seven of its 133 checks fail until the evidence-regeneration event records fresh
-receipts. `portable/gate.py` carries the same failure as `sidecar-receipts exit=1`.
-`perf/SIDECAR.md` enumerates the seven and ADOPTION A6 carries the event.
+`perf/sidecar/verify_receipts.py` was red on purpose between the F-WP5-006
+supervision repairs and the 2026-08-19 regeneration event — seven checks,
+enumerated in `perf/SIDECAR.md` while they stood. The event recorded fresh
+receipts at the repaired bytes and rebound `ADMITTED`, the inventory and the
+manifest; ADOPTION A5/A6 carry the closure.
 
 `portable/gate.py` is the row worth a second look, because it sits on the recompute side for a
 reason and still does not close E13's shape. It runs eight suites as subprocesses at current bytes —

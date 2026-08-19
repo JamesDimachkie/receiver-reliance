@@ -12,15 +12,12 @@ THIS COMMAND IS RED UNTIL THE WP5 EVIDENCE-REGENERATION EVENT, BY DESIGN.  The
 F-WP5-006 supervision repairs move ``supervised_client.py``, ``_trace_exec.py``
 and ``_evidence.py``, which the admitted receipts pin byte-exactly, and read-time
 input pinning moves the execution-input manifest from schema
-``...-manifest-1`` to ``...-manifest-2``.  Both admitted receipts predate all of
-that, so their source rows and their manifest schema no longer describe the
-files in the tree.  That is this verifier working: the repairs cannot be
-absorbed silently, and the receipts cannot be rewritten to claim bytes they were
-not produced from.  The red clears when a fresh Windows CPython 3.12 profiling
-and parity run is recorded and ``ADMITTED``, the ``SOURCE_PIN_ERRATA`` table,
-``portable/inventory.json``, ``portable/MANIFEST.json`` and the counts pinned to
-this command are rebound to it.  ERRATA E12 and E14 describe the event shape;
-``perf/SIDECAR.md`` states the expected failures.
+``...-manifest-1`` to ``...-manifest-2``.  The 2026-08-19 regeneration event
+recorded both receipts fresh at those bytes -- profile attempt8 and parity
+attempt11, schema ``-2``, read-time pinning, writer redaction -- so ADMITTED,
+the inventory and the manifest bind runs the current sources actually
+produced.  ERRATA E12 and E14 describe the event shape this followed; the
+superseded 2026-08-12 attempts stay on disk as chronology.
 
 Only schema ``-2`` is admitted.  The ``-1`` receipts are not kept as a legacy
 branch because nothing reads them here: this verifier checks exactly the entries
@@ -44,74 +41,21 @@ from _evidence import canonical, sha256  # noqa: E402
 
 
 ADMITTED = {
-    "perf/receipts/robustness/profile-windows-cpython-3.12-20260812-attempt7.json":
-        "90A2F0BA3FB344FB500F7C600B3D7824F233E44EBA027D49544DF11C809B8D1F",
-    "perf/receipts/robustness/sidecar-parity-windows-cpython-3.12-20260812-attempt10.json":
-        "7295C40565B09405333C173CC136B7CBF8BE83DA106E7F1A63C3CC03BDB73904",
+    "perf/receipts/robustness/profile-windows-cpython-3.12-20260819-attempt8.json":
+        "088BF9FED9E29D960CF304124D8568DE6F0068BAC142DC2D0A4370052027FC63",
+    "perf/receipts/robustness/sidecar-parity-windows-cpython-3.12-20260819-attempt11.json":
+        "29ECC8D4E74CDA6BB63869BFE7FEA06469036E5A5DECA7EC66A9BA90FAE71C71",
 }
 
-# ERRATA E14.  Each admitted receipt carries a ``source_sha256`` map recording
-# the bytes that produced its recorded profiling run.  The hardening campaign
-# deliberately changed four of those sources, so seven pin rows across the two
-# receipts no longer equal the current bytes:
-#
-#   grounded-0_4/rr_api.py             W1 withdrew the bare decide route and W3
-#                                      added runtime byte-authentication of
-#                                      every governing input.
-#   grounded-0_4/authority_surface.py  W3 added register nesting and vocabulary
-#                                      authentication.
-#   grounded-0_4/rr_batch.py           W3 added the batch overlimit cap and the
-#                                      OBL-30 R1-R3 pool bindings.
-#   perf/sidecar/profile_robustness.py the W3-adapters/W4 evidence rebind.
-#
-# The pins are NOT rebound, and could not be even if that were the right call:
-# they live inside the receipt bodies, whose raw digests are pinned in ADMITTED
-# above, in the 61-file portable manifest, and by the receipts' own self-zero
-# seals.  What they bind is provenance -- which bytes produced a recorded run --
-# so rewriting them would assert that today's hardened sources produced the
-# 2026-08-12 profiling numbers.  They did not.
-#
-# Failing seven checks silently was no better: perf/SIDECAR.md listed this
-# command under "Verification" with no caveat while it exited 1.  Each drifted
-# row is now declared with the digest of the current bytes, so the receipt keeps
-# its honest historical pin and a FURTHER undisclosed move of any of these four
-# files fails here.
-# (receipt label, source label) -> (digest the receipt pins, current digest)
-_HARDENED_AUTHORITY_SURFACE = (
-    "44BA458B93416B48404AAEF19335EA558106A83CA3DD4A65C3F6EE0EDB5ACAA6",
-    "62B689D964CA906C2E3F8376047E0DDD14C78364432B1A7EA8499C8FF7E8C5DD",
-)
-_HARDENED_RR_API = (
-    "7774AA7BCCD0251DFCFA5A6B0A8ADD40D356359756DA3DABA3C1E70DEF5AFF80",
-    "79C0582FAB4A04DA3FCA90ECD7B5096457D67EBA4CA7E8D6A487C5D3E2CDECD3",
-)
-_HARDENED_RR_BATCH = (
-    "BF38779E9A568C45EA8FA7315FCBFE58B62C0FE1742F5F2497D7603B3F983B1C",
-    "B271C6DBADC050DC0302B30EFEDD050608146881DB974D6C369BBAB781307870",
-)
-_HARDENED_PROFILE_ROBUSTNESS = (
-    "1DD4E53E9E3A2260255AB393825A0DB64184F558148D05681D3EB68F326FB1E9",
-    "71B0CD8829421842686F7B5379398017EBB3D254C7AF903A8490FA3E9280E660",
-)
-_PROFILE_ATTEMPT7 = (
-    "perf/receipts/robustness/profile-windows-cpython-3.12-20260812-attempt7.json"
-)
-_PARITY_ATTEMPT10 = (
-    "perf/receipts/robustness/"
-    "sidecar-parity-windows-cpython-3.12-20260812-attempt10.json"
-)
-SOURCE_PIN_ERRATA = {
-    (_PROFILE_ATTEMPT7, "grounded-0_4/authority_surface.py"):
-        _HARDENED_AUTHORITY_SURFACE,
-    (_PROFILE_ATTEMPT7, "grounded-0_4/rr_api.py"): _HARDENED_RR_API,
-    (_PROFILE_ATTEMPT7, "grounded-0_4/rr_batch.py"): _HARDENED_RR_BATCH,
-    (_PROFILE_ATTEMPT7, "perf/sidecar/profile_robustness.py"):
-        _HARDENED_PROFILE_ROBUSTNESS,
-    (_PARITY_ATTEMPT10, "grounded-0_4/authority_surface.py"):
-        _HARDENED_AUTHORITY_SURFACE,
-    (_PARITY_ATTEMPT10, "grounded-0_4/rr_api.py"): _HARDENED_RR_API,
-    (_PARITY_ATTEMPT10, "grounded-0_4/rr_batch.py"): _HARDENED_RR_BATCH,
-}
+# ERRATA E14 mechanism, table currently empty.  The 2026-08-19 regeneration
+# event recorded fresh receipts whose ``source_sha256`` maps pin the CURRENT
+# bytes -- the supervision bounds (A6), the pinned-tools migration (A5) and
+# the writer redaction included -- so no admitted pin is drifted and no
+# erratum row exists.  The mechanism stays: if a pinned source deliberately
+# moves again before the next regeneration, the move is declared here as
+# (receipt label, source label) -> (digest the receipt pins, current digest),
+# and an undisclosed move fails the plain sha256 check below.
+SOURCE_PIN_ERRATA: dict[tuple[str, str], tuple[str, str]] = {}
 
 
 def main() -> int:

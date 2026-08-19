@@ -464,20 +464,17 @@ each drifted (receipt, source) pair with both digests. Each such row now yields
 two checks — the erratum must quote the digest the receipt still publishes, and
 the current bytes must equal the recorded post-erratum digest — so the historical
 pin cannot be quietly rewritten and a further undisclosed move fails. The command
-reports `checks=133 failures=0`. `perf/sidecar/findings/F-WP5-008.md` carries the
+reports `checks=134 failures=0`. `perf/sidecar/findings/F-WP5-008.md` carries the
 record and `perf/SIDECAR.md` now states the command's scope.
 
-**That figure is historical: the command is red again, on purpose.** The F-WP5-006
-supervision repairs moved `perf/sidecar/supervised_client.py`,
-`perf/sidecar/_trace_exec.py` and `perf/sidecar/_evidence.py`, and read-time input
-pinning moved the execution-input manifest schema, so the command reports
-`checks=133 failures=7` until the evidence-regeneration event records fresh
-receipts. Those seven are deliberately NOT given `SOURCE_PIN_ERRATA` rows: the rows
-in this erratum exist for sources the campaign changed and never intends to re-run,
-and converting a scheduled event into a permanent disposition is the opposite of
-what this page is for. `perf/SIDECAR.md` enumerates the seven failures before a
-reader runs the command, which is the whole lesson of this erratum applied to its
-own successor.
+**The red window that followed is closed.** The F-WP5-006 supervision
+repairs and A5's migration moved three pinned sources and the manifest
+schema, so the command reported `checks=133 failures=7` — enumerated in
+`perf/SIDECAR.md` while it stood — until the 2026-08-19 regeneration event
+recorded fresh receipts at those bytes and rebound `ADMITTED`, the portable
+inventory and the manifest. No `SOURCE_PIN_ERRATA` rows were spent on that
+window: this page's rows exist for sources never intended to re-run, and
+those were changed precisely so a fresh run could be recorded.
 
 Same class as E12 and E13.
 

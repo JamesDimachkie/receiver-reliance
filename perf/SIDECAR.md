@@ -112,33 +112,21 @@ python -B perf/sidecar/verify_receipts.py
 
 Expected: `sidecar parity: checks=728 failures=0 fixtures=124`, then
 `supervision bounds: checks=37 failures=0`, then
-`wp5 receipt verification: checks=133 failures=7` — **the third command is red
-on purpose and exits 1.**
+`wp5 receipt verification: checks=134 failures=0`.
 
-**The third command is red until the WP5 evidence-regeneration event.** The
-F-WP5-006 supervision repairs move three files the admitted receipts pin
-byte-exactly, and read-time input pinning moves the execution-input manifest
-schema those receipts declare. Exactly seven checks fail, and they are listed
-here so a reader can hold the command against the list rather than take a
-summary line on trust:
+**The WP5 evidence-regeneration event is recorded (2026-08-19).** The
+F-WP5-006 supervision repairs and ADOPTION A5's migration moved three files
+the previously admitted receipts pinned byte-exactly, and read-time input
+pinning moved the manifest schema they declared, so this command was red
+(seven enumerated checks) from the repairs until the event. Fresh receipts
+now bind the current bytes — `profile-…-20260819-attempt8.json` and
+`sidecar-parity-…-20260819-attempt11.json`, schema `-2`, writer redaction
+active — and `ADMITTED`, the portable inventory and the manifest are rebound
+to them. The superseded 2026-08-12 attempts stay on disk as chronology.
 
-| Failing check | Why |
-|---|---|
-| `profile-…attempt7.json:manifest-complete` | the receipt declares `…-manifest-1`; the verifier requires `…-manifest-2` with `input_pin_time: "read"` |
-| `sidecar-parity-…attempt10.json:manifest-complete` | same |
-| `profile-…attempt7.json:perf/sidecar/_evidence.py:sha256` | ADOPTION A5 migration to `pinned_tools.git()` plus ERRATA E15 redaction at the receipt write boundary |
-| `sidecar-parity-…attempt10.json:perf/sidecar/_evidence.py:sha256` | same |
-| `profile-…attempt7.json:perf/sidecar/_trace_exec.py:sha256` | bound 5 read-time pinning |
-| `sidecar-parity-…attempt10.json:perf/sidecar/_trace_exec.py:sha256` | bound 5 read-time pinning |
-| `sidecar-parity-…attempt10.json:perf/sidecar/supervised_client.py:sha256` | bounds 1, 2 and 3 |
-
-These seven are NOT given an `SOURCE_PIN_ERRATA` row. E14 rows exist for sources
-the campaign changed and never intends to re-run; these three are changed
-precisely so a fresh run can be recorded, so an erratum row would convert a
-scheduled event into a permanent disposition. The red clears when a Windows
-CPython 3.12 profiling and parity run at these bytes is recorded, `ADMITTED` is
-rebound to the new receipts, and the portable inventory and manifest follow.
-ADOPTION A6 carries the event; ERRATA E12 and E14 describe its shape.
+No `SOURCE_PIN_ERRATA` row was ever added for that window: E14 rows exist
+for sources the campaign changed and never intends to re-run, and these were
+changed precisely so a fresh run could be recorded — which it now is.
 
 **Read the third command's scope before relying on it.** It verifies recorded
 evidence, not current behaviour: raw receipt digests, self-zero seals, the
