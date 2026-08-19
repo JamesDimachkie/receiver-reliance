@@ -214,17 +214,26 @@ string that no verifier reads and no published number depends on.
 **The deferral condition fired during the 1.2.1 hardening campaign, and the
 correction was still not made — stated plainly rather than left to be found.**
 This erratum used to defer to "the next sealed second-implementation
-generation ... when the pins move anyway", and the pins did move: the
-consolidated evidence-rebind event regenerated the receipt, `verify_hygiene`'s
-`ALLOWED` digest was updated and `portable/MANIFEST.json` was rebuilt. The
-status string and `official_author_strike_count` were left at their stale
-values through that re-bind. The honest reason is that the rebind event was
-scoped to evidence bindings and reviewed as such across six rounds, and
-reopening a sealed receipt's semantic fields inside it would have changed what
-that review had accepted. The correction now waits on the next event that
-opens the receipt for its own reasons; until then `RI5.md` governs and this
-paragraph is the record that the deferral was renewed deliberately rather than
-by oversight.
+generation ... when the pins move anyway", and the pins moved twice.
+
+`9243cd2`, the consolidated evidence-rebind event, regenerated the receipt
+(`FF22DA0F...` to `CB42DDBF...`) and rebuilt `portable/MANIFEST.json`. It did
+**not** touch `portability/verify_hygiene.py`, whose `ALLOWED` digest stayed at
+the superseded value; that moved three days later at `af0caf7`, a separate
+21-file commit outside the rebind's six-round review. An earlier revision of
+this paragraph attributed the `ALLOWED` update to the rebind, which is wrong and
+was caught by the v1.2.1 delta review; the two-commit account above is the
+measured one. Between those commits `verify_hygiene`'s custody hash for this
+receipt did not match the file it names.
+
+The status string and `official_author_strike_count` were left stale through
+both. For the rebind, the reason holds: it was scoped to evidence bindings and
+reviewed as such across six rounds, and reopening a sealed receipt's semantic
+fields inside it would have changed what that review had accepted. For
+`af0caf7` there is no such reason — the custody surface was reopened and the
+semantic correction simply was not made. Recorded as a second missed
+opportunity rather than presented as one deliberate deferral. Until an event
+opens the receipt for its own reasons, `RI5.md` governs.
 
 Two related facts remain accurate in the receipt and are **not** stale:
 `campaign_gate` is still
@@ -427,24 +436,23 @@ field — but a published file that names someone's home directory undermines th
 artifact it is meant to support.
 
 **This erratum said "ten" until the v1.2.1 publication preflight, and ten was
-wrong.** The author-separated review that gates this release reproduced the
-true set with a single case-insensitive grep, in seconds, with no knowledge of
-the repository. That is the more serious defect: not the account name, but a
-disclosure page that a reader can falsify faster than they can read it. The
-count is corrected here, the disposition is stated per class rather than per
-hand-listed file, and the whole declaration is now enforced by a program
-instead of asserted by prose.
+wrong.** One case-insensitive grep returns the true set. That is the more
+serious defect: not the account name, but a disclosure page a reader can falsify
+faster than they can read it. The count is corrected here, the disposition is
+stated per class rather than per hand-listed file, and the declaration is
+checked by a program instead of asserted by prose.
 
 The fifty-two split into two classes, and the class decides the treatment:
 
 | Class | Count | What they are | Treatment |
 |---|---|---|---|
-| **Frozen** | 39 | Digest-pinned by another tracked file, by the 60-file portable manifest, or as a `candidate_files` row of the author-increment receipt: the seven `profile-windows-*` and ten `sidecar-parity-*` robustness receipts, five concurrency receipts, four charter-gate receipts, `N48-independent-refuter-20260811.json` and its memsample, the five `F-ORACLE-*` findings, `RI2`–`RI4`, `perf/PROFILE_BASELINE.md`, `adapters/fixtures/parent_corpus_408.jsonl`, and `second-implementation/PROVENANCE.md`. | **Cannot be edited without destroying what they attest.** `verify_hygiene` and `verify_receipts` refuse any change to them by digest. |
+| **Frozen** | 39 | Digest-pinned by another tracked file, by the 60-file portable manifest, or as a `candidate_files` row of the author-increment receipt: the seven `profile-windows-*` and ten `sidecar-parity-*` robustness receipts, five concurrency receipts, four charter-gate receipts, `N48-independent-refuter-20260811.json` and its memsample, the five `F-ORACLE-*` findings, `RI2`–`RI4`, `perf/PROFILE_BASELINE.md`, `adapters/fixtures/parent_corpus_408.jsonl`, and `second-implementation/PROVENANCE.md`. | **Cannot be edited without destroying what they attest** — but the enforcement is not uniform, and the difference matters. **Twelve** are refused by a running program: `portability/verify_receipts.py`, `portability/verify_hygiene.py`, `perf/sidecar/verify_receipts.py::ADMITTED`, the 60-file portable manifest, the author-increment receipt, or `adapters/outcome_receipt.py`. The remaining **twenty-seven** are pinned by a published digest table inside another tracked file — `perf/COST_MODEL.md`, `orchestration/CRITICISM_ADJUDICATION.md`, `portability/oracle/PROVENANCE.md`, `portability/concurrency/receipts/STATUS.md` — which a reader can check by hand and no program reads. That is a real gap, and it is stated here rather than smoothed over: a prose pin detects nothing on its own. |
 | **Recorded** | 13 | Not digest-pinned, but each is a record of an observed run or a historical witness held on purpose: three concurrency receipts, `orchestration/MATRIX.md`, `FUZZ_CAMPAIGN.md`, the two `fuzz-streams/T1*_SOL.md` stream logs, `N48-POST-F-MODEL-003-SUMMARY.md`, the four `F-SANDBOX-018`–`021` findings, and `portability/sandbox/test_sandbox.py`, whose `FROZEN_WINDOWS_REPOSITORY_SOURCE` constant pins the exact string a hosted sandbox receipt recorded. | **Deliberately not redacted.** Scrubbing the path would make the repository's account of a run disagree with what was observed, which is the failure class E12, E13 and E14 exist to prevent. A record is corrected by a later record, not by a quiet rewrite. (These files are not immutable — their prose is corrected when it goes stale; it is the recorded observation that is not rewritten.) |
 
-There is no third class: nothing here is both unpinned and non-evidentiary,
-which is why the correct number of redactions in this release is zero and why
-that is a disposition rather than an omission.
+Nothing here is both unpinned and non-evidentiary, so no file in the set can be
+redacted without either breaking a digest that another file publishes or
+rewriting a record of an observed run. That is why the number of redactions is
+zero.
 
 The forward half is a real fix and was made when the class was confirmed. The
 new charter-gate receipt this campaign produced repeated the defect —
@@ -471,9 +479,16 @@ python -B portability/test_home_path_disclosure.py
 Expected: `home-path-disclosure: {"declared": 52, "failures": 0, "frozen": 39,
 "observed": 52, "recorded": 13}`. It recomputes — it enumerates the tracked
 files, reads each one, and compares the observed set against the declaration
-carried in its own source. A new instance introduced by any future generator
+carried in its own source. A new instance under the maintainer's Windows home
 fails as `UNDECLARED`; a declared instance that stops carrying a path fails as
 `STALE`, because a disclosure that silently shrinks is also a wrong disclosure.
+**The pattern is account-specific, and that is the residual:** it matches this
+account under a Windows user root, so a generator running under a POSIX `/home`,
+a different account name, or a display-name home directory would introduce an
+instance this gate does not see. It also reads UTF-8 with `errors="ignore"` and
+skips tracked files absent from the worktree. The gate narrows the residual E15
+has always carried — that a future evidence generator could introduce a new
+instance — it does not close it.
 **Negative proof:** both arms were exercised at the commit that added the gate —
 an injected undeclared file exits 1, and removing a declared file from the
 enumeration exits 1 on both the `STALE` and the count check. The gate assembles

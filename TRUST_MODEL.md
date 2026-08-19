@@ -41,11 +41,19 @@ decision *law* classifies every schema-valid decision input into exactly one of
 `OMISSION_OR_INCOMPLETE` — that is a property of the frozen tables. The audited
 *surface* wrapping it can additionally return `AUDIT_INCOMPLETE` and
 `PROTOCOL_ERROR` (`grounded-0_4/rr_api.py`, `grounded-0_4/rr_batch.py`), neither
-of which is a classification of a schema-valid input: the first is the
-fail-closed outcome of a closure evaluator error, the second is what a request
-that never reached classification returns. Totality is intact; "exactly one of
+of which is a class the law assigns. `AUDIT_INCOMPLETE` is the fail-closed
+outcome of a closure evaluator error, and it fires precisely where the law said
+`VALID` — the audited surface refuses to certify what it could not completely
+check. `PROTOCOL_ERROR` is what a request that never reached classification
+returns. Totality is intact; "exactly one of
 four" is a statement about the law, not about the envelope, and a consumer
-switching on `audited_behavior_class` must handle all six.
+switching on `audited_behavior_class` must handle all six. One in-repo consumer does not:
+`portability/concurrency/ladder.py` pins a five-member set omitting
+`AUDIT_INCOMPLETE` and raises `InvariantFailure` on anything outside it. That is
+a narrower contract over a closed fixture set rather than a claim about the
+surface, and it has held across every recorded ladder run — but no proof exists
+here that those inputs cannot reach a closure-evaluator error, so it is recorded
+as a narrower contract, not a demonstrated impossibility.
 
 ## Trust boundaries, by surface
 
