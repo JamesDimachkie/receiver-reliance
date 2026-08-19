@@ -303,7 +303,7 @@ One of the four no longer matches.
 
 `4ea69dc` bound the clean v3 normative and smoke receipts, with
 `portability/concurrency/ladder.py` at
-`B5436C851C849CFB2B39A7EC2B35C258E501E3171A2ECD6BE6AF913329CC27E6`. Three changes have moved
+`B5436C851C849CFB2B39A7EC2B35C258E501E3171A2ECD6BE6AF913329CC27E6`. Four changes have moved
 it since:
 
 1. `ca1ccfe` changed exactly one line — `AUDITED_FORMAT_VERSION` from
@@ -319,8 +319,13 @@ it since:
    normative cells rejected every fresh envelope (`audited_envelope_version`)
    until it moved -- taking the digest to
    `CB7D1FA56C50C99576A7B1E717A06E6C902A5262400B5DE0D52143FDBC706C12`.
+4. The ERRATA E15 redaction adoption routed the ladder receipt through
+   `portability/receipt_paths.py` at its single write boundary, so a new receipt
+   no longer records the operator home directory in `runtime.executable` or in a
+   controller traceback, taking the digest to
+   `CD725088C497E36BA9906DB49104F451ECBB7AA1DCF3C2E3F9627722B81050E3`.
 
-The second move is worth stating plainly: the guard this erratum installed is
+The second and fourth moves are worth stating plainly: the guard this erratum installed is
 what surfaced it. The adoption commit ran `verify_receipts`, which failed
 `source_pin.errata_current`, so the change could not land without either
 disclosing the move or reverting it. That is the difference between a
@@ -328,6 +333,13 @@ disposition and a note. `ladder.py` was adopted rather than exempted because its
 `git` invocation is provenance evidence for the concurrency receipts, and an
 exemption would have left the one harness whose source is published as a receipt
 binding resolving its authority from the ambient `PATH`.
+
+The fourth move followed the same law and was surfaced the same way: the
+redaction change failed `source_pin.errata_current` on its first run, so it had
+to be disclosed here or reverted. The ladder was redacted rather than exempted
+because a receipt writer that keeps publishing an account name is the defect E15
+exists to stop, and the one harness whose source is itself a published receipt
+binding is the worst available place to keep that exception.
 
 The other three pins — `test_ladder.py`, `oracle/oracle.py`,
 `oracle/__init__.py` — still equal their published digests exactly.
@@ -355,8 +367,10 @@ bytes.
 Enforcement: `portability/verify_receipts.py` now hashes all four published
 sources. Three must equal their published digests. `ladder.py` is bound to the
 newest digest recorded above, so a further undisclosed move fails the gate
-rather than hiding behind the disclosed ones. `portability/concurrency/findings/F-CONC-004.md`
-carries the full record.
+rather than hiding behind the disclosed ones. Two of the four moves were forced
+through this disclosure by that guard rather than remembered by an author, which
+is the reason the count in this erratum can be trusted at all.
+`portability/concurrency/findings/F-CONC-004.md` carries the full record.
 
 ## E13 — A replay verifier reported green over a red gate for four commits
 
@@ -453,6 +467,18 @@ pin cannot be quietly rewritten and a further undisclosed move fails. The comman
 reports `checks=133 failures=0`. `perf/sidecar/findings/F-WP5-008.md` carries the
 record and `perf/SIDECAR.md` now states the command's scope.
 
+**That figure is historical: the command is red again, on purpose.** The F-WP5-006
+supervision repairs moved `perf/sidecar/supervised_client.py`,
+`perf/sidecar/_trace_exec.py` and `perf/sidecar/_evidence.py`, and read-time input
+pinning moved the execution-input manifest schema, so the command reports
+`checks=133 failures=7` until the evidence-regeneration event records fresh
+receipts. Those seven are deliberately NOT given `SOURCE_PIN_ERRATA` rows: the rows
+in this erratum exist for sources the campaign changed and never intends to re-run,
+and converting a scheduled event into a permanent disposition is the opposite of
+what this page is for. `perf/SIDECAR.md` enumerates the seven failures before a
+reader runs the command, which is the whole lesson of this erratum applied to its
+own successor.
+
 Same class as E12 and E13.
 
 ## E15 — Tracked files contain the maintainer's home directory
@@ -489,18 +515,38 @@ new charter-gate receipt this campaign produced repeated the defect —
 the home directory to `<HOME>`, preserving path structure below it, and the
 receipt was regenerated rather than shipped with the leak.
 
-**The forward half is not complete, and an earlier revision of this erratum said
-it was.** `portability/matrix/receipt.py` still writes `sys.executable` verbatim
-into `environment.runtime.executable` (`:539`) and expands the plan's `{python}`
-template to the same absolute path in the recorded `argv` (`:646`); it contains
-no redaction. It escapes the count above only because matrix receipts are
-generated on hosted runners, whose home directory is not the maintainer's — a
-maintainer-local run that got committed would leak immediately.
+**The forward half was not complete, and an earlier revision of this erratum said
+it was.** Three further writers were still producing new instances:
+`portability/matrix/receipt.py` wrote `sys.executable` verbatim into
+`environment.runtime.executable` and expanded the plan's `{python}` template to
+the same absolute path in the recorded `argv`; `perf/profile.py` wrote it into
+`system.executable`; `perf/sidecar/_evidence.py` wrote it into `runtime`, into the
+real `command` argv, into `executed_argv` and into the temporary pycache root of
+every WP5 receipt; and `portability/concurrency/ladder.py` wrote it once per run,
+once per worker run, and wrote a checkout path inside a controller traceback. The
+matrix writer escaped the count above only because matrix receipts are generated on
+hosted runners, whose home directory is not the maintainer's — a maintainer-local
+run that got committed would have leaked immediately.
 `adapters/outcome_receipt.py` records no argv at all, so naming it as a
 generator that records argv safely was simply wrong. `run_sandbox.py` does build
-its argv from repository-relative plan entries. Porting `_redact` into
-`matrix/receipt.py` is the outstanding forward work and is the right thing to do
-before the next locally-generated matrix receipt, not after.
+its argv from repository-relative plan entries.
+
+**All four now redact, through one implementation rather than four.** `_redact` was
+not ported into the other writers; it moved to `portability/receipt_paths.py` and
+`run_local_expanded_gate.py` calls it there, so there is one rule and not five
+copies to drift. Each writer applies it to the whole receipt tree at its single
+write boundary rather than to an enumerated field list, because the field nobody
+enumerated — a traceback, a child argv, a cProfile function label — is exactly the
+one that ships the leak. The match is case-insensitive and separator-insensitive,
+because the gate's pattern is; a case-sensitive redactor would have reported a
+guarantee the gate then falsified. `portability/test_receipt_redaction.py` holds
+each writer's real boundary against the gate's own compiled pattern under a
+synthetic home, and fails if a second home-directory redactor appears anywhere in
+the tracked tree. Residue: redaction rewrites the home directory as
+`pathlib.Path.home()` spells it, so an 8.3 short name, a UNC spelling, a
+substituted drive or a symlink to the same directory is a different string and is
+not redacted. The gate remains the backstop — it recomputes over tracked bytes, so
+an unredacted spelling surfaces as a gate failure rather than as a silent leak.
 
 **Scope, stated because `git clone` ships more than HEAD.** The count, the
 classes and the gate all describe *tracked files at the published commit*. The

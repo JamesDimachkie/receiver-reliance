@@ -106,13 +106,41 @@ pairs; never share one child's stdout among readers.
 
 ```powershell
 python -B perf/sidecar/test_sidecar.py
+python -B perf/sidecar/test_supervision_bounds.py
 python -B perf/sidecar/verify_receipts.py
 ```
 
 Expected: `sidecar parity: checks=728 failures=0 fixtures=124`, then
-`wp5 receipt verification: checks=133 failures=0`.
+`supervision bounds: checks=37 failures=0`, then
+`wp5 receipt verification: checks=133 failures=7` — **the third command is red
+on purpose and exits 1.**
 
-**Read the second command's scope before relying on it.** It verifies recorded
+**The third command is red until the WP5 evidence-regeneration event.** The
+F-WP5-006 supervision repairs move three files the admitted receipts pin
+byte-exactly, and read-time input pinning moves the execution-input manifest
+schema those receipts declare. Exactly seven checks fail, and they are listed
+here so a reader can hold the command against the list rather than take a
+summary line on trust:
+
+| Failing check | Why |
+|---|---|
+| `profile-…attempt7.json:manifest-complete` | the receipt declares `…-manifest-1`; the verifier requires `…-manifest-2` with `input_pin_time: "read"` |
+| `sidecar-parity-…attempt10.json:manifest-complete` | same |
+| `profile-…attempt7.json:perf/sidecar/_evidence.py:sha256` | ADOPTION A5 migration to `pinned_tools.git()` plus ERRATA E15 redaction at the receipt write boundary |
+| `sidecar-parity-…attempt10.json:perf/sidecar/_evidence.py:sha256` | same |
+| `profile-…attempt7.json:perf/sidecar/_trace_exec.py:sha256` | bound 5 read-time pinning |
+| `sidecar-parity-…attempt10.json:perf/sidecar/_trace_exec.py:sha256` | bound 5 read-time pinning |
+| `sidecar-parity-…attempt10.json:perf/sidecar/supervised_client.py:sha256` | bounds 1, 2 and 3 |
+
+These seven are NOT given an `SOURCE_PIN_ERRATA` row. E14 rows exist for sources
+the campaign changed and never intends to re-run; these three are changed
+precisely so a fresh run can be recorded, so an erratum row would convert a
+scheduled event into a permanent disposition. The red clears when a Windows
+CPython 3.12 profiling and parity run at these bytes is recorded, `ADMITTED` is
+rebound to the new receipts, and the portable inventory and manifest follow.
+ADOPTION A6 carries the event; ERRATA E12 and E14 describe its shape.
+
+**Read the third command's scope before relying on it.** It verifies recorded
 evidence, not current behaviour: raw receipt digests, self-zero seals, the
 traced-versus-pinned input closure, and the provenance pins each receipt carries.
 Seven of those pins are stale by design and carry ERRATA E14, because the
@@ -124,7 +152,9 @@ bytes produced the recorded numbers — so the verifier holds them against the
 erratum, which also pins the current bytes so a further undisclosed move fails.
 `findings/F-WP5-008.md` carries the record. Between 3985356 and the commit
 carrying that finding this command exited 1 with `checks=126 failures=7` while
-this section listed it as verification with no caveat.
+this section listed it as verification with no caveat. The table above exists so
+that history cannot repeat: the command is red again, deliberately, and the
+failures are enumerated before a reader runs it.
 
 The receipts themselves are historical. Reproducing the profiling numbers at
 current bytes would need a fresh run on a comparable host, and none has been

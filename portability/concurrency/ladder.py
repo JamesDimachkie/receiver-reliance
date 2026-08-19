@@ -73,6 +73,13 @@ if str(REPO / "portability") not in sys.path:
 # no receipt digest moves; with it set, tools resolve inside a directory an
 # unprivileged process cannot write and never fall back to PATH.
 import pinned_tools  # noqa: E402
+# ERRATA E15: the ladder receipts record sys.executable once per run and once
+# per worker run, and a controller traceback records the checkout path.  All
+# three carried the maintainer's home directory into a published receipt.  The
+# redaction is applied to the whole receipt at its single write boundary, not to
+# an enumerated field list, because the traceback is exactly the field a field
+# list would miss.
+import receipt_paths  # noqa: E402
 
 import rr_batch  # noqa: E402  (accepted implementation, read-only)
 from portability.oracle import (  # noqa: E402
@@ -1698,7 +1705,15 @@ def _discover_free_threaded() -> tuple[list[str] | None, dict[str, Any]]:
 
 def _write_receipt(path: pathlib.Path, receipt: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    payload = json.dumps(receipt, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
+    # The one write boundary for every ladder receipt, so the one place the
+    # operator's home directory is removed (ERRATA E15).  Redaction rewrites
+    # what is RECORDED; nothing below reopens a redacted path.
+    payload = (
+        json.dumps(
+            receipt_paths.redact_tree(receipt), indent=2, sort_keys=True, ensure_ascii=False
+        )
+        + "\n"
+    )
     path.write_text(payload, encoding="utf-8", newline="\n")
 
 

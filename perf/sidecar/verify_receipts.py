@@ -7,6 +7,25 @@ deliberately changed four of those files afterwards.  Those rows verify against
 the erratum instead of being rebound, so the receipts keep an honest historical
 provenance pin while a FURTHER undisclosed move of any of the four fails here.
 ``perf/sidecar/findings/F-WP5-008.md`` carries the record.
+
+THIS COMMAND IS RED UNTIL THE WP5 EVIDENCE-REGENERATION EVENT, BY DESIGN.  The
+F-WP5-006 supervision repairs move ``supervised_client.py``, ``_trace_exec.py``
+and ``_evidence.py``, which the admitted receipts pin byte-exactly, and read-time
+input pinning moves the execution-input manifest from schema
+``...-manifest-1`` to ``...-manifest-2``.  Both admitted receipts predate all of
+that, so their source rows and their manifest schema no longer describe the
+files in the tree.  That is this verifier working: the repairs cannot be
+absorbed silently, and the receipts cannot be rewritten to claim bytes they were
+not produced from.  The red clears when a fresh Windows CPython 3.12 profiling
+and parity run is recorded and ``ADMITTED``, the ``SOURCE_PIN_ERRATA`` table,
+``portable/inventory.json``, ``portable/MANIFEST.json`` and the counts pinned to
+this command are rebound to it.  ERRATA E12 and E14 describe the event shape;
+``perf/SIDECAR.md`` states the expected failures.
+
+Only schema ``-2`` is admitted.  The ``-1`` receipts are not kept as a legacy
+branch because nothing reads them here: this verifier checks exactly the entries
+of ``ADMITTED``, and the superseded attempts on disk are chronology, not inputs.
+A legacy branch would be a validator arm no receipt exercises.
 """
 from __future__ import annotations
 
@@ -137,7 +156,13 @@ def main() -> int:
             f"{label}:manifest-complete",
             manifest.get("complete") is True
             and manifest.get("schema")
-            == "receiver-reliance/wp5-complete-execution-input-manifest-1",
+            == "receiver-reliance/wp5-complete-execution-input-manifest-2"
+            and manifest.get("input_pin_time") == "read"
+            and manifest.get("read_pinned_events") == manifest.get("repo_open_events"),
+            f"schema={manifest.get('schema')!r} "
+            f"input_pin_time={manifest.get('input_pin_time')!r} "
+            f"read_pinned_events={manifest.get('read_pinned_events')!r} "
+            f"repo_open_events={manifest.get('repo_open_events')!r}",
         )
         check(
             f"{label}:manifest-labels",

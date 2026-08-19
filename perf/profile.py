@@ -38,6 +38,12 @@ if str(REPO / "portability") not in sys.path:
 # demonstrated to move a receipt gate from FAIL to PASS). With RR_TOOL_DIR
 # unset the argv stays byte-identical, so no recorded digest moves.
 import pinned_tools  # noqa: E402
+# ERRATA E15: this file records sys.executable into every profile it writes, so
+# a profile produced from a home-directory checkout published the maintainer's
+# account name for no evidentiary purpose.  One shared redactor, applied at the
+# serialization boundary rather than field by field, because the field nobody
+# enumerated is the one that ships the leak.
+import receipt_paths  # noqa: E402
 IMPL = REPO / "baseline-run" / "implementation-output-0.3"
 GROUNDED = REPO / "grounded-0_4"
 RUNNER = IMPL / "pcb_runner.py"
@@ -604,6 +610,19 @@ def git_head() -> str | None:
     return result.stdout.strip() if result.returncode == 0 else None
 
 
+def encode_profile(result: dict[str, Any]) -> str:
+    """The one serialization boundary for a profile, so the one redaction site.
+
+    ``result`` records ``system.executable`` and, through the component probes,
+    absolute paths this profiler never enumerated.  ERRATA E15 is about the
+    field nobody listed, so the whole tree is redacted here rather than field by
+    field.  Extracted from ``main`` so the boundary is callable by
+    ``portability/test_receipt_redaction.py`` -- an unreachable boundary cannot
+    be shown to hold.
+    """
+    return json.dumps(receipt_paths.redact_tree(result), indent=2, sort_keys=True) + "\n"
+
+
 def main() -> int:
     args = parse_args()
     fixtures = load_fixtures()
@@ -702,7 +721,7 @@ def main() -> int:
             "Results describe this Python build and platform; rerun before using them for another host.",
         ],
     }
-    encoded = json.dumps(result, indent=2, sort_keys=True) + "\n"
+    encoded = encode_profile(result)
     if args.output is None:
         sys.stdout.write(encoded)
     else:

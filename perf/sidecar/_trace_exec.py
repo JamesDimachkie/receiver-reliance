@@ -4,6 +4,13 @@
 The caller supplies a unique empty ``-X pycache_prefix`` directory and ``-B``.
 This bootstrap installs the hook before opening the target source, records its
 own already-opened source explicitly, then executes the target with ``runpy``.
+
+F-WP5-006 bound 5: every recorded read carries the digest of the bytes AS
+OPENED.  The manifest used to pin each unique input once, after the run, so a
+file mutated mid-run was recorded at its post-run content and the receipt
+asserted that content was the execution input.  Pinning at the read makes a
+mid-run mutation two different digests for one path instead of one late digest
+that hides both.
 """
 from __future__ import annotations
 
@@ -19,6 +26,7 @@ import sys
 HERE = pathlib.Path(__file__).resolve().parent
 REPO = HERE.parents[1]
 RECEIPTS = REPO / "perf" / "receipts"
+READ_CHUNK_BYTES = 1024 * 1024
 
 
 def canonical(value: object) -> bytes:
@@ -48,6 +56,38 @@ def main() -> int:
     trace_path = trace_dir / f"opens-{args.trace_id}.jsonl"
     meta_path = trace_dir / f"meta-{args.trace_id}.json"
     event_index = 0
+    pinning = False
+
+    def read_time_pin(resolved: pathlib.Path) -> tuple[str | None, int | None]:
+        """Digest and length of the file as this read opened it.
+
+        Hashing is itself an open, so the audit hook would record it and
+        recurse.  ``pinning`` suppresses exactly that reentrance and nothing
+        else: it is set and cleared around one read with no yield point between,
+        and the hook consults it before doing any work.
+
+        An input that cannot be read at the moment it is opened is pinned as
+        ``None`` rather than dropped.  Dropping it would shrink a manifest that
+        calls itself complete; a null digest fails closed in
+        ``_evidence.execution_input_manifest``.
+        """
+        nonlocal pinning
+        pinning = True
+        try:
+            digest = hashlib.sha256()
+            length = 0
+            with open(resolved, "rb") as handle:
+                while True:
+                    chunk = handle.read(READ_CHUNK_BYTES)
+                    if not chunk:
+                        break
+                    digest.update(chunk)
+                    length += len(chunk)
+            return digest.hexdigest().upper(), length
+        except OSError:
+            return None, None
+        finally:
+            pinning = False
 
     def record_path(raw_path: object, event: str) -> None:
         nonlocal event_index
@@ -67,7 +107,15 @@ def main() -> int:
         # are not executable inputs; a later existence check admits only files.
         if not resolved.is_file():
             return
-        row = {"event": event, "index": event_index, "path": label, "pid": os.getpid()}
+        digest, length = read_time_pin(resolved)
+        row = {
+            "event": event,
+            "index": event_index,
+            "path": label,
+            "pid": os.getpid(),
+            "sha256": digest,
+            "bytes": length,
+        }
         event_index += 1
         payload = canonical(row) + b"\n"
         descriptor = os.open(trace_path, os.O_APPEND | os.O_CREAT | os.O_WRONLY, 0o600)
@@ -77,6 +125,8 @@ def main() -> int:
             os.close(descriptor)
 
     def audit(event: str, values: tuple[object, ...]) -> None:
+        if pinning:
+            return
         if event == "open" and values:
             mode = values[1] if len(values) > 1 else None
             flags = values[2] if len(values) > 2 else None
@@ -103,7 +153,7 @@ def main() -> int:
             exit_code = 1
     finally:
         meta = {
-            "schema": "receiver-reliance/wp5-audit-trace-process-1",
+            "schema": "receiver-reliance/wp5-audit-trace-process-2",
             "pid": os.getpid(),
             "trace_id": args.trace_id,
             "target": target.relative_to(REPO).as_posix(),
@@ -114,6 +164,7 @@ def main() -> int:
                 else None
             ),
             "event_count": event_index,
+            "input_pin_time": "read",
             "pycache_prefix": str(prefix),
             "pycache_empty_at_start": True,
             "pycache_empty_at_end": not any(prefix.rglob("*")),

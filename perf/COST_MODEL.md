@@ -88,9 +88,20 @@ traced child set; the sidecar receipt (728 checks) pins its own traced set.
 Exact traced-set/pin-set equality is verified by
 `perf/sidecar/verify_receipts.py`. This is Python `open` audit-event custody
 for repository regular files in the traced Python process tree, not native
-or OS-wide I/O provenance — and pins record file bytes at manifest time
-(after the run), not at each read: a file mutated mid-run is pinned at its
-post-run content (F-WP5-006).
+or OS-wide I/O provenance.
+
+**Pin time changed, and both receipts above predate the change.** Pins used to
+record file bytes at manifest time, after the run, so a file mutated mid-run was
+pinned at its post-run content (F-WP5-006 bound 5). Every recorded read now
+carries the digest of the bytes it opened, and collection fails on a read with
+no pin, on two reads of one path that disagree, and on a path whose
+manifest-time bytes differ from its read-time pin. The manifest schema is
+`receiver-reliance/wp5-complete-execution-input-manifest-2`. Both receipts named
+above declare `…-manifest-1` and were produced under the older, weaker rule, so
+their custody scope is the manifest-time one described in the previous
+paragraph; `perf/sidecar/verify_receipts.py` fails their `manifest-complete`
+check until the evidence-regeneration event replaces them. `perf/SIDECAR.md`
+enumerates that red.
 
 Both receipts bind their actual `sys.orig_argv`, including `--receipt` and the
 immutable target path. `verify_receipts.py` pins their raw bytes, embedded

@@ -50,6 +50,12 @@ if str(REPO_ROOT / "portability") not in sys.path:
 # no receipt digest moves; with it set, tools resolve inside a directory an
 # unprivileged process cannot write and never fall back to PATH.
 import pinned_tools  # noqa: E402
+# ERRATA E15: this file records the executing interpreter and every expanded
+# argv into each matrix receipt.  On a hosted runner neither is under a home
+# directory; on a maintainer's host both are, and the receipt is the same
+# schema either way.  Redaction is applied at _write_json, the one boundary
+# every receipt and the summary pass through.
+import receipt_paths  # noqa: E402
 import strict_ingest  # noqa: E402  (ADOPTION A4: the one shared ingest law)
 SAFE_ENV_KEYS = (
     "CI",
@@ -807,6 +813,13 @@ def _decimal_json_lexeme(value: decimal.Decimal) -> str:
 def _canonical_json_chunks(value: Any):
     """Yield deterministic JSON without traversing containers recursively."""
 
+    # ERRATA E15.  Redaction happens at this writer's keys and string leaves,
+    # not over a copied tree, so it inherits the depth bound, the cycle
+    # detection and the non-recursive traversal below instead of adding a second
+    # traversal that would hit a RecursionError before any of them applied.
+    # The home directory is resolved once per document rather than per string.
+    home = receipt_paths.home()
+
     stack: list[tuple[str, Any, int]] = [("value", value, 0)]
     active_containers: set[int] = set()
     while stack:
@@ -834,16 +847,24 @@ def _canonical_json_chunks(value: Any):
                 yield "{}"
                 continue
             active_containers.add(identity)
+            renamed: dict[str, Any] = {}
+            for key in item:
+                redacted_key = receipt_paths.redact(key, base=home)
+                if redacted_key in renamed:
+                    raise ValueError(
+                        "home-directory redaction would collide two object keys"
+                    )
+                renamed[redacted_key] = item[key]
             indent = "  " * level
             child_indent = "  " * (level + 1)
             operations: list[tuple[str, Any, int]] = [("text", "{\n", 0)]
-            for index, key in enumerate(sorted(item)):
+            for index, key in enumerate(sorted(renamed)):
                 if index:
                     operations.append(("text", ",\n", 0))
                 operations.append(
                     ("text", f"{child_indent}{json.dumps(key)}: ", 0)
                 )
-                operations.append(("value", item[key], level + 1))
+                operations.append(("value", renamed[key], level + 1))
             operations.extend(
                 [
                     ("text", f"\n{indent}}}", 0),
@@ -896,6 +917,8 @@ def _canonical_json_chunks(value: Any):
             item, -MAX_RECEIPT_INTEGER, MAX_RECEIPT_INTEGER
         ):
             raise ValueError("integer exceeds the finite writer domain")
+        if isinstance(item, str):
+            item = receipt_paths.redact(item, base=home)
         yield json.dumps(item, allow_nan=False)
 
 
@@ -1666,6 +1689,23 @@ def _suite_counts_validation_error(value: Any) -> str | None:
     return None
 
 
+def _is_absolute_or_redacted(path_text: str) -> bool:
+    """An absolute path, or one whose home-directory prefix was redacted.
+
+    Receipts remove the operator's home directory from recorded paths (ERRATA
+    E15).  On a host whose temporary directory lives under that home directory
+    -- which is the Windows default -- the recorded temporary root therefore
+    begins with the redaction marker instead of a drive letter or a separator.
+    The marker stands for an absolute prefix that was removed, so it is admitted
+    here and nothing else is: a relative temporary root is still a receipt
+    defect.  Hosted-runner receipts never take this branch, because their
+    temporary root is not under a home directory and is left verbatim.
+    """
+    if path_text.startswith(receipt_paths.HOME_MARKER):
+        return True
+    return ntpath.isabs(path_text) or posixpath.isabs(path_text)
+
+
 def _argv_validation_error(
     actual: Any,
     templates: Any,
@@ -1696,7 +1736,7 @@ def _argv_validation_error(
             return f"command argv[{index}] does not match the temporary-path template"
         end = len(observed) - len(suffix) if suffix else len(observed)
         temp_root = observed[len(prefix) : end]
-        if not temp_root or not (ntpath.isabs(temp_root) or posixpath.isabs(temp_root)):
+        if not temp_root or not _is_absolute_or_redacted(temp_root):
             return f"command argv[{index}] has a non-absolute temporary root"
         temp_roots.add(temp_root)
         if len(temp_roots) != 1:

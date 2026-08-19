@@ -75,8 +75,8 @@ ALLOWED = {
     # and the WP5 documents/verifier are admitted on the same byte-exact
     # custody terms rather than normalized.
     "perf/COST_MODEL.md": (
-        174,
-        "6E89886BC7F69F66548BC39E4705568FB3186658B04ACFFB8BAD5078FE37ECC9",
+        185,
+        "875A23E674D247C4946B4E14A8D73F8B90D535E02D4D4BD987CB7618BA08D9D4",
     ),
     "perf/PROFILE_ROBUSTNESS_20260811.md": (
         146,
@@ -86,12 +86,12 @@ ALLOWED = {
     # stale-provenance-pin table and SIDECAR.md stopped presenting a red command
     # as verification.  CRLF custody terms are unchanged.
     "perf/SIDECAR.md": (
-        154,
-        "68081C3FB6A614286263D5A8B3ABDA887B870BAC3A8369060BF5E12CF7CA9CD3",
+        184,
+        "47DCC3E9AB3C7599124FBD737C74DC91AD2ECF09F667E7DEF0B38F2B4C9ACCB2",
     ),
     "perf/sidecar/verify_receipts.py": (
-        316,
-        "D024123E50FE463F1A954BBB6701D59283574AF69ABA95FB625C96EB9E446A21",
+        341,
+        "1512EFD115D75557BA81CD1CAE6FA280E7CB982AEC72EE2E1427157876D088CB",
     ),
     "second-implementation/receipts/AUTHOR_INCREMENT_RECEIPT_0_1.json": (
         189,

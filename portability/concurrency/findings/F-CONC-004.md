@@ -20,7 +20,7 @@ The gap was not hypothetical. Measured at this revision:
 
 | Role | Source | Published | Current |
 |---|---|---|---|
-| harness | `../ladder.py` | `B5436C85…` | `CB7D1FA5…` |
+| harness | `../ladder.py` | `B5436C85…` | `CD725088…` |
 | focused tests | `../test_ladder.py` | `926D75C5…` | `926D75C5…` |
 | clean oracle implementation | `../../oracle/oracle.py` | `2148F0C9…` | `2148F0C9…` |
 | clean oracle public API | `../../oracle/__init__.py` | `747CF137…` | `747CF137…` |
@@ -48,11 +48,22 @@ until `AUDITED_FORMAT_VERSION` moved to `B1-AUDITED-DECISION-0.4.2`, taking
 the digest to `CB7D1FA5…`. The disclosure lands in the same change as the
 move, which is what this guard exists to force.
 
+A fourth move, and the second the guard caught rather than the author
+remembered. ERRATA E15 discloses that tracked files record the maintainer home
+directory; the ladder was one of four receipt writers still producing new
+instances, recording `sys.executable` once per run and once per worker run, and a
+checkout path inside a controller traceback. `_write_receipt` now redacts the
+whole receipt through `portability/receipt_paths.py`, the one shared
+implementation, taking the digest to `CD725088…`. The ladder was redacted rather
+than exempted for the same reason it was adopted rather than exempted in the
+second move: it is the one harness whose source is itself a published receipt
+binding, which makes it the worst available place to keep an exception.
+
 ## Why the pin is not refreshed
 
 Refreshing it is the cheap repair and it is the wrong one. The digest's only
-function is to say which bytes produced the recorded run. Rewriting it to
-`D40F692A…` would assert that the current bytes produced the 242,400-envelope,
+function is to say which bytes produced the recorded run. Rewriting it to any
+later digest would assert that the current bytes produced the 242,400-envelope,
 213.937-second normative run, which they did not: no ladder re-run receipt
 exists at these bytes. F-MATRIX-016 argues the 0.4.1 and 0.4.2 envelopes keep the frozen
 six-field surface so the seal recompute and oracle projection hold unchanged,
@@ -76,10 +87,11 @@ produced those receipts. It is not. Anyone re-running the ladder here runs the
 
 `verify_receipts.py` gains `CONCURRENCY_SOURCE_PINS` and `SOURCE_PIN_ERRATA`.
 Three pins must equal the current bytes exactly. `ladder.py` is bound to the
-post-erratum digest, and a further check requires `STATUS.md` to still publish
-the historical digest and to carry the E12 cross-reference — so neither the pin
-nor its disclosure can be quietly dropped, and a second undisclosed byte move
-fails the gate instead of hiding behind the first.
+newest post-erratum digest, and a further check requires `STATUS.md` to still
+publish the historical digest and to carry the E12 cross-reference — so neither
+the pin nor its disclosure can be quietly dropped, and a further undisclosed byte
+move fails the gate instead of hiding behind the disclosed ones. It has now
+caught two, which is the difference between a guard and a note.
 
 Same class as F-MATRIX-013/014/015/016/017: bindings to program-era truths must
 migrate in the same change that moves the truths. This one could not migrate,

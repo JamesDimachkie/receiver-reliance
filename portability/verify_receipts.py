@@ -110,8 +110,8 @@ CONCURRENCY_SOURCE_PINS = {
 # refreshed: rewriting it would assert that today's bytes produced the recorded
 # 213.937-second run, which is false.  The erratum records the published digest
 # and the digest of the current bytes instead, so the stale pin stays honest and
-# no undisclosed move can hide behind a disclosed one.  Two changes have moved
-# the file since the binding, both recorded in ERRATA E12:
+# no undisclosed move can hide behind a disclosed one.  Four changes have moved
+# the file since the binding, all four recorded in ERRATA E12:
 #   ca1ccfe  AUDITED_FORMAT_VERSION 0.4 -> 0.4.1, the F-MATRIX-016 migration
 #            (digest D40F692A...).
 #   the pinned_tools adoption, which replaced the ladder's bare ``git`` argv
@@ -121,11 +121,17 @@ CONCURRENCY_SOURCE_PINS = {
 #            after 0ff243c moved the audit format and left this pin behind;
 #            the hosted normative cells rejected every fresh envelope
 #            (audited_envelope_version) until it moved (digest CB7D1FA5...).
+#   the ERRATA E15 redaction adoption, which routed the ladder receipt through
+#            portability/receipt_paths.py at its single write boundary so a
+#            new receipt stops recording the operator home directory in
+#            runtime.executable and in a controller traceback (digest CD725088...).
+#            The fourth move, and the second this guard forced into disclosure
+#            rather than an author remembering to record it.
 # path -> (digest published in STATUS.md, digest of the current bytes).
 SOURCE_PIN_ERRATA = {
     "portability/concurrency/ladder.py": (
         "B5436C851C849CFB2B39A7EC2B35C258E501E3171A2ECD6BE6AF913329CC27E6",
-        "CB7D1FA56C50C99576A7B1E717A06E6C902A5262400B5DE0D52143FDBC706C12",
+        "CD725088C497E36BA9906DB49104F451ECBB7AA1DCF3C2E3F9627722B81050E3",
     ),
 }
 

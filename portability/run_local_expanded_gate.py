@@ -35,9 +35,17 @@ import expanded_gate  # noqa: E402
 # digest moves; with it set, tools resolve inside an administrator-write-only
 # directory and never fall back to PATH.
 import pinned_tools  # noqa: E402
+# ERRATA E15.  This file wrote the first home-directory redactor, privately.
+# Three other receipt writers needed the same thing and did not have it, which
+# is the shape ADOPTION A5 records twice: a control that exists but is not in
+# every decision path it belongs to.  The implementation now lives in
+# portability/receipt_paths.py and all four writers call it; this file keeps its
+# own name for the behaviour so the receipts it already produced and the ones it
+# produces now are written by visibly the same rule.
+import receipt_paths  # noqa: E402
 
 
-HOME_MARKER = "<HOME>"
+HOME_MARKER = receipt_paths.HOME_MARKER
 
 
 def _redact(value: str) -> str:
@@ -52,14 +60,7 @@ def _redact(value: str) -> str:
     from repeating it. Path structure below the home directory is preserved.
     """
 
-    home = str(pathlib.Path.home())
-    if not home:
-        return value
-    for spelling in (home, home.replace("\\", "/")):
-        for candidate in (spelling, spelling.replace("/", "\\")):
-            if candidate and candidate in value:
-                value = value.replace(candidate, HOME_MARKER)
-    return value
+    return receipt_paths.redact(value)
 
 
 def _canonical(value: Any) -> bytes:
