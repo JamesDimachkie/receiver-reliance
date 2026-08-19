@@ -38,8 +38,15 @@ _ACCOUNT = "james"
 # A character class holding both separators, built without writing either
 # escape literally, so this file stays outside its own search.
 _SEP = "[/" + chr(92) + chr(92) + "]"
+# The boundary is "not a word character", NOT "a separator or end of file".
+# The first revision of this gate used the latter and was falsified by the
+# v1.2.1 adversarial audit: the bare home directory at the end of a line, inside
+# a closing JSON quote, before a markdown backtick, or followed by a space or
+# comma all went unseen -- and that is exactly the shape %USERPROFILE% and
+# pathlib.Path.home() produce, which makes an environment dump the most likely
+# future leak and the one the gate could not see.
 HOME_PATH = re.compile(
-    _USERS + _SEP + "+" + _ACCOUNT + "(?=" + _SEP + "|$)", re.IGNORECASE
+    _USERS + _SEP + "+" + _ACCOUNT + "(?![A-Za-z0-9_-])", re.IGNORECASE
 )
 
 # ERRATA E15's table, as data. Class meanings:
@@ -122,11 +129,15 @@ def _tracked() -> list[str]:
 def main() -> int:
     failures: list[str] = []
     observed: dict[str, str] = {}
+    unreadable: set[str] = set()
 
     for rel in _tracked():
         try:
             data = (REPO / rel).read_bytes()
         except (OSError, ValueError):
+            # Unreadable is not "clean". Record it so a declared file that has
+            # gone missing is reported as missing rather than as scrubbed.
+            unreadable.add(rel)
             continue
         text = data.decode("utf-8", errors="ignore")
         if HOME_PATH.search(text):
@@ -140,7 +151,14 @@ def main() -> int:
                 observed[rel] = cls
 
     for rel in DECLARED:
-        if rel not in observed:
+        if rel in observed:
+            continue
+        if rel in unreadable:
+            failures.append(
+                f"UNREADABLE: ERRATA E15 declares {rel} but it could not be read; "
+                f"this is not evidence the path is gone"
+            )
+        else:
             failures.append(
                 f"STALE: ERRATA E15 declares {rel} but it no longer records a "
                 f"home-directory path; correct the disclosure"

@@ -447,22 +447,43 @@ The fifty-two split into two classes, and the class decides the treatment:
 | Class | Count | What they are | Treatment |
 |---|---|---|---|
 | **Frozen** | 39 | Digest-pinned by another tracked file, by the 60-file portable manifest, or as a `candidate_files` row of the author-increment receipt: the seven `profile-windows-*` and ten `sidecar-parity-*` robustness receipts, five concurrency receipts, four charter-gate receipts, `N48-independent-refuter-20260811.json` and its memsample, the five `F-ORACLE-*` findings, `RI2`–`RI4`, `perf/PROFILE_BASELINE.md`, `adapters/fixtures/parent_corpus_408.jsonl`, and `second-implementation/PROVENANCE.md`. | **Cannot be edited without destroying what they attest** — but the enforcement is not uniform, and the difference matters. **Twelve** are refused by a running program: `portability/verify_receipts.py`, `portability/verify_hygiene.py`, `perf/sidecar/verify_receipts.py::ADMITTED`, the 60-file portable manifest, the author-increment receipt, or `adapters/outcome_receipt.py`. The remaining **twenty-seven** are pinned by a published digest table inside another tracked file — `perf/COST_MODEL.md`, `orchestration/CRITICISM_ADJUDICATION.md`, `portability/oracle/PROVENANCE.md`, `portability/concurrency/receipts/STATUS.md` — which a reader can check by hand and no program reads. That is a real gap, and it is stated here rather than smoothed over: a prose pin detects nothing on its own. |
-| **Recorded** | 13 | Not digest-pinned, but each is a record of an observed run or a historical witness held on purpose: three concurrency receipts, `orchestration/MATRIX.md`, `FUZZ_CAMPAIGN.md`, the two `fuzz-streams/T1*_SOL.md` stream logs, `N48-POST-F-MODEL-003-SUMMARY.md`, the four `F-SANDBOX-018`–`021` findings, and `portability/sandbox/test_sandbox.py`, whose `FROZEN_WINDOWS_REPOSITORY_SOURCE` constant pins the exact string a hosted sandbox receipt recorded. | **Deliberately not redacted.** Scrubbing the path would make the repository's account of a run disagree with what was observed, which is the failure class E12, E13 and E14 exist to prevent. A record is corrected by a later record, not by a quiet rewrite. (These files are not immutable — their prose is corrected when it goes stale; it is the recorded observation that is not rewritten.) |
+| **Recorded** | 13 | Not digest-pinned, but each is a record of an observed run or a historical witness held on purpose: three concurrency receipts, `orchestration/MATRIX.md`, `FUZZ_CAMPAIGN.md`, the two `fuzz-streams/T1*_SOL.md` stream logs, `N48-POST-F-MODEL-003-SUMMARY.md`, and the five-file sandbox cluster — the four `F-SANDBOX-018`–`021` findings plus `portability/sandbox/test_sandbox.py`, whose `FROZEN_WINDOWS_REPOSITORY_SOURCE` is a synthetic constant, **not** a string any hosted receipt recorded (the hosted sandbox receipt records `/home/runner/work/...`; an earlier revision of this erratum claimed otherwise and was wrong). | **Deliberately not redacted, for two different reasons.** Eight of the thirteen are records of an observed run, and scrubbing one would make the repository's account disagree with what was observed — the failure class E12, E13 and E14 exist to prevent. The five-file sandbox cluster is not that: it records no observation. Its reason is that the constant is cross-pinned across five files whose published byte lengths and digests are *derived from it*, so redacting it means recomputing six figures across the cluster; it is a frozen historical custody surface, not a witness. Both are reasons to leave it; only the first is about evidence, and conflating them would be the kind of tidy sentence this page exists to avoid. (These files are not immutable — their prose is corrected when it goes stale; it is the recorded observation that is not rewritten.) |
 
-Nothing here is both unpinned and non-evidentiary, so no file in the set can be
-redacted without either breaking a digest that another file publishes or
-rewriting a record of an observed run. That is why the number of redactions is
-zero.
+No file in the set can be redacted without breaking a digest another file
+publishes, rewriting a record of an observed run, or recomputing a cross-pinned
+cluster. That is why the number of redactions is zero.
 
 The forward half is a real fix and was made when the class was confirmed. The
 new charter-gate receipt this campaign produced repeated the defect —
 `portability/run_local_expanded_gate.py` recorded `sys.executable` verbatim into
 `runtime.executable` and into every `executed_argv` — so the runner now redacts
 the home directory to `<HOME>`, preserving path structure below it, and the
-receipt was regenerated rather than shipped with the leak. The other generators
-that write durable receipts (`portability/matrix/receipt.py`,
-`portability/sandbox/run_sandbox.py`, `adapters/outcome_receipt.py`) record argv
-from plans whose entries are repository-relative.
+receipt was regenerated rather than shipped with the leak.
+
+**The forward half is not complete, and an earlier revision of this erratum said
+it was.** `portability/matrix/receipt.py` still writes `sys.executable` verbatim
+into `environment.runtime.executable` (`:539`) and expands the plan's `{python}`
+template to the same absolute path in the recorded `argv` (`:646`); it contains
+no redaction. It escapes the count above only because matrix receipts are
+generated on hosted runners, whose home directory is not the maintainer's — a
+maintainer-local run that got committed would leak immediately.
+`adapters/outcome_receipt.py` records no argv at all, so naming it as a
+generator that records argv safely was simply wrong. `run_sandbox.py` does build
+its argv from repository-relative plan entries. Porting `_redact` into
+`matrix/receipt.py` is the outstanding forward work and is the right thing to do
+before the next locally-generated matrix receipt, not after.
+
+**Scope, stated because `git clone` ships more than HEAD.** The count, the
+classes and the gate all describe *tracked files at the published commit*. The
+repository's history carries more: a scan of the whole object database finds the
+pattern in roughly eighty blobs across fifty-five paths, including
+`portability/receipts/local-expanded-gate-hardening-6776332.json`, the leaked
+charter-gate receipt this erratum describes as regenerated. It was regenerated
+and removed from the tip — it was not removed from history, and the honest
+release posture is the full 24-commit history unsquashed. So the sentence above
+means the leak is not in what you check out; it does not mean the leak is not in
+what you cloned. Filtering history is not planned: it would rewrite published
+commits, which this project does not do.
 
 **What is new in 1.2.1: the disclosure is now a control.** This erratum
 previously ended by saying nothing enforced it, and justified that with the
@@ -482,13 +503,28 @@ files, reads each one, and compares the observed set against the declaration
 carried in its own source. A new instance under the maintainer's Windows home
 fails as `UNDECLARED`; a declared instance that stops carrying a path fails as
 `STALE`, because a disclosure that silently shrinks is also a wrong disclosure.
-**The pattern is account-specific, and that is the residual:** it matches this
-account under a Windows user root, so a generator running under a POSIX `/home`,
-a different account name, or a display-name home directory would introduce an
-instance this gate does not see. It also reads UTF-8 with `errors="ignore"` and
-skips tracked files absent from the worktree. The gate narrows the residual E15
-has always carried — that a future evidence generator could introduce a new
-instance — it does not close it.
+**The first revision of this gate was itself falsified, which is worth
+recording.** Its boundary was "a separator or the end of the file", so the bare
+home directory at the end of a line, inside a closing JSON quote, before a
+markdown backtick, or followed by a space or comma all went unseen — and that is
+precisely the shape `%USERPROFILE%` and `pathlib.Path.home()` produce, making an
+environment dump the likeliest future leak and the one case the gate could not
+see. The v1.2.1 adversarial audit demonstrated it end to end with two tracked
+probe files that the gate passed at 52/0. The boundary is now "not a word
+character", proven against all three shapes; the declared count is unchanged at
+fifty-two, because nothing currently tracked needed the looser rule.
+
+**Residuals that remain, stated so the next reader does not have to find them:**
+the pattern is account-specific, so a generator running under a POSIX `/home`, a
+different account name, or a display-name home directory introduces an instance
+this gate does not see; it decodes UTF-8 with `errors="ignore"`, so a UTF-16 or
+other non-UTF-8 file is effectively skipped (none is tracked today, checked); it
+reads the worktree rather than the index; and **it is not yet wired into any
+hosted workflow**, so today it runs when a person runs it — which is the same
+"control outside the decision path" shape that reopened `ADOPTION.md` A5, and it
+should be a step in the robustness workflow at the next owner-authorized
+workflow edit. The gate narrows the residual E15 has always carried; it does not
+close it.
 **Negative proof:** both arms were exercised at the commit that added the gate —
 an injected undeclared file exits 1, and removing a declared file from the
 enumeration exits 1 on both the `STALE` and the count check. The gate assembles
