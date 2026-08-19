@@ -43,7 +43,7 @@ BASELINE_SHA = "4e788d21e882a30bdda2aec3f780537161f81644"
 # release evidence, which is the pin F-MATRIX-014 moved here from a deleted
 # ``sol/*`` branch.  A single-branch equality, though, made the sandbox arm
 # unreachable on the branch under review — and that arm is the one independent
-# check that runs the eleven-command charter gate inside the hardened container.
+# check that runs the whole charter gate inside the hardened container.
 # It is why the red gate 3985356 introduced survived four commits: the only
 # other custody program replays recorded stdout.  Verification branches now run
 # and their receipts record the exact branch, so release evidence stays
@@ -158,6 +158,22 @@ def _expected_observed() -> dict[str, Any]:
         "contract_lint": {"findings": 0},
         "synthetic_proof_harness": {"tests": 9, "failures": 0},
         "fuzz_ci_smoke": {"strategies": 31, "completed": 31, "failures": 0},
+        "incident_replay_corpus": {
+            "incidents": 12,
+            "executable": 12,
+            "checks": 27,
+            "failures": 0,
+        },
+        # unittest_N gates.  The count is declared once, in the validator name,
+        # exactly as the checks_N family declares it; these entries exist only
+        # because the derivation below reads checks_N and nothing else.
+        # test_sandbox.DeclaredCountsMatchTheSuites re-derives every one of
+        # them from the suite's own bytes, so neither copy can lag the other.
+        "engine_manifest": {"tests": 12, "failures": 0},
+        "audit_seal": {"tests": 14, "failures": 0},
+        "observability": {"tests": 30, "failures": 0},
+        "portable_preflight": {"tests": 37, "failures": 0},
+        "admission_profile": {"tests": 25, "failures": 0},
     }
     checks_name = re.compile(r"\Achecks_([0-9]+)\Z")
     for spec in expanded_gate.GATES:

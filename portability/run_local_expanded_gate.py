@@ -1,4 +1,4 @@
-"""Run the exact eleven-command charter gate and emit one durable receipt."""
+"""Run the exact charter gate, command for command, and emit one durable receipt."""
 from __future__ import annotations
 
 import argparse
@@ -158,7 +158,10 @@ def main(argv: list[str] | None = None) -> int:
         "schema": "receiver-reliance/local-expanded-gate-receipt-2",
         "status": "STARTED",
         "started_utc": started.isoformat(),
-        "authority_commands": 11,
+        # Derived, never a literal: a receipt that says eleven while it
+        # records nineteen commands is a receipt that lies about its own
+        # scope, and the literal is exactly the shape ERRATA E13 names.
+        "authority_commands": len(expanded_gate.GATES),
         "receipt_path": receipt_path_label(receipt_path),
         "git": {
             "head": _git(["rev-parse", "HEAD"]).decode("ascii").strip(),

@@ -151,11 +151,12 @@ python -B deployment/derive_admission_numbers.py --cost             # re-measure
 
 Both commands now run on every normative cell of the hosted matrix, as
 `admission-profile-tests` and `admission-extent-check` in
-`portability/matrix/plan.json`. That addition was the designed
-evidence-regeneration event `ERRATA.md` E12 and E14 describe, not an inline
-edit: the committed hosted receipts predate both rows, so
-`portability/verify_receipts.py` declares them in `HOSTED_ERA_ABSENT_COMMANDS`
-and those receipts keep replaying against the 17-command manifest their own run
-executed. The suite is still not in the eleven-command charter gate, which pins
-its command set inside a byte-committed receipt of its own, and `--cost`
-measures on your host, so it stays hand-run.
+`portability/matrix/plan.json`, and the suite is in the charter gate as
+`admission_profile` — the charter went from eleven commands to nineteen and
+the current-counts hardening receipt was re-recorded against the new
+manifest. Both additions were the designed evidence-regeneration event
+`ERRATA.md` E12 and E14 describe, not inline edits: the committed hosted
+receipts predate the rows, so `portability/verify_receipts.py` declares them
+in `HOSTED_ERA_ABSENT_COMMANDS` and those receipts keep replaying against the
+17-command manifest their own run executed. `--cost` measures on your host,
+so it stays hand-run.

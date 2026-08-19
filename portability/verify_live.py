@@ -10,8 +10,8 @@ the charter gate pinned at 7.  The live gate was red for four commits while
 ``verify_receipts`` reported ``checks=193 failures=0``, truthfully, because the
 recorded stdout it replays says "Ran 7 tests".
 
-This program is the recompute half.  It executes the eleven-command charter gate
-at the current bytes and holds the live output against both declared
+This program is the recompute half.  It executes the whole charter gate at the
+current bytes and holds the live output against both declared
 authorities — the gate's own validators and the matrix plan's expectations — and
 against what the sealed receipt recorded.  A difference from the sealed receipt
 is not a failure by itself, because the sealed receipt describes an earlier era;
@@ -66,7 +66,38 @@ GATE_TO_PLAN_ID = {
     "fuzz_ci_smoke": "seeded-fuzz-smoke",
     "batch_perf": "batch-performance-gate",
     "single_pass_audit_benchmark": "single-pass-benchmark",
+    "engine_manifest": "engine-manifest-tests",
+    "audit_seal": "audit-seal-tests",
+    "observability": "observability-tests",
+    "portable_preflight": "portable-preflight-tests",
+    "mcp_gate": "mcp-gate-regression",
+    "admission_profile": "admission-profile-tests",
+    # These two are declared once, in the plan's ``portability_checks``
+    # profile, where every focused matrix row already runs them.  A second copy
+    # under ``expanded_extra`` would be two declarations of one command that can
+    # drift apart, which is the whole failure class this file exists to catch,
+    # so the charter binds the declaration that already exists.
+    "decision_law_structural": "decision-law-structural",
+    "incident_replay_corpus": "incident-replay-corpus",
 }
+if set(GATE_TO_PLAN_ID) != {spec.gate_id for spec in expanded_gate.GATES}:
+    raise AssertionError(
+        "GATE_TO_PLAN_ID must name exactly the charter's gate_ids: a new "
+        "GateSpec needs a matrix plan command to check it a second time"
+    )
+
+# Gates the charter gained after the sealed close receipt was written.  The
+# sealed receipt cannot carry an observation for a command that did not exist
+# when it was recorded, and that absence is not drift — but an absence nobody
+# declared is indistinguishable from a gate_id silently renamed, so it is
+# declared under the same law as LEGACY_GATE_VALIDATORS.  Derived from the era
+# manifest rather than hand-listed, because a hand-listed complement is one more
+# copy to forget; main() then checks it against the sealed receipt's own bytes,
+# so neither the derivation nor the receipt can drift alone.
+POST_SEAL_GATES = frozenset(
+    {spec.gate_id for spec in expanded_gate.GATES}
+    - set(expanded_gate.SEALED_ERA_GATE_MANIFEST)
+)
 
 # What no amount of recomputation here can convert from replay to recompute, and
 # why.  Printed on every run so the split is stated rather than assumed.
@@ -91,7 +122,7 @@ REPLAY_ONLY = (
     (
         "portability/receipts/local-expanded-gate-*.json",
         "past charter-gate executions at their own heads. This program re-runs "
-        "the same eleven commands at the current bytes and compares.",
+        "the charter's commands at the current bytes and compares.",
     ),
 )
 
@@ -121,6 +152,19 @@ def main() -> int:
     sealed_observed = {
         item["gate_id"]: item.get("observed") for item in sealed["commands"]
     }
+    absent_from_seal = {
+        spec.gate_id
+        for spec in expanded_gate.GATES
+        if spec.gate_id not in sealed_observed
+    }
+    if absent_from_seal != POST_SEAL_GATES:
+        print(
+            "FAIL post_seal_declaration: sealed receipt is missing "
+            f"{sorted(absent_from_seal)}; POST_SEAL_GATES declares "
+            f"{sorted(POST_SEAL_GATES)}",
+            file=sys.stderr,
+        )
+        return 1
 
     environment = dict(os.environ)
     environment.update(
@@ -183,6 +227,11 @@ def main() -> int:
         recorded = sealed_observed.get(gate_id)
         if recorded == observed:
             print(f"PASS {gate_id} {json.dumps(observed, sort_keys=True)}")
+            continue
+        if gate_id in POST_SEAL_GATES:
+            live = json.dumps(observed, sort_keys=True)
+            declared.append(f"{gate_id} (added after the sealed era): live={live}")
+            print(f"PASS {gate_id} declared post-seal gate; live={live}")
             continue
         era = verify_receipts.LEGACY_GATE_VALIDATORS.get(gate_id)
         detail = (

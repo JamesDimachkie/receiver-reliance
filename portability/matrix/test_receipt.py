@@ -54,15 +54,34 @@ class MatrixPlanTests(unittest.TestCase):
         self.assertEqual(len(intel), 3)
         self.assertTrue(all("non_substitute" in row["claim_scope"] for row in intel))
 
-    def test_expanded_profile_adds_only_two_performance_commands(self) -> None:
+    def test_expanded_profile_carries_the_charter_gate_commands(self) -> None:
+        """The expanded profile is the hosted mirror of the charter gate.
+
+        It was two performance commands on top of the baseline until the gate
+        grew to cover the surfaces the repository had added since: the
+        engine-manifest, audit-seal, observability, preflight, MCP-gate and
+        admission-profile suites.  ``decision-law-structural`` and
+        ``incident-replay-corpus`` are in the charter too but are declared once,
+        in ``portability_checks``, where every focused row already runs them --
+        a second copy here would be two declarations of one command.
+        """
         focused = receipt.profile_commands(self.plan, "focused")
         expanded = receipt.profile_commands(self.plan, "expanded")
         self.assertEqual(len(focused), 42)
-        self.assertEqual(len(expanded), 11)
+        self.assertEqual(len(expanded), 17)
         self.assertEqual(expanded[0]["id"], "accepted-0.2")
         self.assertEqual(
-            [item["id"] for item in expanded[-2:]],
-            ["batch-performance-gate", "single-pass-benchmark"],
+            [item["id"] for item in expanded[9:]],
+            [
+                "batch-performance-gate",
+                "single-pass-benchmark",
+                "engine-manifest-tests",
+                "audit-seal-tests",
+                "observability-tests",
+                "portable-preflight-tests",
+                "mcp-gate-regression",
+                "admission-profile-tests",
+            ],
         )
         free_threaded = receipt.profile_commands(self.plan, "free_threaded")
         self.assertEqual(len(free_threaded), 43)

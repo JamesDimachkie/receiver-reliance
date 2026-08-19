@@ -19,7 +19,7 @@ python -B portability/sandbox/run_sandbox.py
 
 Add `--receipt PATH` to persist the same canonical JSON that is written to
 stdout. `--print-plan` emits the exact Docker build and create commands without
-contacting Docker. Exit 0 means all eleven expanded-gate commands exited 0 and
+contacting Docker. Exit 0 means all nineteen expanded-gate commands exited 0 and
 their declared counts were observed. Exit 1 is a setup, hardening, gate,
 timeout, or cleanup failure. Exit 2 with `status=INFRA_UNAVAILABLE` means a
 Docker CLI or Linux daemon was not available; absence is recorded and is not a
@@ -207,7 +207,7 @@ The host treats container output as untrusted. Host `PASS` requires container
 exit 0 and one canonical JSON record conforming exactly to the inner-receipt
 schema: the treatment-exposed flag; Linux environment; effective identity,
 mount, tmpfs, network, capability, no-new-privileges, secret-name, and cgroup
-proof; the eleven ordered command identities; zero exits and timeouts; exact
+proof; the nineteen ordered command identities; zero exits and timeouts; exact
 declared counts; retained stream transcripts, hashes, and byte counts;
 resource observations; and a host-recomputed deterministic projection hash.
 Missing, extra, malformed, or inconsistent evidence produces

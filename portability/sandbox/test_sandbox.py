@@ -35,7 +35,19 @@ def expected_image_tag() -> str:
     return f"receiver-reliance-portability-sandbox:{dockerfile_sha[:12]}"
 
 
-def synthetic_pass_receipt() -> dict[str, object]:
+def synthetic_pass_receipt(
+    specs: tuple[expanded_gate.GateSpec, ...] | None = None,
+) -> dict[str, object]:
+    """Build one structurally valid inner PASS receipt.
+
+    ``specs`` defaults to the live charter, because this fixture is the positive
+    control for ``validate_inner_receipt``, which requires exactly the live
+    command manifest.  The historical witnesses below pass the sealed era's
+    manifest instead: their digests are published in the F-SANDBOX findings, and
+    a witness that silently tracks a charter written after it is no longer the
+    witness those findings name.
+    """
+    specs = expanded_gate.GATES if specs is None else specs
     boundary: dict[str, object] = {
         "uid": 65532,
         "gid": 65532,
@@ -69,7 +81,7 @@ def synthetic_pass_receipt() -> dict[str, object]:
         },
     }
     commands: list[dict[str, object]] = []
-    for index, spec in enumerate(expanded_gate.GATES):
+    for index, spec in enumerate(specs):
         stdout = bytes([index + 1])
         commands.append(
             {
@@ -137,10 +149,16 @@ def encoded_receipt(receipt: dict[str, object]) -> bytes:
     return run_sandbox.canonical_bytes(receipt) + b"\n"
 
 
+SEALED_ERA_SPECS = tuple(
+    {spec.gate_id: spec for spec in expanded_gate.GATES}[gate_id]
+    for gate_id in expanded_gate.SEALED_ERA_GATE_MANIFEST
+)
+
+
 def historical_pass_receipt_before_f015() -> dict[str, object]:
     """Recreate the exact pre-F015 synthetic PASS used by older findings."""
 
-    receipt = synthetic_pass_receipt()
+    receipt = synthetic_pass_receipt(SEALED_ERA_SPECS)
     boundary = receipt["boundary"]
     commands = receipt["commands"]
     if not isinstance(boundary, dict) or not isinstance(commands, list):
@@ -496,6 +514,18 @@ class DeclaredCountsMatchTheSuites(unittest.TestCase):
     side-effect-free.
     """
 
+    # gate_id -> the suite whose bytes decide the count.  Every unittest_* gate
+    # in the charter must appear here; the set equality below is what makes the
+    # table impossible to leave behind when a gate is added.
+    UNITTEST_GATE_SOURCES = {
+        "synthetic_proof_harness": "proof/test_proof_harness.py",
+        "engine_manifest": "receiver_reliance/test_engine_manifest.py",
+        "audit_seal": "receiver_reliance/test_audit_seal.py",
+        "observability": "receiver_reliance/test_observe.py",
+        "portable_preflight": "adapters/test_portable_preflight.py",
+        "admission_profile": "deployment/test_admission.py",
+    }
+
     def _declared(self, gate_id: str) -> int:
         spec = {spec.gate_id: spec for spec in expanded_gate.GATES}[gate_id]
         match = re.fullmatch(r"unittest_([0-9]+)", spec.validator)
@@ -513,25 +543,43 @@ class DeclaredCountsMatchTheSuites(unittest.TestCase):
             and child.name.startswith("test")
         )
 
-    def test_proof_harness_gate_declares_the_real_test_count(self) -> None:
-        declared = self._declared("synthetic_proof_harness")
-        actual = self._test_methods("proof/test_proof_harness.py")
+    def test_every_unittest_gate_has_a_declared_source(self) -> None:
+        live = {
+            spec.gate_id
+            for spec in expanded_gate.GATES
+            if re.fullmatch(r"unittest_([0-9]+)", spec.validator)
+        }
         self.assertEqual(
-            declared,
-            actual,
-            "expanded_gate's synthetic_proof_harness validator declares "
-            f"{declared} tests; proof/test_proof_harness.py defines {actual}. "
-            "Migrate the declaration in the same change that moves the suite: "
-            "the GateSpec validator, run_sandbox.EXPECTED_OBSERVED, "
-            "matrix/plan.json, and verify_receipts.LEGACY_GATE_VALIDATORS plus "
-            "HOSTED_ERA_EXPECTATIONS for the sealed era.",
+            set(self.UNITTEST_GATE_SOURCES),
+            live,
+            "UNITTEST_GATE_SOURCES must name exactly the charter's unittest_* "
+            "gates: a declared count nothing derives from the artifact is a pin "
+            "waiting to go stale, which is E13.",
         )
 
+    def test_every_unittest_gate_declares_the_real_test_count(self) -> None:
+        for gate_id, relative in sorted(self.UNITTEST_GATE_SOURCES.items()):
+            with self.subTest(gate_id=gate_id):
+                declared = self._declared(gate_id)
+                actual = self._test_methods(relative)
+                self.assertEqual(
+                    declared,
+                    actual,
+                    f"expanded_gate's {gate_id} validator declares {declared} "
+                    f"tests; {relative} defines {actual}. Migrate the "
+                    "declaration in the same change that moves the suite: the "
+                    "GateSpec validator, run_sandbox.EXPECTED_OBSERVED, "
+                    "matrix/plan.json, and verify_receipts.LEGACY_GATE_VALIDATORS "
+                    "plus HOSTED_ERA_EXPECTATIONS for the sealed era.",
+                )
+
     def test_host_declaration_agrees_with_the_gate_validator(self) -> None:
-        self.assertEqual(
-            run_sandbox.EXPECTED_OBSERVED["synthetic_proof_harness"],
-            {"tests": self._declared("synthetic_proof_harness"), "failures": 0},
-        )
+        for gate_id in sorted(self.UNITTEST_GATE_SOURCES):
+            with self.subTest(gate_id=gate_id):
+                self.assertEqual(
+                    run_sandbox.EXPECTED_OBSERVED[gate_id],
+                    {"tests": self._declared(gate_id), "failures": 0},
+                )
 
     def test_unittest_validator_family_binds_the_count_in_its_name(self) -> None:
         """A sealed era count and the live count must not be interchangeable."""
@@ -2940,8 +2988,8 @@ class SandboxSpecTests(unittest.TestCase):
         )
 
     def test_gate_has_exact_expanded_command_count(self) -> None:
-        self.assertEqual(len(expanded_gate.GATES), 11)
-        self.assertEqual(len({gate.gate_id for gate in expanded_gate.GATES}), 11)
+        self.assertEqual(len(expanded_gate.GATES), 19)
+        self.assertEqual(len({gate.gate_id for gate in expanded_gate.GATES}), 19)
 
     def test_core_validator_sums_800(self) -> None:
         counts = {

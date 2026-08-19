@@ -134,7 +134,145 @@ GATES = (
         ),
         "checks_1142",
     ),
+    # --- surfaces the repository grew after the eleven-command era ----------
+    # A charter that runs eleven of the nineteen evidence surfaces it can reach
+    # is a charter with a hole.  Every suite below is stdlib-only,
+    # deterministic, network-free, writes only under TMPDIR, and finishes well
+    # inside the 300 s per-command ceiling, so nothing but omission kept them
+    # out.  What the charter still cannot reach is declared under GATES.
+    GateSpec(
+        "engine_manifest",
+        "/repo",
+        ("python", "-B", "receiver_reliance/test_engine_manifest.py"),
+        "unittest_12",
+    ),
+    GateSpec(
+        "audit_seal",
+        "/repo",
+        ("python", "-B", "receiver_reliance/test_audit_seal.py"),
+        "unittest_14",
+    ),
+    GateSpec(
+        "observability",
+        "/repo",
+        ("python", "-B", "receiver_reliance/test_observe.py"),
+        "unittest_30",
+    ),
+    GateSpec(
+        "portable_preflight",
+        "/repo",
+        ("python", "-B", "adapters/test_portable_preflight.py"),
+        "unittest_37",
+    ),
+    GateSpec(
+        "mcp_gate",
+        "/repo",
+        ("python", "-B", "adapters/mcp/test_mcp_gate.py"),
+        "checks_103",
+    ),
+    GateSpec(
+        "admission_profile",
+        "/repo",
+        ("python", "-B", "deployment/test_admission.py"),
+        "unittest_25",
+    ),
+    GateSpec(
+        "decision_law_structural",
+        "/repo",
+        ("python", "-B", "law/verify_law.py", "--structural-only", "--quiet"),
+        "checks_26",
+    ),
+    GateSpec(
+        "incident_replay_corpus",
+        "/repo",
+        ("python", "-B", "replay-corpus/replay_incidents.py"),
+        "replay_corpus_27",
+    ),
 )
+
+# The eleven gate_ids, in order, that the sealed portability-era receipts
+# recorded.  Declared here beside the live charter because three programs need
+# it and a second copy is a second thing to forget when the charter moves:
+# verify_receipts.py checks sealed receipts against this manifest rather than
+# against a charter written after them, test_sandbox.py rebuilds the pre-F015
+# historical witness from it so the digests those findings publish stay exact,
+# and verify_live.py takes its post-seal gate set as the complement.  This
+# tuple is frozen chronology: those receipts were correct when written.
+SEALED_ERA_GATE_MANIFEST = (
+    "frozen_0_2_parity",
+    "composed_0_3_parity",
+    "grounded_0_4_regression",
+    "contract_lint",
+    "lint_gate_meta",
+    "grounded_properties",
+    "audit_adversarial",
+    "synthetic_proof_harness",
+    "fuzz_ci_smoke",
+    "batch_perf",
+    "single_pass_audit_benchmark",
+)
+
+# DECLARED ABSENCES.  A suite this repository ships and this charter does not
+# execute is recorded here with the reason, so the hole is stated rather than
+# left to be inferred from a diff.  Nothing below is excluded on quality.
+#
+# Cannot run under this containment, and the specific reason:
+#   portability/verify_hygiene.py            git diff --check; the image carries
+#                                            no git binary.
+#   portability/test_home_path_disclosure.py git ls-files.
+#   portability/test_pinned_tools.py         git ls-files.
+#   portability/matrix/test_receipt.py       git provenance, and ~130 s on the
+#                                            reference host -- too near the
+#                                            300 s ceiling to be a gate.
+#   portable/gate.py                         the matrix plan budgets it 1800 s.
+#
+# Would make this gate a precondition of itself:
+#   portability/verify_receipts.py           binds the receipt this gate emits.
+#   portability/sandbox/test_sandbox.py      the spec suite for this file and
+#                                            for run_sandbox, which needs Docker.
+#   portability/test_strict_ingest.py        the strict-ingest law is squarely an
+#                                            evidence surface and this gate ought
+#                                            to run it, but one of its 26 tests
+#                                            executes verify_receipts.py end to
+#                                            end and requires failures=0.  That
+#                                            closes a loop with no fixed point:
+#                                            a charter change invalidates the
+#                                            hardening receipt binding, which
+#                                            reds verify_receipts, which reds
+#                                            this suite, which reds the charter,
+#                                            so the PASS run needed to regenerate
+#                                            the binding can never be produced --
+#                                            and that would be true of EVERY
+#                                            future charter change, not just this
+#                                            one.  Admitting it needs that one
+#                                            test scoped to the ingest law it
+#                                            names, which is a change to a suite
+#                                            outside this charter's remit.
+#
+# Covered more widely elsewhere than a single container row can cover them --
+# the matrix focused profile runs these on six platforms and three interpreters:
+#   portability/model/test_model.py, portability/oracle/test_oracle.py,
+#   portability/live/test_live.py, portability/concurrency/test_ladder.py
+#                                            (the ladder is a timing measurement
+#                                            besides).
+#
+# Not evidence surfaces of the shipped artifact, by their own docstrings:
+#   adapters/test_reference_host.py          non-shipping WP1 experiment.
+#   adapters/test_outcome_receipt.py         measurement-only.
+#
+# Frozen: second-implementation/**, baseline-run/implementation-output-*/**.
+#
+# DEFERRED, not excluded on merit.  Each runs clean, fast and git-free here;
+# each is outside this change's declared scope and is gated on ``main`` by
+# robustness-verification.yml.  What each would need:
+#   grounded-0_4/test_authority_legibility.py  prints checks=452 failures=0 --
+#                                            a checks_452 count_validators entry.
+#   perf/sidecar/test_sidecar.py             prints "sidecar parity: checks=728
+#                                            failures=0 fixtures=124" in 10 s --
+#                                            a checks_728 entry.
+#   grounded-0_4/test_public_surface.py      prints "PUBLIC-SURFACE PASS: 38
+#                                            checks" -- a bespoke validator,
+#                                            since it is not the checks=N shape.
 
 
 def _canonical_bytes(value: Any) -> bytes:
@@ -486,6 +624,8 @@ def validate_gate_output(validator: str, stdout: bytes, stderr: bytes) -> dict[s
         "checks_6497": 6497,
         "checks_2160": 2160,
         "checks_1142": 1142,
+        "checks_103": 103,
+        "checks_26": 26,
         # Era-legacy values: the SHA-pinned portability-era gate receipts
         # replay through these via verify_receipts.py; no live GateSpec
         # references them.
@@ -546,6 +686,56 @@ def validate_gate_output(validator: str, stdout: bytes, stderr: bytes) -> dict[s
                 f"proof harness did not report {expected_tests} passing tests"
             )
         return {"tests": expected_tests, "failures": 0}
+
+    if validator == "replay_corpus_27":
+        # The corpus summary interleaves other fields between ``checks=`` and
+        # ``failures=``, which the shared _extract_counts reader requires to be
+        # adjacent, so this shape needs its own.  It reads the twelve
+        # per-incident rows and not the summary alone: a summary that
+        # contradicts its own rows is the evidence-free PASS this repository
+        # refuses everywhere else (F-SANDBOX-003).
+        rows = re.findall(
+            r"^incident=[^\r\n]*?\bfailures=(?P<failures>[0-9]+) "
+            r"executable=(?P<executable>[a-z]+)\r?$",
+            combined,
+            re.MULTILINE,
+        )
+        if len(rows) != 12 or any(
+            failures != "0" or executable != "yes" for failures, executable in rows
+        ):
+            raise GateFailure(
+                "replay corpus requires twelve clean executable rows; "
+                f"observed {rows!r}"
+            )
+        summaries = [
+            line.rstrip("\r")
+            for line in combined.splitlines()
+            if line.startswith("replay-incidents:")
+        ]
+        if len(summaries) != 1:
+            raise GateFailure(
+                "replay corpus requires exactly one summary; "
+                f"observed {len(summaries)}"
+            )
+        match = re.fullmatch(
+            r"replay-incidents: incidents=(?P<incidents>[0-9]+) "
+            r"executable=(?P<executable>[0-9]+) checks=(?P<checks>[0-9]+) "
+            r"holds=[0-9]+ clean_pass=[0-9]+ failures=(?P<failures>[0-9]+)",
+            summaries[0],
+        )
+        if match is None:
+            raise GateFailure("malformed replay corpus summary")
+        observed = {key: int(match.group(key)) for key in match.groupdict()}
+        if observed != {
+            "incidents": 12,
+            "executable": 12,
+            "checks": 27,
+            "failures": 0,
+        }:
+            raise GateFailure(
+                f"replay corpus observed {observed}; expected 12/12/27/0"
+            )
+        return observed
 
     if validator == "fuzz_31":
         summaries = re.findall(

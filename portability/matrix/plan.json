@@ -275,7 +275,7 @@
         "cwd": ".",
         "argv": ["{python}", "-B", "portability/sandbox/test_sandbox.py"],
         "timeout_seconds": 900,
-        "expected": {"tests": [84]}
+        "expected": {"tests": [85]}
       },
       {
         "id": "portable-bundle-gate",
@@ -533,6 +533,48 @@
         "argv": ["{python}", "-B", "grounded-0_4/test_single_pass_audit.py", "--benchmark"],
         "timeout_seconds": 1200,
         "expected": {"checks": [1142], "failures": [0]}
+      },
+      {
+        "id": "engine-manifest-tests",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "receiver_reliance/test_engine_manifest.py"],
+        "timeout_seconds": 900,
+        "expected": {"tests": [12]}
+      },
+      {
+        "id": "audit-seal-tests",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "receiver_reliance/test_audit_seal.py"],
+        "timeout_seconds": 300,
+        "expected": {"tests": [14]}
+      },
+      {
+        "id": "observability-tests",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "receiver_reliance/test_observe.py"],
+        "timeout_seconds": 900,
+        "expected": {"tests": [30]}
+      },
+      {
+        "id": "portable-preflight-tests",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "adapters/test_portable_preflight.py"],
+        "timeout_seconds": 300,
+        "expected": {"tests": [37]}
+      },
+      {
+        "id": "mcp-gate-regression",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "adapters/mcp/test_mcp_gate.py"],
+        "timeout_seconds": 300,
+        "expected": {"checks": [103], "failures": [0]}
+      },
+      {
+        "id": "admission-profile-tests",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "deployment/test_admission.py"],
+        "timeout_seconds": 900,
+        "expected": {"tests": [25]}
       }
     ],
     "free_threaded_extra": [

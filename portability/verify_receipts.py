@@ -131,14 +131,56 @@ SOURCE_PIN_ERRATA = {
 
 # Hardening-branch evidence: the clean-tree charter gate re-run after the E13
 # repair, on CURRENT suite counts.  This is the only committed gate receipt whose
-# eleven observations equal what the suites produce today; the two below it
-# record their own eras and replay through LEGACY_GATE_VALIDATORS.  It is bound
+# observations equal what the suites produce today; the two below it record their
+# own eras and replay through LEGACY_GATE_VALIDATORS.  It is bound
 # here so the recompute is custody-tracked, not just asserted in prose.
 # Regenerated at the 0.4.2 commit.  This receipt is checked with
 # era_validators=False -- its whole purpose is to be at CURRENT suite counts, so
 # when the grounded suite moved 517 -> 521 it had to be re-recorded rather than
 # era-mapped.  The 7d1c6cb receipt stays on disk as immutable chronology; it is
 # simply no longer the current-counts binding.
+#
+# REGENERATION IS DUE.  The charter gate grew from eleven commands to nineteen,
+# so this receipt's recorded manifest is a prefix of the live one and
+# `hardening_gate.manifest_order` is RED by design.  Faking it would mean
+# era-mapping the one receipt whose entire purpose is to be un-era-mapped.
+# At the FINAL merged tip, with a clean worktree (the runner refuses a dirty
+# one, and refuses to overwrite an existing receipt):
+#
+#   python -B portability/run_local_expanded_gate.py \
+#       --receipt portability/receipts/local-expanded-gate-hardening-<head7>.json
+#
+# <head7> is the first seven characters of that tip, the convention 0ff243c and
+# 7d1c6cb already follow.  Then rebind the four constants below from that run:
+# HARDENING_GATE_RECEIPT to the new filename, HARDENING_SOURCE_HEAD to the full
+# 40-character head the receipt records in `git.head`, HARDENING_GATE_RAW_SHA256
+# to the uppercase SHA-256 of the file's bytes, and
+# HARDENING_GATE_EMBEDDED_SHA256 to the receipt's own `receipt_sha256` member.
+#
+# THE REGENERATION ALSO MOVES THIS PROGRAM'S OWN CHECK COUNT, and that is not
+# optional bookkeeping: _verify_clean_gate_receipt spends three checks per
+# recorded command (.exit, .stream_binding, .validator_rerun), so a hardening
+# receipt carrying N commands instead of eleven takes the total from 267 to
+# 267 + 3 * (N - 11).  At N = 19 that is 291, measured, not predicted.  Four
+# pins carry the old number and move in the SAME commit as the rebinding above,
+# or this program's own gate rejects it:
+#   portability/matrix/plan.json        verify-committed-receipts expected
+#   portability/test_strict_ingest.py   test_verify_receipts_reports_its_pinned_
+#                                       check_count, and its docstring
+#   README.md                           "Expected: verify-receipts: checks=267"
+#   DIAGRAMS.md                         the C4 Replay row and the C4 Sources
+#                                       quote of that README line
+# HOSTED_ERA_EXPECTATIONS["verify-committed-receipts"] stays at 62: that is the
+# hosted era's count and does not move.  They are deliberately NOT pre-migrated
+# here, because until the rebinding lands this program really does report 267
+# and a pin describing a state that does not exist yet is the defect this file
+# exists to catch.
+#
+# Then, in this order: verify_receipts <new count>/0, then verify_live green at
+# gates=19, then portability/test_strict_ingest.py green -- it runs
+# verify_receipts end to end, so it is red until this binding is current and is
+# the second observation of this one root cause, not a second defect.  The old
+# receipt stays on disk as chronology, exactly as 7d1c6cb did.
 HARDENING_GATE_RECEIPT = (
     REPO / "portability" / "receipts" / "local-expanded-gate-hardening-0ff243c.json"
 )
@@ -239,6 +281,16 @@ LEGACY_GATE_VALIDATORS = {
     # receipts keep their own era's count here.
     "synthetic_proof_harness": "unittest_7",
 }
+# The same law, applied to the manifest instead of a count.  Both sealed
+# portability-era receipts recorded the eleven-command charter; the charter has
+# since grown, and checking sealed bytes against a charter written after them
+# would make immutable chronology permanently red for having been recorded on
+# time.  Only receipts carrying era_validators=True get this reading.  The
+# hardening receipt deliberately does not: it is the current-counts binding, so
+# it is held against the live GATES manifest and goes red the moment the charter
+# set moves, which is the signal that says regenerate it.  The manifest itself
+# is declared once, beside the charter it is the ancestor of.
+LEGACY_GATE_MANIFEST = expanded_gate.SEALED_ERA_GATE_MANIFEST
 # The committed hosted tree is run 31562391384 at HOSTED_HEAD.  Its rows were
 # never replayed through the matrix's own plan-aware row validator here — only
 # through hardcoded manifest, count and outcome constants — so this file could
@@ -265,6 +317,14 @@ LEGACY_GATE_VALIDATORS = {
 # 31562391384's manifest either, so all twenty-two join the same declaration.
 # With them absent the hosted era stays exactly the 17-command manifest that
 # run executed, which is the invariant this tuple exists to hold.
+#
+# The charter-gate extension then mirrored six of those suites into the
+# expanded profile, which composes from baseline_nonperformance +
+# expanded_extra and never sees portability_checks.  Three of its ids are
+# already declared above; the other three (the expanded profile's own names
+# for the observability, preflight and MCP-gate commands) join here.  Same
+# declaration, same reason: run 31562391384's expanded manifest predates
+# them all.
 HOSTED_ERA_ABSENT_COMMANDS = (
     "portable-bundle-gate",
     "decision-law-structural",
@@ -291,6 +351,9 @@ HOSTED_ERA_ABSENT_COMMANDS = (
     "wrapper-hardening-tests",
     "second-implementation-artifacts",
     "conformance-authority",
+    "observability-tests",
+    "portable-preflight-tests",
+    "mcp-gate-regression",
 )
 HOSTED_ERA_EXPECTATIONS = {
     "verify-committed-receipts": {"checks": [62], "failures": [0]},
@@ -372,10 +435,14 @@ def _verify_clean_gate_receipt(
         and doc["git"]["status_bytes"] == 0,
     )
     commands = doc["commands"]
+    expected_manifest = (
+        list(LEGACY_GATE_MANIFEST)
+        if era_validators
+        else [spec.gate_id for spec in expanded_gate.GATES]
+    )
     v.check(
         f"{prefix}.manifest_order",
-        [item["gate_id"] for item in commands]
-        == [spec.gate_id for spec in expanded_gate.GATES],
+        [item["gate_id"] for item in commands] == expected_manifest,
     )
     specs = {spec.gate_id: spec for spec in expanded_gate.GATES}
     for item in commands:
