@@ -2,7 +2,7 @@
 
 E1–E7 entered after the 2026-08-10 external review; E8–E9 after the
 2026-08-12 Deep Security Scan (Intake 10); E10–E16 during the hardening
-campaign that followed it.
+campaign that followed it; E17–E18 during the v1.2.1 release review.
 
 Confirmed against the artifact at cc6f3657 by reproducing the external
 review's probes (conformance 800+107 green; OBL-08/OBL-30 mutation probes;
@@ -154,7 +154,8 @@ adjacent path unpinned. Two checkouts differing only in closure policy
 produced indistinguishable audit shapes. *Status:* fixed additively — audit
 format `B1-AUDITED-DECISION-0.4.1` seals `governing_authorities` (closure
 policy, authority register, and both engine-source digests) into every
-audit object, on the error path included. 0.4 objects remain verifiable by
+audit object, on the error path included. 0.4.2 extends the sealed set with
+both decision-table contract digests (E18). 0.4 objects remain verifiable by
 self-zero recomputation under their recorded format string. The repository
 commit remains the root that authenticates the digests themselves
 ([TRUST_MODEL.md](TRUST_MODEL.md)). *Enforcement:* the GOVERNANCE section
@@ -596,6 +597,78 @@ there, the gate requires a digest manifest and verifies every file against it
 before the mode may be called available. The code path inside the frozen runner is
 unchanged and still performs no check of its own; that residual is the reason this
 is a disposition and not a repair.
+
+## E17 — A receipt validator's verdict depended on an ambient variable
+
+`portability/matrix/receipt.py::_runnable_git_binding_error` compared a
+receipt's recorded commit to `os.environ["GITHUB_SHA"]` inside the leaf
+validator. An environment variable is not an artifact: the clause was silent
+everywhere the variable was unset — every local run, the README's third-party
+verification command, and every matrix child, because `SAFE_ENV_KEYS` strips
+it — and unsatisfiable where it was set against sealed historical evidence,
+because a workflow's current commit can never equal a head recorded before
+it. The same committed bytes therefore verified 267/0 on a developer host
+while the hosted robustness-verification workflow failed all nine of its
+cells, and with `GITHUB_SHA` set to the empty string every runnable row was
+rejected with a cause that named the recorded sha rather than the
+environment.
+
+Same family as E13: a verifier must compute its verdict from declared
+inputs. E13's verifier could not see its subject; this one deliberated over
+a subject that changed with the shell it ran in. (Receipts still *record*
+the ambient `GITHUB_SHA` at capture time and must be internally consistent
+with it — recording evidence is not the defect; deciding on the validator's
+own environment was.)
+
+*Status:* fixed (`e27e331`) — the expected commit is an explicit
+`expected_sha` parameter with no default on the leaf validator, so no caller
+can drop the authority by omission; passing `None` is an explicit statement
+that the caller holds no external authority and asserts nothing beyond the
+receipt's self-consistency. Only the `summarize` CLI reads the environment,
+once, and refuses to run (exit 2) when neither `--workflow-sha` nor a
+non-empty `GITHUB_SHA` supplies the commit its receipts must belong to.
+
+*Enforcement:* `RunCurrencyAuthorityTests` in
+`portability/matrix/test_receipt.py` (suite 54 → 60) holds the receipt
+fixed and varies the environment — the axis the rest of the suite
+deliberately does not vary. Hosted witness: run 32225089695, the first
+green robustness-verification on `main`.
+
+## E18 — The audit seal identified its governing policy but not its decision law
+
+Found during the 2026-08-18 release review; fixed the same night
+(`0ff243c`). E8 introduced `governing_authorities` so that decisions
+produced under different governing bytes would be distinguishable by seal.
+It sealed the closure policy, the authority register, and the two engine
+source files — and not the contracts holding the thirty operations the
+engine actually executes. Two parties running different decision tables
+therefore emitted byte-identical `governing_authorities`, and a recipient
+holding an envelope could not tell which law decided it.
+
+Provable by construction rather than by attack: the four digests were
+computed from four files, none of which was a contract, so no change to the
+table could change the seal. A local tamper was always caught — both
+contracts are engine-manifest rows and `import receiver_reliance` verifies
+them before serving a decision — so the gap was never local forgery. It was
+cross-party identification, which is the purpose an audit envelope exists
+to serve.
+
+*Status:* fixed additively — `AUDIT_FORMAT` moved to
+`B1-AUDITED-DECISION-0.4.2`, whose `governing_authorities` gains
+`decision_table_contract_sha256` and `composed_contract_sha256`, both read
+under the same pinned-read law as the existing authorities. 0.4, 0.4.1, and
+0.4.2 objects each remain verifiable by self-zero recomputation under their
+recorded format strings. Read the scope exactly: the seal *identifies* the
+law, it does not *authenticate* it — nothing is signed
+([TRUST_MODEL.md](TRUST_MODEL.md)), and anyone who can author an envelope
+can author a matching seal.
+
+*Enforcement:* four mutation arms in `grounded-0_4/test_grounded_0_4.py`
+(517 → 521 checks) prove each new digest sits inside the seal. The count
+migration the format move required is itself part of this record: the
+migration commit moved its pin list by hand and left two program-era pins
+behind — E12's third recorded move and the `run_sandbox.py` count mirror,
+both closed (by disclosure and by derivation respectively) in `5c29965`.
 
 ## Authority census (context for E5)
 
