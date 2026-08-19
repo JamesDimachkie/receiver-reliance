@@ -104,7 +104,7 @@ process history that claims elsewhere cite.
 | Directory | Class | What is in it |
 |---|---|---|
 | `receiver_reliance/` | live surface | The installable package. `engine_manifest.json` pins all eleven engine files by byte length and SHA-256; importing verifies every one before executing any of them and refuses to import on drift. |
-| `grounded-0_4/` | live surface | The audited decision layer — `decide_audited`, the authority register, the closure policy, the lint gate, the 517-check regression. This is the one supported evidentiary route. |
+| `grounded-0_4/` | live surface | The audited decision layer — `decide_audited`, the authority register, the closure policy, the lint gate, the 521-check regression. This is the one supported evidentiary route. |
 | `adapters/` | live surface | The stdlib-only three-state preflight, its calibration playbook, and the outcome receipt that reproduces the 18/18-detection-at-0.0%-false-holds result. |
 | `portable/` | live surface | The self-contained bundle: manifest, builder, gate, CLI, threat model, operator runbook. |
 | `examples/` | live surface | The three handoff records [EXAMPLE.md](EXAMPLE.md) decides end to end — clean, inconsistent, unchecked revocation. |
@@ -635,7 +635,7 @@ sealed 0.2/0.3 bytes changed:
   run exposed and measured the applicability gap (ERRATA E7). Full
   protocol and limits in `proof/README.md`.
 
-`grounded-0_4/test_grounded_0_4.py` (517 checks) pins parity with every
+`grounded-0_4/test_grounded_0_4.py` (521 checks) pins parity with every
 frozen fixture plus the review's probes as regressions.
 
 ## Cross-platform validation: the portability program
@@ -676,7 +676,7 @@ Expected: `verify-live: gates=11 passed=11 declared_era_divergences=3
 undeclared_divergences=0 failures=0`. The three declared divergences are
 real and deliberate — the sealed close receipt recorded 504 grounded
 checks, 7 lint-gate checks and 7 proof tests, and the current suites have
-517, 9 and 9. Each is declared in `verify_receipts.LEGACY_GATE_VALIDATORS`,
+521, 9 and 9. Each is declared in `verify_receipts.LEGACY_GATE_VALIDATORS`,
 so the sealed transcripts still replay under their own era while the live
 gate enforces current counts. An *undeclared* divergence is a defect, and
 this program is what turns it into a red exit instead of a silent green.
