@@ -1,6 +1,7 @@
 # Receiver-reliance baseline — conformance suite and reference implementation
 
-Release 1.2, composed generation. License: Apache-2.0 (see `LICENSE`;
+Release 1.2.1 — the hardening point release of the 1.2 composed
+generation. License: Apache-2.0 (see `LICENSE`;
 Copyright 2026 James Dimachkie).
 
 ## What this is, and where it comes from
@@ -90,6 +91,46 @@ fixtures.
 For one concrete handoff decided end to end (the records, the exact
 commands, and byte-pinned responses for a clean, a violated, and an
 unresolved case), see [EXAMPLE.md](EXAMPLE.md).
+
+## Repository map
+
+What each top-level directory holds, and which class it belongs to. **Live
+surface** is code you can call or run today. **Frozen evidence** is sealed bytes
+that may not change by charter — defects there are handled by additive guards
+and `ERRATA.md` dispositions, never by editing the bytes. **Harness** is
+verification machinery that produces or checks receipts. **Records** are the
+process history that claims elsewhere cite.
+
+| Directory | Class | What is in it |
+|---|---|---|
+| `receiver_reliance/` | live surface | The installable package. `engine_manifest.json` pins all eleven engine files by byte length and SHA-256; importing verifies every one before executing any of them and refuses to import on drift. |
+| `grounded-0_4/` | live surface | The audited decision layer — `decide_audited`, the authority register, the closure policy, the lint gate, the 517-check regression. This is the one supported evidentiary route. |
+| `adapters/` | live surface | The stdlib-only three-state preflight, its calibration playbook, and the outcome receipt that reproduces the 18/18-detection-at-0.0%-false-holds result. |
+| `portable/` | live surface | The self-contained bundle: manifest, builder, gate, CLI, threat model, operator runbook. |
+| `examples/` | live surface | The three handoff records [EXAMPLE.md](EXAMPLE.md) decides end to end — clean, inconsistent, unchecked revocation. |
+| `baseline-run/` | frozen evidence + harness | The frozen 0.2 and 0.3 engines, their sealed contracts and fixture packs, both conformance runners, and the RUNBOOK — plus `verify_conformance_authority.py`, the additive gate that actually executes both suites because the frozen manifest emitters write `failures: 0` and `PASS` as literals (`ERRATA.md` E16). |
+| `supplemental-0_3/` | frozen evidence | The sealed 0.3 comparator contract and composed capability matrix, the two supplemental fixture packs, the hash-pinned prior-art snapshot, and the candidate-blind completeness verdict. |
+| `second-implementation/` | frozen evidence | The author-increment attempt, its provenance and non-exposure record, and thirteen recorded findings. Twenty-four of these files — plus `orchestration/REIMPLEMENTERS_GUIDE.md` — are the `candidate_files` of a published receipt whose verifier checks their hashes, including its own path, so this tree is attempt evidence rather than live infrastructure and is never edited ([ADOPTION.md](ADOPTION.md) A4). |
+| `access/` | frozen evidence | The sanitized implementer packet and the shared-domain vocabulary projection schema: the public projection an author-separated implementer is given, and nothing beyond it. |
+| `evidence/` | frozen evidence | Byte-exact releases of the two custody files the candidate-blind completeness reviewer read that did not otherwise ship here, with the recipe that checks them against their pins. The reviewer's other two files already sit in `supplemental-0_3/`. |
+| `portability/` | harness | Five validation lanes — a finite behavioral model, an independent no-read oracle, deterministic live transports, a bounded concurrency ladder, and the hosted matrix with its container sandbox — plus the custody verifiers and `verify_live.py`, the recompute gate this README tells you to run first. |
+| `perf/` | harness | Cost model, profiling campaigns, and the sidecar supervisor with its transport envelope, adversarial child, and receipt verifier. |
+| `proof/` | harness | The applicability arms, the synthetic corpus and truth set, and the scoring harness behind `proof/RESULTS.md`. |
+| `fuzz/` | harness | The deterministic seeded campaign: 100,000 case identities, 67,599 unique raw byte strings, zero findings. |
+| `orchestration/` | records | Ledgers, the standing criticism-adjudication protocol, the external-validation and portability-validation reports, the minimized refuter reports, and `REIMPLEMENTERS_GUIDE.md`. |
+| `continuation-specs/` | drafts | Proposed generation-0.5 core and semantic drafts. **Not adopted, not implemented, not evidence** — each carries that banner at the top, and nothing in this release depends on them. |
+| `.github/workflows/` | harness | The hosted conformance, portability, and robustness gates. Which of them fires on which branch is recorded, including what does not fire, in [ADOPTION.md](ADOPTION.md) A2. |
+
+The root documents divide the same way. [TRUST_MODEL.md](TRUST_MODEL.md) is
+canonical for what every seal and receipt may be read as claiming and who is
+assumed to consume it; [HOST_OBLIGATIONS.md](HOST_OBLIGATIONS.md) is the
+caller's half of the contract; [ERRATA.md](ERRATA.md) records known defects and
+how each is enforced; [ADOPTION.md](ADOPTION.md) is the recorded-and-unfixed
+list with a treatment and an owner per row; [ACCEPTANCE.md](ACCEPTANCE.md)
+records what was accepted and under which protocol; [WITHHELD.md](WITHHELD.md)
+ledgers what is deliberately not published and why; [EXAMPLE.md](EXAMPLE.md) is
+one handoff decided end to end; [SECURITY.md](SECURITY.md) is how to report a
+defect.
 
 ## Using it on your own records
 
