@@ -149,8 +149,13 @@ python -B deployment/derive_admission_numbers.py --extent --check   # contract e
 python -B deployment/derive_admission_numbers.py --cost             # re-measure the table on your host
 ```
 
-The suite is not in the hosted matrix or the eleven-command charter gate. Both
-pin their command sets inside byte-committed receipts, so adding a row there is
-a designed evidence-regeneration event rather than an inline edit — the event
-shape `ERRATA.md` E12 and E14 describe. Until one happens, this suite is run
-from the list in `README.md` "Contributing / re-verification", which names it.
+Both commands now run on every normative cell of the hosted matrix, as
+`admission-profile-tests` and `admission-extent-check` in
+`portability/matrix/plan.json`. That addition was the designed
+evidence-regeneration event `ERRATA.md` E12 and E14 describe, not an inline
+edit: the committed hosted receipts predate both rows, so
+`portability/verify_receipts.py` declares them in `HOSTED_ERA_ABSENT_COMMANDS`
+and those receipts keep replaying against the 17-command manifest their own run
+executed. The suite is still not in the eleven-command charter gate, which pins
+its command set inside a byte-committed receipt of its own, and `--cost`
+measures on your host, so it stays hand-run.

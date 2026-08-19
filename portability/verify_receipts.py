@@ -255,10 +255,42 @@ LEGACY_GATE_VALIDATORS = {
 # command, so they join the same era declaration rather than being validated
 # against a manifest that postdates them.  This gate is what caught the
 # addition: adding the two plan rows alone took it to 23 failures.
+#
+# The consumer-surface sweep then moved the planned count 20 to 42 by putting
+# every remaining deterministic suite -- the engine and audit-seal gates, the
+# admission profile, the four adapter surfaces including the MCP gate, the
+# ingest/tool-pinning/home-path gates, the authority and public-surface gates,
+# the wrapper-hardening and WP4 artifact verifiers, and the conformance
+# authority gate -- on every normative cell.  None of them existed in run
+# 31562391384's manifest either, so all twenty-two join the same declaration.
+# With them absent the hosted era stays exactly the 17-command manifest that
+# run executed, which is the invariant this tuple exists to hold.
 HOSTED_ERA_ABSENT_COMMANDS = (
     "portable-bundle-gate",
     "decision-law-structural",
     "incident-replay-corpus",
+    "engine-manifest-check",
+    "engine-manifest-tests",
+    "audit-seal-tests",
+    "observer-equivalence-tests",
+    "admission-profile-tests",
+    "admission-extent-check",
+    "outcome-receipt-tests",
+    "outcome-receipt-check",
+    "reference-host-tests",
+    "adapter-fixture-provenance",
+    "mcp-gate-calibration",
+    "mcp-gate-tests",
+    "mcp-gate-demo",
+    "strict-ingest-tests",
+    "pinned-tools-tests",
+    "home-path-disclosure-tests",
+    "authority-legibility-tests",
+    "authority-table-check",
+    "public-surface-tests",
+    "wrapper-hardening-tests",
+    "second-implementation-artifacts",
+    "conformance-authority",
 )
 HOSTED_ERA_EXPECTATIONS = {
     "verify-committed-receipts": {"checks": [62], "failures": [0]},

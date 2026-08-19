@@ -34,11 +34,17 @@ substituted for any hosted row. **The committed hosted evidence under
 `../receipts/hosted/` predates that command.** Run 31562391384 executed the
 17-command manifest of its own era; `portable-bundle-gate` was added afterwards
 and F-MATRIX-015 migrated the planned count from 17 to 18 in the same change.
-`portability/verify_receipts.py` declares that era explicitly
-(`HOSTED_ERA_ABSENT_COMMANDS`, `HOSTED_ERA_EXPECTATIONS`) and replays all 25
-committed rows through the current row validator against it, so the difference
-between what the plan now schedules and what the committed receipts prove is
-enforced rather than assumed.
+The decision-law and incident-replay rows took it to 20, and the
+consumer-surface sweep to 42: `portability_checks` now schedules every
+deterministic suite the repository can run from a bare checkout on stdlib
+alone, so a `receiver_reliance`, `deployment`, `adapters` or `grounded-0_4`
+regression surfaces on every cell rather than only when someone runs the
+README's hand list. `portability/verify_receipts.py` declares that era
+explicitly (`HOSTED_ERA_ABSENT_COMMANDS`, `HOSTED_ERA_EXPECTATIONS`) and
+replays all 25 committed rows through the current row validator against it, so
+the difference between what the plan now schedules and what the committed
+receipts prove is enforced rather than assumed. The declaration is what holds
+the hosted manifest at 17 while the live one grew to 42.
 Concurrency v3 keeps its proof layers separate: concurrent physical bytes are
 compared with isolated grounded transport bytes, while each inner
 `sealed_response` is compared with the independent semantic oracle. That

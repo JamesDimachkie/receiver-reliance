@@ -307,6 +307,151 @@
           "checks": [27],
           "failures": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         }
+      },
+      {
+        "id": "engine-manifest-check",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "receiver_reliance/generate_engine_manifest.py", "--check"],
+        "timeout_seconds": 300
+      },
+      {
+        "id": "engine-manifest-tests",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "receiver_reliance/test_engine_manifest.py"],
+        "timeout_seconds": 900,
+        "expected": {"tests": [12]}
+      },
+      {
+        "id": "audit-seal-tests",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "receiver_reliance/test_audit_seal.py"],
+        "timeout_seconds": 300,
+        "expected": {"tests": [14]}
+      },
+      {
+        "id": "observer-equivalence-tests",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "receiver_reliance/test_observe.py"],
+        "timeout_seconds": 900,
+        "expected": {"tests": [30]}
+      },
+      {
+        "id": "admission-profile-tests",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "deployment/test_admission.py"],
+        "timeout_seconds": 900,
+        "expected": {"tests": [25]}
+      },
+      {
+        "id": "admission-extent-check",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "deployment/derive_admission_numbers.py", "--extent", "--check"],
+        "timeout_seconds": 300,
+        "expected": {"failures": [0]}
+      },
+      {
+        "id": "outcome-receipt-tests",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "adapters/test_outcome_receipt.py"],
+        "timeout_seconds": 300,
+        "expected": {"tests": [3]}
+      },
+      {
+        "id": "outcome-receipt-check",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "adapters/outcome_receipt.py", "--check"],
+        "timeout_seconds": 300
+      },
+      {
+        "id": "reference-host-tests",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "adapters/test_reference_host.py"],
+        "timeout_seconds": 300,
+        "expected": {"tests": [48]}
+      },
+      {
+        "id": "adapter-fixture-provenance",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "adapters/fixture_extract.py", "--check"],
+        "timeout_seconds": 300
+      },
+      {
+        "id": "mcp-gate-calibration",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "adapters/mcp/rr_mcp_gate.py", "--calibrate"],
+        "timeout_seconds": 300
+      },
+      {
+        "id": "mcp-gate-tests",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "adapters/mcp/test_mcp_gate.py"],
+        "timeout_seconds": 300,
+        "expected": {"checks": [103], "failures": [0]}
+      },
+      {
+        "id": "mcp-gate-demo",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "adapters/mcp/demo.py"],
+        "timeout_seconds": 300,
+        "expected": {"failures": [0]}
+      },
+      {
+        "id": "strict-ingest-tests",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "portability/test_strict_ingest.py"],
+        "timeout_seconds": 300,
+        "expected": {"tests": [26]}
+      },
+      {
+        "id": "pinned-tools-tests",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "portability/test_pinned_tools.py"],
+        "timeout_seconds": 300,
+        "expected": {"tests": [12]}
+      },
+      {
+        "id": "home-path-disclosure-tests",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "portability/test_home_path_disclosure.py"],
+        "timeout_seconds": 300
+      },
+      {
+        "id": "authority-legibility-tests",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "grounded-0_4/test_authority_legibility.py"],
+        "timeout_seconds": 300,
+        "expected": {"checks": [452], "failures": [0]}
+      },
+      {
+        "id": "authority-table-check",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "grounded-0_4/generate_authority_table.py", "--check"],
+        "timeout_seconds": 300
+      },
+      {
+        "id": "public-surface-tests",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "grounded-0_4/test_public_surface.py"],
+        "timeout_seconds": 300
+      },
+      {
+        "id": "wrapper-hardening-tests",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "second-implementation/test_wrapper_hardening.py"],
+        "timeout_seconds": 300
+      },
+      {
+        "id": "second-implementation-artifacts",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "second-implementation/verify_artifacts.py"],
+        "timeout_seconds": 300
+      },
+      {
+        "id": "conformance-authority",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "baseline-run/verify_conformance_authority.py"],
+        "timeout_seconds": 900,
+        "expected": {"checks": [32], "failures": [0]}
       }
     ],
     "baseline_nonperformance": [

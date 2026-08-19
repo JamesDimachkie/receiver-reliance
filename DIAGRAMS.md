@@ -911,7 +911,7 @@ failures=0`; `conformance-authority: checks=32 failures=0 declared_divergences=4
 ```mermaid
 flowchart TD
   accTitle: Which gates fire in CI and which need a person
-  accDescr: Three hosted workflows execute the suites on push, but every program that checks a declaration about those suites against current bytes runs only when a person runs it.
+  accDescr: Three hosted workflows execute the suites on push, and the portability workflow now reaches most of the declaration-recompute gates through the matrix plan; two of them still run only when a person runs them.
 
   push{{"A push or pull request"}}
   person{{"A person on a checkout"}}
@@ -919,7 +919,7 @@ flowchart TD
   ci_main[/"Portability and robustness workflows"/]
   suites[/"The suites execute"/]
   replay[/"Replay verifiers"/]
-  recompute[/"Declaration recompute gates"/]
+  recompute[/"The two hand-only declaration recompute gates"/]
 
   push -->|any branch| ci_conformance
   push -->|main only| ci_main
@@ -946,11 +946,25 @@ flowchart TD
 **Reading it.** The suites themselves recompute in CI, and generously — `conformance.yml` runs both
 runners on every push and every pull request across three operating systems, and the robustness
 workflow executes ten `grounded-0_4` steps plus fifteen more across the other trees. The distinction
-this draws is narrower and is the whole point: **every program that checks a *declaration about*
-those suites against current bytes fires only when a person runs it.** `verify_live`,
+this draws is narrower, and until the consumer-surface sweep it was the whole point: **most programs
+that check a *declaration about* those suites against current bytes fired only when a person ran
+them.** The sweep closed most of that gap by route rather than by workflow edit.
 `verify_conformance_authority`, `test_home_path_disclosure`, `test_audit_seal`,
-`generate_engine_manifest` and `test_engine_manifest` appear in none of the three workflow files —
-verified by grep, not inferred — including the one the README tells a third party to run first.
+`generate_engine_manifest` and `test_engine_manifest` are now rows of
+`portability/matrix/plan.json` `profiles.portability_checks`, which the portability workflow
+executes on every normative cell through `receipt.py run`. They still appear in none of the three
+workflow files — verified by grep, not inferred — because the plan, not the workflow, is the
+command manifest, which is why that grep alone never established hand-only status.
+
+Two are deliberately still hand-only, and the reasons are measured rather than habitual.
+`verify_live` — the one the README tells a third party to run first — executes all eleven charter
+gates, two of which are wall-clock assertions (`test_batch.py --perf` requires an amortized ratio at
+most 3x, and the single-pass benchmark measures one), and `plan.json` deliberately confines those to
+the single `expanded_gate` row rather than to every public-preview arm runner.
+`verify_predicate_coverage.py --full` mutates 117 predicate atoms through two arms each, re-running
+the 0.2 conformance suite every time; measured at roughly 26 seconds per atom, that is about 51
+minutes on one cell, and the matrix README already states the policy for exactly this shape — one
+long finite enumeration is not turned into fifteen redundant jobs.
 
 That is exactly E13's failure shape: a declared count went stale while the suite it named was
 green. **It was live in the working tree when this page was assembled.** Sealing the decision
@@ -977,9 +991,9 @@ page and closed by hand (`5c29965`..`000652d`).
 | `python -B second-implementation/verify_artifacts.py` | WP4 receipt bindings, import closure, runtime read set | **CI** — `main` only |
 | `python -B portable/gate.py` | Eight suites execute at current bytes, under count-agnostic validators | **CI** — `main` only |
 | `python -B portability/verify_live.py` | **The eleven charter gates pass at the bytes you have checked out** — the README tells a third party to run this one first | **hand only** |
-| `python -B baseline-run/verify_conformance_authority.py` | The frozen manifests' literal `PASS` and `failures: 0` equal what the suites actually observe (E16) | **hand only** |
-| `python -B portability/test_home_path_disclosure.py` | E15's fifty-two-instance disclosure still describes current bytes | **hand only** |
-| `python -B receiver_reliance/generate_engine_manifest.py --check`, `test_engine_manifest.py`, `test_audit_seal.py` | The eleven engine files still hold their published bytes | **hand only** |
+| `python -B baseline-run/verify_conformance_authority.py` | The frozen manifests' literal `PASS` and `failures: 0` equal what the suites actually observe (E16) | **CI** — every normative matrix cell |
+| `python -B portability/test_home_path_disclosure.py` | E15's fifty-two-instance disclosure still describes current bytes | **CI** — every normative matrix cell |
+| `python -B receiver_reliance/generate_engine_manifest.py --check`, `test_engine_manifest.py`, `test_audit_seal.py` | The eleven engine files still hold their published bytes | **CI** — every normative matrix cell |
 | `python -B baseline-run/verify_predicate_coverage.py --full` | Which predicate atoms of the frozen law any fixture actually constrains | **hand only**; this page is its first documentary reference |
 
 **Not shown:** the three `workflow_dispatch` triggers, which still require a person and so belong to
@@ -997,7 +1011,9 @@ robustness workflow's `suites` job runs ten `grounded-0_4` steps, five `adapters
 `portability/verify_receipts.py` and `portability/verify_hygiene.py`. The absences were verified
 mechanically: `grep -c` for `verify_live`, `verify_conformance_authority`,
 `test_home_path_disclosure`, `test_audit_seal`, `engine_manifest` and `generate_engine_manifest`
-returns `0` in all three workflow files. `README.md` §"Cross-platform validation" (*"**Run this one
+returns `0` in all three workflow files — which is why that grep is not by itself evidence of
+hand-only status, and `portability/matrix/plan.json` `profiles.portability_checks` has to be read
+beside it. `README.md` §"Cross-platform validation" (*"**Run this one
 first.**"*, and the era-divergence declaration, now `521, 9 and 9`), §"Repository map" (the
 `521-check regression` row),
 §"Contributing / re-verification" (the hand-run list). `ADOPTION.md` A1 (a dated publication
