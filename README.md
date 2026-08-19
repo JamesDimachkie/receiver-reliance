@@ -612,9 +612,10 @@ sealed 0.2/0.3 bytes changed:
   `receiver_reliance.conformance.execute`, and
   `grounded-0_4/test_public_surface.py` pins the absence of `decide` so the
   route cannot silently return. The current audit format
-  (`B1-AUDITED-DECISION-0.4.1`, ERRATA E8/E9) additionally seals the
-  governing closure-policy, authority-register, and engine-source digests
-  into every audit, discloses record-reference truncation explicitly, and
+  (`B1-AUDITED-DECISION-0.4.2`, ERRATA E8/E9) additionally seals the
+  governing closure-policy, authority-register, engine-source, and both
+  decision-table contract digests into every audit, discloses
+  record-reference truncation explicitly, and
   fails closed to `AUDIT_INCOMPLETE` when a closure evaluator errors on an
   otherwise-VALID decision.
 - `grounded-0_4/closures_0_4.json` — tighten-only closure predicates fixing

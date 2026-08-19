@@ -117,11 +117,15 @@ CONCURRENCY_SOURCE_PINS = {
 #   the pinned_tools adoption, which replaced the ladder's bare ``git`` argv
 #            with pinned_tools.git() (digest 7CF10CC6...).  This guard is what
 #            forced that second move to be disclosed rather than absorbed.
+#   the 0.4.2 count-migration completion: AUDITED_FORMAT_VERSION 0.4.1 -> 0.4.2
+#            after 0ff243c moved the audit format and left this pin behind;
+#            the hosted normative cells rejected every fresh envelope
+#            (audited_envelope_version) until it moved (digest CB7D1FA5...).
 # path -> (digest published in STATUS.md, digest of the current bytes).
 SOURCE_PIN_ERRATA = {
     "portability/concurrency/ladder.py": (
         "B5436C851C849CFB2B39A7EC2B35C258E501E3171A2ECD6BE6AF913329CC27E6",
-        "7CF10CC692FCF938CD69D831FA74C9AD94994073212ACBB75B3F61E57701E798",
+        "CB7D1FA56C50C99576A7B1E717A06E6C902A5262400B5DE0D52143FDBC706C12",
     ),
 }
 

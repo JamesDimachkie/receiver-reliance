@@ -20,7 +20,7 @@ The gap was not hypothetical. Measured at this revision:
 
 | Role | Source | Published | Current |
 |---|---|---|---|
-| harness | `../ladder.py` | `B5436C85…` | `7CF10CC6…` |
+| harness | `../ladder.py` | `B5436C85…` | `CB7D1FA5…` |
 | focused tests | `../test_ladder.py` | `926D75C5…` | `926D75C5…` |
 | clean oracle implementation | `../../oracle/oracle.py` | `2148F0C9…` | `2148F0C9…` |
 | clean oracle public API | `../../oracle/__init__.py` | `747CF137…` | `747CF137…` |
@@ -41,13 +41,20 @@ invocation is provenance evidence for these very receipts, and exempting it
 would have left the one harness whose source is a published receipt binding
 resolving its authority from the ambient `PATH`.
 
+A third move followed the same law. The 0.4.2 audit-format migration
+(`0ff243c`) moved the engine truth and left this pin behind; the hosted
+normative cells rejected every fresh envelope (`audited_envelope_version`)
+until `AUDITED_FORMAT_VERSION` moved to `B1-AUDITED-DECISION-0.4.2`, taking
+the digest to `CB7D1FA5…`. The disclosure lands in the same change as the
+move, which is what this guard exists to force.
+
 ## Why the pin is not refreshed
 
 Refreshing it is the cheap repair and it is the wrong one. The digest's only
 function is to say which bytes produced the recorded run. Rewriting it to
 `D40F692A…` would assert that the current bytes produced the 242,400-envelope,
 213.937-second normative run, which they did not: no ladder re-run receipt
-exists at these bytes. F-MATRIX-016 argues the 0.4.1 envelope keeps the frozen
+exists at these bytes. F-MATRIX-016 argues the 0.4.1 and 0.4.2 envelopes keep the frozen
 six-field surface so the seal recompute and oracle projection hold unchanged,
 and that argument is sound — but it is an equivalence argument, not evidence of
 re-execution, and a provenance pin is exactly the field that must not absorb an
@@ -63,7 +70,7 @@ bindings and the R-CONC-4 refutation all rest on the three unmoved pins.
 
 Affected: the claim that the ladder source *at this revision* is the source that
 produced those receipts. It is not. Anyone re-running the ladder here runs the
-0.4.1 auditor.
+0.4.2 auditor.
 
 ## Enforcement
 

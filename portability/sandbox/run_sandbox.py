@@ -124,33 +124,58 @@ class DockerInspectError(DockerMetadataError):
     """A Docker inspect response did not identify exactly one valid object."""
 
 
-EXPECTED_OBSERVED = {
-    "frozen_0_2_parity": {
-        "total": 800,
-        "failures": 0,
-        "counts": {
-            "semantic": 112,
-            "competence": 370,
-            "wrapper_arms": 224,
-            "negative": 10,
-            "metamorphic": 4,
-            "error_law": 80,
+def _expected_observed() -> dict[str, Any]:
+    """Host-side declared count evidence for every container gate.
+
+    The ``checks_N`` gate family declares each count exactly once, in the
+    container-side GateSpec validator name (``checks_521`` -> 521), so the
+    host expectation for that family is derived from ``expanded_gate.GATES``
+    rather than hand-mirrored.  The 0.4.2 migration moved the container
+    declaration (``checks_517`` -> ``checks_521``) while this table's copy
+    stayed at 517 -- the F-MATRIX-013..017 drift class -- and the hosted
+    gate then rejected the container's truthful receipt.  A derived entry
+    cannot lag its source; only shapes the validator name cannot express
+    are declared literally.
+    """
+
+    expected: dict[str, Any] = {
+        "frozen_0_2_parity": {
+            "total": 800,
+            "failures": 0,
+            "counts": {
+                "semantic": 112,
+                "competence": 370,
+                "wrapper_arms": 224,
+                "negative": 10,
+                "metamorphic": 4,
+                "error_law": 80,
+            },
         },
-    },
-    "composed_0_3_parity": {
-        "0.2": {"total": 800, "failures": 0},
-        "0.3": {"total": 107, "failures": 0},
-    },
-    "grounded_0_4_regression": {"checks": 517, "failures": 0},
-    "contract_lint": {"findings": 0},
-    "lint_gate_meta": {"checks": 9, "failures": 0},
-    "grounded_properties": {"checks": 2296, "failures": 0},
-    "audit_adversarial": {"checks": 6497, "failures": 0},
-    "synthetic_proof_harness": {"tests": 9, "failures": 0},
-    "fuzz_ci_smoke": {"strategies": 31, "completed": 31, "failures": 0},
-    "batch_perf": {"checks": 2160, "failures": 0},
-    "single_pass_audit_benchmark": {"checks": 1142, "failures": 0},
-}
+        "composed_0_3_parity": {
+            "0.2": {"total": 800, "failures": 0},
+            "0.3": {"total": 107, "failures": 0},
+        },
+        "contract_lint": {"findings": 0},
+        "synthetic_proof_harness": {"tests": 9, "failures": 0},
+        "fuzz_ci_smoke": {"strategies": 31, "completed": 31, "failures": 0},
+    }
+    checks_name = re.compile(r"\Achecks_([0-9]+)\Z")
+    for spec in expanded_gate.GATES:
+        match = checks_name.match(spec.validator)
+        if match is not None:
+            expected[spec.gate_id] = {
+                "checks": int(match.group(1)),
+                "failures": 0,
+            }
+    if set(expected) != {spec.gate_id for spec in expanded_gate.GATES}:
+        raise AssertionError(
+            "EXPECTED_OBSERVED must declare exactly the container's gate_ids:"
+            " a new GateSpec needs a checks_N validator or an explicit entry"
+        )
+    return expected
+
+
+EXPECTED_OBSERVED = _expected_observed()
 
 TOP_LEVEL_INNER_KEYS = {
     "schema",

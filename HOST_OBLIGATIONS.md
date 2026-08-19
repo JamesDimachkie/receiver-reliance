@@ -69,11 +69,11 @@ are logged, not silently dropped.
 
 The sealed 0.2/0.3 response does not bind the decision input (recorded
 defect, `ERRATA.md` E2). Hosts that need an auditable decision must either
-use `grounded-0_4/rr_api.py::decide_audited` (the 0.4.1 audit seal binds
+use `grounded-0_4/rr_api.py::decide_audited` (the 0.4.2 audit seal binds
 request bytes, decision-input digest, the sealed receipt, and the governing
-closure-policy/authority-register/engine digests — see `TRUST_MODEL.md` for
-exactly what that seal proves) or record full transcripts and verify with
-the core transcript evaluator. Do not present a
+closure-policy/authority-register/engine/decision-table-contract digests —
+see `TRUST_MODEL.md` for exactly what that seal proves) or record full
+transcripts and verify with the core transcript evaluator. Do not present a
 bare sealed receipt as evidence of *what* was decided — it proves only that
 *a* decision of that class was sealed under that request id.
 

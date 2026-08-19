@@ -280,8 +280,8 @@ One of the four no longer matches.
 
 `4ea69dc` bound the clean v3 normative and smoke receipts, with
 `portability/concurrency/ladder.py` at
-`B5436C851C849CFB2B39A7EC2B35C258E501E3171A2ECD6BE6AF913329CC27E6`. Two changes have moved it
-since:
+`B5436C851C849CFB2B39A7EC2B35C258E501E3171A2ECD6BE6AF913329CC27E6`. Three changes have moved
+it since:
 
 1. `ca1ccfe` changed exactly one line — `AUDITED_FORMAT_VERSION` from
    `B1-AUDITED-DECISION-0.4` to `B1-AUDITED-DECISION-0.4.1`, the F-MATRIX-016
@@ -290,6 +290,12 @@ since:
 2. The `pinned_tools` adoption replaced the ladder's bare `git` argv with
    `pinned_tools.git()`, taking it to
    `7CF10CC692FCF938CD69D831FA74C9AD94994073212ACBB75B3F61E57701E798`.
+3. The 0.4.2 count-migration completion moved `AUDITED_FORMAT_VERSION` from
+   `B1-AUDITED-DECISION-0.4.1` to `B1-AUDITED-DECISION-0.4.2` after `0ff243c`
+   moved the audit format itself and left this pin behind -- the hosted
+   normative cells rejected every fresh envelope (`audited_envelope_version`)
+   until it moved -- taking the digest to
+   `CB7D1FA56C50C99576A7B1E717A06E6C902A5262400B5DE0D52143FDBC706C12`.
 
 The second move is worth stating plainly: the guard this erratum installed is
 what surfaced it. The adoption commit ran `verify_receipts`, which failed
@@ -316,17 +322,17 @@ and the R-CONC-4 refutation all rest on the three unmoved pins.
 
 What it does invalidate: the claim that the *current* `ladder.py` bytes are the
 bytes that produced those receipts. Anyone re-running the ladder at this
-revision is running the 0.4.1 auditor, not the 0.4 auditor the receipts
-recorded. F-MATRIX-016 establishes why the change was required — the 0.4.1
-envelope keeps the frozen six-field surface, so the auditor's seal recompute and
-oracle projection hold unchanged over it — but that is an argument about
+revision is running the 0.4.2 auditor, not the 0.4 auditor the receipts
+recorded. F-MATRIX-016 establishes why such migrations are required — the 0.4.1
+and 0.4.2 envelopes keep the frozen six-field surface, so the auditor's seal
+recompute and oracle projection hold unchanged over them — but that is an argument about
 equivalence, not evidence of re-execution. No re-run receipt exists at these
 bytes.
 
 Enforcement: `portability/verify_receipts.py` now hashes all four published
 sources. Three must equal their published digests. `ladder.py` is bound to the
-post-erratum digest recorded above, so a second undisclosed move fails the gate
-rather than hiding behind the first. `portability/concurrency/findings/F-CONC-004.md`
+newest digest recorded above, so a further undisclosed move fails the gate
+rather than hiding behind the disclosed ones. `portability/concurrency/findings/F-CONC-004.md`
 carries the full record.
 
 ## E13 — A replay verifier reported green over a red gate for four commits
