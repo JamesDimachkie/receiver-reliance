@@ -166,9 +166,12 @@ class AdoptionIsComplete(unittest.TestCase):
     them fails here rather than shipping.
     """
 
-    # The four surfaces ADOPTION A4 names.  Production files only; the law
-    # module itself and test files are out of scope by construction.
-    ADOPTED = ("portability/live/", "portability/matrix/", "portable/")
+    # The four surfaces ADOPTION A4 names, plus ``adapters/mcp/``: a consumer
+    # written after the law existed, which therefore never had a bare ingest to
+    # migrate and is enumerated here so it cannot acquire one.  Production files
+    # only; the law module itself and test files are out of scope by
+    # construction.
+    ADOPTED = ("portability/live/", "portability/matrix/", "portable/", "adapters/mcp/")
     ADOPTED_FILES = ("portability/verify_receipts.py",)
     # A4 phase 2 closed the last three exemptions (portable/cli.py, gate.py and
     # verify_bundle.py) by declaring the law itself in the bundle inventory, so

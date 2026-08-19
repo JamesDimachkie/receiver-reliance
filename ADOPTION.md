@@ -71,3 +71,16 @@ only rows that blocked reproducing what is already claimed, and the 2026-08-18
 publication closed the first and ratified the second, so what a clone of the
 default branch gives you now is what passes the gates. The remaining rows bound
 what may be claimed next, not what is claimed today.
+
+`adapters/mcp/` is the first surface in this tree built to be wired into a stack
+outside it, so it is where that trigger stops being hypothetical. It does not
+fire on the commit: the gate is an in-repo consumer, verified by this
+repository's own gates, and no outside party relies on it
+([TRUST_MODEL.md](TRUST_MODEL.md)'s census is unchanged). It fires when a host
+wires the server into its own client, because that host is then the first
+external consumer and its senders are by construction adversarial to the
+receiver's tooling. A4 and A6 are blocking work before that embedding ships, and
+A5 is reopened over one unmigrated harness; the adapter's own README restates
+this where a host will read it. The gate adopts the shared ingest law at birth
+rather than inheriting a bare one, so it enlarges A4's guarded set without
+enlarging A4's remainder.

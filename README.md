@@ -105,7 +105,7 @@ process history that claims elsewhere cite.
 |---|---|---|
 | `receiver_reliance/` | live surface | The installable package. `engine_manifest.json` pins all eleven engine files by byte length and SHA-256; importing verifies every one before executing any of them and refuses to import on drift. |
 | `grounded-0_4/` | live surface | The audited decision layer — `decide_audited`, the authority register, the closure policy, the lint gate, the 521-check regression. This is the one supported evidentiary route. |
-| `adapters/` | live surface | The stdlib-only three-state preflight, its calibration playbook, and the outcome receipt that reproduces the 18/18-detection-at-0.0%-false-holds result. |
+| `adapters/` | live surface | The stdlib-only three-state preflight, its calibration playbook, and the outcome receipt that reproduces the 18/18-detection-at-0.0%-false-holds result. `adapters/mcp/` is one consumer of it: a stdio MCP server that runs the preflight and then `decide_audited` over records an agent received, verifies every envelope's seal, and logs the audited decision. It adds no fourth preflight status and is the first surface here built for a consumer outside this repository — [ADOPTION.md](ADOPTION.md) states what that promotes to blocking. |
 | `portable/` | live surface | The self-contained bundle: manifest, builder, gate, CLI, threat model, operator runbook. |
 | `examples/` | live surface | The three handoff records [EXAMPLE.md](EXAMPLE.md) decides end to end — clean, inconsistent, unchecked revocation. |
 | `deployment/` | live surface, off by default | One operator-enabled control: a pre-engine byte bound that narrows this deployment's contract in exchange for bounding what an oversized request can cost. Unset it is byte-identical to its absence; set, it rejects requests the published contract declares valid, which [deployment/README.md](deployment/README.md) states as the price rather than a caveat. Not part of the supported surface; obligation at [HOST_OBLIGATIONS.md](HOST_OBLIGATIONS.md) H7. |
@@ -928,8 +928,12 @@ committed corpus with and without an observer and compares JCS bytes),
 admission profile, including the arm that proves enabling it rejects a request
 the frozen engine seals `ok`),
 `python -B law/verify_law.py --structural-only`,
-`python -B replay-corpus/replay_incidents.py`, and the two custody
-verifiers in "Cross-platform validation" above. The engine manifest is the
+`python -B replay-corpus/replay_incidents.py`,
+`python -B portability/test_strict_ingest.py` (which recomputes A4's adopted
+ingest surfaces from `git ls-files` rather than a hand-written list),
+`python -B adapters/mcp/test_mcp_gate.py` (the MCP gate over the audited route,
+including the seal check's negative arm and all six audited class values), and
+the two custody verifiers in "Cross-platform validation" above. The engine manifest is the
 package's own integrity gate: importing `receiver_reliance` verifies all
 eleven engine files by byte length and SHA-256 before executing any of them
 and refuses to import on drift, so a checkout or a distribution that does

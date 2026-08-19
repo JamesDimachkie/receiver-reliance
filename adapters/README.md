@@ -82,3 +82,18 @@ Current-byte local evidence covers CPython 3.12, 3.13, and 3.14
 (`RUNTIME_EVIDENCE.md`, re-pinned 2026-08-13). The recorded runs meet the
 requested 3.12–3.14 evidence bar. Package completion beyond the delivered
 fallback is still not claimed.
+
+## One consumer of it, in this tree
+
+[`mcp/`](mcp/README.md) is a stdio MCP server that runs this preflight and then
+`receiver_reliance.decide_audited` over records an agent received from a tool
+call. It is a **consumer** of the fallback above, not a widening of it: it adds
+no fourth status, re-derives none of these rules, and its own verdict vocabulary
+restates a preflight status or an audited class with the underlying value
+reported beside it. The three-status law on this page governs there unchanged.
+
+It is also the first surface in this repository built for a consumer outside it,
+which is a posture question before it is a code question:
+[TRUST_MODEL.md](../TRUST_MODEL.md) and [ADOPTION.md](../ADOPTION.md) record what
+the first external consumer promotes to blocking work, and `mcp/README.md`
+restates that trigger where a host wiring the server will read it.

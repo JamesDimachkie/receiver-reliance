@@ -106,6 +106,16 @@ The artifact is therefore maintained as a **research artifact**: consumers
 re-verify from the commit root; receipts exist to make that re-verification
 mechanical. This posture is a recorded decision, not an accident.
 
+That census is unchanged by `adapters/mcp/`, and the distinction is worth being
+exact about rather than leaving to a reader. The MCP gate is an **in-repo**
+consumer — it is in this tree, it is verified by this repository's own gates, and
+no party outside it relies on the decisions it makes. What is new is its
+intended audience: it is the first surface here written to be wired into someone
+else's stack, and an MCP gate's premise is that the sender of the record is not
+trusted by the receiver's tooling. Committing it does not fire the
+re-adjudication trigger below. A host wiring it up does, and that host would be
+the first external consumer this page has ever recorded.
+
 **Re-adjudication trigger:** the first external consumer, or any embedding
 where handoff senders are adversarial to the receiver's own tooling,
 re-opens the deferred hardening set recorded in Intake 10 (shared canonical
