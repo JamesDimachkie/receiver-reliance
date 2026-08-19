@@ -102,12 +102,23 @@ def _walk_bounds(value: Any, depth: int, pointer: str) -> None:
                 raise IngestError(f"lone surrogate in string at {pointer or '/'}")
 
 
-def load_safe(raw: bytes, *, label: str = "input") -> Any:
+def load_safe(
+    raw: bytes,
+    *,
+    label: str = "input",
+    parse_float=None,
+    parse_int=None,
+) -> Any:
     """Parse bytes under the safety half. Raises IngestError, never anything else.
 
     Bounds are checked iteratively-by-recursion over the parsed value rather than
     during the scan, so the ceiling is enforced even when CPython's own parser
     would have accepted the shape.
+
+    ``parse_float`` / ``parse_int`` pass through to the decoder untouched, for
+    consumers whose evidence requires numeric fidelity (the matrix verifier
+    parses receipt floats as Decimal).  They affect only the Python values
+    produced, never what the safety half accepts or rejects.
     """
     if not isinstance(raw, (bytes, bytearray)):
         raise IngestError(f"{label}: bytes required, got {type(raw).__name__}")
@@ -117,7 +128,11 @@ def load_safe(raw: bytes, *, label: str = "input") -> Any:
         raise IngestError(f"{label}: not valid UTF-8: {exc}") from exc
     try:
         value = json.loads(
-            text, object_pairs_hook=_no_duplicate_keys, parse_constant=_reject_constant
+            text,
+            object_pairs_hook=_no_duplicate_keys,
+            parse_constant=_reject_constant,
+            parse_float=parse_float,
+            parse_int=parse_int,
         )
     except IngestError:
         raise

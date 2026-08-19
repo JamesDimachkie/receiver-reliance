@@ -50,6 +50,7 @@ if str(REPO_ROOT / "portability") not in sys.path:
 # no receipt digest moves; with it set, tools resolve inside a directory an
 # unprivileged process cannot write and never fall back to PATH.
 import pinned_tools  # noqa: E402
+import strict_ingest  # noqa: E402  (ADOPTION A4: the one shared ingest law)
 SAFE_ENV_KEYS = (
     "CI",
     "COMSPEC",
@@ -235,29 +236,18 @@ def _preflight_json_structure(text: str) -> None:
         raise ValueError("JSON document contains unclosed structural delimiters")
 
 
-def _reject_duplicate_members(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
-    """Refuse a repeated object member rather than collapsing it last-wins.
-
-    Matrix plans and downloaded hosted receipts both reach the decoder here, and
-    the implementation treats hosted artifacts as hostile.  Default decoding
-    erases the first of two conflicting ``entry_id``, ``outcome``, ``git``,
-    ``environment`` or ``status`` members before any closed-shape, identity or
-    binding check sees them, so the same bytes could mean different things to
-    different consumers (csf_3df8c8b0).  Deterministic rejection is the only
-    reading that keeps durable evidence consumer-independent.
-    """
-    seen: dict[str, Any] = {}
-    for key, value in pairs:
-        if key in seen:
-            raise ValueError(f"duplicate JSON member {key!r} is ambiguous evidence")
-        seen[key] = value
-    return seen
-
-
 def _json_load(path: pathlib.Path) -> dict[str, Any]:
-    def reject_constant(value: str) -> None:
-        raise ValueError(f"non-finite JSON number {value} is not permitted")
-
+    # ADOPTION A4: parsing goes through the one shared safety law.  Matrix
+    # plans and downloaded hosted receipts both reach this decoder, and the
+    # implementation treats hosted artifacts as hostile: default decoding
+    # would erase the first of two conflicting ``entry_id``, ``outcome``,
+    # ``git``, ``environment`` or ``status`` members before any closed-shape,
+    # identity or binding check saw them (csf_3df8c8b0).  strict_ingest
+    # rejects the duplicate deterministically; IngestError is a ValueError.
+    # Kept local, deliberately: the byte-size admission (this verifier's own
+    # finite input domain), the lexical structure preflight (bounds nesting
+    # BEFORE the recursive decoder allocates), and Decimal numeric fidelity
+    # (passed through load_safe, affecting values only, never acceptance).
     try:
         with path.open("rb") as handle:
             raw = handle.read(MAX_JSON_INPUT_BYTES + 1)
@@ -271,10 +261,9 @@ def _json_load(path: pathlib.Path) -> dict[str, Any]:
         except UnicodeDecodeError as exc:
             raise ValueError("JSON document is not valid UTF-8") from exc
         _preflight_json_structure(text)
-        value = json.loads(
-            text,
-            object_pairs_hook=_reject_duplicate_members,
-            parse_constant=reject_constant,
+        value = strict_ingest.load_safe(
+            raw,
+            label="JSON document",
             parse_float=_parse_json_decimal,
             parse_int=_parse_json_integer,
         )
@@ -668,11 +657,10 @@ def parse_suite_counts(stdout: bytes, stderr: bytes) -> dict[str, Any]:
     count_totals = []
     for match in re.finditer(r"counts=(\{[^\r\n]+?\})(?=\s+[a-z_]+=|\s*$)", text):
         try:
-            # Duplicate count names must not collapse into an expected total.
-            value = json.loads(
-                match.group(1), object_pairs_hook=_reject_duplicate_members
-            )
-        except (json.JSONDecodeError, ValueError):
+            # Duplicate count names must not collapse into an expected total
+            # (ADOPTION A4: the shared law owns the rejection).
+            value = strict_ingest.load_safe(match.group(1).encode("utf-8"))
+        except ValueError:
             continue
         if isinstance(value, dict) and all(
             _is_nonnegative_integer(item) for item in value.values()

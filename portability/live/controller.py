@@ -25,8 +25,11 @@ GROUNDED = REPO / "grounded-0_4"
 WORKER = HERE / "worker.py"
 if str(GROUNDED) not in sys.path:
     sys.path.insert(0, str(GROUNDED))
+if str(HERE.parent) not in sys.path:
+    sys.path.insert(0, str(HERE.parent))
 
 import rr_batch  # noqa: E402
+import strict_ingest  # noqa: E402  (ADOPTION A4: the one shared ingest law)
 
 TRANSPORTS = ("pipe", "socketpair")
 ACTIONS = {
@@ -74,19 +77,6 @@ class DivergenceError(AssertionError):
 
 class _ControlRecordError(ValueError):
     """A deterministic child-control protocol rejection."""
-
-
-def _reject_duplicate_members(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
-    value: dict[str, Any] = {}
-    for key, member in pairs:
-        if key in value:
-            raise _ControlRecordError("duplicate member")
-        value[key] = member
-    return value
-
-
-def _reject_nonfinite_number(unused_token: str) -> None:
-    raise _ControlRecordError("non-finite number")
 
 
 def _control_integer(
@@ -183,11 +173,11 @@ def _validate_control_event(value: Any) -> dict[str, Any]:
 
 def _decode_control_record(line: bytes) -> dict[str, Any]:
     try:
-        payload = line[len(CONTROL_PREFIX) : -1].decode("utf-8")
-        value = json.loads(
-            payload,
-            object_pairs_hook=_reject_duplicate_members,
-            parse_constant=_reject_nonfinite_number,
+        # ADOPTION A4: the shared safety law replaces this file's local
+        # duplicate-member and non-finite hooks; IngestError is a ValueError,
+        # so the deterministic rejection below is unchanged.
+        value = strict_ingest.load_safe(
+            line[len(CONTROL_PREFIX) : -1], label="control record"
         )
     except _ControlRecordError:
         raise
@@ -290,8 +280,10 @@ def load_schedule(path: pathlib.Path | str) -> tuple[Step, ...]:
             if not line.endswith("\n"):
                 raise ScheduleError(f"line {line_number}: NDJSON line must end with LF")
             try:
-                item = json.loads(line)
-            except json.JSONDecodeError as error:
+                item = strict_ingest.load_safe(
+                    line.encode("utf-8"), label="schedule"
+                )
+            except strict_ingest.IngestError as error:
                 raise ScheduleError(f"line {line_number}: {error}") from error
             if type(item) is not dict:
                 raise ScheduleError(f"line {line_number}: object required")

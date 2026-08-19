@@ -157,10 +157,82 @@ class PublishedCorpusStillPasses(unittest.TestCase):
 
 
 class AdoptionIsComplete(unittest.TestCase):
-    def test_verify_receipts_has_no_unguarded_json_load(self) -> None:
-        source = (HERE / "verify_receipts.py").read_text(encoding="utf-8")
-        self.assertNotIn("json.loads(", source)
-        self.assertIn("strict_ingest.load_safe(", source)
+    """No adopted surface may quietly regress to a bare ``json.loads``.
+
+    The first revision of this class checked one hand-named file, which is
+    the shape whose failure ADOPTION A5 records twice: a guard that cannot
+    see its subject.  This one recomputes the subject from ``git ls-files``
+    over the surfaces A4 names, so a bare ingest reappearing anywhere in
+    them fails here rather than shipping.
+    """
+
+    # The four surfaces ADOPTION A4 names.  Production files only; the law
+    # module itself and test files are out of scope by construction.
+    ADOPTED = ("portability/live/", "portability/matrix/", "portable/")
+    ADOPTED_FILES = ("portability/verify_receipts.py",)
+    # portable/* is the offline bundle: adopting the shared law there moves
+    # the bundle's file set (inventory + MANIFEST re-bind), so it is staged
+    # as A4's next event, not exempted forever.  A stale exemption fails.
+    EXEMPT = {
+        "portable/cli.py": "offline bundle; A4 phase 2 needs the inventory re-bind",
+        "portable/gate.py": "offline bundle; A4 phase 2 needs the inventory re-bind",
+        "portable/verify_bundle.py": "offline bundle; A4 phase 2 needs the inventory re-bind",
+    }
+
+    @classmethod
+    def _adopted_production_sources(cls) -> list[str]:
+        import subprocess
+
+        import pinned_tools
+
+        out = subprocess.run(
+            [pinned_tools.git(), "-C", str(REPO), "ls-files", "-z", "*.py"],
+            capture_output=True,
+            check=True,
+        ).stdout
+        selected: list[str] = []
+        for chunk in out.split(b"\0"):
+            rel = chunk.decode("utf-8")
+            if not rel:
+                continue
+            if not (rel.startswith(cls.ADOPTED) or rel in cls.ADOPTED_FILES):
+                continue
+            if pathlib.PurePosixPath(rel).name.startswith("test_"):
+                continue
+            selected.append(rel)
+        return selected
+
+    def test_no_adopted_surface_regresses_to_a_bare_ingest(self) -> None:
+        offenders: dict[str, int] = {}
+        for rel in self._adopted_production_sources():
+            if rel in self.EXEMPT:
+                continue
+            count = (REPO / rel).read_text(encoding="utf-8").count("json.loads(")
+            if count:
+                offenders[rel] = count
+        self.assertEqual(
+            offenders,
+            {},
+            "bare json.loads inside an adopted surface: route it through "
+            "strict_ingest.load_safe, or record a reasoned exemption here",
+        )
+
+    def test_every_exemption_is_still_needed(self) -> None:
+        """A silently satisfied exemption is a stale disclosure (E15's law)."""
+        for rel, reason in sorted(self.EXEMPT.items()):
+            with self.subTest(path=rel, reason=reason):
+                source = (REPO / rel).read_text(encoding="utf-8")
+                self.assertIn(
+                    "json.loads(",
+                    source,
+                    f"{rel} no longer contains a bare ingest; delete its exemption",
+                )
+
+    def test_the_enumeration_sees_its_subject(self) -> None:
+        """Negative arm: the scan detects the thing it exists to detect."""
+        self.assertGreaterEqual(len(self._adopted_production_sources()), 4)
+        probe = "value = json." + "loads(raw)"
+        self.assertEqual(probe.count("json.loads("), 1)
 
     def test_verify_receipts_reports_its_pinned_check_count(self) -> None:
         """The ingest law rejects nothing this repository publishes.

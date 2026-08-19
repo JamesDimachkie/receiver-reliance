@@ -20,8 +20,11 @@ REPO = HERE.parents[1]
 GROUNDED = REPO / "grounded-0_4"
 if str(GROUNDED) not in sys.path:
     sys.path.insert(0, str(GROUNDED))
+if str(HERE.parent) not in sys.path:
+    sys.path.insert(0, str(HERE.parent))
 
 import rr_batch  # noqa: E402
+import strict_ingest  # noqa: E402  (ADOPTION A4: the one shared ingest law)
 
 CONTROL_PREFIX = b"RRCTL "
 
@@ -108,8 +111,8 @@ class NonBlockingSink:
         if not line:
             raise OSError("boundary-control EOF")
         try:
-            command = json.loads(line)
-        except (UnicodeDecodeError, json.JSONDecodeError) as error:
+            command = strict_ingest.load_safe(line, label="boundary-control")
+        except strict_ingest.IngestError as error:
             raise OSError("invalid boundary-control command") from error
         if type(command) is not dict or command.get("command") != expected:
             raise OSError(f"expected boundary-control command {expected!r}")

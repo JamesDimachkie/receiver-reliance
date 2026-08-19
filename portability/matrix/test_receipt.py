@@ -179,7 +179,7 @@ class AmbiguousEvidenceIsRefused(unittest.TestCase):
         # make the verifier read an outcome the receipt also contradicts.
         with self.assertRaises(ValueError) as caught:
             self._load(b'{"entry_id":"a","outcome":"FAIL","outcome":"PASS"}')
-        self.assertIn("duplicate JSON member", str(caught.exception))
+        self.assertIn("duplicate object key", str(caught.exception))
         self.assertEqual(
             self._load(b'{"entry_id":"a","outcome":"PASS"}')["outcome"], "PASS"
         )
@@ -298,12 +298,17 @@ class ReceiptParsingTests(unittest.TestCase):
                 decoder.assert_not_called()
 
             path.write_bytes(b'{"entry_id":0}')
-            for failure in (RecursionError("synthetic"), MemoryError("synthetic")):
+            # A RecursionError inside the decoder is bounded by the shared
+            # ingest law (ADOPTION A4), which converts it to its own
+            # ValueError; a MemoryError propagates to this module's outer
+            # resource boundary.  Both stay ValueError -- the property.
+            for failure, expected in (
+                (RecursionError("synthetic"), "nesting exceeded"),
+                (MemoryError("synthetic"), "MemoryError"),
+            ):
                 with self.subTest(failure=type(failure).__name__):
                     with mock.patch.object(receipt.json, "loads", side_effect=failure):
-                        with self.assertRaisesRegex(
-                            ValueError, type(failure).__name__
-                        ):
+                        with self.assertRaisesRegex(ValueError, expected):
                             receipt._json_load(path)
 
     def test_canonical_writer_bounds_depth_without_recursive_failure(self) -> None:
