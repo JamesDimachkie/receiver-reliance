@@ -13,7 +13,7 @@ round.
 To be precise: the reviewer's formal verdict in every round, including
 round 10, was REJECT-with-findings. It never issued a sign-off. Acceptance
 is the implementing lane's convergence claim under a pre-stated stopping
-rule: the final, heaviest round found zero implementation defects, and its
+rule: the final round found zero implementation defects, and its
 sole finding was adjudicated against the contract's pinned text as a
 contract-design non-closure (below) rather than an implementation defect.
 

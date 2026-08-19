@@ -63,7 +63,7 @@ attention card, so experiment arms can control for ceremony.
 
 Requires CPython 3.12 or newer; 3.12, 3.13, and 3.14 are validated on the
 hosted matrix (see "Cross-platform validation" below), and re-run against a
-clean clone at the current commit in
+clean clone at `72efd11`, twenty-two commits into this release, in
 [portability/THIRD_PARTY_REPRODUCTION_20260818.md](portability/THIRD_PARTY_REPRODUCTION_20260818.md).
 From `baseline-run/`:
 
@@ -116,7 +116,7 @@ process history that claims elsewhere cite.
 | `portability/` | harness | Five validation lanes — a finite behavioral model, an independent no-read oracle, deterministic live transports, a bounded concurrency ladder, and the hosted matrix with its container sandbox — plus the custody verifiers and `verify_live.py`, the recompute gate this README tells you to run first. |
 | `perf/` | harness | Cost model, profiling campaigns, and the sidecar supervisor with its transport envelope, adversarial child, and receipt verifier. |
 | `proof/` | harness | The applicability arms, the synthetic corpus and truth set, and the scoring harness behind `proof/RESULTS.md`. |
-| `fuzz/` | harness | The deterministic seeded campaign: 100,000 case identities, 67,599 unique raw byte strings, zero findings. |
+| `fuzz/` | harness | The deterministic seeded campaign. It contributes 50,000 of the 100,000-identity aggregate; the other half ran as the batch campaign (`perf/batch_campaign.py`, `orchestration/BATCH_50K.md`). Together: 67,599 unique raw byte strings, zero findings. |
 | `orchestration/` | records | Ledgers, the standing criticism-adjudication protocol, the external-validation and portability-validation reports, the minimized refuter reports, and `REIMPLEMENTERS_GUIDE.md`. |
 | `continuation-specs/` | drafts | Proposed generation-0.5 core and semantic drafts. **Not adopted, not implemented, not evidence** — each carries that banner at the top, and nothing in this release depends on them. |
 | `.github/workflows/` | harness | The hosted conformance, portability, and robustness gates. Which of them fires on which branch is recorded, including what does not fire, in [ADOPTION.md](ADOPTION.md) A2. |
@@ -207,14 +207,14 @@ rounds surfaced 22 real conformance defects, every one fixed and pinned as
 a regression case. The first round alone caught a critical RFC 8785
 member-ordering bug that corrupted canonical output. Two findings were
 refuted against the contract's own pinned bytes. Both refutations held on
-re-examination. The final round, the heaviest (45 designed probes plus
+re-examination. The final round (45 designed probes plus
 70,000 randomized grammar and totality cases), found no implementation
 defect: no input crashed, exceeded the output limit, or broke a seal.
 
 To be precise about what "acceptance" means here: the reviewer's formal
 verdict in every round, including the last, was REJECT-with-findings. It
 never issued a sign-off. The loop ended under a pre-stated stopping rule
-when the heaviest round found zero implementation defects and its sole
+when the final round found zero implementation defects and its sole
 finding was adjudicated against the contract's pinned text as a
 contract-design non-closure rather than an implementation defect. The
 implementing lane made that call, and its reasoning is on record.
@@ -319,14 +319,18 @@ efforts:
 This artifact sits between those layers: *after* records arrive and
 *before* the receiver acts on them, it deterministically classifies each
 obligation from caller-assembled facts, with the whole decision surface
-byte-pinned and replayable. Its distinguishing properties are checkable:
-one integrated decision table spanning all 30 operations, exact byte
-behavior in two execution modes, competence mutations that kill
-metadata-pattern-matching implementations, paired wrapper arms for
-ceremony control, and a published defect-to-regression review record. The
-adjacent systems compose with it: a session established by ATN, receipts
-drawn from a SCITT log, or actions governed by a policy engine can all
-feed the fact profiles this engine classifies.
+byte-pinned and replayable. Its properties are checkable: one integrated
+decision table spanning all 30 operations, exact byte behavior in two
+execution modes, competence mutations that kill metadata-pattern-matching
+implementations, paired wrapper arms for ceremony control, and a published
+defect-to-regression review record. **Nothing here integrates with the
+adjacent systems named above.** No adapter, fixture, schema mapping, or test
+for any of them exists in this tree, and none is claimed: a host that
+establishes a session, keeps a transparency log, or runs a policy engine still
+assembles the fact profiles this engine classifies, by its own means. The
+descriptions above are of published surfaces as documented, read in August
+2026; they are orientation for a reader, not a compatibility statement and not
+a comparison this artifact can adjudicate.
 
 ## What this does not claim
 

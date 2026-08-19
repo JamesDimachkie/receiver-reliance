@@ -55,6 +55,25 @@ surface, and it has held across every recorded ladder run — but no proof exist
 here that those inputs cannot reach a closure-evaluator error, so it is recorded
 as a narrower contract, not a demonstrated impossibility.
 
+The same correction applies one level down, and stopping at the class values
+would have left the cause unfixed. Three further things a caller observes were
+pinned by `grounded-0_4/test_public_surface.py` as supported and declared in no
+document until this release:
+
+- **`audit.object_request_error`** — present only when a Python object could not
+  be canonicalized into a request. Its values are `ERR_JSON` (non-string key,
+  cycle, or unencodable value), `ERR_NUMBER` (non-finite), and `ERR_LIMIT`
+  (size, depth, or digit ceiling). When it is present the decision is a refusal,
+  not a classification.
+- **`grounded-0_4/rr_batch.py` is a supported transport**, not merely a file
+  with recorded bounds. It serves newline-delimited requests over the same
+  `decide_audited` path and seals each result identically.
+- **`audit.transport_error`**, with the value `ERR_BATCH_RECORD_LIMIT`, plus
+  `request_prefix_sha256` and `request_prefix_bytes` — what that transport
+  returns when a record crosses the physical-line ceiling. The prefix fields
+  exist so a refusal names what it saw without claiming a digest of a request it
+  never received in full.
+
 ## Trust boundaries, by surface
 
 | Boundary | Untrusted side | Defense |

@@ -35,7 +35,12 @@ no security mailing list and no PGP key.
 
 Include the commit you tested, the exact command, and the observed output. A
 reproduction from a clean clone is worth more than a description, and this
-repository is built so that one is always possible.
+repository is built so that one is possible for everything in scope above.
+Three exceptions are already ledgered and are not oversights: the `proof/` arm
+scripts need an operator-only extractor (`WITHHELD.md`), the sealed
+subprocess-ABI conformance mode pins a Windows interpreter that is not
+distributed ([ADOPTION.md](ADOPTION.md)), and `portability/verify_hygiene.py`
+shells `git`, so it needs a real clone rather than an unpacked archive.
 
 ## What to expect
 

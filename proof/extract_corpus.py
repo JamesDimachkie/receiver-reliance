@@ -43,9 +43,28 @@ REPO = OUT_DIR.parent
 if str(REPO / "portability") not in sys.path:
     sys.path.insert(0, str(REPO / "portability"))
 
-# Provenance this script records must not depend on whichever `git` the
-# ambient PATH resolves first (TRUST_MODEL.md's harness boundary).
-import pinned_tools  # noqa: E402
+# Resolve `git` through the pinned-tool law when this file sits in the
+# repository, so the timestamps it reads do not depend on whichever `git` the
+# ambient PATH offers first (TRUST_MODEL.md's harness boundary).
+#
+# This extractor is deliberately relocatable -- `test_proof_harness.py` copies
+# it to a scratch directory and runs it against an arbitrary
+# RR_SOURCE_WORKSPACE -- so the import cannot be unconditional. When the copy
+# is outside the repository the law is unreachable and the bare name is used.
+# That degradation is real and is stated here rather than hidden: a relocated
+# copy has no pinned-tool guarantee. It is acceptable only because this script
+# is operator-only, writes no receipt, and emits a corpus whose own digests are
+# recomputed downstream; nothing published depends on which `git` it found.
+try:
+    import pinned_tools  # noqa: E402
+
+    def _git_binary() -> str:
+        return pinned_tools.git()
+
+except ModuleNotFoundError:  # relocated copy, outside the repository
+
+    def _git_binary() -> str:
+        return "git"
 
 HEX64 = re.compile(r"\b[A-F0-9]{64}\b")
 # `NAME.md`, SHA-256 `HASH`  (the epistemic-handoff citation convention)
@@ -67,7 +86,7 @@ def sha256_file(path: pathlib.Path) -> str | None:
 def git(repo: pathlib.Path, *args: str) -> str | None:
     try:
         proc = subprocess.run(
-            [pinned_tools.git(), "-C", str(repo), *args],
+            [_git_binary(), "-C", str(repo), *args],
             capture_output=True,
             text=True,
             timeout=30,
