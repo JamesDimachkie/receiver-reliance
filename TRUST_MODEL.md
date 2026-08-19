@@ -35,6 +35,18 @@ law (`adapters/portable_preflight.py` module docstring). `REJECTED_INVALID`
 is detection; `INSUFFICIENT_EVIDENCE` is abstention; `AUDIT_INCOMPLETE`
 means a VALID class could not be certified by a complete closure pass (E9).
 
+**The audited envelope is not four-valued, and the distinction matters.** The
+decision *law* classifies every schema-valid decision input into exactly one of
+`VALID`, `MALFORMED_OR_BOUNDARY`, `BINDING_OR_CONFLICT`,
+`OMISSION_OR_INCOMPLETE` — that is a property of the frozen tables. The audited
+*surface* wrapping it can additionally return `AUDIT_INCOMPLETE` and
+`PROTOCOL_ERROR` (`grounded-0_4/rr_api.py`, `grounded-0_4/rr_batch.py`), neither
+of which is a classification of a schema-valid input: the first is the
+fail-closed outcome of a closure evaluator error, the second is what a request
+that never reached classification returns. Totality is intact; "exactly one of
+four" is a statement about the law, not about the envelope, and a consumer
+switching on `audited_behavior_class` must handle all six.
+
 ## Trust boundaries, by surface
 
 | Boundary | Untrusted side | Defense |
