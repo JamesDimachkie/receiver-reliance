@@ -202,14 +202,29 @@ duplicate keys with lone surrogates).
 receipt's status string is stale.
 
 Recorded rather than rewritten, for the same reason E2, E4 and E5 are: the
-receipt's raw SHA-256 is pinned in four places —
-`portability/verify_hygiene.py` (`ALLOWED`), `portable/inventory.json`,
-`portable/MANIFEST.json`, and it is consumed by
-`second-implementation/verify_artifacts.py` as `author-file-hash` rows. Editing
-its bytes cascades through all four custody surfaces to correct a status
-string that no verifier reads and no published number depends on. The next
-sealed second-implementation generation should carry the corrected status at
-its own re-bind, when the pins move anyway.
+receipt's raw SHA-256 is pinned in three places —
+`portability/verify_hygiene.py` (`ALLOWED`) and `portable/MANIFEST.json`, and it
+is consumed by `second-implementation/verify_artifacts.py` as `author-file-hash`
+rows. (An earlier revision of this erratum counted four, adding
+`portable/inventory.json`; that file records `path` and `role` only and carries
+no digest at all. Corrected at the v1.2.1 publication preflight.) Editing the
+receipt's bytes cascades through all three custody surfaces to correct a status
+string that no verifier reads and no published number depends on.
+
+**The deferral condition fired during the 1.2.1 hardening campaign, and the
+correction was still not made — stated plainly rather than left to be found.**
+This erratum used to defer to "the next sealed second-implementation
+generation ... when the pins move anyway", and the pins did move: the
+consolidated evidence-rebind event regenerated the receipt, `verify_hygiene`'s
+`ALLOWED` digest was updated and `portable/MANIFEST.json` was rebuilt. The
+status string and `official_author_strike_count` were left at their stale
+values through that re-bind. The honest reason is that the rebind event was
+scoped to evidence bindings and reviewed as such across six rounds, and
+reopening a sealed receipt's semantic fields inside it would have changed what
+that review had accepted. The correction now waits on the next event that
+opens the receipt for its own reasons; until then `RI5.md` governs and this
+paragraph is the record that the deferral was renewed deliberately rather than
+by oversight.
 
 Two related facts remain accurate in the receipt and are **not** stale:
 `campaign_gate` is still
@@ -402,41 +417,68 @@ record and `perf/SIDECAR.md` now states the command's scope.
 
 Same class as E12 and E13.
 
-## E15 — Published receipts contain the maintainer's home directory
+## E15 — Tracked files contain the maintainer's home directory
 
-Ten tracked files in this public repository record an absolute path under the
-maintainer's home directory. The leak is an account name, not a secret, and it
-has no evidentiary purpose — the interpreter identity that matters is the
-implementation, version and build, each recorded in its own field — but a
-published receipt that names someone's home directory undermines the artifact it
-is meant to support.
+**Fifty-two** tracked files in this public repository record an absolute path
+under the maintainer's home directory. The leak is an account name, not a
+secret, and it has no evidentiary purpose — the interpreter identity that
+matters is the implementation, version and build, each recorded in its own
+field — but a published file that names someone's home directory undermines the
+artifact it is meant to support.
 
-Where it is, and what can be done about each:
+**This erratum said "ten" until the v1.2.1 publication preflight, and ten was
+wrong.** The author-separated review that gates this release reproduced the
+true set with a single case-insensitive grep, in seconds, with no knowledge of
+the repository. That is the more serious defect: not the account name, but a
+disclosure page that a reader can falsify faster than they can read it. The
+count is corrected here, the disposition is stated per class rather than per
+hand-listed file, and the whole declaration is now enforced by a program
+instead of asserted by prose.
 
-| File | Content | Disposition |
-|---|---|---|
-| `perf/receipts/robustness/profile-windows-*.json` (seven receipts) | profiler stack frames naming the interpreter's stdlib path | **Frozen.** Two are digest-pinned by `perf/sidecar/verify_receipts.py::ADMITTED`, by the 60-file portable manifest and by their own self-zero seals; all seven are recorded profiling evidence. Cannot be edited without destroying what they attest. |
-| `portability/model/receipts/N48-independent-refuter-20260811.json` | the repository path of the refuted tree | **Frozen.** `REFUTER_RAW_SHA256` pins its raw bytes. |
-| `portability/receipts/local-expanded-gate-close.json` | `runtime.executable`, all eleven `executed_argv`, and an absolute scratchpad `receipt_path` | **Frozen.** `CLOSE_GATE_RAW_SHA256` and its embedded self-zeroed hash pin it. |
-| `second-implementation/PROVENANCE.md` | the repository path | **Frozen.** One of the 25 `candidate_files` of the author-increment receipt, verified by `verify_artifacts.py` as `author-file-hash`. |
-| `portability/oracle/PROVENANCE.md` | a workspace path outside the repository, in a digest table | **Corrected** in the commit carrying this erratum: relabelled `<workspace>/AGENTS.md`. The digest is unchanged, because the label was never part of it. |
+The fifty-two split into two classes, and the class decides the treatment:
 
-The new charter-gate receipt this campaign produced repeated the defect, which is
-how the class was confirmed rather than assumed:
+| Class | Count | What they are | Treatment |
+|---|---|---|---|
+| **Frozen** | 39 | Digest-pinned by another tracked file, by the 60-file portable manifest, or as a `candidate_files` row of the author-increment receipt: the seven `profile-windows-*` and ten `sidecar-parity-*` robustness receipts, five concurrency receipts, four charter-gate receipts, `N48-independent-refuter-20260811.json` and its memsample, the five `F-ORACLE-*` findings, `RI2`–`RI4`, `perf/PROFILE_BASELINE.md`, `adapters/fixtures/parent_corpus_408.jsonl`, and `second-implementation/PROVENANCE.md`. | **Cannot be edited without destroying what they attest.** `verify_hygiene` and `verify_receipts` refuse any change to them by digest. |
+| **Recorded** | 13 | Not digest-pinned, but each is a record of an observed run or a historical witness held on purpose: three concurrency receipts, `orchestration/MATRIX.md`, `FUZZ_CAMPAIGN.md`, the two `fuzz-streams/T1*_SOL.md` stream logs, `N48-POST-F-MODEL-003-SUMMARY.md`, the four `F-SANDBOX-018`–`021` findings, and `portability/sandbox/test_sandbox.py`, whose `FROZEN_WINDOWS_REPOSITORY_SOURCE` constant pins the exact string a hosted sandbox receipt recorded. | **Deliberately not redacted.** Scrubbing the path would make the repository's account of a run disagree with what was observed, which is the failure class E12, E13 and E14 exist to prevent. A record is corrected by a later record, not by a quiet rewrite. (These files are not immutable — their prose is corrected when it goes stale; it is the recorded observation that is not rewritten.) |
+
+There is no third class: nothing here is both unpinned and non-evidentiary,
+which is why the correct number of redactions in this release is zero and why
+that is a disposition rather than an omission.
+
+The forward half is a real fix and was made when the class was confirmed. The
+new charter-gate receipt this campaign produced repeated the defect — 
 `portability/run_local_expanded_gate.py` recorded `sys.executable` verbatim into
-`runtime.executable` and into every `executed_argv`. The runner now redacts the
-home directory to `<HOME>`, preserving path structure below it, and the receipt
-was regenerated rather than shipped with the leak.
+`runtime.executable` and into every `executed_argv` — so the runner now redacts
+the home directory to `<HOME>`, preserving path structure below it, and the
+receipt was regenerated rather than shipped with the leak. The other generators
+that write durable receipts (`portability/matrix/receipt.py`,
+`portability/sandbox/run_sandbox.py`, `adapters/outcome_receipt.py`) record argv
+from plans whose entries are repository-relative.
 
-Nothing enforces this, and that is a deliberate limit rather than an oversight.
-A repository-wide scan would have to admit ten frozen exceptions, which makes it
-a table of known values rather than a control; `verify_hygiene` already refuses
-any change to the frozen receipts by digest. The residual is that a future
-evidence generator could introduce a new instance. The generators that write
-durable receipts today are `run_local_expanded_gate.py` (redacted here),
-`portability/matrix/receipt.py` and `portability/sandbox/run_sandbox.py` (both
-record argv from a plan whose entries are repository-relative), and
-`adapters/outcome_receipt.py`.
+**What is new in 1.2.1: the disclosure is now a control.** This erratum
+previously ended by saying nothing enforced it, and justified that with the
+claim that a repository-wide scan "would have to admit ten frozen exceptions,
+which makes it a table of known values rather than a control". Both halves were
+wrong — the exceptions number thirty-nine, and a table of known values IS a
+control when a program compares it against current bytes and fails on any
+difference:
+
+```bash
+python -B portability/test_home_path_disclosure.py
+```
+
+Expected: `home-path-disclosure: {"declared": 52, "failures": 0, "frozen": 39,
+"observed": 52, "recorded": 13}`. It recomputes — it enumerates the tracked
+files, reads each one, and compares the observed set against the declaration
+carried in its own source. A new instance introduced by any future generator
+fails as `UNDECLARED`; a declared instance that stops carrying a path fails as
+`STALE`, because a disclosure that silently shrinks is also a wrong disclosure.
+**Negative proof:** both arms were exercised at the commit that added the gate —
+an injected undeclared file exits 1, and removing a declared file from the
+enumeration exits 1 on both the `STALE` and the count check. The gate assembles
+its own search pattern from fragments so that it is not itself an instance of
+what it searches for.
 
 ## E16 — The frozen conformance surface declares four things it never checks
 

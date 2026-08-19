@@ -110,7 +110,7 @@ process history that claims elsewhere cite.
 | `examples/` | live surface | The three handoff records [EXAMPLE.md](EXAMPLE.md) decides end to end — clean, inconsistent, unchecked revocation. |
 | `baseline-run/` | frozen evidence + harness | The frozen 0.2 and 0.3 engines, their sealed contracts and fixture packs, both conformance runners, and the RUNBOOK — plus `verify_conformance_authority.py`, the additive gate that actually executes both suites because the frozen manifest emitters write `failures: 0` and `PASS` as literals (`ERRATA.md` E16). |
 | `supplemental-0_3/` | frozen evidence | The sealed 0.3 comparator contract and composed capability matrix, the two supplemental fixture packs, the hash-pinned prior-art snapshot, and the candidate-blind completeness verdict. |
-| `second-implementation/` | frozen evidence | The author-increment attempt, its provenance and non-exposure record, and thirteen recorded findings. Twenty-four of these files — plus `orchestration/REIMPLEMENTERS_GUIDE.md` — are the `candidate_files` of a published receipt whose verifier checks their hashes, including its own path, so this tree is attempt evidence rather than live infrastructure and is never edited ([ADOPTION.md](ADOPTION.md) A4). |
+| `second-implementation/` | frozen evidence | The author-increment attempt, its provenance and non-exposure record, and thirteen recorded findings. Twenty-four of these files — plus `orchestration/REIMPLEMENTERS_GUIDE.md` — are the `candidate_files` of a published receipt whose verifier checks their hashes, including its own path, so this tree is attempt evidence rather than live infrastructure and is not edited as such. The candidate itself did receive the W3/W4 hardening changes, which is recorded in [ERRATA.md](ERRATA.md) E10 and visible in `git log -- second-implementation/` ([ADOPTION.md](ADOPTION.md) A4). |
 | `access/` | frozen evidence | The sanitized implementer packet and the shared-domain vocabulary projection schema: the public projection an author-separated implementer is given, and nothing beyond it. |
 | `evidence/` | frozen evidence | Byte-exact releases of the two custody files the candidate-blind completeness reviewer read that did not otherwise ship here, with the recipe that checks them against their pins. The reviewer's other two files already sit in `supplemental-0_3/`. |
 | `portability/` | harness | Five validation lanes — a finite behavioral model, an independent no-read oracle, deterministic live transports, a bounded concurrency ladder, and the hosted matrix with its container sandbox — plus the custody verifiers and `verify_live.py`, the recompute gate this README tells you to run first. |
@@ -519,13 +519,18 @@ lone-surrogate handling; minimized witnesses and reports in
 evidence about reimplementation sensitivity, not independent
 confirmation: a conforming second implementation still does not exist and
 remains the single most valuable outside contribution. To
-re-verify what is here, run the conformance suite (both modes), then
-re-derive every seal per the RUNBOOK, then, from the repository root, run
+re-verify what is here, run the conformance suite (the in-process mode runs
+from a clean clone; the sealed subprocess-ABI mode needs the separately
+reproduced `baseline-run/toolchain/python.exe`, and
+`baseline-run/verify_conformance_authority.py` reports its absence rather than
+skipping it), then re-derive every seal per the RUNBOOK, then, from the repository root, run
 `python -B grounded-0_4/test_grounded_0_4.py`,
 `python -B grounded-0_4/lint_contract.py --gate`,
 `python -B grounded-0_4/test_lint_gate.py`,
 `python -B receiver_reliance/generate_engine_manifest.py --check`,
-`python -B receiver_reliance/test_engine_manifest.py`, and the two custody
+`python -B receiver_reliance/test_engine_manifest.py`,
+`python -B portability/test_home_path_disclosure.py` (which recomputes
+`ERRATA.md` E15's disclosure against current bytes), and the two custody
 verifiers in "Cross-platform validation" above. The engine manifest is the
 package's own integrity gate: importing `receiver_reliance` verifies all
 eleven engine files by byte length and SHA-256 before executing any of them
