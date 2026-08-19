@@ -140,7 +140,8 @@ SOURCE_PIN_ERRATA = {
 # observations equal what the suites produce today; the two below it record their
 # own eras and replay through LEGACY_GATE_VALIDATORS.  It is bound
 # here so the recompute is custody-tracked, not just asserted in prose.
-# Regenerated at the 0.4.2 commit.  This receipt is checked with
+# Regenerated at the 0.4.2 commit, and again at the 19-gate charter
+# extension (506829e), where the eleven-command receipts became era history.  This receipt is checked with
 # era_validators=False -- its whole purpose is to be at CURRENT suite counts, so
 # when the grounded suite moved 517 -> 521 it had to be re-recorded rather than
 # era-mapped.  The 7d1c6cb receipt stays on disk as immutable chronology; it is
@@ -188,14 +189,14 @@ SOURCE_PIN_ERRATA = {
 # the second observation of this one root cause, not a second defect.  The old
 # receipt stays on disk as chronology, exactly as 7d1c6cb did.
 HARDENING_GATE_RECEIPT = (
-    REPO / "portability" / "receipts" / "local-expanded-gate-hardening-0ff243c.json"
+    REPO / "portability" / "receipts" / "local-expanded-gate-hardening-506829e.json"
 )
-HARDENING_SOURCE_HEAD = "0ff243c03eae22c5584e9449744c814dc66b7725"
+HARDENING_SOURCE_HEAD = "506829ed245c05eaf71c09bbd5b19475e7e9d08c"
 HARDENING_GATE_RAW_SHA256 = (
-    "D0B53BA5EDEC131BBF378931F9BF7B71EAFA0606E056BC19C598E7B102C5C86C"
+    "2964947C99C5F8B39FDE5189FB048EB88B4AA6690A4B35F0A43A1864825FC3CD"
 )
 HARDENING_GATE_EMBEDDED_SHA256 = (
-    "99AF27C209F3BC4CB5DFBEE85A5629D1DA51701AA24F10A08728A0848E424BF6"
+    "82B96D1751C596F4D6EFA38C62B0C225028FFD379C625CE6D7B60AB59AB08291"
 )
 
 # Close evidence: the clean-tree expanded gate at the reconciliation commit.

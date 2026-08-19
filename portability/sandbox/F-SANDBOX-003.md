@@ -22,7 +22,7 @@ boundary failure, wrong projection, and nonzero exit.
 
 The correction validates one canonical JSON record against exact nested keys
 and types, requires the treatment flag and effective boundary values, matches
-all eleven ordered command identities and their declared count evidence,
+every ordered command identity in the charter and its declared count evidence,
 requires zero command exits/timeouts plus stream hashes, byte counts, and
 resource observations, and recomputes the deterministic projection on the
 host. Any discrepancy, including container nonzero exit, now yields host

@@ -419,7 +419,7 @@ Repairs, all in the commit carrying this erratum:
   disagrees. A declared count that nothing derives from the artifact is a pin
   waiting to go stale;
 - `portability/verify_live.py` is new and is now the first command the README
-  tells a third party to run. It re-executes all eleven gates at the current
+  tells a third party to run. It re-executes every charter gate at the current
   bytes, holds the live output against both declared authorities — the gate's
   own validators and the matrix plan's expectations — and compares it with what
   the sealed receipt recorded. It prints which evidence it recomputed and which
