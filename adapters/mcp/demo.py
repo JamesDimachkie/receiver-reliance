@@ -43,6 +43,7 @@ sys.dont_write_bytecode = True
 HERE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
+import rr_bridge  # noqa: E402
 from rr_bridge import canonical_json_bytes  # noqa: E402  (host-side digest derivation)
 
 SERVER = HERE / "rr_mcp_gate.py"
@@ -201,13 +202,14 @@ class MCPClient:
     """Minimal MCP stdio client: newline-delimited JSON-RPC 2.0."""
 
     def __init__(self, command: list[str], env: dict[str, str]) -> None:
+        # Binary pipes, like a host's client: the wire is bytes, and every line
+        # read back is bytes this process did not produce, so it is ingested
+        # under the shared bounded law rather than by a bare json.loads.
         self.process = subprocess.Popen(
             command,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            text=True,
-            encoding="utf-8",
             env=env,
             cwd=str(HERE),
         )
@@ -215,7 +217,7 @@ class MCPClient:
 
     def _send(self, message: dict[str, Any]) -> None:
         assert self.process.stdin is not None
-        self.process.stdin.write(json.dumps(message) + "\n")
+        self.process.stdin.write(json.dumps(message).encode("utf-8") + b"\n")
         self.process.stdin.flush()
 
     def request(self, method: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -226,9 +228,12 @@ class MCPClient:
         assert self.process.stdout is not None
         line = self.process.stdout.readline()
         if not line:
-            stderr = self.process.stderr.read() if self.process.stderr else ""
-            raise RuntimeError(f"server closed the stream during {method}: {stderr}")
-        response = json.loads(line)
+            stderr = self.process.stderr.read() if self.process.stderr else b""
+            raise RuntimeError(
+                f"server closed the stream during {method}: "
+                f"{stderr.decode('utf-8', 'replace')}"
+            )
+        response = rr_bridge.strict_ingest.load_safe(line.strip(), label=method)
         if "error" in response:
             raise RuntimeError(f"{method} returned error: {response['error']}")
         return response["result"]
@@ -240,7 +245,9 @@ class MCPClient:
         assert self.process.stdin is not None
         self.process.stdin.close()
         self.process.wait(timeout=30)
-        return self.process.stderr.read() if self.process.stderr else ""
+        if not self.process.stderr:
+            return ""
+        return self.process.stderr.read().decode("utf-8", "replace")
 
 
 def rule(text: str = "") -> None:
