@@ -96,10 +96,46 @@ closure_findings = _module.closure_findings
 derive_record_references = _module.derive_record_references
 AUDIT_FORMAT = _module.AUDIT_FORMAT
 
+def verify_audit_seal(envelope: object) -> bool:
+    """Recompute an audit envelope's self-zero seal from the envelope's own bytes.
+
+    ``decide_audited`` seals every envelope it returns, and until this release
+    nothing on the supported surface could CHECK that seal: a recipient had to
+    reimplement RFC 8785 canonicalization plus the field-zeroing convention, or
+    reach into the engine-internal ``b1`` handle that README declares reachable
+    by construction and deliberately not an API. An artifact whose thesis is
+    that its results are content-addressed and independently checkable could
+    produce its central evidentiary object and could not verify one.
+
+    This recomputes ``audit_sha256`` over the envelope with that field zeroed,
+    exactly as the producer computed it, and compares. It is total: anything
+    that is not a sealed envelope returns False rather than raising, so it is
+    safe to call on bytes you did not produce.
+
+    What a True proves: these envelope bytes are internally intact and were
+    sealed by something implementing this contract. What it does NOT prove: who
+    produced it, when, or that the facts it judged were true. Nothing in this
+    repository is signed, deliberately (TRUST_MODEL.md), so a party who can
+    author an envelope can author its seal. This detects corruption, truncation
+    and tampering-in-transit. It is not authentication.
+    """
+    if not isinstance(envelope, dict):
+        return False
+    recorded = envelope.get("audit_sha256")
+    if not isinstance(recorded, str) or len(recorded) != 64:
+        return False
+    try:
+        recomputed = _module.b1.self_zero_sha256(envelope, "audit_sha256")
+    except (TypeError, ValueError, RecursionError, AttributeError):
+        return False
+    return recomputed == recorded.upper()
+
+
 ENGINE_MANIFEST_SHA256 = ENGINE_MANIFEST["manifest_sha256"]
 
 __all__ = [
     "decide_audited",
+    "verify_audit_seal",
     "closure_findings",
     "derive_record_references",
     "AUDIT_FORMAT",

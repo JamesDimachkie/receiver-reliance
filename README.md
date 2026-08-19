@@ -197,7 +197,7 @@ read as claiming; nothing here adds a guarantee.
 
 | Import surface | Names |
 |---|---|
-| `receiver_reliance` | `__all__` is exactly `decide_audited`, `closure_findings`, `derive_record_references`, `AUDIT_FORMAT`, `ENGINE_MANIFEST_SHA256`. Also public and outside `__all__`: `ENGINE_MANIFEST` — the parsed `engine_manifest.json`, keys `format_version` (`RR-ENGINE-MANIFEST-1`), `file_count` (11), `total_byte_length`, `manifest_sha256`, `files` — and `__version__`. |
+| `receiver_reliance` | `__all__` is exactly `decide_audited`, `verify_audit_seal`, `closure_findings`, `derive_record_references`, `AUDIT_FORMAT`, `ENGINE_MANIFEST_SHA256`. Also public and outside `__all__`: `ENGINE_MANIFEST` — the parsed `engine_manifest.json`, keys `format_version` (`RR-ENGINE-MANIFEST-1`), `file_count` (11), `total_byte_length`, `manifest_sha256`, `files` — and `__version__`. |
 | `receiver_reliance.conformance` | `execute` only. Explicitly non-evidentiary; see "What is not supported". |
 | `adapters` | `__all__` is exactly these ten: `preflight`, `process_jsonl`, `PreflightResult`, `PreflightIssue`, `READY`, `REJECTED_INVALID`, `INSUFFICIENT_EVIDENCE`, `RESULT_STATUSES`, `RESULT_FORMAT_VERSION`, `FACT_PROFILE_FORMAT_VERSION`. Also public and outside `__all__`: the `portable_preflight` submodule. |
 | `grounded-0_4/rr_api.py` | No `__all__`. Public names: `decide_audited`, `closure_findings`, `derive_record_references`, `conformance_execute`, `authority_for_operation`, `AUDIT_FORMAT`, `GOVERNING_AUTHORITIES`, `RuntimeIntegrityError`, plus the loaded-module handles `authority_surface`, `b1`, and `pcb_runner`. The three handles are the byte-verified engine internals: reachable by construction, deliberately not an API. |
@@ -236,6 +236,18 @@ handle and returns the register row set for it, where each field carries a
 `status` of exactly one of four values: `semantic`, `presence_only`,
 `inert_disclosed`, `inert_registered_debt`. The register is re-read and
 re-authenticated on every call.
+
+`verify_audit_seal(envelope)` recomputes an envelope's `audit_sha256` over its
+own bytes, with that field zeroed, and returns whether it matches. It is total —
+anything that is not a sealed envelope returns `False` rather than raising — so
+it is safe to call on bytes you did not produce. **What a `True` proves:** these
+envelope bytes are internally intact and were sealed by something implementing
+this contract. **What it does not prove:** who produced it, when, or that the
+facts it judged were true. Nothing here is signed, deliberately
+([TRUST_MODEL.md](TRUST_MODEL.md)), so a party who can author an envelope can
+author its seal. This detects corruption and tampering in transit; it is not
+authentication, and `receiver_reliance/test_audit_seal.py` pins that limit with
+a re-forging test that must succeed.
 
 `rr_batch.serve(source, sink)` is a supported transport, not merely a file
 with recorded bounds. It reads one request per physical line from a binary
@@ -748,6 +760,7 @@ skipping it), then re-derive every seal per the RUNBOOK, then, from the reposito
 `python -B grounded-0_4/test_lint_gate.py`,
 `python -B receiver_reliance/generate_engine_manifest.py --check`,
 `python -B receiver_reliance/test_engine_manifest.py`,
+`python -B receiver_reliance/test_audit_seal.py`,
 `python -B portability/test_home_path_disclosure.py` (which recomputes
 `ERRATA.md` E15's disclosure against current bytes), and the two custody
 verifiers in "Cross-platform validation" above. The engine manifest is the
