@@ -93,3 +93,36 @@ observed effects against receipts are host duties.
 *Conformance check:* for every executed effect, your system can produce the
 audited decision whose `effect_receipt_sha256` matches the recomputed
 preimage from your effect log.
+
+## H7. Request admission, and what a bound costs
+
+The engine spends whatever a request's shape costs and cannot decline. Its
+error law obliges a full traversal per `oneOf` branch before it may emit
+`ERR_LIMIT` (precedence 90), so an oversized object is walked after it has
+already failed, and the only thing that ends the walk is the frozen ceiling
+`MAX_INPUT_BYTES = 16,777,216`. Deciding which requests are worth evaluating
+at all is therefore the host's, like state and effects.
+
+No bound is free, and the arithmetic is published. The contracts declare
+requests up to **3,392,691 bytes** legal (`oneOf/27`, OBL-28) while this
+artifact's entire 372-request fixture corpus tops out at **4,399** — so any
+bound low enough to control cost rejects requests the contract declares valid.
+A structural-member proxy does not escape it: a contract-legal OBL-01 request
+at declared caps carries 82,363 structural tokens and costs 9.2 ms, while an
+adversarial one carrying 18,057 costs 566 ms, because a comma inside a string
+literal is a structural token and is legal. A deployment that declares a bound
+has narrowed its own contract and owes that fact to its callers, in whatever
+document publishes its supported request shapes. A deployment that declares
+none has accepted the frozen ceiling's cost, which is equally a decision.
+
+`deployment/` ships one implementation of this obligation, off unless an
+operator enables it; nothing here requires it, and its unset state is
+byte-identical to its absence.
+
+*Conformance check:* `python -B deployment/test_admission.py` — its
+`TheProfileRejectsContractLegalRequests` arm states the obligation as a test:
+a request the frozen engine seals `ok` is refused under a declared bound, and
+the refusal records which authority refused it rather than implying the engine
+would have. For your own host the equivalent check is that every request shape
+your deployment refuses before evaluation appears as refused in the request
+contract you publish to your callers.

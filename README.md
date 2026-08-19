@@ -108,6 +108,7 @@ process history that claims elsewhere cite.
 | `adapters/` | live surface | The stdlib-only three-state preflight, its calibration playbook, and the outcome receipt that reproduces the 18/18-detection-at-0.0%-false-holds result. |
 | `portable/` | live surface | The self-contained bundle: manifest, builder, gate, CLI, threat model, operator runbook. |
 | `examples/` | live surface | The three handoff records [EXAMPLE.md](EXAMPLE.md) decides end to end — clean, inconsistent, unchecked revocation. |
+| `deployment/` | live surface, off by default | One operator-enabled control: a pre-engine byte bound that narrows this deployment's contract in exchange for bounding what an oversized request can cost. Unset it is byte-identical to its absence; set, it rejects requests the published contract declares valid, which [deployment/README.md](deployment/README.md) states as the price rather than a caveat. Not part of the supported surface; obligation at [HOST_OBLIGATIONS.md](HOST_OBLIGATIONS.md) H7. |
 | `baseline-run/` | frozen evidence + harness | The frozen 0.2 and 0.3 engines, their sealed contracts and fixture packs, both conformance runners, and the RUNBOOK — plus `verify_conformance_authority.py`, the additive gate that actually executes both suites because the frozen manifest emitters write `failures: 0` and `PASS` as literals (`ERRATA.md` E16). |
 | `supplemental-0_3/` | frozen evidence | The sealed 0.3 comparator contract and composed capability matrix, the two supplemental fixture packs, the hash-pinned prior-art snapshot, and the candidate-blind completeness verdict. |
 | `second-implementation/` | frozen evidence | The author-increment attempt, its provenance and non-exposure record, and thirteen recorded findings. Twenty-four of these files — plus `orchestration/REIMPLEMENTERS_GUIDE.md` — are the `candidate_files` of a published receipt whose verifier checks their hashes, including its own path, so this tree is attempt evidence rather than live infrastructure and is not edited as such. The candidate itself did receive the W3/W4 hardening changes, which is recorded in [ERRATA.md](ERRATA.md) E10 and visible in `git log -- second-implementation/` ([ADOPTION.md](ADOPTION.md) A4). |
@@ -171,8 +172,8 @@ the playbook.
 
 **Then satisfy the host contract.** [HOST_OBLIGATIONS.md](HOST_OBLIGATIONS.md)
 is the testable division of labour — state truthfulness, atomicity,
-derive-don't-assert, applicability calibration, input binding, effects. H1–H6
-remain yours regardless of preflight status. For decisions you intend to rely
+derive-don't-assert, applicability calibration, input binding, effects,
+request admission. H1–H7 remain yours regardless of preflight status. For decisions you intend to rely
 on, call `decide_audited` (see the grounded 0.4 layer below), not the frozen
 response path.
 
@@ -399,6 +400,14 @@ everything else abstains as `PREFLIGHT_FAMILY_UNCALIBRATED`.
   underscore-prefixed name, and the harness, verifier, and record trees under
   `orchestration/`, `portability/`, `perf/`, `proof/` and `fuzz/` are reachable
   and are not an integration API.
+- **`deployment/`.** An operator-enabled admission bound, off by default and
+  pinned by its own suite rather than by the public-surface suite. Enabling it
+  rejects requests this contract declares valid — the derived contract maximum
+  is 3,392,691 bytes against a 4,399-byte corpus maximum, a factor of 771 — so
+  it narrows the deployment's contract instead of widening the engine's. It
+  bounds input size, not the cost of a request it admits, and it is not a
+  security boundary. [deployment/README.md](deployment/README.md) states the
+  trade; [HOST_OBLIGATIONS.md](HOST_OBLIGATIONS.md) H7 states the obligation.
 - **`continuation-specs/`.** Proposed drafts: not adopted, not implemented, not
   evidence. Fields named only there describe a generation that does not exist in
   this release.
@@ -766,7 +775,10 @@ skipping it), then re-derive every seal per the RUNBOOK, then, from the reposito
 `python -B receiver_reliance/test_engine_manifest.py`,
 `python -B receiver_reliance/test_audit_seal.py`,
 `python -B portability/test_home_path_disclosure.py` (which recomputes
-`ERRATA.md` E15's disclosure against current bytes), and the two custody
+`ERRATA.md` E15's disclosure against current bytes),
+`python -B deployment/test_admission.py` (25 tests over the off-by-default
+admission profile, including the arm that proves enabling it rejects a request
+the frozen engine seals `ok`), and the two custody
 verifiers in "Cross-platform validation" above. The engine manifest is the
 package's own integrity gate: importing `receiver_reliance` verifies all
 eleven engine files by byte length and SHA-256 before executing any of them
