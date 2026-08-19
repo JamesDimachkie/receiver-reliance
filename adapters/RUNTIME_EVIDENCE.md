@@ -1,6 +1,6 @@
 # WP1 portable fallback runtime evidence
 
-Re-pinned 2026-08-13 after the fresh-context increment refuter pass on
+Re-pinned 2026-08-18; the correction notice below records the 2026-08-13 pass on
 `a107081` and the F-WP1-014 repair (`15faca2`): the matrix below records
 local runs of the shipping fallback suites on CPython 3.12, 3.13, and 3.14
 over the current bytes. The pre-increment table this block replaces is

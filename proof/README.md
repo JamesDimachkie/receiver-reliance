@@ -109,4 +109,4 @@ What third parties still cannot re-derive is the *extraction* step — turning a
 live coordination workspace into fact profiles — because that reads the
 operator's private records. The 408 extracted records themselves, the referee
 truth, and the scoring are all published and checkable. Read the limits in
-"What this does not establish" below before quoting any number from here.
+"Honest limits" above before quoting any number from here.

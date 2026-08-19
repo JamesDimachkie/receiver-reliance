@@ -419,7 +419,7 @@ a regression case. The first round alone caught a critical RFC 8785
 member-ordering bug that corrupted canonical output. Two findings were
 refuted against the contract's own pinned bytes. Both refutations held on
 re-examination. The final round (45 designed probes plus
-70,000 randomized grammar and totality cases), found no implementation
+70,000 randomized grammar and totality cases) found no implementation
 defect: no input crashed, exceeded the output limit, or broke a seal.
 
 To be precise about what "acceptance" means here: the reviewer's formal
@@ -697,6 +697,7 @@ control bytes, and refuses to call the subprocess mode available unless a
 digest-verified toolchain is present. The four declared divergences are the two
 pack pins that genuinely disagree, in both packs; E16 states why neither side can
 move.
+
 Read what these two do and do not establish: they bind committed receipt
 bytes, rehash the sources those receipts name, and re-run recorded
 transcripts through the gate validators. They cannot tell you the artifact
@@ -706,6 +707,7 @@ theoretical here: commit `3985356` added two proof-harness tests and left
 the charter gate declaring seven, and the live gate was red for four
 commits while `verify_receipts` reported green — truthfully, on the
 recorded bytes. `ERRATA.md` E13 records it.
+
 The separated-evidence report is
 [orchestration/PORTABILITY_VALIDATION.md](orchestration/PORTABILITY_VALIDATION.md).
 It records the full hosted chronology — four red runs, each adjudicated

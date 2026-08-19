@@ -2,7 +2,7 @@
 
 ## Status and stop gate
 
-**HARNESS READY; 50,000-CASE EXECUTION NOT STARTED IN THE AUTHOR LANE.**
+**HARNESS READY. The 50,000-case run was not executed in the author lane; it ran later in the Sol lane** — [../orchestration/BATCH_50K.md](../orchestration/BATCH_50K.md) records PASS at 50/50 chunks, 50,000/50,000 requests, zero failures.
 
 This is the additive campaign requested after O1 correction.  The author lane
 ran planning regeneration and one uncheckpointed 1,000-case smoke chunk only.
