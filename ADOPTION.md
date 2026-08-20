@@ -62,7 +62,9 @@ shape `ERRATA.md` E12 and E14 describe.
 ## The trigger, stated once
 
 `TRUST_MODEL.md` maintains this artifact as a research artifact on the basis of
-a zero-consumer census, and records that the first external consumer — or any
+a census that finds no consumer outside the maintainer's control (re-run
+2026-08-19; the page also records the sibling consumer its previous wording
+denied), and records that the first external consumer — or any
 embedding where handoff senders are adversarial to the receiver's own tooling —
 promotes A6 to blocking work before that embedding ships; A5 is reopened, with one unmigrated harness named. A4 closed on
 2026-08-19, so the shared-ingest half of that trigger is satisfied in advance rather than pending. Adopting
@@ -76,7 +78,8 @@ what may be claimed next, not what is claimed today.
 outside it, so it is where that trigger stops being hypothetical. It does not
 fire on the commit: the gate is an in-repo consumer, verified by this
 repository's own gates, and no outside party relies on it
-([TRUST_MODEL.md](TRUST_MODEL.md)'s census is unchanged). It fires when a host
+([TRUST_MODEL.md](TRUST_MODEL.md)'s census now records it as an in-repo
+consumer, and still finds none outside the maintainer's control). It fires when a host
 wires the server into its own client, because that host is then the first
 external consumer and its senders are by construction adversarial to the
 receiver's tooling. A4 and A6 are blocking work before that embedding ships, and

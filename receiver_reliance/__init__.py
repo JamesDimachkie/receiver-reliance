@@ -197,12 +197,21 @@ def verify_audit_seal(envelope: object) -> bool:
 # the same audit seal, observed or not. An envelope is therefore not evidence
 # about who was watching and cannot be read as any.
 #
-# Why the seam exists at all: this artifact prices a decision by request
-# length, and that proxy under-charges 43 of the 136 requests in its own
-# measured corpus at p50 (2026-08-19 measurement phase; the same run put the
-# probe body at well under a thousandth of a decision). An admission bound
-# built on a proxy that is wrong a third of the time is a bound on paper.
-# Measuring precedes bounding, so the measuring lands first and alone.
+# Why the seam exists at all: the obvious way to price a decision before making
+# it is by request length, and a length proxy mis-prices this artifact's own
+# corpus badly. That is not asserted here -- ``bench_observe.py`` beside this
+# file rebuilds the 136-request corpus from committed bytes (``--corpus``) and
+# re-derives the mis-pricing and this seam's overhead on the caller's host
+# (``--measure``), against a design-phase proxy the script publishes and
+# nothing in the decision path uses. What leaves the measuring host is the
+# ratio between the worst- and best-priced request, 1.86x to 2.15x across the
+# 124 semantic fixtures over four runs on 2026-08-19; a count of under-charged
+# requests does not leave it, because it is denominated in absolute
+# milliseconds and moves with host speed -- those same runs spanned 74 to 84 of
+# 136 at p50, where the faster profile ``perf/COST_MODEL.md`` records yields
+# the forties. An admission bound built on a proxy this sensitive is a bound on
+# paper. Measuring precedes bounding, so the measuring lands first and alone.
+# ``ERRATA.md`` E19 records why this comment used to quote one integer.
 
 class DecisionObservation(NamedTuple):
     """What an observer is handed: one decision's outcome and cost, as scalars.

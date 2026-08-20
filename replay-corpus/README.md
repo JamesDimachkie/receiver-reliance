@@ -153,5 +153,6 @@ Stated plainly so a reviewer does not have to find them:
 
 Under the repository map this is a **harness**: machinery that produces a
 checkable result. It is not frozen evidence and not a conformance surface, and
-`TRUST_MODEL.md`'s "zero external or sibling code consumers" line is unaffected —
-a corpus authored by the artifact's own author is not an external consumer.
+`TRUST_MODEL.md`'s census line is unaffected — a corpus authored by the
+artifact's own author is neither an external consumer nor a sibling one, and
+that census counts consumers outside the maintainer's control.

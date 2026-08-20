@@ -204,8 +204,11 @@ request admission. H1–H7 remain yours regardless of preflight status. For deci
 on, call `decide_audited` (see the grounded 0.4 layer below), not the frozen
 response path.
 
-Honest status on adoption: `TRUST_MODEL.md` records **zero external or sibling
-code consumers** to date. Nothing here has been load-tested by an integrator
+Honest status on adoption: `TRUST_MODEL.md`'s census, re-run 2026-08-19,
+records **zero consumers outside the maintainer's control** — an in-repo
+surface (`adapters/mcp/`) and one sibling integration in the maintainer's own
+workspace, and nobody else. That page also records what the sentence used to
+say and why it was wrong. Nothing here has been load-tested by an integrator
 other than its author, and the applicability limits in `ERRATA.md` E7 are the
 first thing a new consumer should read. What is recorded-and-unfixed between
 this artifact and one you could adopt -- with the treatment and owner for each
@@ -309,8 +312,14 @@ transport's response line with one measurement handed to a caller-supplied
 install call, no module-level slot, and no environment variable that turns one
 on, so two callers in one process cannot instrument each other and a caller that
 passes none is not instrumented at all. `observer=None` is the default and is a
-passthrough — one identity test, then the same call, no clock read taken
-(measured at 24 ns on Windows/CPython 3.12).
+passthrough — one identity test, then the same call, no clock read taken and no
+record built. No cost figure is published for it, and that is a measurement
+result rather than an omission: `python -B receiver_reliance/bench_observe.py
+--measure` isolates the branch against a same-shape function that omits only the
+test, and on CPython 3.12.10 / Windows 11 `10.0.26200` / AMD64 on 2026-08-19 the
+paired deltas straddled zero in all four runs. The method cannot separate one
+identity test from the call it forwards to, so it reports the range and says so.
+Read the passthrough as a branch, not as a number ([ERRATA.md](ERRATA.md) E19).
 
 **Observability here is a property of the wrapper, not of the engine.** No
 sealed envelope records that an observer was attached, because no part of a
@@ -371,18 +380,45 @@ that must **succeed** — the same shape as the re-forging test above. An
 untrusted observer belongs in another process. Nor is it a budget: a blocking
 observer delays its caller and nothing here bounds it.
 
-**Why it exists, and what is deliberately absent.** This artifact prices a
-decision by request length, and that proxy under-charges 43 of the 136 requests
-in its own measured corpus at p50 (measurement phase, 2026-08-19). An admission
-bound built on a proxy that is wrong a third of the time is a bound on paper, so
-the measuring lands first and alone. Absent by decision, not oversight: no
-counters, no histograms, no ring buffer, no aggregation, no emitter, no
-per-predicate tracing, no memory profiling, no sampling policy, no observed
-`serve` loop — a host that wants an observed stream calls
-`response_bytes_observed` once per line. The instrumented path costs 1,165 ns
-per decision on Windows/CPython 3.12 with a no-op observer, which is 0.033% of a
-3.5 ms decision; the observer's own work is the host's, and is not in that
-number.
+**Why it exists, and what is deliberately absent.** The obvious way to price a
+decision before making it is by request length, and a length proxy mis-prices
+this artifact's own corpus badly. That claim is
+`receiver_reliance/bench_observe.py` rather than a sentence. `--corpus` rebuilds
+the 136-request corpus the claim is measured over from committed bytes alone —
+the 124 semantic fixtures, the three `examples/`, and nine protocol-error
+requests, declared literally — and `--corpus --check` fails if that stops being
+true. `--measure` re-derives the mis-pricing **on your host**, against the
+design-phase affine proxy the script publishes and nothing in the decision path
+uses.
+
+The one number that survives leaving this host is the **mis-pricing spread**:
+the proxy is affine in length and the engine's cost is not, so the ratio between
+its worst-priced and best-priced request is what a second host can hold this one
+to. Every other figure here scales with host speed and that one does not.
+Measured 2026-08-19 on CPython 3.12.10 / Windows 11 `10.0.26200` / AMD64, four
+consecutive runs put it at **1.86–2.15x across the 124 semantic fixtures** and
+**3.56–4.83x across all 136**. On that same host, at a median decision of
+3.37–3.42 ms, the proxy under-charged **74, 78, 79 and 84 of the 136** requests
+at p50. Read that count as the host's, not the artifact's: it is denominated in
+absolute milliseconds, most of the corpus prices within a quarter of the line,
+and the same derivation returns a count in the forties at the 2.936 ms profile
+[perf/COST_MODEL.md](perf/COST_MODEL.md) records and none at all a little below
+it. A single integer is what this paragraph used to quote, and
+[ERRATA.md](ERRATA.md) E19 records why it should not have. An admission bound
+built on a proxy this sensitive is a bound on paper, so the measuring lands
+first and alone.
+
+Absent by decision, not oversight: no counters, no histograms, no ring buffer,
+no aggregation, no emitter, no per-predicate tracing, no memory profiling, no
+sampling policy, no observed `serve` loop — a host that wants an observed stream
+calls `response_bytes_observed` once per line. The instrumented path costs
+**649–1,036 ns per decision** with a no-op observer, across repeated runs on
+that host on 2026-08-19 — three `perf_counter_ns` reads, two `process_time_ns`
+reads and one record build, timed as isolated components because a paired A/B
+cannot resolve a microsecond against a millisecond decision. That is
+**0.019–0.028%** of a decision there. The span is clock reads costing what the
+host is doing at the time, which is the same reason no single figure is quoted:
+run it. The observer's own work is the host's, and is in none of those numbers.
 
 `rr_batch.serve(source, sink)` is a supported transport, not merely a file
 with recorded bounds. It reads one request per physical line from a binary
@@ -542,9 +578,10 @@ everything else abstains as `PREFLIGHT_FAMILY_UNCALIBRATED`.
 - **`continuation-specs/`.** Proposed drafts: not adopted, not implemented, not
   evidence. Fields named only there describe a generation that does not exist in
   this release.
-- **Any surface as adversarial-grade.** `TRUST_MODEL.md` records zero external or
-  sibling code consumers to date. Nothing above is a security, interoperability,
-  or efficacy claim; it is a description of what the current bytes expose.
+- **Any surface as adversarial-grade.** `TRUST_MODEL.md`'s 2026-08-19 census
+  records zero consumers outside the maintainer's control. Nothing above is a
+  security, interoperability, or efficacy claim; it is a description of what the
+  current bytes expose.
 
 ## Design properties worth stealing
 
@@ -976,6 +1013,11 @@ skipping it), then re-derive every seal per the RUNBOOK, then, from the reposito
 `python -B receiver_reliance/test_audit_seal.py`,
 `python -B receiver_reliance/test_observe.py` (which re-decides every
 committed corpus with and without an observer and compares JCS bytes),
+`python -B receiver_reliance/bench_observe.py --corpus --check` (which rebuilds
+the 136-request corpus the observability rationale is measured over from
+committed bytes and fails on drift from its declared composition; the same
+file's `--measure` re-derives that rationale's numbers on your host and stays
+hand-run, exactly as `derive_admission_numbers.py --cost` does),
 `python -B portability/test_home_path_disclosure.py` (which recomputes
 `ERRATA.md` E15's disclosure against current bytes),
 `python -B deployment/test_admission.py` (25 tests over the off-by-default

@@ -93,28 +93,67 @@ document until this release:
 
 ## Who consumes this, today
 
-Verified consumer census, 2026-08-12 (method: content search for
+Consumer census, re-run 2026-08-19 (method: content search for
 `receiver_reliance`, `decide_audited`, `portable_preflight`, and the wire
 format strings across the operator's workspace and adjacent project trees;
 one unrelated production repository excluded by standing operator policy):
-**zero external or sibling code consumers exist.** Every present consumer is
-in-repo (the proof harness, the lanes, the verifiers) or a reader of the
-public repository. No party currently relies on preflight `READY` or on
-audit seals as adversarial-grade guarantees.
+**zero consumers outside the maintainer's control exist.** Inside that
+boundary there are two kinds, and the second is new to this page.
 
-The artifact is therefore maintained as a **research artifact**: consumers
+- **In-repo:** the proof harness, the lanes, the verifiers, and now
+  `adapters/mcp/` — in this tree, verified by this repository's own gates.
+- **Sibling:** one integration in the maintainer's own workspace since
+  2026-08-15 (`rr-gate`, which is a separate unpublished tree and not the
+  `rr_gate_check`/`rr_gate_explain` tools `adapters/mcp/` exports). It
+  `sys.path`-imports `grounded-0_4/rr_api.py` and calls `decide_audited` over
+  real workspace facts, and it was built against `main` at `5aa2b4b`. Its own
+  README disclaims security and efficacy, its senders are the maintainer's own
+  tooling, and the hook that would put it in a decision path is staged and not
+  installed — it appears in no client or settings configuration.
+
+**Correction, stated plainly rather than absorbed.** Until this edit the
+sentence above read "zero external **or sibling** code consumers exist," dated
+2026-08-12. The sibling clause was false from 2026-08-15, and the census was
+re-asserted in the present tense on 2026-08-19 — "unchanged by `adapters/mcp/`"
+— by an edit that answered the MCP question without re-running the search the
+census names as its own method. Four days of a false clause is the small half.
+The mechanism is the larger one: a present-tense claim carrying an old date is
+a claim that re-asserts itself every time someone reads the page and nobody
+re-measures. The census is therefore dated at its verb from here on, and the
+rule that goes with it is that **no edit to this section may leave the census
+sentence standing without re-running the method and re-dating it.**
+
+Read the correction's direction before weighing it: it makes the census worse,
+not better. It is also not checkable by anyone but the maintainer — the sibling
+tree is unpublished, so this entry is a disclosure, not evidence, and it sits
+on the same footing as any other host-attested fact this page declines to call
+authenticated (H1).
+
+The artifact is therefore still maintained as a **research artifact**: consumers
 re-verify from the commit root; receipts exist to make that re-verification
-mechanical. This posture is a recorded decision, not an accident.
+mechanical. This posture is a recorded decision, not an accident. No party
+relies on preflight `READY` or on audit seals as adversarial-grade guarantees.
 
-That census is unchanged by `adapters/mcp/`, and the distinction is worth being
-exact about rather than leaving to a reader. The MCP gate is an **in-repo**
-consumer — it is in this tree, it is verified by this repository's own gates, and
-no party outside it relies on the decisions it makes. What is new is its
-intended audience: it is the first surface here written to be wired into someone
-else's stack, and an MCP gate's premise is that the sender of the record is not
-trusted by the receiver's tooling. Committing it does not fire the
-re-adjudication trigger below. A host wiring it up does, and that host would be
-the first external consumer this page has ever recorded.
+**What the corrected census does to the trigger: nothing, and the reason is the
+trigger's own wording rather than charity.** It fires on "the first external
+consumer, or any embedding where handoff senders are adversarial to the
+receiver's own tooling." Neither clause reaches either consumer. A sibling under
+the maintainer's control is not an *external* consumer: the whole content of
+"external" here is a party other than the maintainer choosing to rely on this
+artifact's guarantees, because that is the party whose reliance the deferred
+hardening set would be protecting. A tree the maintainer wrote, runs, and can
+change in the same afternoon supplies no such party. And the second clause needs
+an embedding whose senders are adversarial; the sibling's senders are the
+maintainer's own tooling and its hook is not installed, so there is no embedding
+at all. `adapters/mcp/` is the same analysis one step earlier — it is in this
+tree and no party outside it relies on the decisions it makes.
+
+That is the arming-versus-firing distinction [ADOPTION.md](ADOPTION.md) states
+for the MCP gate, and it composes here: what has happened is that the artifact
+now has consumers, all of them the maintainer's. A host wiring the gate into its
+own client fires the trigger, because that host is a party other than the
+maintainer and its senders are by construction adversarial to the receiver's
+tooling. That host would be the first external consumer this page has recorded.
 
 **Re-adjudication trigger:** the first external consumer, or any embedding
 where handoff senders are adversarial to the receiver's own tooling,

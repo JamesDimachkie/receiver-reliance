@@ -2,7 +2,8 @@
 
 E1–E7 entered after the 2026-08-10 external review; E8–E9 after the
 2026-08-12 Deep Security Scan (Intake 10); E10–E16 during the hardening
-campaign that followed it; E17–E18 during the v1.2.1 release review.
+campaign that followed it; E17–E18 during the v1.2.1 release review; E19
+after the 2026-08-19 audit.
 
 Confirmed against the artifact at cc6f3657 by reproducing the external
 review's probes (conformance 800+107 green; OBL-08/OBL-30 mutation probes;
@@ -739,6 +740,81 @@ migration the format move required is itself part of this record: the
 migration commit moved its pin list by hand and left two program-era pins
 behind — E12's third recorded move and the `run_sandbox.py` count mirror,
 both closed (by disclosure and by derivation respectively) in `5c29965`.
+
+## E19 — The measurement that justified the observability seam was reproducible from no committed byte
+
+Found by the 2026-08-19 audit. The seam's stated reason to exist was a
+measured claim: a request-length proxy "under-charges 43 of the 136 requests
+in its own measured corpus at p50," and the instrumented path "costs 1,165 ns
+per decision … 0.033% of a 3.5 ms decision." Those five numbers appeared in
+exactly two places, `README.md` and the comment above `DecisionObservation`,
+and in no test, receipt, script or JSON. `receiver_reliance/test_observe.py`
+pins what the seam *does* — byte-identity observed and unobserved, the record's
+contents, that an observer cannot mutate a decision, this host's effective CPU
+tick — and measured none of it. Nor was "136" reconcilable with any published
+corpus size: the documented counts are 124 semantic fixtures and 372 audited
+calls.
+
+The corpus was real and was always derivable; nothing published said so. It is
+the 112 entries of the 0.2 semantic pack, the 12 of the 0.3 pack, the three
+`examples/`, and nine protocol-error requests — 136. The proxy was real too,
+and was **not** published: an affine `0.10 + 1.20 × (bytes / 1024)` ms fitted
+at the design phase on the maintainer's host, living in a module that never
+shipped. So the artifact held every other result to mechanical re-derivation
+from published bytes and shipped a surface justified by a number that met that
+standard nowhere.
+
+Re-deriving it found a second defect inside the first, and the second is the
+one worth keeping. The count is not a property of the artifact; it is a
+property of the artifact *and the host's speed*, and steeply so, because the
+proxy is denominated in absolute milliseconds and most of the corpus prices
+within a quarter of the line. Four consecutive runs on one host on 2026-08-19
+returned 74, 78, 79 and 84 at a median decision of 3.37–3.42 ms; an earlier
+sitting on the same host under different load returned 83 to 110 at ~4.5 ms;
+scaled to the 2.936 ms profile `perf/COST_MODEL.md` records the derivation
+returns the forties, and a little below that it returns none. So the original
+43 was an honest measurement of one afternoon, published in a voice that
+implied a constant. The worst ratio is no better — it scales with the host too.
+
+What does survive the host is the ratio between the worst- and best-priced
+request. Scaling every measured cost by the same factor leaves that quotient
+where it was, so it is the one figure a second host can hold this one to:
+1.86–2.15x across the 124 semantic fixtures, 3.56–4.83x across all 136. It is
+also the claim the seam actually rests on — a proxy affine in length cannot
+track an engine whose cost is not — and it is what the prose now leads with.
+
+*Status:* fixed additively. `receiver_reliance/bench_observe.py` splits derived
+from measured the way `deployment/derive_admission_numbers.py` does. `--corpus`
+rebuilds the 136 requests from committed bytes and prints their composition and
+a digest; `--corpus --check` fails on drift from the composition it declares.
+`--measure` re-derives the under-charge and the seam's overhead on the caller's
+host, publishing the design-phase proxy so the count is recomputable, and
+prints the host-invariant spread and the near-the-line population beside the
+count so the count cannot be read as a constant. The overhead half is measured
+by isolating the three `perf_counter_ns` reads, the two `process_time_ns` reads
+and the record build that the instrumented path adds, rather than by A/B
+against `decide_audited`: at a microsecond against a millisecond, a paired A/B
+reports noise. Both README passages now carry host, date and interpreter, and
+point at the script.
+
+One further number went the same way and is recorded rather than quietly
+dropped. The passthrough was published at "24 ns," and building the isolation
+for it showed the method cannot resolve a figure that size: paired deltas
+against a same-shape function straddled zero in every run. `--measure` now
+reports the range and names it unresolved, and the README states the branch
+instead of a number. A measurement that reports its own resolution is the
+smaller correction here; publishing the midpoint of a range containing zero
+would have been the same defect as E19 itself, one release later.
+
+*Enforcement:* `--corpus --check` is in the README re-verification battery, so
+a corpus that stops being the one the prose names fails a listed command. It is
+deliberately **not** a twentieth row in the charter gate or the hosted matrix:
+adding a gate row is the evidence-regeneration event E12 and E14 describe, and
+this correction did not earn one. Stated so a reader does not assume CI covers
+it — a clone does, on the listed command. `--measure` measures on the caller's
+host and stays hand-run, the same standing `derive_admission_numbers.py --cost`
+has. What this erratum does not do is make a measured number portable: it makes
+one re-derivable, and dates the run it came from.
 
 ## Authority census (context for E5)
 
