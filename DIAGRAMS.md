@@ -560,8 +560,8 @@ described 0.4.1: `README.md` said "Closed four keys" and named `0.4.1`; `TRUST_M
 `rr_api.py`'s own module docstring described the 0.4.1 format; and `ERRATA.md` had no entry for
 the defect 0.4.2 fixed. All of it is closed (`5c29965`, `69853aa`, `5073238`): E18 records the
 defect, E8 points forward to it, the live-voice documents now say 0.4.2 and six keys, and the two
-dated observations (A7's reproduction, A1's publication record) carry currency parentheticals
-rather than rewrites. The finding is kept because it is this repository's characteristic failure
+dated observations (A7's reproduction, A1's publication record) carried currency parentheticals
+rather than rewrites; their records now live in [ADOPTION_HISTORY.md](ADOPTION_HISTORY.md) A7 and A1. The finding is kept because it is this repository's characteristic failure
 shape — found again by the act of drawing the seal.
 
 **Not shown:** the key-by-key inventory of `audit` — which keys appear on which route is the

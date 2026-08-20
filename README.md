@@ -154,8 +154,10 @@ The root documents divide the same way. [TRUST_MODEL.md](TRUST_MODEL.md) is
 canonical for what every seal and receipt may be read as claiming and who is
 assumed to consume it; [HOST_OBLIGATIONS.md](HOST_OBLIGATIONS.md) is the
 caller's half of the contract; [ERRATA.md](ERRATA.md) records known defects and
-how each is enforced; [ADOPTION.md](ADOPTION.md) is the recorded-and-unfixed
-list with a treatment and an owner per row; [ACCEPTANCE.md](ACCEPTANCE.md)
+how each is enforced; [ADOPTION.md](ADOPTION.md) is the adoption ledger --
+each row leads with its status, what it means for an adopter, and how to
+check it -- with the full treatment-and-owner history per row in
+[ADOPTION_HISTORY.md](ADOPTION_HISTORY.md); [ACCEPTANCE.md](ACCEPTANCE.md)
 records what was accepted and under which protocol; [WITHHELD.md](WITHHELD.md)
 ledgers what is deliberately not published and why; [EXAMPLE.md](EXAMPLE.md) is
 one handoff decided end to end; [DIAGRAMS.md](DIAGRAMS.md) draws the
@@ -212,8 +214,9 @@ workspace, and nobody else. That page also records what the sentence used to
 say and why it was wrong. Nothing here has been load-tested by an integrator
 other than its author, and the applicability limits in `ERRATA.md` E7 are the
 first thing a new consumer should read. What is recorded-and-unfixed between
-this artifact and one you could adopt -- with the treatment and owner for each
-item -- is ledgered in [ADOPTION.md](ADOPTION.md).
+this artifact and one you could adopt is ledgered in
+[ADOPTION.md](ADOPTION.md), with the treatment and owner for each item in
+[ADOPTION_HISTORY.md](ADOPTION_HISTORY.md).
 
 ## The supported surface
 
