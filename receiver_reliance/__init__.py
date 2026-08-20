@@ -427,4 +427,4 @@ __all__ = [
 # suffix means these bytes are past the last tag and are not a released
 # version: `git describe --tags` names the tag they are ahead of. Cutting a
 # release replaces the suffix; the next commit after a tag restores one.
-__version__ = "1.3.0"
+__version__ = "1.4.0.dev0"
