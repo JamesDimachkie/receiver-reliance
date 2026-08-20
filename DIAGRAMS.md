@@ -733,7 +733,8 @@ stale pin with a disposition is honest; a refreshed pin is a false provenance cl
 `SOURCE_PIN_ERRATA` table in `perf/sidecar/verify_receipts.py`, which declared seven stale
 receipt-source pairs while they stood and holds none at this tip: the 2026-08-19 regeneration
 recorded fresh receipts at the moved bytes instead of spending rows on them, so the mechanism is
-unspent rather than retired — an empty table and a live one are the same guard). `ADOPTION.md` A5,
+unspent rather than retired — an empty table and a live one are the same guard). `ADOPTION.md` A5
+with its record in `ADOPTION_HISTORY.md` A5,
 status **closed** — `perf/sidecar/_evidence.py` is migrated, and how it was unblocked is what the
 gap node above draws: admitted `perf/receipts/robustness/*` receipts and the 61-file portable
 manifest pin that file, so the repair had to be re-recorded rather than edited in place. Directory
@@ -1037,7 +1038,8 @@ hand-only status, and `portability/matrix/plan.json` `profiles.portability_check
 beside it. `README.md` §"Cross-platform validation" (*"**Run this one
 first.**"*, and the era-divergence declaration, now `521, 9 and 9`), §"Repository map" (the
 `521-check regression` row),
-§"Contributing / re-verification" (the hand-run list). `ADOPTION.md` A1 (a dated publication
+§"Contributing / re-verification" (the hand-run list). `ADOPTION.md` A1 with its record in
+`ADOPTION_HISTORY.md` A1 (a dated publication
 record, now carrying a 521 currency parenthetical) and A2 (**closed**; hosted runs 32225089695 and
 32270122137 on `main`). `ERRATA.md` E13, E15, E16. The live count 521 is what
 `grounded-0_4/test_grounded_0_4.py` prints at `HEAD`; the machinery agreeing with it is
