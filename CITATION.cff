@@ -23,7 +23,8 @@ version: "1.2.1"
 date-released: "2026-08-18"
 keywords:
   - agent-handoff
-  - decision-auditing
-  - multi-agent-systems
   - conformance-testing
-  - reproducible-research
+  - decision-auditing
+  - determinism
+  - multi-agent-systems
+  - reproducibility
