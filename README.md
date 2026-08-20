@@ -849,23 +849,24 @@ holds five lanes plus the verifiers that bind their receipts:
 
 Hosted receipts are committed under `portability/receipts/hosted/` with a
 hash-bound manifest. **Run this one first.** It re-executes the
-nineteen-command charter gate at the bytes you have checked out and states
+twenty-command charter gate at the bytes you have checked out and states
 plainly which evidence it recomputed and which it could only replay:
 
 ```bash
 python -B portability/verify_live.py
 ```
 
-Expected: `verify-live: gates=19 passed=19 declared_era_divergences=11
-undeclared_divergences=0 failures=0`. All eleven declared divergences are
+Expected: `verify-live: gates=20 passed=20 declared_era_divergences=12
+undeclared_divergences=0 failures=0`. All twelve declared divergences are
 real and deliberate, in two kinds. Three are counts that moved: the sealed
 close receipt recorded 504 grounded checks, 7 lint-gate checks and 7 proof
 tests, and the current suites have 521, 9 and 9; each is declared in
 `verify_receipts.LEGACY_GATE_VALIDATORS`, so the sealed transcripts still
 replay under their own era while the live gate enforces current counts.
-The other eight are gates the charter gained after that receipt was sealed —
+The other nine are gates the charter gained after that receipt was sealed —
 the engine-manifest, audit-seal, observability, preflight, MCP-gate,
-admission-profile, decision-law and incident-replay suites — for which the
+admission-profile, decision-law, incident-replay and release-identity
+suites — for which the
 sealed receipt holds no observation at all; that set is
 `verify_live.POST_SEAL_GATES`, derived from the sealed era's own manifest and
 checked against the sealed bytes on every run rather than pinned. An

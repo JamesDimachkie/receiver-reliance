@@ -575,6 +575,13 @@
         "argv": ["{python}", "-B", "deployment/test_admission.py"],
         "timeout_seconds": 900,
         "expected": {"tests": [25]}
+      },
+      {
+        "id": "release-identity",
+        "cwd": ".",
+        "argv": ["{python}", "-B", "portability/test_release_identity.py"],
+        "timeout_seconds": 300,
+        "expected": {"tests": [5]}
       }
     ],
     "free_threaded_extra": [

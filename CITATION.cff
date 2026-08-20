@@ -20,7 +20,7 @@ license: Apache-2.0
 # a `.devN` package version (`pyproject.toml`, `receiver_reliance.__version__`).
 # Cite the tag, or cite the commit `git rev-parse HEAD` reports.
 version: "1.2.1"
-date-released: "2026-08-18"
+date-released: "2026-08-19"
 keywords:
   - agent-handoff
   - conformance-testing

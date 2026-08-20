@@ -79,6 +79,7 @@ GATE_TO_PLAN_ID = {
     # so the charter binds the declaration that already exists.
     "decision_law_structural": "decision-law-structural",
     "incident_replay_corpus": "incident-replay-corpus",
+    "release_identity": "release-identity",
 }
 if set(GATE_TO_PLAN_ID) != {spec.gate_id for spec in expanded_gate.GATES}:
     raise AssertionError(

@@ -135,8 +135,8 @@ GATES = (
         "checks_1142",
     ),
     # --- surfaces the repository grew after the eleven-command era ----------
-    # A charter that runs eleven of the nineteen evidence surfaces it can reach
-    # is a charter with a hole.  Every suite below is stdlib-only,
+    # A charter that runs eleven of the then-reachable nineteen evidence
+    # surfaces is a charter with a hole.  Every suite below is stdlib-only,
     # deterministic, network-free, writes only under TMPDIR, and finishes well
     # inside the 300 s per-command ceiling, so nothing but omission kept them
     # out.  What the charter still cannot reach is declared under GATES.
@@ -187,6 +187,12 @@ GATES = (
         "/repo",
         ("python", "-B", "replay-corpus/replay_incidents.py"),
         "replay_corpus_27",
+    ),
+    GateSpec(
+        "release_identity",
+        "/repo",
+        ("python", "-B", "portability/test_release_identity.py"),
+        "unittest_5",
     ),
 )
 

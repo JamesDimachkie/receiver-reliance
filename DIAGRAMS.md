@@ -884,7 +884,7 @@ the recorded stdout it replays says `Ran 7 tests`.
 | Class | Programs | What a green line means |
 |---|---|---|
 | **Replay** | `portability/verify_receipts.py` (`checks=297`), `perf/sidecar/verify_receipts.py` (`checks=134`), `second-implementation/verify_artifacts.py` | The committed receipt bytes are intact, the sources they name still hash as recorded, and the transcripts they recorded still satisfy the validators of their own era. **Nothing was executed.** |
-| **Recompute** | `portability/verify_live.py` (`gates=19`), `baseline-run/verify_conformance_authority.py` (`checks=32`, four declared divergences), `portability/test_home_path_disclosure.py`, `receiver_reliance/generate_engine_manifest.py --check` plus the package's import-time check over eleven engine files, `portable/gate.py` | The artifact at the bytes you have checked out was executed, and its live output was held against the declarations. |
+| **Recompute** | `portability/verify_live.py` (`gates=20`), `baseline-run/verify_conformance_authority.py` (`checks=32`, four declared divergences), `portability/test_home_path_disclosure.py`, `receiver_reliance/generate_engine_manifest.py --check` plus the package's import-time check over eleven engine files, `portable/gate.py` | The artifact at the bytes you have checked out was executed, and its live output was held against the declarations. |
 | **Pin surfaces** | `portable/MANIFEST.json` (61 files — 22 runtime, 13 gate, 11 authority, 9 document, 5 receipt, 1 version), `receiver_reliance/engine_manifest.json` (11 files, self-zero sealed), each receipt's `source_sha256` map | Inventory bindings. They detect drift; they do not authenticate — see C1. |
 
 `perf/sidecar/verify_receipts.py` was red on purpose between the F-WP5-006
@@ -917,8 +917,8 @@ contains a `subprocess` reference). `portable/gate.py` `COMMANDS` (eight entries
 pairs while they stood and declares none at this tip — the 2026-08-19 regeneration re-recorded the
 receipts at the moved bytes rather than spending rows), E15
 (52 declared instances, 39 frozen and 13 recorded, of which 27 are pinned only in prose), E16.
-`README.md` §"Cross-platform validation": `verify-live: gates=19 passed=19
-declared_era_divergences=11 undeclared_divergences=0 failures=0`; `verify-receipts: checks=297
+`README.md` §"Cross-platform validation": `verify-live: gates=20 passed=20
+declared_era_divergences=12 undeclared_divergences=0 failures=0`; `verify-receipts: checks=297
 failures=0`; `conformance-authority: checks=32 failures=0 declared_divergences=4`.
 `portable/MANIFEST.json` (61 rows, `role` field) and `portable/build_manifest.py` (derived from
 `portable/inventory.json`, not from a tree walk). `receiver_reliance/engine_manifest.json`
@@ -979,7 +979,7 @@ workflow files — verified by grep, not inferred — because the plan, not the 
 command manifest, which is why that grep alone never established hand-only status.
 
 Two are deliberately still hand-only, and the reasons are measured rather than habitual.
-`verify_live` — the one the README tells a third party to run first — executes all nineteen charter
+`verify_live` — the one the README tells a third party to run first — executes all twenty charter
 gates, two of which are wall-clock assertions (`test_batch.py --perf` requires an amortized ratio at
 most 3x, and the single-pass benchmark measures one), and `plan.json` deliberately confines those to
 the single `expanded_gate` row rather than to every public-preview arm runner.
@@ -1012,7 +1012,7 @@ page and closed by hand (`5c29965`..`000652d`).
 | `python -B portability/verify_hygiene.py` | Branch hygiene with custody-bound exceptions — **this is the program the forged `git` defeated** | **CI** — `main` only |
 | `python -B second-implementation/verify_artifacts.py` | WP4 receipt bindings, import closure, runtime read set | **CI** — `main` only |
 | `python -B portable/gate.py` | Eight suites execute at current bytes, under count-agnostic validators | **CI** — `main` only |
-| `python -B portability/verify_live.py` | **The nineteen charter gates pass at the bytes you have checked out** — the README tells a third party to run this one first | **hand only** |
+| `python -B portability/verify_live.py` | **The twenty charter gates pass at the bytes you have checked out** — the README tells a third party to run this one first | **hand only** |
 | `python -B baseline-run/verify_conformance_authority.py` | The frozen manifests' literal `PASS` and `failures: 0` equal what the suites actually observe (E16) | **CI** — every normative matrix cell |
 | `python -B portability/test_home_path_disclosure.py` | E15's fifty-two-instance disclosure still describes current bytes | **CI** — every normative matrix cell |
 | `python -B receiver_reliance/generate_engine_manifest.py --check`, `test_engine_manifest.py`, `test_audit_seal.py` | The eleven engine files still hold their published bytes | **CI** — every normative matrix cell |
