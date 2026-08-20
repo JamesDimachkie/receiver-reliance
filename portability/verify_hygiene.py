@@ -76,26 +76,26 @@ ALLOWED = {
     # custody terms rather than normalized.
     "perf/COST_MODEL.md": (
         184,
-        "2AEC5F8BC67945D7FC7913F46565E6E182E717720F0512B03FA6FC64CD1A145C",
+        "7B0303C591C09A86F10DC563BD9574ABE32E29F24872405E6BE5D8F82C49E35F",
     ),
     # Re-bound 2026-08-19: the "Current receipts" section named the superseded
     # 20260812 pair as current.  It now carries a currency block naming the
     # admitted attempt9/attempt12 pair, and the file grew from 146 CRLF lines
     # to 172.  CRLF custody terms are unchanged.
     "perf/PROFILE_ROBUSTNESS_20260811.md": (
-        172,
-        "AF38ADEA2E58228BF02CD4BCA1CA82C5FA12AE8B231D6583A49888FE29E683CB",
+        174,
+        "7AE28B12FA54B2488AC98B937226501172FD6C23C04C5B2F1D5C308392828FE8",
     ),
     # Both re-bound by the ERRATA E14 disposition: the WP5 verifier gained the
     # stale-provenance-pin table and SIDECAR.md stopped presenting a red command
     # as verification.  CRLF custody terms are unchanged.
     "perf/SIDECAR.md": (
         172,
-        "26FC10C49335A5E6F1E9D558A23872B65B1EC8C4F9A579EE099CC7A38B58D000",
+        "3B9839A4EF745145ADE1CAA9ED1FC18944192C40D7AD6B86ECCCD3E7F8F32A00",
     ),
     "perf/sidecar/verify_receipts.py": (
         285,
-        "4CFE1E93D1ECF4C3A43D0CA7AA263FF81CFF3F59D4E7BDF518BBE942CEC2218B",
+        "F62B9925C0F548B63EF17A28EDF8A08887E55DE2BAA5ADE5D2F59107B314083B",
     ),
     "second-implementation/receipts/AUTHOR_INCREMENT_RECEIPT_0_1.json": (
         189,

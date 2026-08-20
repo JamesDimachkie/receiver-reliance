@@ -43,8 +43,8 @@ from _evidence import canonical, sha256  # noqa: E402
 ADMITTED = {
     "perf/receipts/robustness/profile-windows-cpython-3.12-20260819-attempt9.json":
         "4014309050F2AB6C0513616E247EF6B41EC474C62281FF07990883A2D93D1E20",
-    "perf/receipts/robustness/sidecar-parity-windows-cpython-3.12-20260819-attempt12.json":
-        "2242F94946EA6C40F8D59C76759A54D83E1228AE7E13AD454B1F121924368507",
+    "perf/receipts/robustness/sidecar-parity-windows-cpython-3.12-20260820-attempt13.json":
+        "3DC8663500662520B4D1E97A1E879CC0187477BC790A58E7295277204719916F",
 }
 
 # ERRATA E14 mechanism, table currently empty.  The 2026-08-19 regeneration

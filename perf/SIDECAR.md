@@ -119,8 +119,8 @@ F-WP5-006 supervision repairs and ADOPTION A5's migration moved three files
 the previously admitted receipts pinned byte-exactly, and read-time input
 pinning moved the manifest schema they declared, so this command was red
 (seven enumerated checks) from the repairs until the event. Fresh receipts
-now bind the current bytes — `profile-…-20260819-attempt8.json` and
-`sidecar-parity-…-20260819-attempt11.json`, schema `-2`, writer redaction
+now bind the current bytes — `profile-…-20260819-attempt9.json` and
+`sidecar-parity-…-20260820-attempt13.json`, schema `-2`, writer redaction
 active — and `ADMITTED`, the portable inventory and the manifest are rebound
 to them. The superseded 2026-08-12 attempts stay on disk as chronology.
 

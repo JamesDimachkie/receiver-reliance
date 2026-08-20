@@ -97,12 +97,14 @@ report measured, and it is superseded. `ADMITTED` in
 embedded pre-seal SHA-256
 `2464357DDD356218F96773DEE2A4973BC8F1ED1BB601F86B999939068C8CAC3C`,
 25 source pins) and
-`perf/receipts/robustness/sidecar-parity-windows-cpython-3.12-20260819-attempt12.json`
+`perf/receipts/robustness/sidecar-parity-windows-cpython-3.12-20260820-attempt13.json`
 (raw SHA-256
-`2242F94946EA6C40F8D59C76759A54D83E1228AE7E13AD454B1F121924368507`,
+`3DC8663500662520B4D1E97A1E879CC0187477BC790A58E7295277204719916F`,
 embedded pre-seal SHA-256
-`B8D890CACBDDE0718D02C75B1FA15C2759123097D63B94EE036EF32A9FF91649`,
-23 source pins). Both were recorded by the 2026-08-19 regeneration event at
+`09D0E68864389A471D03D03B8D98C6519211FA58FB45C3F6EDF172F37667B076`,
+23 source pins). The profile half was recorded by the 2026-08-19
+regeneration event; the parity half was re-recorded on 2026-08-20 after the
+timing-determinism hardening of its own suite, at
 the repaired bytes; `perf/COST_MODEL.md` §"Admitted receipt custody" and
 `perf/SIDECAR.md` carry the same pair, and `perf/sidecar/verify_receipts.py`
 reports `checks=134 failures=0` over it. The `20260812` pair below stays on
