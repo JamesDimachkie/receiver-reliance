@@ -72,16 +72,16 @@ modeled.
 
 ## Admitted receipt custody
 
-- `perf/receipts/robustness/profile-windows-cpython-3.12-20260819-attempt8.json`
+- `perf/receipts/robustness/profile-windows-cpython-3.12-20260819-attempt9.json`
   — raw SHA-256
-  **088BF9FED9E29D960CF304124D8568DE6F0068BAC142DC2D0A4370052027FC63**;
+  **4014309050F2AB6C0513616E247EF6B41EC474C62281FF07990883A2D93D1E20**;
   embedded pre-seal SHA-256
-  `2558DA2B1113BB4120F3A936BB85E6C58C1F49D8F0AF0107F007EBB8403446EE`.
-- `perf/receipts/robustness/sidecar-parity-windows-cpython-3.12-20260819-attempt11.json`
+  `2464357DDD356218F96773DEE2A4973BC8F1ED1BB601F86B999939068C8CAC3C`.
+- `perf/receipts/robustness/sidecar-parity-windows-cpython-3.12-20260819-attempt12.json`
   — raw SHA-256
-  **29ECC8D4E74CDA6BB63869BFE7FEA06469036E5A5DECA7EC66A9BA90FAE71C71**;
+  **2242F94946EA6C40F8D59C76759A54D83E1228AE7E13AD454B1F121924368507**;
   embedded pre-seal SHA-256
-  `E0CDB2E98163ECDF12498E8FEEEF1B1C207A5D2BA4F3EFD67D465F2108E29AA2`.
+  `B8D890CACBDDE0718D02C75B1FA15C2759123097D63B94EE036EF32A9FF91649`.
 
 The profile pins the Python-audit-visible repository inputs across its full
 traced child set; the sidecar receipt (728 checks) pins its own traced set.
