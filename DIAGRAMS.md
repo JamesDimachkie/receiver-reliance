@@ -31,6 +31,14 @@ catalogued — the `0.4.2` audit format (B2) and the four-arm grounded-regressio
 described the state before — was closed by `5c29965`..`000652d`, a sequence this page's own
 assembly triggered. B2 and C5 keep the finding as a dated record.
 
+**Re-read at `v1.2.1-31-gf09da5a` (2026-08-19).** The `000652d` claim above did not hold for the
+`grounded-0_4/rr_api.py` pins: every one of them had already shifted by one line at `000652d`, so
+the page was carrying `e27e331` line numbers under a `000652d` re-verification claim. Those pins,
+the C2 directory census, the C2 and C4 E14 descriptions, C1's and C2's `ADOPTION.md` A5 status, the
+C2 manifest count, C3's `README.md` section citation and C5's charter-gate count were recomputed
+against this tip. Where a figure moved, the current value is stated here and the superseded one is
+kept where it is a dated record.
+
 **Numbers.** No diagram carries a number unless the committed file it came from is named on that
 diagram's **Sources** line. A count appears inside a node label only where the count *is* the
 diagram's argument — A1's false-hold rate and A4's corpus split, both of which are adoption
@@ -214,7 +222,7 @@ the thirty rows this is one of (the appendix).
 (`semantic_decision_contract.class_precedence`, `predicate_language`, `operation_decision_table`,
 `evaluation_result_contract` — `VIOLATED` / `VIOLATED` / `UNRESOLVED` and exit 1 are its literal
 values); `baseline-run/implementation-output-0.3/b1_capabilities.py:57` (`CLASS_PRECEDENCE`, the
-three-tuple) and `:635` (`return matched or "VALID"`); `grounded-0_4/rr_api.py:208` (`_CLASS_ORDER`),
+three-tuple) and `:635` (`return matched or "VALID"`); `grounded-0_4/rr_api.py:209` (`_CLASS_ORDER`),
 `_classify_traced`, `_trace`; `second-implementation/rr2.py:1260`
 (`if op == "NO_EARLIER_CLASS_MATCH": return False`); `README.md` envelope-key table
 (`first_match_predicates` — *"Closed three keys"*, *"At most one is true"*; `matched_class_witness`
@@ -463,7 +471,7 @@ out-of-band host-side gate (A4), and drawing it here would be wrong. Also hidden
 `ERR_INTERNAL` when a built response fails its own response schema, and `ERR_LIMIT` when the
 response exceeds `MAX_OUTPUT_BYTES` (16777216).
 
-**Sources:** `grounded-0_4/rr_api.py:648` (`decide_audited`), `:346` (`_prepare_request`), `:241`
+**Sources:** `grounded-0_4/rr_api.py:649` (`decide_audited`), `:347` (`_prepare_request`), `:242`
 (`_bounded_object_wire` — refuses with `ERR_JSON`, `ERR_LIMIT` or `ERR_NUMBER` and returns
 `raw = None`, which is why `request_raw_sha256` is null on that route);
 `baseline-run/implementation-output-0.3/pcb_runner.py:226` (`_parse`), `:333` (`_execute`), `:361`
@@ -561,14 +569,14 @@ mechanism B1 draws as three differently shaped terminations, and `README.md` alr
 table. Also not shown: everything the seal cannot speak to at all — who ran the decision, when, and
 whether the host's attested facts were true (H1).
 
-**Sources:** `grounded-0_4/rr_api.py:173` (`AUDIT_FORMAT`), `:178-198` (the comment block explaining
-the cross-party identification gap), `:199-207` (`GOVERNING_AUTHORITIES`, six keys:
+**Sources:** `grounded-0_4/rr_api.py:174` (`AUDIT_FORMAT`), `:180-199` (the comment block explaining
+the cross-party identification gap), `:200-207` (`GOVERNING_AUTHORITIES`, six keys:
 `closure_policy_sha256`, `authority_register_sha256`, `engine_capabilities_sha256`,
-`engine_runner_sha256`, `decision_table_contract_sha256`, `composed_contract_sha256`), `:118-160`
-(the byte-length and SHA-256 literals for every pinned runtime input), `:648-712` (`decide_audited`,
+`engine_runner_sha256`, `decision_table_contract_sha256`, `composed_contract_sha256`), `:122-166`
+(the byte-length and SHA-256 literals for every pinned runtime input), `:649-714` (`decide_audited`,
 the seal call); `baseline-run/implementation-output-0.3/b1_capabilities.py:102`
 (`self_zero_sha256`); `receiver_reliance/engine_manifest.json` (eleven files, self-zero sealed);
-`ERRATA.md` E8 *Scope (2026-08-13)*; `TRUST_MODEL.md:27` (the audited-decision evidence row).
+`ERRATA.md` E8 *Scope (2026-08-13)*; `TRUST_MODEL.md:30` (the audited-decision evidence row).
 Envelope shape reproduced by running `decide_audited` on `examples/handoff-clean.json`: top-level
 keys `format_version`, `sealed_response`, `exit_code`, `audit`, `audited_behavior_class`,
 `audit_sha256`; six `governing_authorities` keys; three `first_match_predicates` keys.
@@ -645,8 +653,9 @@ they hold is the published one is outside the artifact by construction.
 §"What each evidence class proves" (the audited-decision row placing evaluator bytes outside the
 sealed digests under E8 scope, and naming H1 for host-attested facts), and §"Trust boundaries, by
 surface" (the Harness/tooling row, which records the forged-`git` demonstration verbatim);
-`ADOPTION.md` A5, status **open**; `HOST_OBLIGATIONS.md` H1; `grounded-0_4/rr_api.py:173` and
-`:199-207`.
+`ADOPTION.md` A5, status **closed** — eight of eight harnesses migrated, the `RR_TOOL_DIR`-unset
+ambient-`PATH` residual still disclosed, which is the edge drawn here; `HOST_OBLIGATIONS.md` H1;
+`grounded-0_4/rr_api.py:174` and `:200-207`.
 
 ---
 
@@ -666,7 +675,7 @@ flowchart TD
   errata["Published disposition in ERRATA"]
   guard[/"Additive guard elsewhere"/]
   gap_stale["⚠ E12 E14 a guard pin goes stale"]
-  gap_evidence["⚠ A5 one harness still unmigrated"]
+  gap_evidence["⚠ receipt-pinned bytes need a regeneration event"]
 
   frozen_table --> defect
   defect -->|bytes may not change| errata
@@ -700,13 +709,13 @@ cannot be fixed by editing the bytes, so it becomes an ERRATA disposition plus a
 somewhere else — which is itself checkable, which can itself go stale, which reopens the loop. That
 is a cycle, and cycles are precisely what prose renders badly.
 
-The seventeen tracked top-level directories, by the class `README.md` assigns each:
+The twenty tracked top-level directories, by the class `README.md` assigns each:
 
 | Class | Shape | Directories |
 |---|---|---|
-| Live surface | `[rectangle]` | `receiver_reliance/`, `grounded-0_4/`, `adapters/`, `portable/`, `examples/` |
+| Live surface | `[rectangle]` | `receiver_reliance/`, `grounded-0_4/`, `adapters/`, `portable/`, `examples/`, `deployment/` (off by default) |
 | Frozen evidence | `[[subroutine]]` | `baseline-run/` (also harness), `supplemental-0_3/`, `second-implementation/`, `access/`, `evidence/` |
-| Harness | `[/parallelogram/]` | `portability/`, `perf/`, `proof/`, `fuzz/`, `.github/` |
+| Harness | `[/parallelogram/]` | `portability/`, `perf/`, `proof/`, `law/`, `replay-corpus/`, `fuzz/`, `.github/` |
 | Records | `{{hexagon}}` | `orchestration/` |
 | Drafts | `{{hexagon}}` | `continuation-specs/` |
 
@@ -720,11 +729,15 @@ elsewhere cite"*) and the per-directory rows, including `continuation-specs/`: *
 implemented, not evidence"*. `ERRATA.md` preamble (*"Sealed 0.2/0.3 bytes are never edited: fixes
 land additively"*; *"Each erratum names its enforcement so the class cannot recur silently"*), E12 (a
 published source pin that stopped describing the bytes it names, deliberately not refreshed — *"A
-stale pin with a disposition is honest; a refreshed pin is a false provenance claim"*), E14 (seven
-receipt provenance pins stale by design, declared in `SOURCE_PIN_ERRATA` rather than rebound).
-`ADOPTION.md` A5, status **open** — `perf/sidecar/_evidence.py` unmigrated, blocked on an
-evidence-regeneration event because seven `perf/receipts/robustness/*` receipts and the 60-file
-portable manifest pin it. Directory list recomputed from `git ls-files` at `v1.2.1-7-ge27e331`.
+stale pin with a disposition is honest; a refreshed pin is a false provenance claim"*), E14 (the
+`SOURCE_PIN_ERRATA` table in `perf/sidecar/verify_receipts.py`, which declared seven stale
+receipt-source pairs while they stood and holds none at this tip: the 2026-08-19 regeneration
+recorded fresh receipts at the moved bytes instead of spending rows on them, so the mechanism is
+unspent rather than retired — an empty table and a live one are the same guard). `ADOPTION.md` A5,
+status **closed** — `perf/sidecar/_evidence.py` is migrated, and how it was unblocked is what the
+gap node above draws: admitted `perf/receipts/robustness/*` receipts and the 61-file portable
+manifest pin that file, so the repair had to be re-recorded rather than edited in place. Directory
+list recomputed from `git ls-files` at `v1.2.1-31-gf09da5a`.
 
 ---
 
@@ -802,9 +815,9 @@ which are chronology rather than structure and live in `orchestration/`.
 §"Contributing / re-verification" (the 100,000-identity aggregate across `fuzz/fuzz.py` and
 `perf/batch_campaign.py`; the coverage-guided campaign refuting at identity 588 —
 `second-implementation/findings/F-WP4-007.md`; *"a conforming second implementation still does not
-exist and remains the single most valuable outside contribution"*), §"Reproducing the conformance
-result" (the 800-check breakdown, and the composed run's two summary lines `800 … failures=0` and
-`107 … failures=0` totalling 907). `ADOPTION.md` A3, status **in flight, outside this repo**.
+exist and remains the single most valuable outside contribution"*), and §"Quickstart" (the 800-check
+breakdown, and the composed run's two summary lines `800 … failures=0` and `107 … failures=0`
+totalling 907). `ADOPTION.md` A3, status **in flight, outside this repo**.
 `.github/workflows/conformance.yml` (the 800 and 907 counts, in the step names). `ERRATA.md` E10.
 `baseline-run/verify_predicate_coverage.py` module docstring (the two arms, the temporary-directory
 staging, and *"which parts of the law the published evidence actually constrains, which is the
@@ -828,7 +841,7 @@ flowchart LR
   manifests[/"Inventory manifests"/]
   replay[/"Replay verifiers"/]
   recompute[/"Recompute verifiers"/]
-  gap_e14["⚠ E14 seven source pins stale"]
+  gap_e14["⚠ E14 receipt source pins go stale"]
   gap_e13["⚠ E13 replay green over red"]
 
   frozen_table -.->|byte length and digest| receipts
@@ -899,7 +912,9 @@ here, and `ERRATA.md` E15 states it plainly.
 *"Recompute what the receipts assert, instead of replaying what they recorded"*.
 `portability/verify_receipts.py` and `perf/sidecar/verify_receipts.py` docstrings (neither file
 contains a `subprocess` reference). `portable/gate.py` `COMMANDS` (eight entries), `main()` and
-`_summary()`. `ERRATA.md` E13, E14 (`SOURCE_PIN_ERRATA`, seven stale receipt-source pairs), E15
+`_summary()`. `ERRATA.md` E13, E14 (`SOURCE_PIN_ERRATA`, which declared seven stale receipt-source
+pairs while they stood and declares none at this tip — the 2026-08-19 regeneration re-recorded the
+receipts at the moved bytes rather than spending rows), E15
 (52 declared instances, 39 frozen and 13 recorded, of which 27 are pinned only in prose), E16.
 `README.md` §"Cross-platform validation": `verify-live: gates=19 passed=19
 declared_era_divergences=11 undeclared_divergences=0 failures=0`; `verify-receipts: checks=297
@@ -963,7 +978,7 @@ workflow files — verified by grep, not inferred — because the plan, not the 
 command manifest, which is why that grep alone never established hand-only status.
 
 Two are deliberately still hand-only, and the reasons are measured rather than habitual.
-`verify_live` — the one the README tells a third party to run first — executes all eleven charter
+`verify_live` — the one the README tells a third party to run first — executes all nineteen charter
 gates, two of which are wall-clock assertions (`test_batch.py --perf` requires an amortized ratio at
 most 3x, and the single-pass benchmark measures one), and `plan.json` deliberately confines those to
 the single `expanded_gate` row rather than to every public-preview arm runner.

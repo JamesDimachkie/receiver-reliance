@@ -86,9 +86,29 @@ model and framed sidecar shape, as the WP5 fallback permits.
 No scheduling delay is used for identity. Admission requires full host frame
 write and flush completion plus exact envelope correlation.
 
-## Current receipts
+## Receipts
 
-Profile:
+**Currency (2026-08-19).** The pair recorded below is the pair this dated
+report measured, and it is superseded. `ADMITTED` in
+`perf/sidecar/verify_receipts.py` now names
+`perf/receipts/robustness/profile-windows-cpython-3.12-20260819-attempt9.json`
+(raw SHA-256
+`4014309050F2AB6C0513616E247EF6B41EC474C62281FF07990883A2D93D1E20`,
+embedded pre-seal SHA-256
+`2464357DDD356218F96773DEE2A4973BC8F1ED1BB601F86B999939068C8CAC3C`,
+25 source pins) and
+`perf/receipts/robustness/sidecar-parity-windows-cpython-3.12-20260819-attempt12.json`
+(raw SHA-256
+`2242F94946EA6C40F8D59C76759A54D83E1228AE7E13AD454B1F121924368507`,
+embedded pre-seal SHA-256
+`B8D890CACBDDE0718D02C75B1FA15C2759123097D63B94EE036EF32A9FF91649`,
+23 source pins). Both were recorded by the 2026-08-19 regeneration event at
+the repaired bytes; `perf/COST_MODEL.md` §"Admitted receipt custody" and
+`perf/SIDECAR.md` carry the same pair, and `perf/sidecar/verify_receipts.py`
+reports `checks=134 failures=0` over it. The `20260812` pair below stays on
+disk as chronology and supplies no current number.
+
+Profile (recorded 2026-08-12, superseded):
 
 - path:
   `perf/receipts/robustness/profile-windows-cpython-3.12-20260812-attempt7.json`
@@ -97,7 +117,7 @@ Profile:
 - embedded pre-seal SHA-256:
   `202C4F6822772771075AC2B689D7A9FECCFE9E3ED348A4E7BA35A2303EC61EA7`
 
-Sidecar:
+Sidecar (recorded 2026-08-12, superseded):
 
 - path:
   `perf/receipts/robustness/sidecar-parity-windows-cpython-3.12-20260812-attempt10.json`
@@ -106,9 +126,10 @@ Sidecar:
 - embedded pre-seal SHA-256:
   `BB93274443F4F214EF73E341664DC19DB49D3F3CC857FEAB526FED03C3FB4535`
 
-The profile manifest pins 23 Python-audit-visible repository files; the
+That profile manifest pins 23 Python-audit-visible repository files; that
 sidecar manifest pins 21 (the 0.4.1 audit surface newly reads the
-authority register at import for its governing digests). The verifier requires exact traced-set/pin-set
+authority register at import for its governing digests). The admitted
+20260819 pair pins 25 and 23 respectively. The verifier requires exact traced-set/pin-set
 equality, all raw hashes, actual `sys.orig_argv` including receipt target,
 empty temporary bytecode caches, and the receipt-specific behavioral fields.
 This custody is limited to Python `open` audit events for repository regular
@@ -122,14 +143,19 @@ numbers or current sidecar admission.
 ## Commands
 
 ```powershell
-python -B perf/sidecar/profile_robustness.py --receipt perf/receipts/robustness/profile-windows-cpython-3.12-20260812-attempt7.json
-python -B perf/sidecar/test_sidecar.py --receipt perf/receipts/robustness/sidecar-parity-windows-cpython-3.12-20260812-attempt10.json
+python -B perf/sidecar/profile_robustness.py --receipt perf/receipts/robustness/profile-windows-cpython-3.12-<date>-attempt<n>.json
+python -B perf/sidecar/test_sidecar.py --receipt perf/receipts/robustness/sidecar-parity-windows-cpython-3.12-<date>-attempt<n>.json
 python -B perf/sidecar/verify_receipts.py
 ```
 
-Receipt writers use exclusive creation and refuse an existing target. The
-receipts store the actual re-executed `sys.orig_argv`, not merely these caller
-commands.
+Receipt writers use exclusive creation and refuse an existing target, so
+`--receipt` must name a path that does not exist yet. This report's own runs
+used `...-20260812-attempt7.json` and `...-20260812-attempt10.json`; neither
+those nor the admitted `20260819` targets can be reused, which is why the
+filenames above are placeholders rather than literals. Only
+`verify_receipts.py` runs verbatim, and it checks the currently admitted pair.
+The receipts store the actual re-executed `sys.orig_argv`, not merely these
+caller commands.
 
 ## Limits and refutation targets
 

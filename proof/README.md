@@ -54,8 +54,14 @@ Both arms read `corpus.jsonl` and nothing else (same-information rule).
   (acknowledgment-after-effect) onto single-event lifecycles that have no
   acknowledgment concept. The contract has no applicability/abstention
   mechanism; the adapter must either refuse (calibrated) or fabricate and
-  false-hold (strict). This is a confirmed contract gap, now on the 0.4
-  fix list.
+  false-hold (strict). This is a confirmed contract gap. Its practical half
+  closed host-side rather than in the contract: the exported three-state
+  preflight (`adapters/README.md`) abstains explicitly, and replaying the same
+  408-record corpus gives 0 new false holds, 208 insufficient, detection 18/18
+  (`python -B adapters/outcome_receipt.py --check`). The contract-level half is
+  still open and is not on any 0.4 list — 0.4 shipped through 0.4.2 without an
+  `INAPPLICABLE` class, and `ERRATA.md` E7 defers it to a new sealed
+  generation.
 - Adapter burden: 768 fabricated field values across 384/408 decisions —
   the quantified form of the review's "the host does the hard part."
 

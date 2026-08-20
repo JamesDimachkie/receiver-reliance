@@ -242,8 +242,13 @@ external consumer — or any embedding where handoff senders are adversarial to 
 receiver's own tooling — promotes the deferred hardening set to blocking work
 before that embedding ships**. [ADOPTION.md](../../ADOPTION.md) states the same
 trigger once and names the rows: A4 (one bounded ingest law on every peripheral
-surface) and A6 (process-tree and deadline totality in the long-lived harnesses),
-with A5 reopened over one unmigrated harness.
+surface), A5 (no harness resolving a tool by bare name from the ambient `PATH`)
+and A6 (process-tree and deadline totality in the long-lived harnesses). All
+three closed on 2026-08-19, so the trigger now finds that set satisfied in
+advance. What a host owes is re-running their proof suites against the bytes it
+actually embeds — `portability/test_strict_ingest.py`,
+`portability/test_pinned_tools.py`, `perf/sidecar/test_supervision_bounds.py` —
+not waiting on open work.
 
 Committing this directory does not fire that trigger; wiring it into a host does,
 and an MCP gate's whole premise is that the sender of the record is not trusted

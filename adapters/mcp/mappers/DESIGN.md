@@ -25,7 +25,7 @@ Every mapper obeys the same four laws.
    as the shipped family assessor does, so drift surfaces as
    `PREFLIGHT_PROFILE_FACT_MISMATCH` → `REJECTED_INVALID` at the boundary rather
    than as a confidently wrong decision. This is verified by mutation:
-   `test_mcp_tool_result.py::preflight:tampered-profile-rejected`.
+   `../test_mcp_gate.py`, check `preflight:tampered-profile-rejected`.
 
 Contradiction is always checked before applicability
 (`adapters/CALIBRATION.md`): a detectable contradiction is `REJECTED_INVALID`
@@ -35,7 +35,14 @@ even when other semantics are unavailable.
 
 ## Implemented: `mcp_tool_result.py` — MCP `CallToolResult` → REF / OBL-02
 
-Status: **implemented and tested** (`../test_mcp_tool_result.py`, 76 checks).
+Status: **implemented and tested** (`../test_mcp_gate.py`, which reports
+`rr-mcp-gate regression: checks=103 failures=0` and is the suite the charter
+gate and `adapters/mcp/README.md` pin). Earlier revisions of this line cited
+`../test_mcp_tool_result.py` at 76 checks; no such file exists at any commit in
+this repository — `git log --all --follow` over that path returns nothing — and
+no program reports a 76-check figure. The mapper's cases were landed inside the
+aggregate suite, which reports only its total, so 103 is the only count here
+that recomputes.
 
 **Reliance question.** An agent received a tool result and intends to act on the
 record inside it. Is that record the exact record it asked for, and does the

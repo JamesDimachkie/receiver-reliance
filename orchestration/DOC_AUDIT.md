@@ -1,20 +1,24 @@
 # Documentary consistency audit
 
-> **Superseded counts (annotated 2026-08-17).** This audit is dated 2026-08-10
-> and its verification column records what was live *then*. Four of those
-> numbers have since moved, so this document must not be read as a current
-> validation gate:
+> **Superseded counts (annotated 2026-08-17, re-measured 2026-08-19).** This
+> audit is dated 2026-08-10 and its verification column records what was live
+> *then*. Four of those numbers have since moved, so this document must not be
+> read as a current validation gate:
 >
-> | Then | Now |
-> |---|---|
-> | grounded regression 504 checks | `checks=517 failures=0` |
-> | lint-gate meta-test 7 checks | `checks=9 failures=0` |
-> | authority census 111 semantic / 64 presence-only | `141 semantic / 34 presence_only` (of 199) |
-> | `verify_receipts` 154 checks | `checks=267 failures=0` |
+> | Then (2026-08-10) | 2026-08-17 | Now (2026-08-19) |
+> |---|---|---|
+> | grounded regression 504 checks | `checks=517 failures=0` | `checks=521 failures=0` |
+> | lint-gate meta-test 7 checks | `checks=9 failures=0` | `checks=9 failures=0` |
+> | authority census 111 semantic / 64 presence-only | `141 semantic / 34 presence_only` (of 199) | unchanged |
+> | `verify_receipts` 154 checks | `checks=267 failures=0` | `checks=297 failures=0` |
 >
-> ERRATA `F-WP2-001` records why the authority census moved: 30 dual-use fields
-> had been wrongly subtracted from the semantic count. The rows below are left
-> unedited on purpose — this is a dated observation record, not a dashboard.
+> The middle column is itself a dated observation and is kept rather than
+> overwritten: a "Now" column that gets silently rewritten is the failure this
+> table exists to expose. `python -B portability/verify_live.py` recomputes all
+> four at the bytes you have checked out. ERRATA `F-WP2-001` records why the
+> authority census moved: 30 dual-use fields had been wrongly subtracted from
+> the semantic count. The rows below are left unedited on purpose — this is a
+> dated observation record, not a dashboard.
 
 Audit date: 2026-08-10
 

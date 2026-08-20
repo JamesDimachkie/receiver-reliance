@@ -78,9 +78,13 @@ ALLOWED = {
         184,
         "2AEC5F8BC67945D7FC7913F46565E6E182E717720F0512B03FA6FC64CD1A145C",
     ),
+    # Re-bound 2026-08-19: the "Current receipts" section named the superseded
+    # 20260812 pair as current.  It now carries a currency block naming the
+    # admitted attempt9/attempt12 pair, and the file grew from 146 CRLF lines
+    # to 172.  CRLF custody terms are unchanged.
     "perf/PROFILE_ROBUSTNESS_20260811.md": (
-        146,
-        "AC0D43543BA6376F180053A6FCEE521CD603F797CEC463B92A4CBB6D3DAA679D",
+        172,
+        "AF38ADEA2E58228BF02CD4BCA1CA82C5FA12AE8B231D6583A49888FE29E683CB",
     ),
     # Both re-bound by the ERRATA E14 disposition: the WP5 verifier gained the
     # stale-provenance-pin table and SIDECAR.md stopped presenting a red command

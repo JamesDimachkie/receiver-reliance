@@ -88,7 +88,8 @@ characters succeeds and 139 fails.
 
 Requires CPython 3.12 or newer; 3.12, 3.13, and 3.14 are validated on the
 hosted matrix (see "Cross-platform validation" below), and re-run against a
-clean clone at `72efd11`, the tenth commit of this release, in
+clean clone at `72efd11` (2026-08-18; `git describe --tags` reports
+`v1.2-37-g72efd11`, and it precedes the `v1.2.1` tag by 26 commits), in
 [portability/THIRD_PARTY_REPRODUCTION_20260818.md](portability/THIRD_PARTY_REPRODUCTION_20260818.md).
 From `baseline-run/`:
 
@@ -1004,7 +1005,18 @@ re-verify what is here, run the conformance suite (the in-process mode runs
 from a clean clone; the sealed subprocess-ABI mode needs the separately
 reproduced `baseline-run/toolchain/python.exe`, and
 `baseline-run/verify_conformance_authority.py` reports its absence rather than
-skipping it), then re-derive every seal per the RUNBOOK, then, from the repository root, run
+skipping it), then re-derive the seals with the programs that actually do it —
+`python -B portability/verify_receipts.py` recomputes each committed receipt's
+self-zero digest and the source digests it records,
+`python -B baseline-run/verify_conformance_authority.py` recomputes each fixture
+pack's `authority_pins` against the sealed control bytes,
+`python -B perf/sidecar/verify_receipts.py` re-derives the admitted WP5
+receipts' raw and embedded seals, and
+`python -B second-implementation/verify_artifacts.py` re-derives the WP4 receipt
+bindings. (An earlier revision of this sentence said "re-derive every seal per
+the RUNBOOK". `baseline-run/RUNBOOK.md` states the seal *rules* and carries no
+re-derivation command, so that step could not be followed as written.) Then,
+from the repository root, run
 `python -B grounded-0_4/test_grounded_0_4.py`,
 `python -B grounded-0_4/lint_contract.py --gate`,
 `python -B grounded-0_4/test_lint_gate.py`,

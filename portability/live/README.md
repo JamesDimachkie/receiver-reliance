@@ -119,7 +119,7 @@ physical-line surface. Independent semantic expectations and cross-platform
 relations belong to `portability/oracle/`; this lane makes no independence
 claim for that local transport-parity comparison.
 
-The focused lane suite currently passes 29/29 tests. In addition to replaying
+The focused lane suite currently passes 33/33 tests. In addition to replaying
 all eight committed schedules twice on both real transports, it directly
 forces the watchdog, premature control EOF, and mismatched-control-event error
 paths and verifies their deterministic CLI receipts and exit classification,

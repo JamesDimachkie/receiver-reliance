@@ -39,7 +39,21 @@ these SHA-256 values:
 |---|---|
 | `oracle.py` | `2148F0C9C4ED38692B9C6658EC48CDD9628688E6C1708345C89A44AB91A05F17` |
 | `test_oracle.py` | `27DEBE76E80FAE81FBA9B6C26FF2451F688027C0DC15D4FEEAC8B8FAE71F9339` |
-| `PROVENANCE.md` | `74F4716D5FBE12DE875CD76D5FA7A42DA31C6F353A40083DC9DCB55CDE429999` |
+| `PROVENANCE.md` | `74F4716D5FBE12DE875CD76D5FA7A42DA31C6F353A40083DC9DCB55CDE429999` (as published; superseded — see below) |
+
+`oracle.py` and `test_oracle.py` still hash to the values above. `PROVENANCE.md`
+does not, and the published pin is kept rather than rewritten, on the E12
+disposition: a stale pin carrying its disclosure is honest, a silently refreshed
+one asserts a custody event that did not happen. Commit `7d1c6cb` (2026-08-18)
+replaced the maintainer's home directory in that file's source label with
+`<workspace>/` under ERRATA E15, taking it from 9,563 to 9,575 bytes and its
+SHA-256 to
+`F1941A39AF9E06C7D7AFE25A5D4572FD1E0045013D426DBA97175FEC5A27CF27`, which is
+what current bytes hash to. The digest of the source `PROVENANCE.md` *names*
+(`A7F955E227533FE5557133AD9B75C23C5C8AA76BD7FCC5E2037EBF47A5091934`) was not
+touched by that edit; `7d1c6cb`'s commit message says the file's own digest was
+untouched too, and that half of the message is wrong. No program enforces this
+table — it is a prose pin, recomputable by hand.
 
 Focused oracle tests pass 35/35. Four-pack validation admits 124 semantic and
 248 wrapper bindings, 372 unique records, with binding SHA-256

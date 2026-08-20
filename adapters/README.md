@@ -79,7 +79,7 @@ all-408 receipt with `python -B adapters/fixture_extract.py --check` and
 `python -B adapters/outcome_receipt.py --check`.
 
 Current-byte local evidence covers CPython 3.12, 3.13, and 3.14
-(`RUNTIME_EVIDENCE.md`, re-pinned 2026-08-13). The recorded runs meet the
+(`RUNTIME_EVIDENCE.md`, re-pinned 2026-08-18). The recorded runs meet the
 requested 3.12–3.14 evidence bar. Package completion beyond the delivered
 fallback is still not claimed.
 
