@@ -145,7 +145,7 @@ Becoming the first independent verifier takes three commands. The
 below.
 
 ```bash
-git clone -c core.longpaths=true https://github.com/JimGHTB12/receiver-reliance.git
+git clone -c core.longpaths=true https://github.com/JamesDimachkie/receiver-reliance.git
 cd receiver-reliance
 python -B portability/verify_live.py
 ```
@@ -241,7 +241,7 @@ characters —
 138 characters exceeds it, and git-for-windows ships `core.longpaths=false`:
 
 ```bash
-git clone -c core.longpaths=true https://github.com/JimGHTB12/receiver-reliance.git
+git clone -c core.longpaths=true https://github.com/JamesDimachkie/receiver-reliance.git
 ```
 
 Without the flag a deep destination fails as `error: unable to create file …:

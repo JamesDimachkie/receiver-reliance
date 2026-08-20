@@ -26,11 +26,16 @@ classifiers = [
     "Operating System :: OS Independent",
     "Topic :: Software Development :: Testing",
 ]
-# [project.urls] is added in the post-transfer commit: the URLs bake the repo
-# owner into any published wheel, and the owner changes at the ticket-09 org
-# transfer. No console script at 1.3.0 (nothing importable stands behind one);
-# no py.typed (annotation coverage unmeasured -- ship the marker only after a
-# measured pass, or it publishes a false claim).
+[project.urls]
+Homepage = "https://github.com/JamesDimachkie/receiver-reliance"
+Repository = "https://github.com/JamesDimachkie/receiver-reliance"
+Documentation = "https://github.com/JamesDimachkie/receiver-reliance#readme"
+Issues = "https://github.com/JamesDimachkie/receiver-reliance/issues"
+
+# Added post-transfer (ticket 09 executed 2026-08-20: org JamesDimachkie owns
+# this repository). No console script at 1.3.0 (nothing importable stands
+# behind one); no py.typed (annotation coverage unmeasured -- ship the marker
+# only after a measured pass, or it publishes a false claim).
 
 [tool.setuptools]
 packages = ["receiver_reliance"]

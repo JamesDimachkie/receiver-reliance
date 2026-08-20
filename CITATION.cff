@@ -12,7 +12,7 @@ type: software
 authors:
   - given-names: James
     family-names: Dimachkie
-repository-code: "https://github.com/JimGHTB12/receiver-reliance"
+repository-code: "https://github.com/JamesDimachkie/receiver-reliance"
 license: Apache-2.0
 # These two name the last cut release, tag `v1.2.1`, and are a matched pair:
 # they are a dated release record, not a description of the bytes you have
