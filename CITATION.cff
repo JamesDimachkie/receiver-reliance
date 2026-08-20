@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use or cite this artifact, please cite it as below."
-title: "Receiver-reliance baseline: conformance suite and reference implementation"
+title: "Receiver-reliance baseline — conformance suite and reference implementation"
 abstract: >-
   A deterministic, auditable comparator for the decision a receiving agent makes
   about records handed to it by another agent. Ships a frozen 28-operation
