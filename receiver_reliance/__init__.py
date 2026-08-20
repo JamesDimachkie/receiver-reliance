@@ -414,4 +414,8 @@ __all__ = [
     "DecisionObservation",
     "ENGINE_MANIFEST_SHA256",
 ]
-__version__ = "1.2.1"
+# Tracks pyproject.toml's `version`, and the two move together. A `.devN`
+# suffix means these bytes are past the last tag and are not a released
+# version: `git describe --tags` names the tag they are ahead of. Cutting a
+# release replaces the suffix; the next commit after a tag restores one.
+__version__ = "1.3.0.dev0"

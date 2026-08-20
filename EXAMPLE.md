@@ -138,7 +138,12 @@ classifies and seals. It never acts.
 ## Reproduce
 
 The three requests are canonical RFC 8785 JCS bytes with a trailing LF,
-as the wire contract requires. Expected responses, byte-exact:
+as the wire contract requires — exactly one LF, nothing after it, nothing
+before the JSON. Re-serializing one of these files without its terminator
+returns `PROTOCOL_ERROR` / `ERR_JSON`, whose frozen message says
+`Invalid JSON or trailing bytes.` even though the JSON is intact; the rule and
+that message's real scope are in README, "What you may call" and the `errors`
+row of "What you get back". Expected responses, byte-exact:
 
 | Request | Response SHA-256 |
 |---|---|

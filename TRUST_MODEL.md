@@ -85,7 +85,7 @@ document until this release:
 
 | Boundary | Untrusted side | Defense |
 |---|---|---|
-| Wire bytes → parser/engine | Fully attacker-controlled | One total bounded parser law: size before allocation, duplicate rejection, integer domain, NFC, deterministic errors |
+| Wire bytes → parser/engine | Fully attacker-controlled | One total bounded parser law: framing (one JCS line terminated by exactly one LF, nothing before or after — README, "What you may call"), size before allocation, duplicate rejection, integer domain, NFC, deterministic errors |
 | Host evidence → preflight | Attested, not authenticated | Three-state fail-closed preflight detects internal inconsistency; it cannot prove a lying observer (H1) |
 | Repository/bundle bytes → verifiers | Trusted **after** commit-root authentication | Digest pins detect drift; they do not authenticate an untrusted directory |
 | Supervisor ↔ sidecar child | Child output untrusted until correlated | Versioned envelope binding sequence + request-byte digest to a completely written request; no replay |

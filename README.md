@@ -4,6 +4,13 @@ Release 1.2.1 — the hardening point release of the 1.2 composed
 generation. License: Apache-2.0 (see `LICENSE`;
 Copyright 2026 James Dimachkie).
 
+**Which bytes this describes.** This document tracks `main`, which is normally
+ahead of the tag named above and may document surfaces that tag does not
+contain; `git describe --tags` is the discriminator, and a package version
+carrying a `.devN` suffix (`pyproject.toml`, `receiver_reliance.__version__`)
+says the checkout is past the last release rather than being it. Pin the tag
+for a fixed artifact, `git rev-parse HEAD` for exactly the bytes you ran.
+
 ## What this is, and where it comes from
 
 When one autonomous agent hands records to another — claims, versions,
@@ -60,6 +67,24 @@ via a machine-readable predicate table evaluated in frozen precedence order.
 attention card, so experiment arms can control for ceremony.
 
 ## Quickstart
+
+**Clone with long paths enabled on Windows.** The longest tracked path is 120
+characters —
+`replay-corpus/incidents/10-agentdojo-untrusted-content-trusted/records/defective-trusted-without-passing-validation.json`
+— so against Windows' 259-character limit any destination directory longer than
+138 characters exceeds it, and git-for-windows ships `core.longpaths=false`:
+
+```bash
+git clone -c core.longpaths=true https://github.com/JimGHTB12/receiver-reliance.git
+```
+
+Without the flag a deep destination fails as `error: unable to create file …:
+Filename too long` / `warning: Clone succeeded, but checkout failed.`, which
+leaves a half-populated working tree rather than no clone at all — repair one
+with `git config core.longpaths true` followed by
+`git restore --source=HEAD --staged --worktree :/`. Shallow destinations
+(`C:\dev\…`) and macOS and Linux are unaffected; measured 2026-08-19, 138
+characters succeeds and 139 fails.
 
 Requires CPython 3.12 or newer; 3.12, 3.13, and 3.14 are validated on the
 hosted matrix (see "Cross-platform validation" below), and re-run against a
@@ -214,8 +239,19 @@ read as claiming; nothing here adds a guarantee.
 of the manifest that gated the import, which is what a third party compares
 against the repository's. The literal value is deliberately not repeated here:
 any engine change rotates it, and a stale digest in this README would be a new
-claim gap of exactly the kind this section exists to close. It is pinned in
-[portability/THIRD_PARTY_REPRODUCTION_20260818.md](portability/THIRD_PARTY_REPRODUCTION_20260818.md).
+claim gap of exactly the kind this section exists to close. **Recompute it, do
+not look it up:** `python -B receiver_reliance/generate_engine_manifest.py
+--check` prints the current file count, total byte length and
+`manifest_sha256` from the checkout you hold, and `import receiver_reliance`
+gates the same eleven files by length and SHA-256 before any engine byte runs,
+so a checkout that does not hold the published bytes fails at import rather
+than at a comparison. A dated digest recorded in a document is a witness to
+what one run observed, never the live pin — the engine has rotated since the
+one in
+[portability/THIRD_PARTY_REPRODUCTION_20260818.md](portability/THIRD_PARTY_REPRODUCTION_20260818.md)
+was measured (`ERRATA.md` E18; that file's "Engine-manifest currency" section
+records the rotation), and comparing a fresh clone against that record's
+digest mismatches by design rather than by tampering.
 
 `decide_audited(request)` takes a Python object **or** exact wire bytes and
 returns the audited envelope described below. `bytes` is the wire form; a
@@ -224,6 +260,17 @@ refused as `ERR_JSON`. An object is canonicalized under the frozen wire limits
 — 16,777,216 request bytes, 128 nesting levels, 100,000 aggregate members or
 items, integers within the IEEE-754 safe range — and a request that cannot be
 canonicalized is refused rather than truncated or coerced.
+
+**Framing, on the wire path only: wire bytes are one JCS line terminated by
+exactly one LF.** Nothing may follow that LF and nothing may precede the JSON.
+Zero trailing LFs, two, a CRLF, or one trailing space all refuse as `ERR_JSON`,
+including on bytes whose JSON is well-formed and canonical — so a caller who
+re-serializes a request correctly and omits the terminator still gets a
+`PROTOCOL_ERROR`. The object path frames for you: `decide_audited(obj)`
+canonicalizes and terminates, which is why the same request succeeds as an
+object and fails as bytes. `EXAMPLE.md`'s "Reproduce" section and every file in
+`examples/` are written this way, and `rr_batch.serve` applies the same rule per
+physical line.
 
 `closure_findings(obligation_id, decision_input)` returns the tighten-only
 findings for one obligation without running a decision. Its surface is narrow
@@ -401,7 +448,7 @@ path-conditional, and their absence is meaningful:
 | `governing_authorities` | Always | Closed six keys, each 64 uppercase hex: `closure_policy_sha256`, `authority_register_sha256`, `engine_capabilities_sha256`, `engine_runner_sha256`, `decision_table_contract_sha256`, `composed_contract_sha256`. These are the bytes that governed this decision (`ERRATA.md` E8, E18). The grounded evaluator's own bytes are **not** among them; they are authenticated by the commit root alone. |
 | `decision_input_sha256` | Always | 64 uppercase hex over the JCS bytes of `decision_input`, or null when the request never reached classification. |
 | `object_request_error` | Only when a Python object could not be canonicalized | Closed: `ERR_JSON`, `ERR_NUMBER`, `ERR_LIMIT`. Its presence means refusal, not classification. |
-| `errors` | Only when the sealed response is not `ok` | The sealed error array, each entry `{code, pointer, message, precedence}`. One error per response, by the deterministic error law. |
+| `errors` | Only when the sealed response is not `ok` | The sealed error array, each entry `{code, pointer, message, precedence}`. One error per response, by the deterministic error law. **`ERR_JSON`'s frozen message, `Invalid JSON or trailing bytes.`, is broader than it reads:** it is also what a framing violation selects — wire bytes with no trailing LF, more than one, a CRLF, or any byte outside the single terminated JCS line — on input whose JSON parses and is canonical. The message text is sealed and cannot be narrowed, so read `ERR_JSON` with an empty pointer as "the framing or the JSON", and check the terminator first. |
 | `first_match_predicates` | Only when the sealed response is `ok` | Closed three keys — the three defect classes — with boolean values. **At most one is true.** This is the short-circuited evaluation order: after a match, later classes read false because they were not evaluated. It is not the same field as a fixture entry's `first_match_predicates`, where more than one can be true (`baseline-run/RUNBOOK.md`); do not read one as the other. |
 | `matched_class_witness` | Only when the sealed response is `ok` | Array of atoms from the matched class predicate: `{op, pointers}`, or `{op: "not", of: ...}`. Empty when the **sealed** class is `VALID`, there being no matched predicate to witness — including when a closure then tightened the audited class to a defect, because the witness traces the frozen predicate table and not the closures. That evidence is in `closure_findings`. |
 | `record_references` | Only when the sealed response is `ok` | `derive_record_references` over `decision_input.facts`: sorted, deduplicated, at most 64 strings. This is the derived list the sealed response lacks. |
