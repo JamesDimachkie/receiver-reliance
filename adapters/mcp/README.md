@@ -217,8 +217,13 @@ The applicability result the abstention design rests on — 18/18 detection at z
 new false holds — is `proof/RESULTS.md` and `adapters/OUTCOME.md`, measured over
 the synthetic 408-record corpus, not over MCP traffic. The mapper here covers one
 family and one obligation: `REF` / OBL-02, exact reference resolution. Everything
-else abstains as `PREFLIGHT_FAMILY_UNCALIBRATED`. No measurement exists for MCP
-traffic of any kind, because none has been run.
+else abstains as `PREFLIGHT_FAMILY_UNCALIBRATED`. Until 2026-08-20 no measurement
+existed for MCP traffic of any kind; on that date the maintainer ran the first
+one — twelve tool results captured from three locally-run open-source reference
+servers and classified through this gate, retained as harness-side internal
+evidence, not published in this repository. It measured presence of integrity
+semantics on the transport, not detection, accuracy, or efficacy; the mapper's
+coverage statement above is unchanged by it.
 
 ## What this does not claim
 
