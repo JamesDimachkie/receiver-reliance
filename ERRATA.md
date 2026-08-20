@@ -155,7 +155,7 @@ Two honest limits. First, the fallback is deliberately narrow: WP1 reached its
 three-strike boundary at `F-WP1-009`, so this is a preflight for native evidence
 plus optional host-produced profiles — **not** a general host adapter, runner,
 transcript verifier, replay store, or effect API. `READY` does not authorize
-invocation by itself; H1–H6 still bind the integration. Second, abstention is
+invocation by itself; H1–H7 still bind the integration. Second, abstention is
 not free: 208 of 408 rows abstain because timestamps do not establish
 acknowledgment semantics, so a host wanting decisions on those rows must supply
 the missing semantics.
@@ -808,7 +808,7 @@ would have been the same defect as E19 itself, one release later.
 
 *Enforcement:* `--corpus --check` is in the README re-verification battery, so
 a corpus that stops being the one the prose names fails a listed command. It is
-deliberately **not** a twentieth row in the charter gate or the hosted matrix:
+deliberately **not** a twenty-first row in the charter gate or the hosted matrix:
 adding a gate row is the evidence-regeneration event E12 and E14 describe, and
 this correction did not earn one. Stated so a reader does not assume CI covers
 it — a clone does, on the listed command. `--measure` measures on the caller's

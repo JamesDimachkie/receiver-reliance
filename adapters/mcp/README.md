@@ -194,7 +194,7 @@ a review, or does nothing is a decision this server deliberately does not make.
 
 ## What stays with the host
 
-The adapter makes [HOST_OBLIGATIONS.md](../../HOST_OBLIGATIONS.md) H1–H6 easier
+The adapter makes [HOST_OBLIGATIONS.md](../../HOST_OBLIGATIONS.md) H1–H7 easier
 to satisfy. It absorbs none of them.
 
 | | Obligation | Still the host's, specifically |

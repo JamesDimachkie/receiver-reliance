@@ -29,7 +29,7 @@ Tools:
 
 Posture: **OBSERVE by default** — classify and log, never block. ENFORCE exists
 (``RR_MCP_GATE_ENFORCE=1``) and ships off. Enforcement policy is the host's
-(HOST_OBLIGATIONS H1-H6 stay with the host in both postures).
+(HOST_OBLIGATIONS H1-H7 stay with the host in both postures).
 
 Claim discipline: classification and sealed-audit value only. No efficacy,
 security, or behavioral-improvement claim; ``READY`` is eligibility, never a
@@ -609,7 +609,7 @@ INSTRUCTIONS = (
     "NO_FINDING means the engine found no defect on the obligation checked, HOLD names "
     "a detected defect, ABSTAIN means the record does not carry that obligation's "
     "semantics. Enforcement, state truthfulness, atomicity, derivation, input binding, "
-    "and effects remain the host's obligations (HOST_OBLIGATIONS H1-H6)."
+    "and effects remain the host's obligations (HOST_OBLIGATIONS H1-H7)."
 )
 
 

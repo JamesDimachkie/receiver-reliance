@@ -6,7 +6,7 @@
 > today should expect: grounded-0.4 regression `checks=521 failures=0`;
 > lint-gate meta-test `checks=9 failures=0`; authority ledger `141 semantic /
 > 34 presence_only / 10 inert_disclosed / 14 inert_registered_debt` of 199
-> required fields; `verify_receipts.py` `checks=297 failures=0`;
+> required fields; `verify_receipts.py` `checks=300 failures=0`;
 > `verify_hygiene.py` `HYGIENE_PASS allowed_raw_receipt_warnings=1143
 > admitted_diagnostics=5 unexpected_diagnostics=0 custody_hashes=17/17`. The
 > 2026-08-17 revision of this block said 517, 267 and 1120 — true then, wrong

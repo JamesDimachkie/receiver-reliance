@@ -8,9 +8,12 @@
 
 Release 1.2.1, the hardening point release of the 1.2 composed generation.
 Apache-2.0 (`LICENSE`, Copyright 2026 James Dimachkie). Cite it with
-[CITATION.cff](CITATION.cff). Every published result here is mechanically
-re-derivable from published bytes. [ADOPTION.md](ADOPTION.md) ledgers what is
-recorded and unfixed between this artifact and one you can adopt.
+[CITATION.cff](CITATION.cff). The artifact's ledgered claim
+([ADOPTION.md](ADOPTION.md)) is that every published result is mechanically
+re-derivable from published bytes; `verify_live` states, class by class,
+what it recomputes at the bytes you hold and what only replays against
+recorded transcripts. The same ledger records what is recorded and unfixed
+between this artifact and one you can adopt.
 
 ## The decision surface, as sets
 
@@ -129,7 +132,11 @@ outside the maintainer's control**. Inside that boundary there are two kinds:
 the in-repo surface — the proof harness, the lanes, the verifiers, and
 `adapters/mcp/` — and the maintainer's own agent harness, where the MCP gate
 runs as a user-scope stdio server. Nothing here has been load-tested by an
-integrator other than its author.
+integrator other than its author. A second limit belongs beside that one:
+every evidence lane in this repository points at a single implementation by
+a single author — no conforming second implementation exists, so byte-parity
+here is self-parity (`ADOPTION.md` A3; [TRUST_MODEL.md](TRUST_MODEL.md)
+states it canonically).
 
 Becoming the first independent verifier takes three commands. The
 `core.longpaths` flag is a Windows requirement, explained under Quickstart
@@ -178,7 +185,8 @@ receipts. This repository is the **baseline layer** of a research program
 studying that decision. It ships a frozen 28-operation decision engine ("B1")
 and a supplemental 2-operation generation that closes its reviewed capability
 gaps. It also ships their conformance fixture suites, and reference
-implementations that reproduce both suites byte-for-byte. The composed
+implementations — by the same author — that reproduce both suites
+byte-for-byte. The composed
 30-operation surface was ruled complete by a candidate-blind completeness
 review against a hash-pinned prior-art basis, under "The supplemental 0.3
 generation" below. "B1-ATTENTION" is the same engine behind a wrapper that
@@ -363,10 +371,11 @@ request admission. H1–H7 remain yours regardless of preflight status. For deci
 on, call `decide_audited` (see the grounded 0.4 layer below), not the frozen
 response path.
 
-Honest status on adoption: `TRUST_MODEL.md`'s census, re-run 2026-08-19,
-records **zero consumers outside the maintainer's control** — an in-repo
-surface (`adapters/mcp/`) and one sibling integration in the maintainer's own
-workspace, and nobody else. That page also records what the sentence used to
+Honest status on adoption: `TRUST_MODEL.md`'s census, re-run 2026-08-20
+(twice — the second run recorded the sibling integration's retirement),
+records **zero consumers outside the maintainer's control** — inside the
+boundary, the in-repo surface and the maintainer's own agent harness, and
+nobody else. That page also records what the sentence used to
 say and why it was wrong. Nothing here has been load-tested by an integrator
 other than its author, and the applicability limits in `ERRATA.md` E7 are the
 first thing a new consumer should read. What is recorded-and-unfixed between
@@ -738,7 +747,7 @@ everything else abstains as `PREFLIGHT_FAMILY_UNCALIBRATED`.
 - **`continuation-specs/`.** Proposed drafts: not adopted, not implemented, not
   evidence. Fields named only there describe a generation that does not exist in
   this release.
-- **Any surface as adversarial-grade.** `TRUST_MODEL.md`'s 2026-08-19 census
+- **Any surface as adversarial-grade.** `TRUST_MODEL.md`'s 2026-08-20 census
   records zero consumers outside the maintainer's control. Nothing above is a
   security, interoperability, or efficacy claim; it is a description of what the
   current bytes expose.

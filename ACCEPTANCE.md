@@ -211,9 +211,10 @@ implementations. What landed, each with its own evidence record:
   OS/architecture rows, and a hardened daemon-real Linux container gate,
   with all hosted receipts committed under `portability/receipts/hosted/`
   and bound by `portability/verify_receipts.py`, which reported 267 checks at
-  the 2026-08-18 publication and reports `checks=297 failures=0` at this tip —
-  the charter gate grew from eleven commands to nineteen and Event B bound the
-  two regeneration receipts (`orchestration/PORTABILITY_VALIDATION.md`);
+  the 2026-08-18 publication and reports `checks=300 failures=0` at this tip —
+  the charter gate grew from eleven commands to nineteen (Event B bound the
+  two regeneration receipts, `orchestration/PORTABILITY_VALIDATION.md`) and
+  to twenty with the release-identity gate, 2026-08-20;
 - the blind completeness review's published input bundle (`evidence/`);
 - repository consolidation to a single public `main`, with the first
   public run's authority-pin failure adjudicated as F-MATRIX-014 rather

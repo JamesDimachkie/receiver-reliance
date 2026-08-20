@@ -34,7 +34,10 @@ signature edge.
 
 **One limit governs every row of the table above.** Every conformance suite,
 fuzz campaign, differential campaign, oracle, portability lane and receipt in
-this repository points at the same implementation. No conforming second
+this repository points at the same implementation — the one apparent
+exception, the `law/` differential's second engine, is the refuted `rr2.py`
+running as a fidelity control on the checker, not a conforming
+implementation (`ADOPTION.md`, the A3 note). No conforming second
 implementation exists (`ADOPTION.md` A3); the one author-separated attempt was
 refuted over 592 confirmed divergences across five independent mechanisms. So
 byte-parity here is a property of the reference implementation against itself,

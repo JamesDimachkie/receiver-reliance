@@ -30,7 +30,7 @@ if result.status != READY:
 
 `READY` does not authorize invocation by itself. The integration still owns
 atomic state observation, profile construction, engine request binding,
-runner custody, replay, transcripts, and effects under H1–H6.
+runner custody, replay, transcripts, and effects under H1–H7.
 
 ## Portable JSONL CLI
 

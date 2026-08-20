@@ -178,7 +178,7 @@ def main() -> int:
         }
     )
 
-    print("replayed, and why it cannot be recomputed here:")
+    print("What is replayed only, and why it cannot be recomputed here:")
     for target, reason in REPLAY_ONLY:
         print(f"  {target}\n      {reason}")
     print(f"recomputed here: the {len(expanded_gate.GATES)}-command charter gate,")

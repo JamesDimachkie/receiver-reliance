@@ -143,7 +143,7 @@ not a caution.
 host supplied. Also not shown: `decide_audited`, the preflight, the shape of the envelope, and the
 four classes. Those are A2, A3, A4 and B2.
 
-**Sources:** `HOST_OBLIGATIONS.md` H1–H6 (H4: *"forcing it produced 133 false holds"*);
+**Sources:** `HOST_OBLIGATIONS.md` H1–H7 (H4: *"forcing it produced 133 false holds"*);
 `proof/RESULTS.md` (the `b1` arm at false-hold rate 0.341 and the per-family table — clean-n 208 +
 9 + 170 + 3 = 390; the `b1_calibrated` arm at 18/18 detection and zero false holds);
 `EXAMPLE.md` "Who owns what"; `README.md` opening;

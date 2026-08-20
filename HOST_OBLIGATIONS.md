@@ -79,6 +79,12 @@ transcripts and verify with the core transcript evaluator. Do not present a
 bare sealed receipt as evidence of *what* was decided — it proves only that
 *a* decision of that class was sealed under that request id.
 
+The supported import for that surface is the package, from a checkout root:
+`import receiver_reliance as rr; rr.decide_audited(request)` — the
+`grounded-0_4/` directory name is a filesystem path, not an importable
+module. A ready-made request envelope is `examples/handoff-clean.json`, and
+[EXAMPLE.md](EXAMPLE.md) walks it end to end.
+
 *Conformance check:* `python -B grounded-0_4/test_grounded_0_4.py` (the
 BINDING section) — two different fact profiles must never share an audit
 seal in your pipeline.

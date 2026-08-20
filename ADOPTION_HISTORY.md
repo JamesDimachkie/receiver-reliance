@@ -131,9 +131,12 @@ in flight, outside this repo
 
 
 **Dated correction, 2026-08-20 (appended; nothing above rewritten).** Two
-present-tense phrases in this section — "in flight, outside this repo" —
-were true when written and are stale as of this date: the B1 comparator
-lane's current generation has no scheduled attempt. The live row
+present-tense statements in this section were true when written and are
+stale as of this date: "The live attempt is the B1 comparator packet lane,
+external to this repository" and the status phrase "in flight, outside
+this repo" (the same phrase stands in this file's top index row for A3,
+kept there as a record). The B1 comparator lane's current generation has
+no scheduled attempt. The live row
 (`ADOPTION.md` A3) now reads "Open — no attempt scheduled." This page is a
 record; the sentences above keep the wording they had when the events they
 describe happened.
