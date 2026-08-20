@@ -1,15 +1,17 @@
 # Deterministic fuzz campaign report
 
-> **Current re-run values (re-measured 2026-08-19).** This is a dated report;
-> the inline counts below are as-of its date and several have since moved as
+> **Current re-run values (re-measured 2026-08-20, every value re-run at the
+> re-date).** This is a dated report; the inline counts below are as-of its
+> date and several have since moved as
 > later waves added regressions and custody bindings. A third party re-running
 > today should expect: grounded-0.4 regression `checks=521 failures=0`;
 > lint-gate meta-test `checks=9 failures=0`; authority ledger `141 semantic /
 > 34 presence_only / 10 inert_disclosed / 14 inert_registered_debt` of 199
 > required fields; `verify_receipts.py` `checks=300 failures=0`;
-> `verify_hygiene.py` `HYGIENE_PASS allowed_raw_receipt_warnings=1143
+> `verify_hygiene.py` `HYGIENE_PASS allowed_raw_receipt_warnings=1145
 > admitted_diagnostics=5 unexpected_diagnostics=0 custody_hashes=17/17`. The
-> 2026-08-17 revision of this block said 517, 267 and 1120 — true then, wrong
+> 2026-08-19 revision of this block said 297 and 1143; the
+> 2026-08-17 revision said 517, 267 and 1120 — true then, wrong
 > by the time anyone read them, which is why the durable route is
 > `python -B portability/verify_live.py`: it recomputes every one of these at
 > the bytes you have checked out rather than asking you to trust a transcribed

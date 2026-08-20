@@ -19,7 +19,9 @@ between this artifact and one you can adopt.
 
 **The decision law.** Each of the 30 operations classifies a fact profile
 through one machine-readable predicate table, evaluated in frozen precedence
-order. The first match stops the loop, so at most one predicate is ever true.
+order. The first matching predicate determines the class; later predicates
+are not evaluated. (Inputs can satisfy more than one row — precedence is
+load-bearing, and `law/PROOF_REPORT.md` records exactly that.)
 
 | Order | Class |
 |---|---|
@@ -63,7 +65,7 @@ remain yours regardless of preflight status.
 The 30 obligations themselves are tabled verbatim in [DIAGRAMS.md, the
 appendix](DIAGRAMS.md#appendix--the-thirty-operations-in-the-contracts-own-words).
 
-## The measured result: abstaining beat guessing
+## The measured classification result: abstention versus forced classification
 
 Forcing an obligation onto records whose native semantics were absent produced
 133 false holds across 390 clean records, a rate of 34.1%. The three-state

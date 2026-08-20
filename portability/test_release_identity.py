@@ -13,7 +13,12 @@ What it enforces, each failing loudly in both directions:
 1. ``pyproject.toml`` ``[project] version`` equals ``receiver_reliance.__version__``
    (their agreement was previously a prose comment at ``__init__.py:426``).
 2. ``README.md``'s H1 equals ``CITATION.cff``'s ``title`` — one canonical name.
-3. ``CITATION.cff``'s ``version`` names a tag that exists (``v<version>``).
+3. ``CITATION.cff``'s ``version`` names the LATEST release tag reachable from
+   ``HEAD`` — not merely some existing tag. A CFF left pinned to an older
+   release passes an existence check and is exactly the decay this gate is
+   for, so existence is not the bar (found by cross-author review,
+   2026-08-20: substituting the older real tag passed the first cut of this
+   gate). A tag on an unrelated or unmerged history cannot satisfy the check.
 4. ``CITATION.cff``'s ``date-released`` is that tag's date, UTC: the tagger date
    of an annotated tag, the committer date of a lightweight one. "Cut date" IS
    the tag's own timestamp — decided semantics, so a CFF bumped ahead of the tag
@@ -29,7 +34,9 @@ files. Shelling out would make the gate's verdict depend on which lane runs it
 exists for). So refs, loose objects, and pack files are parsed directly from
 ``.git`` with the stdlib: one code path, no subprocess, every lane identical.
 
-Stdlib-only, deterministic, network-free, read-only.
+Stdlib-only, deterministic, network-free, read-only. SHA-1 object format
+only, declared and checked: a repository with ``extensions.objectformat =
+sha256`` fails closed with a named reason rather than misparsing.
 """
 from __future__ import annotations
 
@@ -100,6 +107,145 @@ def _tag_ref_sha(common: pathlib.Path, tag_name: str) -> str:
             if name.strip() == want and re.fullmatch(r"[0-9a-f]{40}", sha):
                 return sha
     raise GitReadError(f"tag {tag_name!r} not found in loose refs or packed-refs")
+
+
+def _object_format_guard(common: pathlib.Path) -> None:
+    """Fail closed, by name, on SHA-256 repositories (declared limit)."""
+    config = common / "config"
+    if config.is_file():
+        text = config.read_text(encoding="utf-8", errors="replace")
+        match = re.search(r"^\s*objectformat\s*=\s*(\S+)", text, re.MULTILINE)
+        if match and match.group(1).lower() != "sha1":
+            raise GitReadError(
+                f"object format {match.group(1)!r} is not supported: this gate "
+                "reads SHA-1 repositories only (declared limit)"
+            )
+
+
+def _release_tags(common: pathlib.Path) -> dict[str, str]:
+    """Every ``v<digits[.digits...]>`` tag -> object id, loose refs winning."""
+    tags: dict[str, str] = {}
+    packed = common / "packed-refs"
+    if packed.is_file():
+        for line in packed.read_text(encoding="utf-8").splitlines():
+            if line.startswith(("#", "^")) or not line.strip():
+                continue
+            sha, _, name = line.partition(" ")
+            name = name.strip()
+            if name.startswith("refs/tags/") and re.fullmatch(r"[0-9a-f]{40}", sha):
+                short = name[len("refs/tags/"):]
+                if re.fullmatch(r"v\d+(\.\d+)*", short):
+                    tags[short] = sha
+    loose_dir = common / "refs" / "tags"
+    if loose_dir.is_dir():
+        for path in loose_dir.iterdir():
+            if path.is_file() and re.fullmatch(r"v\d+(\.\d+)*", path.name):
+                sha = path.read_text(encoding="utf-8").strip()
+                if re.fullmatch(r"[0-9a-f]{40}", sha):
+                    tags[path.name] = sha
+    return tags
+
+
+def _peel_to_commit(common: pathlib.Path, sha: str) -> str:
+    """Follow annotated-tag objects to the commit they name (bounded)."""
+    for _ in range(10):
+        obj_type, body = _read_object(common, sha)
+        if obj_type == "commit":
+            return sha
+        if obj_type != "tag":
+            raise GitReadError(f"object {sha} peels to a {obj_type}, not a commit")
+        match = re.match(rb"object ([0-9a-f]{40})\n", body)
+        if match is None:
+            raise GitReadError(f"tag object {sha} has no object line")
+        sha = match.group(1).decode("ascii")
+    raise GitReadError("tag chain deeper than ten objects")
+
+
+def _head_commit(common: pathlib.Path, git_dir: pathlib.Path) -> str:
+    head = (git_dir / "HEAD").read_text(encoding="utf-8").strip()
+    if head.startswith("ref:"):
+        ref = head.split(":", 1)[1].strip()
+        loose = common / ref
+        if loose.is_file():
+            return loose.read_text(encoding="utf-8").strip()
+        packed = common / "packed-refs"
+        if packed.is_file():
+            for line in packed.read_text(encoding="utf-8").splitlines():
+                if line.startswith(("#", "^")) or not line.strip():
+                    continue
+                sha, _, name = line.partition(" ")
+                if name.strip() == ref:
+                    return sha
+        raise GitReadError(f"HEAD ref {ref!r} not found")
+    if re.fullmatch(r"[0-9a-f]{40}", head):
+        return head
+    raise GitReadError(f"unreadable HEAD: {head!r}")
+
+
+def _reachable(common: pathlib.Path, target: str, head: str, cap: int = 200_000) -> bool:
+    """BFS over commit parents from HEAD; bounded so a pathological history
+    fails loudly instead of hanging."""
+    seen: set[str] = set()
+    frontier = [head]
+    while frontier:
+        if len(seen) > cap:
+            raise GitReadError(f"history walk exceeded {cap} commits")
+        sha = frontier.pop()
+        if sha == target:
+            return True
+        if sha in seen:
+            continue
+        seen.add(sha)
+        obj_type, body = _read_object(common, sha)
+        if obj_type != "commit":
+            raise GitReadError(f"history walk met a {obj_type} object")
+        headers = body.split(b"\n\n", 1)[0]
+        for match in re.finditer(rb"^parent ([0-9a-f]{40})$", headers, re.MULTILINE):
+            frontier.append(match.group(1).decode("ascii"))
+    return False
+
+
+def _semver_key(tag_name: str) -> tuple[int, ...]:
+    return tuple(int(part) for part in tag_name[1:].split("."))
+
+
+def latest_release_error(
+    cff_version: str, reachable_release_tags: dict[str, bool]
+) -> str | None:
+    """PURE adjudicator so the negative arms are testable everywhere.
+
+    ``reachable_release_tags``: tag name -> reachable-from-HEAD. The law: the
+    CFF must name exactly the semver-maximum among the REACHABLE release tags.
+    A CFF naming an older tag (stale pin) fails; a CFF naming an unreachable
+    tag (unrelated or unmerged history) fails; higher tags that are not
+    reachable from this HEAD do not raise the bar for this checkout.
+    """
+    reachable = [name for name, ok in reachable_release_tags.items() if ok]
+    if not reachable:
+        return "no release tag is reachable from HEAD"
+    latest = max(reachable, key=_semver_key)
+    want = f"v{cff_version}"
+    if want not in reachable_release_tags:
+        return f"CITATION.cff names {want}, which is not a release tag"
+    if not reachable_release_tags[want]:
+        return f"CITATION.cff names {want}, which is not reachable from HEAD"
+    if want != latest:
+        return (
+            f"CITATION.cff names {want} but the latest reachable release tag "
+            f"is {latest} — the CFF pin is stale"
+        )
+    return None
+
+
+def reachable_release_map(repo: pathlib.Path) -> dict[str, bool]:
+    git_dir = _git_dir(repo)
+    common = _common_dir(git_dir)
+    _object_format_guard(common)
+    head = _head_commit(common, git_dir)
+    return {
+        name: _reachable(common, _peel_to_commit(common, sha), head)
+        for name, sha in _release_tags(common).items()
+    }
 
 
 def _read_loose(common: pathlib.Path, sha: str) -> tuple[str, bytes] | None:
@@ -255,6 +401,7 @@ def tag_date_utc(repo: pathlib.Path, tag_name: str) -> str:
     either line are already UTC; the recorded zone offset is display-only.
     """
     common = _common_dir(_git_dir(repo))
+    _object_format_guard(common)
     obj_type, body = _read_object(common, _tag_ref_sha(common, tag_name))
     field = {"tag": "tagger", "commit": "committer"}.get(obj_type)
     if field is None:
@@ -270,6 +417,7 @@ def tag_date_utc(repo: pathlib.Path, tag_name: str) -> str:
 
 
 def tag_exists(repo: pathlib.Path, tag_name: str) -> bool:
+    # Existence alone is NOT the identity law (see latest_release_error).
     try:
         _tag_ref_sha(_common_dir(_git_dir(repo)), tag_name)
         return True
@@ -333,13 +481,38 @@ class ReleaseIdentityGate(unittest.TestCase):
             "the same string (tickets 01+03 item 1)",
         )
 
-    def test_cff_version_names_an_existing_tag(self) -> None:
-        version = _cff_field("version")
-        self.assertTrue(
-            tag_exists(REPO, f"v{version}"),
-            f"CITATION.cff version {version!r} names tag v{version}, which "
-            "does not exist — a CFF bumped ahead of the actual tag fails here",
+    def test_cff_names_the_latest_reachable_release_tag(self) -> None:
+        error = latest_release_error(_cff_field("version"), reachable_release_map(REPO))
+        self.assertIsNone(
+            error,
+            f"{error} — existence is not the bar: a stale CFF naming an older "
+            "real tag, and a CFF naming an unreachable tag, both fail here",
         )
+
+    def test_stale_cff_is_rejected(self) -> None:
+        error = latest_release_error("1.2", {"v1.2": True, "v1.2.1": True})
+        self.assertIsNotNone(error)
+        self.assertIn("stale", error)
+
+    def test_unreachable_tag_is_rejected_and_does_not_raise_the_bar(self) -> None:
+        self.assertIsNone(
+            latest_release_error("1.2.1", {"v1.2.1": True, "v1.3": False}),
+            "an unreachable higher tag must not raise the bar for this checkout",
+        )
+        error = latest_release_error("1.3", {"v1.2.1": True, "v1.3": False})
+        self.assertIsNotNone(error)
+        self.assertIn("not reachable", error)
+
+    def test_sha256_object_format_fails_closed(self) -> None:
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp:
+            common = pathlib.Path(tmp)
+            (common / "config").write_text(
+                "[extensions]\n\tobjectformat = sha256\n", encoding="utf-8"
+            )
+            with self.assertRaises(GitReadError):
+                _object_format_guard(common)
 
     def test_cff_date_released_is_the_tag_date_utc(self) -> None:
         version = _cff_field("version")

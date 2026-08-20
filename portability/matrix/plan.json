@@ -581,7 +581,7 @@
         "cwd": ".",
         "argv": ["{python}", "-B", "portability/test_release_identity.py"],
         "timeout_seconds": 300,
-        "expected": {"tests": [5]}
+        "expected": {"tests": [8]}
       }
     ],
     "free_threaded_extra": [

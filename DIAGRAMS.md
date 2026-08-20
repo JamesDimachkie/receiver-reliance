@@ -87,7 +87,7 @@ flowchart LR
   accTitle: The division of labour between host and engine
   accDescr: The host retrieves records, stamps integer instants and assembles one fact profile per obligation, and the engine classifies that account and seals it while never reading a record, consulting a clock, or executing an effect.
 
-  subgraph owned_host["Host owns, under H1 to H6"]
+  subgraph owned_host["Host owns, under H1 to H7"]
     records{{"Records, and whether they are true"}}
     clock{{"Clocks, ordering, concurrency"}}
     effects{{"Execution and enforcement"}}
