@@ -289,7 +289,7 @@
         "cwd": ".",
         "argv": ["{python}", "-B", "portability/verify_receipts.py"],
         "timeout_seconds": 300,
-        "expected": {"checks": [297], "failures": [0]}
+        "expected": {"checks": [300], "failures": [0]}
       },
       {
         "id": "decision-law-structural",

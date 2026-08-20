@@ -192,7 +192,7 @@ SOURCE_PIN_ERRATA = {
 # CHECK COUNT, and that is not optional bookkeeping: _verify_clean_gate_receipt
 # spends three checks per recorded command (.exit, .stream_binding,
 # .validator_rerun), so the total moves by 3 per command added or removed
-# (currently 297 at 19 recorded commands; a rebinding that keeps the command
+# (currently 300 at 20 recorded commands; a rebinding that keeps the command
 # count keeps the total).  When it moves, four pins carry the old number and
 # move in the SAME commit as the rebinding above, or this program's own gate
 # rejects it:
@@ -209,19 +209,19 @@ SOURCE_PIN_ERRATA = {
 # this file exists to catch.
 #
 # Then, in this order: verify_receipts <new count>/0, then verify_live green at
-# gates=19, then portability/test_strict_ingest.py green -- it runs
+# gates=20, then portability/test_strict_ingest.py green -- it runs
 # verify_receipts end to end, so it is red until this binding is current and is
 # the second observation of this one root cause, not a second defect.  The old
 # receipt stays on disk as chronology, exactly as 7d1c6cb did.
 HARDENING_GATE_RECEIPT = (
-    REPO / "portability" / "receipts" / "local-expanded-gate-hardening-80f2dba.json"
+    REPO / "portability" / "receipts" / "local-expanded-gate-hardening-1b10fac.json"
 )
-HARDENING_SOURCE_HEAD = "80f2dba90d6be105830a1131a1847f81d7f92173"
+HARDENING_SOURCE_HEAD = "1b10fac59646a831a06e32e3ea141f7b24e23b0c"
 HARDENING_GATE_RAW_SHA256 = (
-    "2E2430719E42260DA58A5A7D2E7AC73D744410AB4FA7427BACC20942F2C15F8B"
+    "D867594F1DE6704A96DBD384C436107C122C7E1007E115698614BED154AB054C"
 )
 HARDENING_GATE_EMBEDDED_SHA256 = (
-    "C921FF420912346EACAACC60B53CE8D769B9ED29911003E4534A296CCE202D2A"
+    "8FB34095B1D9C494C8E6C0E78AAAB8A8A28B16C002F06086A53CE5164B851037"
 )
 
 # Close evidence: the clean-tree expanded gate at the reconciliation commit.
@@ -357,7 +357,12 @@ LEGACY_GATE_MANIFEST = expanded_gate.SEALED_ERA_GATE_MANIFEST
 # for the observability, preflight and MCP-gate commands) join here.  Same
 # declaration, same reason: run 31562391384's expanded manifest predates
 # them all.
+#
+# The release-identity gate (charter command twenty, 2026-08-20) postdates the
+# hosted run like everything above; this gate caught its plan addition at one
+# failure, which is the declaration working.
 HOSTED_ERA_ABSENT_COMMANDS = (
+    "release-identity",
     "portable-bundle-gate",
     "decision-law-structural",
     "incident-replay-corpus",
