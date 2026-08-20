@@ -214,14 +214,14 @@ SOURCE_PIN_ERRATA = {
 # the second observation of this one root cause, not a second defect.  The old
 # receipt stays on disk as chronology, exactly as 7d1c6cb did.
 HARDENING_GATE_RECEIPT = (
-    REPO / "portability" / "receipts" / "local-expanded-gate-hardening-1b10fac.json"
+    REPO / "portability" / "receipts" / "local-expanded-gate-hardening-7e3d024.json"
 )
-HARDENING_SOURCE_HEAD = "1b10fac59646a831a06e32e3ea141f7b24e23b0c"
+HARDENING_SOURCE_HEAD = "7e3d024f905599e1396332688898a1ff1258ec06"
 HARDENING_GATE_RAW_SHA256 = (
-    "D867594F1DE6704A96DBD384C436107C122C7E1007E115698614BED154AB054C"
+    "63638885422DC515130D3C2DDC87B80551D2303CC7108802F0BDB9A214742181"
 )
 HARDENING_GATE_EMBEDDED_SHA256 = (
-    "8FB34095B1D9C494C8E6C0E78AAAB8A8A28B16C002F06086A53CE5164B851037"
+    "408010BB9A16660C6A6D3934C105A5C6A36347113B16A68147790E371BBB883E"
 )
 
 # Close evidence: the clean-tree expanded gate at the reconciliation commit.
