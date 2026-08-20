@@ -1,5 +1,33 @@
 #!/usr/bin/env python3
-"""Parity, envelope-correlation, and lifecycle probes for the stdio sidecar."""
+"""Parity, envelope-correlation, and lifecycle probes for the stdio sidecar.
+
+Timing is synchronised through observable supervisor state and child-side
+signal files, never through a sleep or a poll bound short enough that a loaded
+host can overshoot it.  This is the law ``test_supervision_bounds.py`` was
+built under, applied here after a hosted ``suites - 3.13 - windows-latest``
+cell failed once at 5aab1ab and passed on rerun with identical bytes.
+
+Three arms were wall-clock races rather than event waits, and each was
+reproduced by delaying the adversary child's first observable action -- the
+faithful model of a starved CI VM, where the child is a fresh interpreter:
+
+* ~1.5 s of child-start delay made ``prewrite-output-no-attempt`` and
+  ``prewrite-output-no-write`` red: the ~1 s poll for the supervisor to observe
+  pre-request output expired, so the request the arm asserts was never
+  attempted was in fact attempted AND written;
+* ~2.5 s made both ``midwrite-*:rejected`` red: the 2.0 s request deadline beat
+  the child's protocol violation, so the recorded failure was the write
+  deadline instead of the envelope reader;
+* ~0.8 s of descheduling between the stall child's readiness signal and its
+  acceptance made ``counted-timeout-child-accepted-once`` red: the 0.5 s
+  deadline fired and killed the child before it recorded the acceptance the
+  arm's anti-replay witness depends on.
+
+Every arm keeps the negative power it had.  Bounds that remain are generous
+ceilings on host scheduling latency, not estimates of how long the work takes,
+so a bound that expires is a real failure and a slow host is slow rather than
+green by luck.
+"""
 from __future__ import annotations
 
 import argparse
@@ -54,6 +82,25 @@ PACKS = (
 LAUNCHER = HERE / "rr_sidecar.py"
 ADVERSARY = HERE / "adversarial_child.py"
 
+POLL_SECONDS = 0.005
+# Wait for an observable supervisor state or a child-side signal file.  Only a
+# genuine hang reaches this, so expiry is reported as the failure it is.
+CONDITION_TIMEOUT_SECONDS = 30.0
+# Request deadline for probes whose expected failure is NOT the deadline.  It
+# must never fire before the child's own protocol violation is observed, or the
+# arm records the wrong failure and stops proving what it names.
+PROBE_TIMEOUT_SECONDS = 20.0
+# The one probe whose expected failure IS the deadline, so it is the one bound
+# that cannot be replaced by an event -- proving a timeout fires costs the
+# timeout.  It has to outlast the scheduling latency of a child that has ALREADY
+# signalled readiness and only has to wake, read a request already sitting in the
+# pipe buffer, and record it.  Measured on 22 cores: 16 ms worst case idle,
+# 203 ms worst case under 2x CPU oversubscription.  5.0 s is ~25x that worst
+# case and absorbs a multi-second scheduler stall, while staying 120x below the
+# child's silence (600 s) so expiry is caused by the silence and never by the
+# child exiting first.
+TIMEOUT_PROBE_SECONDS = 5.0
+
 
 def load_requests() -> list[tuple[str, bytes]]:
     rows: list[tuple[str, bytes]] = []
@@ -83,12 +130,26 @@ def adversary(mode: str, *args: str) -> list[str]:
     return traced_python_command(ADVERSARY, mode, *args)
 
 
-def wait_stopped(client: SidecarProcess) -> bool:
-    for _ in range(200):
-        if client.returncode is not None:
+def await_condition(condition: Any, timeout: float = CONDITION_TIMEOUT_SECONDS) -> bool:
+    """Poll a PURE OBSERVATION until it holds, or report the deadline.
+
+    Only ever used for observing a state some other party reaches -- a child
+    exiting, a supervisor latching a protocol failure, a child-side signal file
+    appearing.  Never used to retry the property an arm is proving.
+    """
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        if condition():
             return True
-        time.sleep(0.005)
-    return client.returncode is not None
+        time.sleep(POLL_SECONDS)
+    return condition()
+
+
+def wait_stopped(client: SidecarProcess) -> bool:
+    # Was 200 * 5 ms.  Process teardown on a loaded host is not bounded by one
+    # second, and the arms that call this assert the child STOPPED, so the wait
+    # has to be long enough that expiry means "never stopped".
+    return await_condition(lambda: client.returncode is not None)
 
 
 class ShortWriteStream:
@@ -259,10 +320,12 @@ def main(argv: list[str] | None = None) -> int:
 
     prewrite_command = adversary("prewrite-poison")
     prewrite = SidecarProcess(prewrite_command).start()
-    for _ in range(200):
-        if prewrite.state_evidence()["protocol_failure"] is not None:
-            break
-        time.sleep(0.005)
+    # Event-synchronised: wait for the supervisor to OBSERVE the pre-request
+    # output.  The old ~1 s poll was a race against the child's interpreter
+    # cold start -- when the child lost it the request below was really
+    # attempted and really written, and the two arms that assert it was
+    # neither went red on an otherwise green suite.
+    await_condition(lambda: prewrite.state_evidence()["protocol_failure"] is not None)
     try:
         prewrite.request(b"{}\n")
     except SidecarFailure as error:
@@ -283,8 +346,12 @@ def main(argv: list[str] | None = None) -> int:
     midwrite_command = adversary("midwrite-poison")
     for repetition, chunk_size in enumerate((None, 4096)):
         midwrite = SidecarProcess(
+            # Was 2.0 s.  The arm proves the ENVELOPE READER rejects poison
+            # emitted mid-write, so the request deadline must not fire first;
+            # at 2.0 s a slow child start made the write deadline win and the
+            # recorded failure was the deadline, not the reader.
             midwrite_command,
-            timeout_seconds=2.0,
+            timeout_seconds=PROBE_TIMEOUT_SECONDS,
             max_write_chunk_bytes=chunk_size,
         )
         try:
@@ -404,10 +471,7 @@ def main(argv: list[str] | None = None) -> int:
             duplicate_returned = duplicate.request(b"{}\n")
         except SidecarFailure:
             pass
-        for _ in range(200):
-            if duplicate.state_evidence()["protocol_failure"] is not None:
-                break
-            time.sleep(0.005)
+        await_condition(lambda: duplicate.state_evidence()["protocol_failure"] is not None)
         if duplicate.state_evidence()["protocol_failure"] is None:
             try:
                 duplicate.request(b'{"next":true}\n')
@@ -460,24 +524,36 @@ def main(argv: list[str] | None = None) -> int:
         marker.write_bytes(b"")
         ready = pathlib.Path(temporary) / "ready.bin"
         counted_timeout_command = adversary("stall", str(marker), str(ready))
-        counted_timeout = SidecarProcess(counted_timeout_command, timeout_seconds=0.5)
+        counted_timeout = SidecarProcess(
+            counted_timeout_command, timeout_seconds=TIMEOUT_PROBE_SECONDS
+        )
         # Start the child and wait for its readiness signal on a generous
-        # bound BEFORE issuing the deliberately short request, so interpreter
-        # cold start under process-creation churn is never charged against
-        # the 0.5 s deadline (F-WP5-007: the previous shape failed 12/12
-        # under 40-spawner churn on an idle-passing box).
+        # bound BEFORE issuing the request, so interpreter cold start under
+        # process-creation churn is never charged against the deadline
+        # (F-WP5-007: the previous shape failed 12/12 under 40-spawner churn
+        # on an idle-passing box).
+        #
+        # Readiness alone was not enough.  This arm's deadline is what it
+        # proves, so the deadline cannot be replaced by an event -- but it CAN
+        # be made unreachable by ordinary scheduling.  At 0.5 s, descheduling
+        # the child for 0.8 s between its readiness signal and its read killed
+        # it before it recorded the acceptance, and the anti-replay witness
+        # below read b"" instead of b"1".  The deadline is now a measured,
+        # generous constant and the child's silence outlasts it by 120x, so
+        # expiry is still caused by the child never answering.
         counted_timeout.start()
-        ready_deadline = time.perf_counter() + 20.0
-        while not ready.exists() and time.perf_counter() < ready_deadline:
-            time.sleep(0.005)
-        check("supervisor:counted-timeout-child-ready", ready.exists())
+        check("supervisor:counted-timeout-child-ready", await_condition(ready.exists))
         try:
             counted_timeout.request(b"{}\n")
         except SidecarFailure as error:
             check("supervisor:counted-timeout-rejected", "not replayed" in str(error), str(error))
+            # Event-synchronised observation of the child's own acceptance
+            # record.  Exactly-once keeps its full negative power: a child that
+            # never accepted never reaches b"1", and a REPLAYED request reaches
+            # b"11", so both still fail on the deadline with the real bytes.
             check(
                 "supervisor:counted-timeout-child-accepted-once",
-                marker.read_bytes() == b"1",
+                await_condition(lambda: marker.read_bytes() == b"1"),
                 repr(marker.read_bytes()),
             )
             check("supervisor:counted-timeout-attempt-count", counted_timeout.request_attempt_count == 1)
@@ -502,7 +578,7 @@ def main(argv: list[str] | None = None) -> int:
         expected_path.write_bytes(early_line)
         early = SidecarProcess(
             adversary("midwrite-valid", str(expected_path)),
-            timeout_seconds=10.0,
+            timeout_seconds=PROBE_TIMEOUT_SECONDS,
             max_write_chunk_bytes=4096,
         )
         try:

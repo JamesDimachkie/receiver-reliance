@@ -63,7 +63,12 @@ def main() -> int:
             pathlib.Path(sys.argv[3]).write_bytes(b"R")
         read_request()
         marker.write_bytes(marker.read_bytes() + b"1")
-        time.sleep(5)
+        # The silence this arm times out against must outlast the host's
+        # deadline by a wide margin.  At 5 s it did not: raising the host
+        # deadline to a value a loaded VM cannot overshoot would have let this
+        # child EXIT first, and the host would have recorded closed-stdout
+        # instead of the timeout the arm exists to prove.
+        time.sleep(600)
         return 0
     if mode == "midwrite-valid":
         # Emit the CORRECT correlated response after the first request byte
