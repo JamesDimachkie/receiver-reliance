@@ -36,12 +36,13 @@ even when other semantics are unavailable.
 ## Implemented: `mcp_tool_result.py` — MCP `CallToolResult` → REF / OBL-02
 
 Status: **implemented and tested** (`../test_mcp_gate.py`, which reports
-`rr-mcp-gate regression: checks=103 failures=0` and is the suite the charter
-gate and `adapters/mcp/README.md` pin). Earlier revisions of this line cited
+`rr-mcp-gate regression: checks=123 failures=0` — 103 before the 2026-08-20
+`rr_gate_batch` section — and is the suite the charter gate and
+`adapters/mcp/README.md` pin). Earlier revisions of this line cited
 `../test_mcp_tool_result.py` at 76 checks; no such file exists at any commit in
 this repository — `git log --all --follow` over that path returns nothing — and
 no program reports a 76-check figure. The mapper's cases were landed inside the
-aggregate suite, which reports only its total, so 103 is the only count here
+aggregate suite, which reports only its total, so 123 is the only count here
 that recomputes.
 
 **Reliance question.** An agent received a tool result and intends to act on the

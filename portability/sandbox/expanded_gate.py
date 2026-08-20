@@ -168,7 +168,7 @@ GATES = (
         "mcp_gate",
         "/repo",
         ("python", "-B", "adapters/mcp/test_mcp_gate.py"),
-        "checks_103",
+        "checks_123",
     ),
     GateSpec(
         "admission_profile",
@@ -624,11 +624,13 @@ def validate_gate_output(validator: str, stdout: bytes, stderr: bytes) -> dict[s
         "checks_6497": 6497,
         "checks_2160": 2160,
         "checks_1142": 1142,
-        "checks_103": 103,
+        "checks_123": 123,
         "checks_26": 26,
         # Era-legacy values: the SHA-pinned portability-era gate receipts
         # replay through these via verify_receipts.py; no live GateSpec
-        # references them.
+        # references them. checks_103 joined this group 2026-08-20 when the
+        # MCP gate suite grew its rr_gate_batch section (103 -> 123).
+        "checks_103": 103,
         "checks_504": 504,
         "checks_517": 517,
         "checks_7": 7,

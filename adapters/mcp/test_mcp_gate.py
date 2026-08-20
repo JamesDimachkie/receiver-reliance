@@ -557,6 +557,190 @@ check(
     rr_bridge.predicate_source("OBL-02", "PROTOCOL_ERROR") is None,
 )
 
+# --- 9. BATCH: one wire call, N independent decisions ------------------------
+
+check(
+    "batch:advertised-in-tools-list",
+    [t["name"] for t in rr_mcp_gate.TOOLS]
+    == ["rr_gate_check", "rr_gate_batch", "rr_gate_explain"],
+    str([t["name"] for t in rr_mcp_gate.TOOLS]),
+)
+
+_single_clean = rr_mcp_gate.gate_check(payload(CLEAN_REF))
+_lines_before = len(
+    [ln for ln in _TMP_LOG.read_text(encoding="utf-8").splitlines() if ln.strip()]
+)
+_batch = rr_mcp_gate.gate_batch(
+    {
+        "checks": [
+            payload(CLEAN_REF),
+            payload(dict(CLEAN_REF, returned="res://tickets/T-99")),
+            payload({}),
+        ]
+    }
+)
+_lines_after = len(
+    [ln for ln in _TMP_LOG.read_text(encoding="utf-8").splitlines() if ln.strip()]
+)
+check(
+    "batch:order-preserved",
+    [item["index"] for item in _batch["items"]] == [0, 1, 2],
+    str([item["index"] for item in _batch["items"]]),
+)
+check(
+    "batch:verdicts-match-the-single-call-pipeline",
+    [item.get("verdict") for item in _batch["items"]] == ["NO_FINDING", "HOLD", "ABSTAIN"],
+    str([item.get("verdict") for item in _batch["items"]]),
+)
+check(
+    "batch:item-decision-id-equals-single-call-id",
+    _batch["items"][0]["decision_id"] == _single_clean["decision_id"],
+    f"{_batch['items'][0]['decision_id']} != {_single_clean['decision_id']}",
+)
+check(
+    "batch:summary-counts",
+    _batch["summary"]
+    == {"items": 3, "no_finding": 1, "hold": 1, "abstain": 1, "errors": 0},
+    json.dumps(_batch["summary"]),
+)
+check("batch:observe-posture-never-blocks", _batch["enforcement_action"] == "NONE")
+check(
+    "batch:every-item-appends-its-own-audit-line",
+    _lines_after - _lines_before == 3,
+    str(_lines_after - _lines_before),
+)
+
+# Per-item isolation: a raising item is reported at its index with the exception
+# text and no verdict; siblings still get full decisions. Same monkeypatch
+# pattern as the SEAL and TOTALITY negative arms.
+_real_map = M.map_tool_result
+try:
+
+    def _exploding_map(arguments):
+        if (
+            isinstance(arguments, dict)
+            and (arguments.get("call") or {}).get("tool") == "boom"
+        ):
+            raise RuntimeError("mapper exploded")
+        return _real_map(arguments)
+
+    M.map_tool_result = _exploding_map
+    _boom = {
+        "call": {"server": "docs", "tool": "boom", "record_reference": dict(CLEAN_REF)},
+        "result": result(),
+        "reliance": {"intent": "ACT_ON_RECORD"},
+    }
+    _isolated = rr_mcp_gate.gate_batch(
+        {"checks": [payload(CLEAN_REF), _boom, payload({})]}
+    )
+    check(
+        "batch:raising-item-reported-at-its-index",
+        "error" in _isolated["items"][1]
+        and "mapper exploded" in _isolated["items"][1]["error"]
+        and "verdict" not in _isolated["items"][1],
+        json.dumps(_isolated["items"][1]),
+    )
+    check(
+        "batch:siblings-unaffected-by-raising-item",
+        _isolated["items"][0].get("verdict") == "NO_FINDING"
+        and _isolated["items"][2].get("verdict") == "ABSTAIN",
+        str([item.get("verdict") for item in _isolated["items"]]),
+    )
+    check(
+        "batch:error-counted-never-classified",
+        _isolated["summary"]["errors"] == 1 and _isolated["summary"]["items"] == 3,
+        json.dumps(_isolated["summary"]),
+    )
+    _wire_err = rr_mcp_gate.handle_message(
+        {
+            "jsonrpc": "2.0",
+            "id": 901,
+            "method": "tools/call",
+            "params": {
+                "name": "rr_gate_batch",
+                "arguments": {"checks": [payload(CLEAN_REF), _boom]},
+            },
+        },
+        {},
+    )
+    check(
+        "batch:wire-is-loud-when-any-item-was-not-judged",
+        _wire_err["result"]["isError"] is True,
+        json.dumps(_wire_err["result"].get("isError")),
+    )
+finally:
+    M.map_tool_result = _real_map
+
+_wire_hold = rr_mcp_gate.handle_message(
+    {
+        "jsonrpc": "2.0",
+        "id": 902,
+        "method": "tools/call",
+        "params": {
+            "name": "rr_gate_batch",
+            "arguments": {
+                "checks": [
+                    payload(CLEAN_REF),
+                    payload(dict(CLEAN_REF, returned="res://tickets/T-99")),
+                ]
+            },
+        },
+    },
+    {},
+)
+check(
+    "batch:hold-in-observe-is-a-classification-not-a-wire-error",
+    _wire_hold["result"]["isError"] is False,
+    str(_wire_hold["result"].get("isError")),
+)
+
+for bad, label in (
+    ({}, "missing-checks"),
+    ({"checks": []}, "empty-checks"),
+    ({"checks": "not-a-list"}, "non-array-checks"),
+    ("not an object", "non-object-arguments"),
+    (
+        {"checks": [payload(CLEAN_REF)] * (rr_mcp_gate.BATCH_MAX_ITEMS + 1)},
+        "over-admission-bound",
+    ),
+):
+    try:
+        rr_mcp_gate.gate_batch(bad)
+        check(f"batch:refuses-{label}", False)
+    except ValueError:
+        check(f"batch:refuses-{label}", True)
+
+_one = rr_mcp_gate.gate_batch({"checks": [payload(CLEAN_REF)]})
+check(
+    "batch:batch-of-one-equals-single-call",
+    _one["items"][0].get("decision_id") == _single_clean["decision_id"]
+    and _one["summary"]["items"] == 1,
+)
+
+os.environ["RR_MCP_GATE_ENFORCE"] = "1"
+try:
+    _enforced_batch = rr_mcp_gate.gate_batch(
+        {
+            "checks": [
+                payload(CLEAN_REF),
+                payload(dict(CLEAN_REF, returned="res://tickets/T-99")),
+            ]
+        }
+    )
+    check(
+        "batch:enforce-blocks-when-any-item-holds",
+        _enforced_batch["enforcement_action"] == "BLOCK",
+        _enforced_batch["enforcement_action"],
+    )
+    _enforced_clean = rr_mcp_gate.gate_batch({"checks": [payload(CLEAN_REF)]})
+    check(
+        "batch:enforce-passes-all-no-finding",
+        _enforced_clean["enforcement_action"] == "NONE",
+        _enforced_clean["enforcement_action"],
+    )
+finally:
+    os.environ.pop("RR_MCP_GATE_ENFORCE", None)
+
 # --- calibration ------------------------------------------------------------
 
 report = rr_bridge.calibrate()

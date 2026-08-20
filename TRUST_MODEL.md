@@ -105,7 +105,8 @@ that boundary there are three kinds, and the third is new to this page.
   `adapters/mcp/` — in this tree, verified by this repository's own gates.
 - **Sibling (staged, stale):** one integration in the maintainer's own
   workspace since 2026-08-15 (`rr-gate`, a separate unpublished tree, not the
-  `rr_gate_check`/`rr_gate_explain` tools `adapters/mcp/` exports). It
+  `rr_gate_check`/`rr_gate_batch`/`rr_gate_explain` tools `adapters/mcp/`
+  exports). It
   `sys.path`-imports `grounded-0_4/rr_api.py` and calls `decide_audited` over
   real workspace facts, built against `main` at `5aa2b4b` — now roughly sixty
   commits stale, predating the 0.4.2 seal. Its own README disclaims security

@@ -23,11 +23,19 @@ MCP tool-call result
   -> compact verdict + one JSONL audit line
 ```
 
-Two tools. `rr_gate_check` classifies one received record, appends the full
+Three tools. `rr_gate_check` classifies one received record, appends the full
 audited decision to the audit log, and returns a compact verdict.
-`rr_gate_explain` takes a decision id from that log, re-verifies that envelope's
-seal from the bytes on disk, and returns the witness trace, the first-match map,
-and the frozen decision-table predicate that produced the class.
+`rr_gate_batch` classifies a list of received records in one call: each item
+runs the identical per-record pipeline — its own preflight, its own audited
+decision, its own audit line and content-addressed decision id — with order
+preserved, and a failing item reported at its index without affecting its
+siblings. Batching reduces the caller's per-record wire and loop cost (for an
+agent host, every tool call is a full model turn) and changes nothing about
+any decision; it is bounded at 64 items per call, the same bounded-ingest
+posture every peripheral surface carries. `rr_gate_explain` takes a decision
+id from that log, re-verifies that envelope's seal from the bytes on disk, and
+returns the witness trace, the first-match map, and the frozen decision-table
+predicate that produced the class.
 
 ## The verdict vocabulary, and where each value comes from
 
@@ -56,7 +64,7 @@ bytecode out of the artifact tree.
 ```text
 python -B adapters/mcp/rr_mcp_gate.py --calibrate    112/112 pack entries reproduce
 python -B adapters/mcp/demo.py                       five scenarios over real MCP stdio
-python -B adapters/mcp/test_mcp_gate.py              checks=103 failures=0
+python -B adapters/mcp/test_mcp_gate.py              checks=123 failures=0
 ```
 
 Calibration is the gate on the request side of the boundary. The adapter builds

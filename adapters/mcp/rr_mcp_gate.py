@@ -15,6 +15,13 @@ Pipeline, per checked record::
 Tools:
   ``rr_gate_check``    classify one received record; append the full audited
                        decision to the audit log; return a compact verdict.
+  ``rr_gate_batch``    classify a LIST of received records in one wire call.
+                       Each item runs the identical per-record pipeline —
+                       independent decision, own audit line, own
+                       content-addressed id; order preserved; a failing item
+                       is reported at its index and never affects siblings.
+                       Wire-level cost reduction only: nothing about the
+                       decisions themselves is batched or shared.
   ``rr_gate_explain``  given a decision id from the log, re-verify that logged
                        envelope's seal and return the witness trace, the
                        predicates that fired, and the frozen decision-table row
@@ -54,7 +61,12 @@ import rr_bridge  # noqa: E402
 from mappers import mcp_tool_result  # noqa: E402
 
 SERVER_NAME = "rr-mcp-gate"
-SERVER_VERSION = "0.1.0"
+SERVER_VERSION = "0.2.0"
+
+# Admission bound for rr_gate_batch, mirroring the bounded-ingest posture every
+# other peripheral surface carries (ADOPTION A4): an unbounded array on the one
+# wire a host's client writes to would be the only unbounded thing here.
+BATCH_MAX_ITEMS = 64
 LATEST_PROTOCOL_VERSION = "2025-06-18"
 SUPPORTED_PROTOCOL_VERSIONS = ("2025-06-18", "2025-03-26", "2024-11-05")
 
@@ -262,6 +274,60 @@ def _append_audit(record: dict[str, Any]) -> None:
         stream.write(json.dumps(record, sort_keys=True) + "\n")
 
 
+def gate_batch(arguments: Any) -> dict[str, Any]:
+    """Classify a list of records in one wire call.
+
+    Batching exists to cut the caller's per-record wire and loop cost: for an
+    agent host, each tool call is a full model turn, so per-record gating puts
+    the loop turn — not the decision — on the critical path, N times per
+    handoff. It changes nothing about any decision: each item runs the
+    same ``gate_check`` pipeline independently — its own preflight, its own
+    audited decision, its own seal verification, its own audit line, its own
+    content-addressed decision id. Order is preserved and results carry their
+    input index. A failing item is reported at its index with the exception
+    text and never suppresses or alters a sibling's decision (there is no
+    shared state between items beyond the append-only log).
+    """
+    if not isinstance(arguments, dict):
+        raise ValueError("arguments must be an object carrying a checks array")
+    checks = arguments.get("checks")
+    if not isinstance(checks, list) or not checks:
+        raise ValueError("checks must be a nonempty array of rr_gate_check argument objects")
+    if len(checks) > BATCH_MAX_ITEMS:
+        raise ValueError(
+            f"checks carries {len(checks)} items; the admission bound is {BATCH_MAX_ITEMS}"
+        )
+    items: list[dict[str, Any]] = []
+    counts = {VERDICT_NO_FINDING: 0, VERDICT_HOLD: 0, VERDICT_ABSTAIN: 0}
+    errors = 0
+    any_block = False
+    for index, check_arguments in enumerate(checks):
+        try:
+            verdict = gate_check(check_arguments)
+        except Exception as exc:  # isolate the item; siblings still get decisions
+            errors += 1
+            items.append({"index": index, "error": f"{type(exc).__name__}: {exc}"})
+            continue
+        counts[verdict["verdict"]] += 1
+        any_block = any_block or verdict["enforcement_action"] == "BLOCK"
+        items.append({"index": index, **verdict})
+    enforced = enforce_enabled()
+    return {
+        "items": items,
+        "summary": {
+            "items": len(checks),
+            "no_finding": counts[VERDICT_NO_FINDING],
+            "hold": counts[VERDICT_HOLD],
+            "abstain": counts[VERDICT_ABSTAIN],
+            "errors": errors,
+        },
+        "posture": "ENFORCE" if enforced else "OBSERVE",
+        # Fail-closed under enforcement: an item that never reached a decision
+        # is "not judged", which may not read as a pass (TRUST_MODEL.md).
+        "enforcement_action": "BLOCK" if (enforced and (any_block or errors)) else "NONE",
+    }
+
+
 def gate_explain(arguments: Any) -> dict[str, Any]:
     """Return the witness trace and the predicate that fired for a logged decision."""
     decision_id = arguments.get("decision_id") if isinstance(arguments, dict) else None
@@ -419,6 +485,53 @@ _CHECK_OUTPUT_SCHEMA = {
     "required": ["decision_id", "stage", "verdict", "reason", "posture"],
 }
 
+_BATCH_INPUT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "checks": {
+            "type": "array",
+            "description": (
+                "rr_gate_check argument objects, one per record relied on. "
+                f"Order is preserved in the result. At most {BATCH_MAX_ITEMS} items."
+            ),
+            "items": _CHECK_INPUT_SCHEMA,
+            "minItems": 1,
+            "maxItems": BATCH_MAX_ITEMS,
+        }
+    },
+    "required": ["checks"],
+}
+
+_BATCH_OUTPUT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "items": {
+            "type": "array",
+            "description": (
+                "One entry per input, in input order, carrying its input index. "
+                "Either a full rr_gate_check verdict object, or {index, error} when "
+                "that item's pipeline raised — an errored item was not judged and "
+                "must not be read as a pass."
+            ),
+            "items": {"type": "object", "required": ["index"]},
+        },
+        "summary": {
+            "type": "object",
+            "properties": {
+                "items": {"type": "integer"},
+                "no_finding": {"type": "integer"},
+                "hold": {"type": "integer"},
+                "abstain": {"type": "integer"},
+                "errors": {"type": "integer"},
+            },
+            "required": ["items", "no_finding", "hold", "abstain", "errors"],
+        },
+        "posture": {"type": "string", "enum": ["OBSERVE", "ENFORCE"]},
+        "enforcement_action": {"type": "string", "enum": ["NONE", "BLOCK"]},
+    },
+    "required": ["items", "summary", "posture", "enforcement_action"],
+}
+
 _EXPLAIN_INPUT_SCHEMA = {
     "type": "object",
     "properties": {
@@ -449,6 +562,22 @@ TOOLS = [
         "outputSchema": _CHECK_OUTPUT_SCHEMA,
     },
     {
+        "name": "rr_gate_batch",
+        "title": "Check a list of received records before relying on them",
+        "description": (
+            "Classify a list of MCP tool-call results in one call. Each item runs the "
+            "identical per-record pipeline as rr_gate_check — independent preflight, "
+            "independent audited decision, its own audit line and content-addressed "
+            "decision id; order is preserved, and a failing item is reported at its "
+            "index without affecting siblings. Batching reduces the caller's per-record "
+            "wire and loop cost; it changes nothing about any decision. Bounded at "
+            f"{BATCH_MAX_ITEMS} items per call. Observe-only by default, same as "
+            "rr_gate_check; the same non-claims apply."
+        ),
+        "inputSchema": _BATCH_INPUT_SCHEMA,
+        "outputSchema": _BATCH_OUTPUT_SCHEMA,
+    },
+    {
         "name": "rr_gate_explain",
         "title": "Explain a prior gate decision",
         "description": (
@@ -462,12 +591,13 @@ TOOLS = [
 ]
 
 INSTRUCTIONS = (
-    "Call rr_gate_check on a tool result before relying on it as a record. The verdict "
-    "is a classification, not an authorization: NO_FINDING means the engine found no "
-    "defect on the obligation checked, HOLD names a detected defect, ABSTAIN means the "
-    "record does not carry that obligation's semantics. Enforcement, state truthfulness, "
-    "atomicity, derivation, input binding, and effects remain the host's obligations "
-    "(HOST_OBLIGATIONS H1-H6)."
+    "Call rr_gate_check on a tool result before relying on it as a record — or "
+    "rr_gate_batch to check several in one call (identical per-record decisions; "
+    "wire-level batching only). The verdict is a classification, not an authorization: "
+    "NO_FINDING means the engine found no defect on the obligation checked, HOLD names "
+    "a detected defect, ABSTAIN means the record does not carry that obligation's "
+    "semantics. Enforcement, state truthfulness, atomicity, derivation, input binding, "
+    "and effects remain the host's obligations (HOST_OBLIGATIONS H1-H6)."
 )
 
 
@@ -529,6 +659,13 @@ def handle_message(message: dict[str, Any], state: dict[str, Any]) -> dict[str, 
                 verdict = gate_check(arguments)
                 block = verdict["enforcement_action"] == "BLOCK"
                 return ok(_tool_result(verdict, is_error=block))
+            if name == "rr_gate_batch":
+                batch = gate_batch(arguments)
+                # Loud on the wire when anything was not judged (an errored item
+                # is never a pass) or when enforcement blocks; a HOLD in OBSERVE
+                # posture is a classification, not an error, same as rr_gate_check.
+                loud = batch["summary"]["errors"] > 0 or batch["enforcement_action"] == "BLOCK"
+                return ok(_tool_result(batch, is_error=loud))
             if name == "rr_gate_explain":
                 return ok(_tool_result(gate_explain(arguments)))
         except Exception as exc:  # tool failure -> isError result, never a crash
