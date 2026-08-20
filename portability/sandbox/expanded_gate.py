@@ -168,7 +168,7 @@ GATES = (
         "mcp_gate",
         "/repo",
         ("python", "-B", "adapters/mcp/test_mcp_gate.py"),
-        "checks_123",
+        "checks_129",
     ),
     GateSpec(
         "admission_profile",
@@ -624,13 +624,19 @@ def validate_gate_output(validator: str, stdout: bytes, stderr: bytes) -> dict[s
         "checks_6497": 6497,
         "checks_2160": 2160,
         "checks_1142": 1142,
-        "checks_123": 123,
+        "checks_129": 129,
         "checks_26": 26,
-        # Era-legacy values: the SHA-pinned portability-era gate receipts
-        # replay through these via verify_receipts.py; no live GateSpec
-        # references them. checks_103 joined this group 2026-08-20 when the
-        # MCP gate suite grew its rr_gate_batch section (103 -> 123).
+        # Legacy values, two kinds, stated precisely: checks_504 and checks_7
+        # are replayed by the SHA-pinned portability-era receipts via
+        # verify_receipts.py's era mapping. checks_103, checks_123, and
+        # checks_517 are enumerated by NO live code path — they are retained
+        # so the superseded hardening receipts on disk (506829e at 103,
+        # ebb0dd7 at 123) and their era's transcripts can be replayed by hand
+        # through the validator their own run declared. The MCP suite moved
+        # 103 -> 123 (rr_gate_batch, 2026-08-20) -> 129 (review-driven
+        # hardening, same day).
         "checks_103": 103,
+        "checks_123": 123,
         "checks_504": 504,
         "checks_517": 517,
         "checks_7": 7,

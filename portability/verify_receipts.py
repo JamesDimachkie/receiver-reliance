@@ -170,12 +170,13 @@ SOURCE_PIN_ERRATA = {
 # era-mapped.  The 7d1c6cb receipt stays on disk as immutable chronology; it is
 # simply no longer the current-counts binding.
 #
-# REGENERATION IS DUE.  The charter gate grew from eleven commands to nineteen,
-# so this receipt's recorded manifest is a prefix of the live one and
-# `hardening_gate.manifest_order` is RED by design.  Faking it would mean
-# era-mapping the one receipt whose entire purpose is to be un-era-mapped.
-# At the FINAL merged tip, with a clean worktree (the runner refuses a dirty
-# one, and refuses to overwrite an existing receipt):
+# STANDING PROCEDURE — regenerate whenever the charter moves under this
+# receipt: a gate command added or removed, or any suite count a live
+# GateSpec validator pins (the receipt replays through the CURRENT specs, so
+# a moved count turns `hardening_gate.<gate>.validator_rerun` red by design;
+# faking it would mean era-mapping the one receipt whose entire purpose is to
+# be un-era-mapped).  At the tip that moved it, with a clean worktree (the
+# runner refuses a dirty one, and refuses to overwrite an existing receipt):
 #
 #   python -B portability/run_local_expanded_gate.py \
 #       --receipt portability/receipts/local-expanded-gate-hardening-<head7>.json
@@ -187,24 +188,25 @@ SOURCE_PIN_ERRATA = {
 # to the uppercase SHA-256 of the file's bytes, and
 # HARDENING_GATE_EMBEDDED_SHA256 to the receipt's own `receipt_sha256` member.
 #
-# THE REGENERATION ALSO MOVES THIS PROGRAM'S OWN CHECK COUNT, and that is not
-# optional bookkeeping: _verify_clean_gate_receipt spends three checks per
-# recorded command (.exit, .stream_binding, .validator_rerun), so a hardening
-# receipt carrying N commands instead of eleven takes the total from 267 to
-# 267 + 3 * (N - 11).  At N = 19 that is 291, measured, not predicted.  Four
-# pins carry the old number and move in the SAME commit as the rebinding above,
-# or this program's own gate rejects it:
+# A REGENERATION THAT CHANGES THE COMMAND COUNT ALSO MOVES THIS PROGRAM'S OWN
+# CHECK COUNT, and that is not optional bookkeeping: _verify_clean_gate_receipt
+# spends three checks per recorded command (.exit, .stream_binding,
+# .validator_rerun), so the total moves by 3 per command added or removed
+# (currently 297 at 19 recorded commands; a rebinding that keeps the command
+# count keeps the total).  When it moves, four pins carry the old number and
+# move in the SAME commit as the rebinding above, or this program's own gate
+# rejects it:
 #   portability/matrix/plan.json        verify-committed-receipts expected
 #   portability/test_strict_ingest.py   test_verify_receipts_reports_its_pinned_
 #                                       check_count, and its docstring
-#   README.md                           "Expected: verify-receipts: checks=267"
+#   README.md                           the "Expected: verify-receipts:
+#                                       checks=<total>" line
 #   DIAGRAMS.md                         the C4 Replay row and the C4 Sources
 #                                       quote of that README line
 # HOSTED_ERA_EXPECTATIONS["verify-committed-receipts"] stays at 62: that is the
-# hosted era's count and does not move.  They are deliberately NOT pre-migrated
-# here, because until the rebinding lands this program really does report 267
-# and a pin describing a state that does not exist yet is the defect this file
-# exists to catch.
+# hosted era's count and does not move.  Pins are never pre-migrated ahead of a
+# rebinding: a pin describing a state that does not exist yet is the defect
+# this file exists to catch.
 #
 # Then, in this order: verify_receipts <new count>/0, then verify_live green at
 # gates=19, then portability/test_strict_ingest.py green -- it runs

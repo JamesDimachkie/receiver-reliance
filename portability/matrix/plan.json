@@ -386,7 +386,7 @@
         "cwd": ".",
         "argv": ["{python}", "-B", "adapters/mcp/test_mcp_gate.py"],
         "timeout_seconds": 300,
-        "expected": {"checks": [123], "failures": [0]}
+        "expected": {"checks": [129], "failures": [0]}
       },
       {
         "id": "mcp-gate-demo",
@@ -567,7 +567,7 @@
         "cwd": ".",
         "argv": ["{python}", "-B", "adapters/mcp/test_mcp_gate.py"],
         "timeout_seconds": 300,
-        "expected": {"checks": [123], "failures": [0]}
+        "expected": {"checks": [129], "failures": [0]}
       },
       {
         "id": "admission-profile-tests",

@@ -732,14 +732,117 @@ try:
         _enforced_batch["enforcement_action"] == "BLOCK",
         _enforced_batch["enforcement_action"],
     )
+    check(
+        "batch:posture-reported-enforce",
+        _enforced_batch["posture"] == "ENFORCE",
+        _enforced_batch["posture"],
+    )
     _enforced_clean = rr_mcp_gate.gate_batch({"checks": [payload(CLEAN_REF)]})
     check(
         "batch:enforce-passes-all-no-finding",
         _enforced_clean["enforcement_action"] == "NONE",
         _enforced_clean["enforcement_action"],
     )
+    # Fail-closed on the OTHER arm: an item that never reached a decision is
+    # "not judged", and under enforcement not-judged may not read as a pass.
+    # This is the errors-only case — zero HOLDs, one raising item — and it is
+    # the clause whose deletion an author-separated mutation review proved
+    # invisible to the whole battery before this check existed.
+    _real_map2 = M.map_tool_result
+    try:
+
+        def _exploding_map2(arguments):
+            if (
+                isinstance(arguments, dict)
+                and (arguments.get("call") or {}).get("tool") == "boom"
+            ):
+                raise RuntimeError("mapper exploded")
+            return _real_map2(arguments)
+
+        M.map_tool_result = _exploding_map2
+        _enforced_error = rr_mcp_gate.gate_batch(
+            {
+                "checks": [
+                    payload(CLEAN_REF),
+                    {
+                        "call": {
+                            "server": "docs",
+                            "tool": "boom",
+                            "record_reference": dict(CLEAN_REF),
+                        },
+                        "result": result(),
+                        "reliance": {"intent": "ACT_ON_RECORD"},
+                    },
+                ]
+            }
+        )
+        check(
+            "batch:enforce-blocks-when-an-item-errored",
+            _enforced_error["enforcement_action"] == "BLOCK"
+            and _enforced_error["summary"]["errors"] == 1
+            and _enforced_error["summary"]["hold"] == 0,
+            json.dumps(
+                {
+                    "enforcement_action": _enforced_error["enforcement_action"],
+                    "summary": _enforced_error["summary"],
+                }
+            ),
+        )
+    finally:
+        M.map_tool_result = _real_map2
 finally:
     os.environ.pop("RR_MCP_GATE_ENFORCE", None)
+
+# The documented bound IS the bound: the refusal check above proves a bound
+# exists; these pin its magnitude and the advertised schema to the constant,
+# so widening either silently is a red suite, not a silently false README.
+check("batch:admission-bound-is-64", rr_mcp_gate.BATCH_MAX_ITEMS == 64)
+check(
+    "batch:schema-maxItems-matches-the-bound",
+    rr_mcp_gate._BATCH_INPUT_SCHEMA["properties"]["checks"]["maxItems"]
+    == rr_mcp_gate.BATCH_MAX_ITEMS,
+)
+
+# An errored item was not judged and appends no audit line (the prose in the
+# README and the tool description says exactly this; here it is scored).
+_real_map3 = M.map_tool_result
+try:
+
+    def _exploding_map3(arguments):
+        raise RuntimeError("mapper exploded")
+
+    M.map_tool_result = _exploding_map3
+    _lines_before_err = len(
+        [ln for ln in _TMP_LOG.read_text(encoding="utf-8").splitlines() if ln.strip()]
+    )
+    rr_mcp_gate.gate_batch({"checks": [payload(CLEAN_REF)]})
+    _lines_after_err = len(
+        [ln for ln in _TMP_LOG.read_text(encoding="utf-8").splitlines() if ln.strip()]
+    )
+    check(
+        "batch:errored-item-appends-no-audit-line",
+        _lines_after_err == _lines_before_err,
+        str(_lines_after_err - _lines_before_err),
+    )
+finally:
+    M.map_tool_result = _real_map3
+
+# "Changes nothing about any decision", scored at full-object strength: the
+# batch item minus its index deep-equals the single-call verdict object.
+_single_parity = rr_mcp_gate.gate_check(payload(CLEAN_REF))
+_batch_parity = rr_mcp_gate.gate_batch({"checks": [payload(CLEAN_REF)]})["items"][0]
+_batch_parity = {k: v for k, v in _batch_parity.items() if k != "index"}
+check(
+    "batch:item-deep-equals-single-call-verdict",
+    _batch_parity == _single_parity,
+    json.dumps(
+        sorted(
+            k
+            for k in set(_batch_parity) | set(_single_parity)
+            if _batch_parity.get(k) != _single_parity.get(k)
+        )
+    ),
+)
 
 # --- calibration ------------------------------------------------------------
 

@@ -277,16 +277,20 @@ def _append_audit(record: dict[str, Any]) -> None:
 def gate_batch(arguments: Any) -> dict[str, Any]:
     """Classify a list of records in one wire call.
 
-    Batching exists to cut the caller's per-record wire and loop cost: for an
-    agent host, each tool call is a full model turn, so per-record gating puts
-    the loop turn — not the decision — on the critical path, N times per
-    handoff. It changes nothing about any decision: each item runs the
-    same ``gate_check`` pipeline independently — its own preflight, its own
-    audited decision, its own seal verification, its own audit line, its own
-    content-addressed decision id. Order is preserved and results carry their
-    input index. A failing item is reported at its index with the exception
-    text and never suppresses or alters a sibling's decision (there is no
-    shared state between items beyond the append-only log).
+    Batching exists to cut the caller's per-record wire and loop cost: for a
+    host whose tool calls are model turns, per-record gating puts the loop
+    turn — not the decision — on the critical path, N times per handoff. It
+    changes nothing about any decision: each item runs the same ``gate_check``
+    pipeline independently — its own preflight, its own audited decision, its
+    own seal verification, its own content-addressed decision id. Every item
+    that reaches a decision appends its own audit line; an item that raised
+    was not judged and appends none. Order is preserved and results carry
+    their input index. A failing item is reported at its index with the
+    exception text and never suppresses or alters a sibling's decision (there
+    is no shared state between items beyond the append-only log). The
+    batch-level ``enforcement_action`` aggregates: BLOCK when any item
+    blocked OR any item errored — an item that was not judged may not read
+    as a pass — while each item keeps its own per-item value.
     """
     if not isinstance(arguments, dict):
         raise ValueError("arguments must be an object carrying a checks array")
@@ -302,15 +306,19 @@ def gate_batch(arguments: Any) -> dict[str, Any]:
     errors = 0
     any_block = False
     for index, check_arguments in enumerate(checks):
+        # The whole per-item unit sits inside the guard — including the
+        # post-processing of the verdict object — so even a value the closed
+        # vocabulary forbids (the TOTALITY law's seventh-class scenario)
+        # downgrades that one item to an error instead of taking the batch,
+        # and its siblings' already-sealed decisions, down with it.
         try:
             verdict = gate_check(check_arguments)
+            counts[verdict["verdict"]] += 1
+            any_block = any_block or verdict["enforcement_action"] == "BLOCK"
+            items.append({"index": index, **verdict})
         except Exception as exc:  # isolate the item; siblings still get decisions
             errors += 1
             items.append({"index": index, "error": f"{type(exc).__name__}: {exc}"})
-            continue
-        counts[verdict["verdict"]] += 1
-        any_block = any_block or verdict["enforcement_action"] == "BLOCK"
-        items.append({"index": index, **verdict})
     enforced = enforce_enabled()
     return {
         "items": items,
@@ -569,10 +577,14 @@ TOOLS = [
             "identical per-record pipeline as rr_gate_check — independent preflight, "
             "independent audited decision, its own audit line and content-addressed "
             "decision id; order is preserved, and a failing item is reported at its "
-            "index without affecting siblings. Batching reduces the caller's per-record "
-            "wire and loop cost; it changes nothing about any decision. Bounded at "
+            "index without affecting siblings (an errored item was not judged, appends "
+            "no audit line, and must never be read as a pass). Batching reduces the "
+            "caller's per-record wire and loop cost for hosts whose tool calls are "
+            "model turns; it changes nothing about any decision. Bounded at "
             f"{BATCH_MAX_ITEMS} items per call. Observe-only by default, same as "
-            "rr_gate_check; the same non-claims apply."
+            "rr_gate_check. It is not an authorization, not a security control, and "
+            "carries no efficacy claim; an abstention is a designed outcome, not a "
+            "failure."
         ),
         "inputSchema": _BATCH_INPUT_SCHEMA,
         "outputSchema": _BATCH_OUTPUT_SCHEMA,
