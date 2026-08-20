@@ -7,6 +7,7 @@
 > host.
 
 Release 1.3.0, the maturation release of the composed generation.
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22035952.svg)](https://doi.org/10.5281/zenodo.22035952)
 Apache-2.0 (`LICENSE`, Copyright 2026 James Dimachkie). Cite it with
 [CITATION.cff](CITATION.cff). The artifact's ledgered claim
 ([ADOPTION.md](ADOPTION.md)) is that every published result is mechanically

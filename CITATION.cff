@@ -14,6 +14,8 @@ authors:
     family-names: Dimachkie
 repository-code: "https://github.com/JamesDimachkie/receiver-reliance"
 license: Apache-2.0
+# Concept DOI: every version; version DOIs live on the Zenodo record per release.
+doi: 10.5281/zenodo.22035952
 # These two name the last cut release, tag `v1.3.0`, and are a matched pair:
 # they are a dated release record, not a description of the bytes you have
 # checked out. A checkout of `main` is normally ahead of that tag and carries
