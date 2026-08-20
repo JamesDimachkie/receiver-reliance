@@ -14,13 +14,13 @@ authors:
     family-names: Dimachkie
 repository-code: "https://github.com/JamesDimachkie/receiver-reliance"
 license: Apache-2.0
-# These two name the last cut release, tag `v1.2.1`, and are a matched pair:
+# These two name the last cut release, tag `v1.3.0`, and are a matched pair:
 # they are a dated release record, not a description of the bytes you have
 # checked out. A checkout of `main` is normally ahead of that tag and carries
 # a `.devN` package version (`pyproject.toml`, `receiver_reliance.__version__`).
 # Cite the tag, or cite the commit `git rev-parse HEAD` reports.
-version: "1.2.1"
-date-released: "2026-08-19"
+version: "1.3.0"
+date-released: "2026-08-20"
 keywords:
   - agent-handoff
   - conformance-testing

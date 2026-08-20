@@ -6,7 +6,7 @@
 > is never an authorization: enforcement, state, and effects stay with the
 > host.
 
-Release 1.2.1, the hardening point release of the 1.2 composed generation.
+Release 1.3.0, the maturation release of the composed generation.
 Apache-2.0 (`LICENSE`, Copyright 2026 James Dimachkie). Cite it with
 [CITATION.cff](CITATION.cff). The artifact's ledgered claim
 ([ADOPTION.md](ADOPTION.md)) is that every published result is mechanically
