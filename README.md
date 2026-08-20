@@ -1,70 +1,226 @@
 # Receiver-reliance baseline — conformance suite and reference implementation
 
-Release 1.2.1 — the hardening point release of the 1.2 composed
-generation. License: Apache-2.0 (see `LICENSE`;
-Copyright 2026 James Dimachkie).
+> **A deterministic, auditable comparator for the decision a receiving agent
+> makes about records handed to it by another agent.** It classifies a fact
+> profile the host assembles, then seals that classification. A classification
+> is never an authorization: enforcement, state, and effects stay with the
+> host.
 
-**Which bytes this describes.** This document tracks `main`, which is normally
-ahead of the tag named above and may document surfaces that tag does not
-contain; `git describe --tags` is the discriminator, and a package version
-carrying a `.devN` suffix (`pyproject.toml`, `receiver_reliance.__version__`)
-says the checkout is past the last release rather than being it. Pin the tag
-for a fixed artifact, `git rev-parse HEAD` for exactly the bytes you ran.
+Release 1.2.1, the hardening point release of the 1.2 composed generation.
+Apache-2.0 (`LICENSE`, Copyright 2026 James Dimachkie). Cite it with
+[CITATION.cff](CITATION.cff). Every published result here is mechanically
+re-derivable from published bytes. [ADOPTION.md](ADOPTION.md) ledgers what is
+recorded and unfixed between this artifact and one you can adopt.
+
+## The decision surface, as sets
+
+**The decision law.** Each of the 30 operations classifies a fact profile
+through one machine-readable predicate table, evaluated in frozen precedence
+order. The first match stops the loop, so at most one predicate is ever true.
+
+| Order | Class |
+|---|---|
+| 1 | `MALFORMED_OR_BOUNDARY` |
+| 2 | `BINDING_OR_CONFLICT` |
+| 3 | `OMISSION_OR_INCOMPLETE` |
+| n/a | `VALID`, what remains when none of the three fired |
+
+`VALID` is not a test. It carries an empty `matched_class_witness`, because no
+predicate fired to witness. [DIAGRAMS.md
+A2](DIAGRAMS.md#a2--the-decision-law-frozen-precedence-and-first-match-short-circuit)
+draws the short-circuit.
+
+**The preflight.** Before the engine, `adapters/` runs a stdlib-only
+three-state preflight over native evidence and an optional host-produced fact
+profile.
+
+| Status | Meaning | Accounting |
+|---|---|---|
+| `READY` | sufficient, noncontradictory native evidence — an optional profile agrees with it | eligibility only, not a pass or engine decision |
+| `REJECTED_INVALID` | evidence or profile assertions are malformed or contradictory | detection, never a pass |
+| `INSUFFICIENT_EVIDENCE` | required host semantics are unavailable | abstention, never a pass |
+
+**Two further sets, at pointer depth.** The audited envelope's
+`audited_behavior_class` is a closed six-value set: the four classes above plus
+`AUDIT_INCOMPLETE` and `PROTOCOL_ERROR`. A consumer switching on that field
+must handle all six. The caller's half of the contract is seven testable
+obligations in [HOST_OBLIGATIONS.md](HOST_OBLIGATIONS.md); H1 through H7
+remain yours regardless of preflight status.
+
+| | The host's obligation |
+|---|---|
+| H1 | State truthfulness |
+| H2 | Atomicity and replay |
+| H3 | Derive facts; never assert conclusions |
+| H4 | Applicability calibration |
+| H5 | Input binding and transcripts |
+| H6 | Effects |
+| H7 | Request admission |
+
+The 30 obligations themselves are tabled verbatim in [DIAGRAMS.md, the
+appendix](DIAGRAMS.md#appendix--the-thirty-operations-in-the-contracts-own-words).
+
+## The measured result: abstaining beat guessing
+
+Forcing an obligation onto records whose native semantics were absent produced
+133 false holds across 390 clean records, a rate of 34.1%. The three-state
+preflight abstains on those rows instead. Over the same published 408-record
+corpus it holds detection at 18/18 and takes the clean false-hold rate to
+**0.0%**. All 133 false holds came from forcing one obligation — OBL-17,
+acknowledgment-after-effect — onto one family: 133 of the LIFECYCLE family's
+208 clean records, zero across the other three families' 182. Abstention
+withdrew exactly that family's clean set rather than guessing, and no
+defective row lands in the abstention bucket. Reproduce it from a clean clone,
+with no private inputs:
+
+```bash
+python -B adapters/outcome_receipt.py --check
+```
+
+Expected: `WP1 all-408 fallback replay: 0 new false holds, 208 insufficient,
+detection 18/18; FALLBACK_DELIVERED_RUNTIME_BAR_MET`.
+
+**Scope of that number.** It is a classification result. No efficacy claim
+attaches to it. The corpus is one operator's own recorded coordination
+workspace: 398 real records plus 10 seeded, 18 defective, four obligation
+families out of 30. The adapter and the referee share an author. On the
+external review's evidence ladder it sits at the internal held-out benchmark
+tier, not the preregistered blinded tier. Read `proof/README.md` "Honest
+limits" before quoting the number anywhere.
+
+## Start here, by what you are doing
+
+| You are | Read first | Then |
+|---|---|---|
+| evaluating it | [EXAMPLE.md](EXAMPLE.md), one handoff decided end to end | [TRUST_MODEL.md](TRUST_MODEL.md), what the evidence claims and for whom |
+| integrating it | [HOST_OBLIGATIONS.md](HOST_OBLIGATIONS.md), your half of the contract | `adapters/README.md` for the taxonomy, `adapters/CALIBRATION.md` for the playbook |
+| auditing it | `baseline-run/RUNBOOK.md`, the layout and the sealed subprocess-ABI mode | `python -B portability/verify_live.py`, which recomputes at the bytes you hold |
+
+## What it classifies, on public incidents
+
+Twelve publicly documented agent-system failures are adapted into fact
+profiles and replayed through the real preflight and the real audited API, 27
+records against pinned classifications. Five of the twelve:
+
+| Adapted incident | Obligation | Preflight | Audited class, defective record |
+|---|---|---|---|
+| Safety parameter hand-copied from a superseded version | `OBL-02` | `READY` | `OMISSION_OR_INCOMPLETE` |
+| Task derailment, work outside the task specification *(taxonomy-derived; weaker provenance than the report-derived rows)* | `OBL-03` | `READY` | `OMISSION_OR_INCOMPLETE` |
+| Access grant left live past its window | `OBL-26` | `INSUFFICIENT_EVIDENCE` | `MALFORMED_OR_BOUNDARY`, `BINDING_OR_CONFLICT` |
+| Tool-returned content treated as an instruction source *(prompt injection — the injection itself is outside RR's reach; what is classified is the adapted record)* | `OBL-22` | `INSUFFICIENT_EVIDENCE` | `MALFORMED_OR_BOUNDARY`, `OMISSION_OR_INCOMPLETE` |
+| Recurring-payment recipient redirected *(prompt injection — same limit)* | `OBL-28` | `INSUFFICIENT_EVIDENCE` | `OMISSION_OR_INCOMPLETE` |
+
+**The one claim this table makes: RR classifies this adapted record as that
+class.** No incident claims RR would have prevented, stopped, detected, or
+altered its source event. Nothing here is evidence of efficacy, security,
+novelty or interoperability, and this corpus does not extend the artifact's
+claims — see [TRUST_MODEL.md](TRUST_MODEL.md), which governs. Ten of the
+twelve sit outside the preflight's four calibrated families, so the preflight
+abstains and the corpus invokes the engine anyway. That is the H3 and H4
+fabrication the artifact tells hosts not to do, done deliberately and declared
+in each incident's `METHOD.md`. Full corpus, sources, lanes and weaknesses:
+[replay-corpus/README.md](replay-corpus/README.md).
+
+## Nobody outside this repository has run it yet
+
+`TRUST_MODEL.md`'s consumer census, re-run 2026-08-20 (twice — the second run
+recorded a stale sibling integration's retirement), records **zero consumers
+outside the maintainer's control**. Inside that boundary there are two kinds:
+the in-repo surface — the proof harness, the lanes, the verifiers, and
+`adapters/mcp/` — and the maintainer's own agent harness, where the MCP gate
+runs as a user-scope stdio server. Nothing here has been load-tested by an
+integrator other than its author.
+
+Becoming the first independent verifier takes three commands. The
+`core.longpaths` flag is a Windows requirement, explained under Quickstart
+below.
+
+```bash
+git clone -c core.longpaths=true https://github.com/JimGHTB12/receiver-reliance.git
+cd receiver-reliance
+python -B portability/verify_live.py
+```
+
+Expected: `verify-live: gates=20 passed=20 declared_era_divergences=12
+undeclared_divergences=0 failures=0`. A different line is a finding, and
+[SECURITY.md](SECURITY.md) is how to report one.
+
+**How an adopter states conformance.** One line a stranger checks
+mechanically, with no lookup:
+
+```text
+<implementation>@<version> • composed-0.3-frozen • 907/907 • ENGINE_MANIFEST_SHA256=<recomputed> • <receipt URL>
+```
+
+`composed-0.3-frozen` is the closed `engine_generation` value every audited
+envelope carries. 907 is the composed suite, 800 accepted plus 107
+supplemental, run with
+`python -B implementation-output-0.3/run_conformance_0_3.py --suite all` from
+`baseline-run/`. Recompute the manifest digest rather than looking it up:
+`python -B receiver_reliance/generate_engine_manifest.py --check`. A dated
+digest recorded in a document is a witness to one run, never the live pin.
+
+## Which bytes this describes
+
+This document tracks `main`, which is normally ahead of the tag named above
+and can document surfaces that tag does not contain. `git describe --tags` is
+the discriminator. A package version carrying a `.devN` suffix
+(`pyproject.toml`, `receiver_reliance.__version__`) says the checkout is past
+the last release rather than being it. For a fixed artifact, pin the tag. For
+exactly the bytes you ran, use `git rev-parse HEAD`.
 
 ## What this is, and where it comes from
 
-When one autonomous agent hands records to another — claims, versions,
-grants, lifecycle events, effect receipts — the receiving side needs a
-deterministic, auditable way to decide what it may rely on. This repository
-is the **baseline layer** of a research program studying that decision: a
-frozen 28-operation decision engine ("B1"), a supplemental 2-operation
-generation that closes its reviewed capability gaps, their conformance
-fixture suites, and reference implementations that reproduce both suites
-byte-for-byte. The composed 30-operation surface was ruled complete by a
-candidate-blind completeness review against a hash-pinned prior-art basis
-(see "The supplemental 0.3 generation" below).
+When one autonomous agent hands records to another, the receiving side needs
+a deterministic, auditable way to decide what it may rely on. The record
+kinds in scope are claims, versions, grants, lifecycle events and effect
+receipts. This repository is the **baseline layer** of a research program
+studying that decision. It ships a frozen 28-operation decision engine ("B1")
+and a supplemental 2-operation generation that closes its reviewed capability
+gaps. It also ships their conformance fixture suites, and reference
+implementations that reproduce both suites byte-for-byte. The composed
+30-operation surface was ruled complete by a candidate-blind completeness
+review against a hash-pinned prior-art basis, under "The supplemental 0.3
+generation" below. "B1-ATTENTION" is the same engine behind a wrapper that
+adds a neutral attention card, so experiment arms can control for ceremony.
 
-The program's larger question — whether a specific receiver-local binding
-rule causally improves handoff outcomes against a strong baseline — is a
-blinded experiment that is *not* part of this artifact and has not produced
-results. What ships here is the part with standalone value: a
-content-addressed, independently checkable comparator you can run, port, or
-adapt.
+The engine is deliberately narrow. It classifies structured fact profiles the
+caller assembles and supplies, and it seals the decision. It does not
+retrieve records, store lifecycle state, enforce policy, run clarification
+dialogues, or execute effects. Those live in the host system, and
+[HOST_OBLIGATIONS.md](HOST_OBLIGATIONS.md) is the explicit, testable contract
+for that division. [DIAGRAMS.md
+A1](DIAGRAMS.md#a1--the-division-of-labour-and-the-paths-that-do-not-exist)
+draws it. The payload of that drawing is three crossed edges: the engine
+never reads a record, never consults a clock, and never executes an effect.
+One of the three is a property of the bytes: neither frozen engine file
+imports `time`, `datetime`, `random` or `os`, and the only date-time
+reference in either is a string-shape regex inside schema validation, so
+"never consults a clock" is byte-warranted. The other two edges are design
+statements the drawing commits the artifact to.
 
-The engine is deliberately narrow: it deterministically classifies
-structured fact profiles that the caller assembles and supplies, and seals
-the decision. It does not retrieve records, store lifecycle state, enforce
-policy, run clarification dialogues, or execute effects. Those live in the
-host system — [HOST_OBLIGATIONS.md](HOST_OBLIGATIONS.md) is the explicit,
-testable contract for that division (state truthfulness, atomicity,
-derive-don't-assert, applicability calibration, input binding, effects).
 Some schema-required inputs are bound for future semantics and are
-classification-inert today. Call
-`grounded-0_4/rr_api.py::authority_for_operation` with an obligation ID or
-operation handle to ask the artifact which required fields carry authority;
-the result is read from `grounded-0_4/authority_register_0_4.json`, not a
-second code table. The generated one-glance view is
+classification-inert today. To ask the artifact which required fields carry
+authority, call `grounded-0_4/rr_api.py::authority_for_operation` with an
+obligation ID or an operation handle. It reads
+`grounded-0_4/authority_register_0_4.json`, not a second code table. The
+generated one-glance view is
 [grounded-0_4/AUTHORITY_TABLE.md](grounded-0_4/AUTHORITY_TABLE.md), and
-`python -B grounded-0_4/generate_authority_table.py --check` fails if it
-drifts from the register. Known defects and enforcement are recorded in
-[ERRATA.md](ERRATA.md). What every seal and receipt in this repository
-does and does not prove — and who is assumed to consume it — is declared
-once, canonically, in [TRUST_MODEL.md](TRUST_MODEL.md).
+`python -B grounded-0_4/generate_authority_table.py --check` fails if that
+view drifts from the register. Known defects and their enforcement are
+recorded in [ERRATA.md](ERRATA.md). What every seal and receipt in this
+repository does and does not prove, and who is assumed to consume it, is
+declared once, canonically, in [TRUST_MODEL.md](TRUST_MODEL.md).
 
-The 30 operations — the 28-operation accepted core plus the two
-supplemental rows — cover the obligation surface a careful receiver faces:
-vocabulary and purpose binding, exact reference resolution, scope and
-interval consistency, evidence independence, version functionality,
-write-set visibility, dependency acyclicity, lifecycle ordering, effect
-authorization windows, nonce replay, untrusted-content validation,
-render/effect binding, terminate-as-unresolved when the basis is absent,
-selective clarification triage (proceed, ask, or hold, with burden
-accounting), and intent-compatible selection from frozen candidate pools.
-Each operation classifies structured facts into `VALID`,
-`MALFORMED_OR_BOUNDARY`, `BINDING_OR_CONFLICT`, or `OMISSION_OR_INCOMPLETE`
-via a machine-readable predicate table evaluated in frozen precedence order.
-"B1-ATTENTION" is the same engine behind a wrapper that adds a neutral
-attention card, so experiment arms can control for ceremony.
+**What is out of scope here.** The program's larger question is whether a
+specific receiver-local binding rule causally improves handoff outcomes
+against a strong baseline. That is a blinded experiment which is *not* part
+of this artifact and has not produced results. What ships is the part with
+standalone value: a content-addressed, independently checkable comparator you
+can run, port, or adapt. This repository makes no security, efficacy,
+novelty, external-standard or universal-portability claim, which
+[TRUST_MODEL.md](TRUST_MODEL.md#non-claims) states canonically and "What this
+does not claim" below repeats for this document.
 
 ## Quickstart
 
@@ -697,7 +853,7 @@ misclassifies nothing and re-activates at any future enum extension.
 
 ## Where this sits among adjacent systems
 
-Orientation, not a ranking (see "What this does not claim"). Four adjacent
+Orientation, not a ranking (see "What this does not claim"). Five adjacent
 efforts:
 
 - [Microsoft's Agent Governance Toolkit](https://github.com/microsoft/agent-governance-toolkit)
@@ -722,6 +878,14 @@ efforts:
   collaboration: hash-linked envelopes of drafts, edits, and rationales.
   It audits the decision history; it does not render the reliance
   decision.
+- [The Five Tests Standard (5TS)](https://github.com/edmeyman/4ts-standard)
+  (steward FERZ, Inc.; spec v1.2.0, read August 2026) is proof-carrying
+  decision governance: five named tests yielding ALLOW / DENY / ABSTAIN,
+  where the verdict itself is the authorization, over an assumed external
+  PKI, with eight published conformance vectors. It governs whether an
+  action proceeds; it does not classify the received records an agent
+  relies on — and verdict-as-authorization is the exact reading this
+  artifact's classifications refuse.
 
 This artifact sits between those layers: *after* records arrive and
 *before* the receiver acts on them, it deterministically classifies each

@@ -818,7 +818,7 @@ which are chronology rather than structure and live in `orchestration/`.
 `second-implementation/findings/F-WP4-007.md`; *"a conforming second implementation still does not
 exist and remains the single most valuable outside contribution"*), and §"Quickstart" (the 800-check
 breakdown, and the composed run's two summary lines `800 … failures=0` and `107 … failures=0`
-totalling 907). `ADOPTION.md` A3, status **in flight, outside this repo**.
+totalling 907). `ADOPTION.md` A3, status **Open — no attempt scheduled**.
 `.github/workflows/conformance.yml` (the 800 and 907 counts, in the step names). `ERRATA.md` E10.
 `baseline-run/verify_predicate_coverage.py` module docstring (the two arms, the temporary-directory
 staging, and *"which parts of the law the published evidence actually constrains, which is the

@@ -32,6 +32,15 @@ signature edge.
 | Hosted matrix receipts | A named GitHub Actions run (an authority external to this repo) observed the recorded outcomes for the pinned plan rows | Rows not executed; bytes newer than the bound head |
 | Harness receipts (perf, sidecar, WP1 outcome) | The measurement, on the recorded host and corpus, scoped exactly as the receipt states | Generalization to other hosts, workloads, or corpora |
 
+**One limit governs every row of the table above.** Every conformance suite,
+fuzz campaign, differential campaign, oracle, portability lane and receipt in
+this repository points at the same implementation. No conforming second
+implementation exists (`ADOPTION.md` A3); the one author-separated attempt was
+refuted over 592 confirmed divergences across five independent mechanisms. So
+byte-parity here is a property of the reference implementation against itself,
+and nothing on this page may be read as cross-implementation confirmation.
+`DIAGRAMS.md` C3 draws the shape of that hole.
+
 `READY` from the portable preflight is **eligibility, never a pass**:
 sufficient, noncontradictory native evidence under the fail-closed boundary
 law (`adapters/portable_preflight.py` module docstring). `REJECTED_INVALID`
@@ -93,25 +102,29 @@ document until this release:
 
 ## Who consumes this, today
 
-Consumer census, re-run 2026-08-20 (method: content search for
+Consumer census, re-run 2026-08-20 and again the same day at the sibling
+retirement below (method: content search for
 `receiver_reliance`, `decide_audited`, `portable_preflight`, and the wire
 format strings across the operator's workspace and adjacent project trees,
 plus a client-configuration search for `rr_mcp_gate` and `mcpServers`
 entries; one unrelated production repository excluded by standing operator
 policy): **zero consumers outside the maintainer's control exist.** Inside
-that boundary there are three kinds, and the third is new to this page.
+that boundary there are two kinds; a third was retired on 2026-08-20 and its
+dated record stays below.
 
 - **In-repo:** the proof harness, the lanes, the verifiers, and
   `adapters/mcp/` — in this tree, verified by this repository's own gates.
-- **Sibling (staged, stale):** one integration in the maintainer's own
-  workspace since 2026-08-15 (`rr-gate`, a separate unpublished tree, not the
-  `rr_gate_check`/`rr_gate_batch`/`rr_gate_explain` tools `adapters/mcp/`
-  exports). It
-  `sys.path`-imports `grounded-0_4/rr_api.py` and calls `decide_audited` over
-  real workspace facts, built against `main` at `5aa2b4b` — now roughly sixty
-  commits stale, predating the 0.4.2 seal. Its own README disclaims security
-  and efficacy, and the hook that would put it in a decision path remains
-  staged and uninstalled.
+- **Sibling (RETIRED 2026-08-20):** one integration lived in the maintainer's
+  own workspace from 2026-08-15 (`rr-gate`, a separate unpublished tree, not
+  the `rr_gate_check`/`rr_gate_batch`/`rr_gate_explain` tools `adapters/mcp/`
+  exports). It `sys.path`-imported `grounded-0_4/rr_api.py` and called
+  `decide_audited` over real workspace facts, built against `main` at
+  `5aa2b4b` and long stale; its own README disclaims security and efficacy,
+  and the hook that would have put it in a decision path was never installed.
+  Retired by the maintainer's decision on 2026-08-20 and archived out of the
+  active workspace; it leaves the consumer count from that date. This entry
+  stays as the dated record of the days it was a consumer, under the same
+  census-correction rule as everything else in this section.
 - **Wired (2026-08-20):** the maintainer's own agent harness registers
   `adapters/mcp/rr_mcp_gate.py` as a user-scope stdio MCP server
   (`receiver-reliance`, running from this checkout under CPython 3.12 with
