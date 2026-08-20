@@ -93,23 +93,35 @@ document until this release:
 
 ## Who consumes this, today
 
-Consumer census, re-run 2026-08-19 (method: content search for
+Consumer census, re-run 2026-08-20 (method: content search for
 `receiver_reliance`, `decide_audited`, `portable_preflight`, and the wire
-format strings across the operator's workspace and adjacent project trees;
-one unrelated production repository excluded by standing operator policy):
-**zero consumers outside the maintainer's control exist.** Inside that
-boundary there are two kinds, and the second is new to this page.
+format strings across the operator's workspace and adjacent project trees,
+plus a client-configuration search for `rr_mcp_gate` and `mcpServers`
+entries; one unrelated production repository excluded by standing operator
+policy): **zero consumers outside the maintainer's control exist.** Inside
+that boundary there are three kinds, and the third is new to this page.
 
-- **In-repo:** the proof harness, the lanes, the verifiers, and now
+- **In-repo:** the proof harness, the lanes, the verifiers, and
   `adapters/mcp/` — in this tree, verified by this repository's own gates.
-- **Sibling:** one integration in the maintainer's own workspace since
-  2026-08-15 (`rr-gate`, which is a separate unpublished tree and not the
+- **Sibling (staged, stale):** one integration in the maintainer's own
+  workspace since 2026-08-15 (`rr-gate`, a separate unpublished tree, not the
   `rr_gate_check`/`rr_gate_explain` tools `adapters/mcp/` exports). It
   `sys.path`-imports `grounded-0_4/rr_api.py` and calls `decide_audited` over
-  real workspace facts, and it was built against `main` at `5aa2b4b`. Its own
-  README disclaims security and efficacy, its senders are the maintainer's own
-  tooling, and the hook that would put it in a decision path is staged and not
-  installed — it appears in no client or settings configuration.
+  real workspace facts, built against `main` at `5aa2b4b` — now roughly sixty
+  commits stale, predating the 0.4.2 seal. Its own README disclaims security
+  and efficacy, and the hook that would put it in a decision path remains
+  staged and uninstalled.
+- **Wired (2026-08-20):** the maintainer's own agent harness registers
+  `adapters/mcp/rr_mcp_gate.py` as a user-scope stdio MCP server
+  (`receiver-reliance`, running from this checkout under CPython 3.12 with
+  an audit log outside the repository). This is the first configuration in
+  which any client can call the gate in a live session. It is still inside
+  the maintainer's control: its senders are the maintainer's own tooling, so
+  the external-consumer clause of the trigger below does not fire, and the
+  embedding clause finds its named hardening set satisfied in advance
+  (ADOPTION A4/A5/A6, closed 2026-08-19). What it changes is the census
+  fact: the gate is no longer only a surface — it is in a decision path on
+  one machine, the maintainer's.
 
 **Correction, stated plainly rather than absorbed.** Until this edit the
 sentence above read "zero external **or sibling** code consumers exist," dated
