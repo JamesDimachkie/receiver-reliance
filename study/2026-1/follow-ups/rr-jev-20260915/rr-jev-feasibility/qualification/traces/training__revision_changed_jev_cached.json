@@ -1,0 +1,361 @@
+{
+  "common": {
+    "a2_raw_shared_bundle": {
+      "bundle_id": "BUNDLE_773CA248811001A6E8F588D6C9B286175E15B82992E7F47CCEB576D2E3A09C4C",
+      "capabilities": [
+        {
+          "capability_id": "CAP_41CF6794BA4200B839C53531",
+          "episode_id": "EP_4A0F11A660887F2DE35BF240",
+          "role_id": "ROLE_REGISTERED_ACTOR"
+        },
+        {
+          "capability_id": "CAP_A8E43DD7A15E1D81AD9124AB",
+          "episode_id": "EP_4A0F11A660887F2DE35BF240",
+          "role_id": "ROLE_REGISTERED_ACTOR"
+        }
+      ],
+      "claim_versions": [
+        {
+          "claim_id": "CLAIM_49FA5DD0323D984ED7FC25FF96796AD3855403C92AC63CBB31393643E000D667",
+          "exact_claim_version_id": "CLAIM_49FA5DD0323D984ED7FC25FF96796AD3855403C92AC63CBB31393643E000D667",
+          "payload": "{\"assessment\":{\"answer_json\":\"{\\\"choice\\\":\\\"supports\\\",\\\"confidence\\\":0.95,\\\"probabilities\\\":{\\\"contradicts\\\":0.01,\\\"insufficient\\\":0.01,\\\"supports\\\":0.98},\\\"type\\\":\\\"choice\\\"}\",\"kind\":\"jev\",\"request_sha256\":\"AD62F11923F93D8ADC55243D2C03460838314CBAEC68E895039C125CD799E7CB\",\"response_sha256\":\"7D9CC3DA58352A58D6DE1D902897E508C4F702B6691AB4879F4C3ABE67C49FA1\",\"returned_model\":\"jev-latest\"},\"claim\":\"Maya completed the introductory course.\",\"intended_use\":\"PURPOSE_SUMMARY\",\"source_revision\":1,\"source_sha256\":\"EB48A0A24FC1F978F0620DFEF6D22CB1720CE14CDCA11B0209AC94D60539F44B\"}",
+          "source_record_refs": [
+            "SOURCE_AFE24E251B56F27F8A2116C186724EB05B625497BED333A799E55A257F1942EF"
+          ],
+          "version": 2
+        }
+      ],
+      "closure_attestations": [
+        {
+          "closed_record_classes": [
+            "CLAIM_VERSION",
+            "DECLARATION_RECORD",
+            "MANDATE_RECORD",
+            "USE_RECORD"
+          ],
+          "closed_through": "2026-09-05T12:00:01Z",
+          "closure_attestation_id": "CLOSURE_6751D26B9AC4167346EAED4215B4C4DA46AA91D46FDCA5D25871507F75146744",
+          "committed_frontier": 1,
+          "ledger_id": "LEDGER_74D490FD02F5932854953E3573CF33E0475EEF39EF9D0A038B128A3B4DD0BD05",
+          "source_extent": [
+            "SOURCE_MANDATE",
+            "SOURCE_PRIMARY"
+          ],
+          "verification_method_ref": "REGISTERED_FINITE_HISTORY_CENSUS"
+        }
+      ],
+      "declaration_records": [
+        {
+          "declaration_kind": "ADOPTION_DECLARED",
+          "declaration_version_ref": "DECL_USE",
+          "episode_id": "EP_4A0F11A660887F2DE35BF240",
+          "exact_claim_version_id": "CLAIM_804279D7F8F1AB1ABEF7533D21CCCC4B1FF77E2127EB1C5AF614AACF08D98313",
+          "interval": {
+            "effective_from": "2026-09-05T11:00:00Z",
+            "effective_until": "2026-09-05T13:00:00Z"
+          },
+          "issuer_capability_id": "CAP_41CF6794BA4200B839C53531",
+          "mandate_version_ref": "STANDING_EF839495BF5B2B0AE32D43FD",
+          "policy_ref": "POLICY_SHARED_0_1",
+          "purpose_id": "PURPOSE_SUMMARY",
+          "receiver_capability_id": "CAP_A8E43DD7A15E1D81AD9124AB",
+          "recorded_at": "2026-09-05T12:00:00Z",
+          "scope_id": "SCOPE_TASK",
+          "standing_basis_ref": "STANDING_EF839495BF5B2B0AE32D43FD"
+        }
+      ],
+      "domain_mandate_records": [
+        {
+          "interval": {
+            "effective_from": "2026-09-05T11:00:00Z",
+            "effective_until": "2026-09-05T13:00:00Z"
+          },
+          "mandate_version_ref": "STANDING_EF839495BF5B2B0AE32D43FD",
+          "permitted_record_kinds": [
+            "ADOPTION_DECLARED"
+          ],
+          "policy_ref": "POLICY_SHARED_0_1",
+          "purpose_ids": [
+            "PURPOSE_SUMMARY"
+          ],
+          "scope_ids": [
+            "SCOPE_TASK"
+          ],
+          "subject_capability_id": "CAP_41CF6794BA4200B839C53531"
+        }
+      ],
+      "domain_vocabulary": {
+        "canonicalization_method_ref": "EH_CANONICAL_JSON_0_1",
+        "domain_id": "RR_LOCAL_CONSTRUCTED_WORKFLOW",
+        "purpose_entries": [
+          {
+            "description": "Registered receiver operation",
+            "id": "PURPOSE_SUMMARY"
+          }
+        ],
+        "scope_entries": [
+          {
+            "description": "Registered constructed task scope",
+            "id": "SCOPE_TASK"
+          }
+        ],
+        "selector_language_id": "EH-SELECTOR-CORE-0_1",
+        "vocabulary_id": "RR_LOCAL_WORKFLOW_VOCAB",
+        "vocabulary_version": "1.0"
+      },
+      "episodes": [
+        {
+          "cross_party_episode_id": "EP_4A0F11A660887F2DE35BF240",
+          "domain_vocabulary_ref": "RR_LOCAL_WORKFLOW_VOCAB",
+          "episode_family_id": "RR_LOCAL_WORKFLOW",
+          "interval": {
+            "effective_from": "2026-09-05T11:00:00Z",
+            "effective_until": "2026-09-05T13:00:00Z"
+          },
+          "purpose_id": "PURPOSE_SUMMARY",
+          "receiver_capability_id": "CAP_A8E43DD7A15E1D81AD9124AB",
+          "receiver_role_id": "ROLE_RECEIVER",
+          "scope_id": "SCOPE_TASK",
+          "sender_capability_id": "CAP_41CF6794BA4200B839C53531",
+          "sender_role_id": "ROLE_SENDER"
+        }
+      ],
+      "format_version": "EH-G0-A2-SHARED-0.1",
+      "ledger_observations": [
+        {
+          "action_or_decision_ref": "ACTION_3676EBE5AE30974892AEA34D",
+          "captured_at": "2026-09-05T12:00:00Z",
+          "committed_frontier": 1,
+          "decision_context_ref": "CONTEXT_CONTROL",
+          "included_record_refs": [
+            "DECL_USE"
+          ],
+          "ledger_id": "LEDGER_74D490FD02F5932854953E3573CF33E0475EEF39EF9D0A038B128A3B4DD0BD05",
+          "nonce": "NONCE_CONTROL"
+        }
+      ],
+      "observable_external_facts": [],
+      "recorded_action_grants": [],
+      "recorded_support_assessments": [],
+      "source_records": [
+        {
+          "observed_at": "2026-09-05T12:00:00Z",
+          "payload": "{\"revision\":1,\"source_text\":\"The training register lists Maya as having completed the introductory course. Maya has not completed the advanced course.\"}",
+          "source_kind": "DOCUMENT",
+          "source_record_id": "SOURCE_AFE24E251B56F27F8A2116C186724EB05B625497BED333A799E55A257F1942EF"
+        }
+      ],
+      "use_records": [
+        {
+          "action_or_decision_ref": "ACTION_3676EBE5AE30974892AEA34D",
+          "decision_context_ref": "CONTEXT_CONTROL",
+          "declared_basis_refs": [
+            "DECL_USE"
+          ],
+          "episode_id": "EP_4A0F11A660887F2DE35BF240",
+          "exact_claim_version_id": "CLAIM_49FA5DD0323D984ED7FC25FF96796AD3855403C92AC63CBB31393643E000D667",
+          "occurred_at": "2026-09-05T12:00:01Z",
+          "purpose_id": "PURPOSE_SUMMARY",
+          "receiver_capability_id": "CAP_A8E43DD7A15E1D81AD9124AB",
+          "scope_id": "SCOPE_TASK",
+          "use_id": "USE_9E7C31226DBD85EC637F68424F0D573638F6D7BF74D8D4CFF86575BE04627595"
+        }
+      ]
+    },
+    "comparison_facts": {
+      "carrier_fence": 1,
+      "consumed_representation_sha256": "49FA5DD0323D984ED7FC25FF96796AD3855403C92AC63CBB31393643E000D667",
+      "current_fence": 1,
+      "expected_action_class": "PERMIT",
+      "expected_authority": "AUTH_LOCAL",
+      "expected_carrier": "CARRIER_CONTROL",
+      "expected_direct_parents": [
+        "PARENT_F0EFEBDAB7B8C9D1AD39B0CFD6DDFB0FF645BB438789CF910A4BCB6A61CE90D5"
+      ],
+      "expected_generation": 1,
+      "expected_owner": "OWNER_LOCAL",
+      "expected_principal": "CAP_41CF6794BA4200B839C53531",
+      "expected_purpose": "PURPOSE_SUMMARY",
+      "expected_receiver_capability": "CAP_A8E43DD7A15E1D81AD9124AB",
+      "expected_representation_sha256": "49FA5DD0323D984ED7FC25FF96796AD3855403C92AC63CBB31393643E000D667",
+      "expected_route": "ROUTE_CONTROL",
+      "expected_scope": [
+        "SCOPE_TASK"
+      ],
+      "expected_slot": "SLOT_CONTROL",
+      "observed_action_class": "PERMIT",
+      "observed_authority": "AUTH_LOCAL",
+      "observed_carrier": "CARRIER_CONTROL",
+      "observed_direct_parents": [
+        "PARENT_F0EFEBDAB7B8C9D1AD39B0CFD6DDFB0FF645BB438789CF910A4BCB6A61CE90D5"
+      ],
+      "observed_generation": 1,
+      "observed_owner": "OWNER_LOCAL",
+      "observed_principal": "CAP_41CF6794BA4200B839C53531",
+      "observed_purpose": "PURPOSE_SUMMARY",
+      "observed_receiver_capability": "CAP_A8E43DD7A15E1D81AD9124AB",
+      "observed_route": "ROUTE_CONTROL",
+      "observed_scope": [
+        "SCOPE_TASK"
+      ],
+      "observed_slot": "SLOT_CONTROL",
+      "origin_finalized": true,
+      "revocation_active": false,
+      "use_time_ns": 1001,
+      "valid_from_ns": 0,
+      "valid_until_ns": 10000
+    },
+    "delivered_artifact_envelope": {
+      "artifact_id": "ART_CONTROL",
+      "content_b64": "eyJhc3Nlc3NtZW50Ijp7ImFuc3dlcl9qc29uIjoie1wiY2hvaWNlXCI6XCJzdXBwb3J0c1wiLFwiY29uZmlkZW5jZVwiOjAuOTUsXCJwcm9iYWJpbGl0aWVzXCI6e1wiY29udHJhZGljdHNcIjowLjAxLFwiaW5zdWZmaWNpZW50XCI6MC4wMSxcInN1cHBvcnRzXCI6MC45OH0sXCJ0eXBlXCI6XCJjaG9pY2VcIn0iLCJraW5kIjoiamV2IiwicmVxdWVzdF9zaGEyNTYiOiJBRDYyRjExOTIzRjkzRDhBREM1NTI0M0QyQzAzNDYwODM4MzE0Q0JBRUM2OEU4OTUwMzlDMTI1Q0Q3OTlFN0NCIiwicmVzcG9uc2Vfc2hhMjU2IjoiN0Q5Q0MzREE1ODM1MkE1OEQ2REUxRDkwMjg5N0U1MDhDNEY3MDJCNjY5MUFCNDg3OUY0QzNBQkU2N0M0OUZBMSIsInJldHVybmVkX21vZGVsIjoiamV2LWxhdGVzdCJ9LCJjbGFpbSI6Ik1heWEgY29tcGxldGVkIHRoZSBpbnRyb2R1Y3RvcnkgY291cnNlLiIsImludGVuZGVkX3VzZSI6IlBVUlBPU0VfU1VNTUFSWSIsInNvdXJjZV9yZXZpc2lvbiI6MSwic291cmNlX3NoYTI1NiI6IkVCNDhBMEEyNEZDMUY5NzhGMDYyMERGRUY2RDIyQ0IxNzIwQ0UxNENEQ0ExMUIwMjA5QUM5NEQ2MDUzOUY0NEIifQ==",
+      "format": "RR-SCIENTIFIC-CLOSED-ARTIFACT-1",
+      "media_type": "application/json",
+      "revision": 2
+    },
+    "format": "RR-STUDY-TREATMENT-COMMON-5",
+    "guard_observation_facts": {
+      "consumption_state": "UNUSED",
+      "effect_receipt_count": 1,
+      "effect_sha256": "733818A4374F3513C980C9019BE1D2A7BA02E5CB5C6094A2D67578B1CB4FB596",
+      "execution_receipt_effect_sha256": "733818A4374F3513C980C9019BE1D2A7BA02E5CB5C6094A2D67578B1CB4FB596",
+      "grant_expires_at": 2000,
+      "grant_not_before": 0,
+      "invocation_nonce": "NONCE_INGRESS",
+      "invocation_time": 1000,
+      "prior_invocation_nonces": [],
+      "revocation_checked_at": 1000,
+      "revoked_at": null
+    },
+    "remediation": {
+      "attempt_ordinal": 0,
+      "refetch_budget": 1
+    },
+    "requested_delivered_transfer": {
+      "declared_sha256": "49FA5DD0323D984ED7FC25FF96796AD3855403C92AC63CBB31393643E000D667",
+      "delivered_artifact_id": "ART_CONTROL",
+      "delivered_revision": 2,
+      "requested_artifact_id": "ART_CONTROL",
+      "requested_revision": 2
+    },
+    "source_lineage_observation": {
+      "format": "RR-SCIENTIFIC-CLOSED-LINEAGE-OBSERVATION-1",
+      "source_artifact_id": "SOURCE_AFE24E251B56F27F8A2116C186724EB05B625497BED333A799E55A257F1942EF",
+      "source_revision": 0,
+      "source_sha256": "AFE24E251B56F27F8A2116C186724EB05B625497BED333A799E55A257F1942EF"
+    },
+    "task_id": "TASK_A8E95D4FB1B44A73DE2AFDA49D4C6EB5AE4E0FCBE1347200F9B002DA2B85A043",
+    "task_instruction_constraints": {
+      "constraints": [],
+      "instruction": "Use the exact supported factual claim for the declared purpose."
+    }
+  },
+  "receipt": {
+    "arm": "R",
+    "common_sha256": "F941904A40299D2EEA00E4EB6884D76C738924C35F53470708A3CE237DB69362",
+    "constructions": [
+      {
+        "evidence": {
+          "code": "R_ACCEPTANCE_INAPPLICABLE",
+          "module": "R",
+          "occurrence": 0,
+          "pointer": "",
+          "semantic_evidence": {
+            "acceptance_class": "INAPPLICABLE",
+            "engine_class": "VALID",
+            "engine_output_sha256": "8CD1D1976FACA688C0FBDDAC67C4D65B55C1D17D3DACEB99904475312157BDF9",
+            "lineage_class": "COMPLETE",
+            "recorded_use_sha256": "C663A0DCE45753C368FB7E6009E41B2CEC242AFE3757B5F1685873A123C3F063",
+            "selected_issuance_id": null
+          },
+          "stage": "MODULE_SEMANTICS"
+        },
+        "output_sha256": "17AE42E695EA0101486713AB7B08BD062F16DFD2AA927B67783D72F392A92B71"
+      }
+    ],
+    "cpu_ns": 31250000,
+    "engine_calls": [
+      {
+        "request_b64": "eyJkZWNpc2lvbl9pbnB1dCI6eyJmYWN0cyI6eyJjb25zdW1wdGlvbl9zdGF0ZSI6IlVOVVNFRCIsImVmZmVjdF9yZWNlaXB0X2NvdW50IjoxLCJlZmZlY3Rfc2hhMjU2IjoiNzMzODE4QTQzNzRGMzUxM0M5ODBDOTAxOUJFMUQyQTdCQTAyRTVDQjVDNjA5NEEyRDY3NTc4QjFDQjRGQjU5NiIsImV4ZWN1dGlvbl9yZWNlaXB0X2VmZmVjdF9zaGEyNTYiOiI3MzM4MThBNDM3NEYzNTEzQzk4MEM5MDE5QkUxRDJBN0JBMDJFNUNCNUM2MDk0QTJENjc1NzhCMUNCNEZCNTk2IiwiZ3JhbnRfZXhwaXJlc19hdCI6MjAwMCwiZ3JhbnRfbm90X2JlZm9yZSI6MCwiaW52b2NhdGlvbl9ub25jZSI6Ik5PTkNFX0lOR1JFU1MiLCJpbnZvY2F0aW9uX3RpbWUiOjEwMDAsInByaW9yX2ludm9jYXRpb25fbm9uY2VzIjpbXSwicmV2b2NhdGlvbl9jaGVja2VkX2F0IjoxMDAwLCJyZXZva2VkX2F0IjpudWxsfSwiZm9ybWF0X3ZlcnNpb24iOiJCMS1TRU1BTlRJQy1GQUNUUy0wLjIiLCJvYmxpZ2F0aW9uX2lkIjoiT0JMLTI2Iiwib3BlcmF0aW9uX2hhbmRsZSI6Ik9QUl8yQjEyQzhGOEQ0MjQwRkRBNjFDREExOTgifSwiZm9ybWF0X3ZlcnNpb24iOiJCMS1TRU1BTlRJQy1ERUNJU0lPTi1SRVFVRVNULTAuMiIsImlubmVyX2lucHV0X3NoYTI1NiI6IjlFN0Q0MjA5Rjc3NEI5QURGM0ZDNDU5RDg3REIyRUY1MjhCQkExMDMzREU0MjAyRUEzNUIwODJFMTcyRUQxMDkiLCJpbm5lcl9yZXF1ZXN0Ijp7ImNvbmZpZ3VyYXRpb25faGFuZGxlIjoiQ0ZHX0IwNkJDQUFCMEY1NzEzQjc1QUMwRjEyNiIsImZvcm1hdF92ZXJzaW9uIjoiUENCLVJVTk5FUi1SRVFVRVNULTAuMiIsImlucHV0Ijp7ImJ1bmRsZV9pZCI6IkJVTkRMRV83NzNDQTI0ODgxMTAwMUE2RThGNTg4RDZDOUIyODYxNzVFMTVCODI5OTJFN0Y0N0NDRUI1NzZEMkUzQTA5QzRDIiwiY2FwYWJpbGl0aWVzIjpbeyJjYXBhYmlsaXR5X2lkIjoiQ0FQXzQxQ0Y2Nzk0QkE0MjAwQjgzOUM1MzUzMSIsImVwaXNvZGVfaWQiOiJFUF80QTBGMTFBNjYwODg3RjJERTM1QkYyNDAiLCJyb2xlX2lkIjoiUk9MRV9SRUdJU1RFUkVEX0FDVE9SIn0seyJjYXBhYmlsaXR5X2lkIjoiQ0FQX0E4RTQzREQ3QTE1RTFEODFBRDkxMjRBQiIsImVwaXNvZGVfaWQiOiJFUF80QTBGMTFBNjYwODg3RjJERTM1QkYyNDAiLCJyb2xlX2lkIjoiUk9MRV9SRUdJU1RFUkVEX0FDVE9SIn1dLCJjbGFpbV92ZXJzaW9ucyI6W3siY2xhaW1faWQiOiJDTEFJTV80OUZBNUREMDMyM0Q5ODRFRDdGQzI1RkY5Njc5NkFEMzg1NTQwM0M5MkFDNjNDQkIzMTM5MzY0M0UwMDBENjY3IiwiZXhhY3RfY2xhaW1fdmVyc2lvbl9pZCI6IkNMQUlNXzQ5RkE1REQwMzIzRDk4NEVEN0ZDMjVGRjk2Nzk2QUQzODU1NDAzQzkyQUM2M0NCQjMxMzkzNjQzRTAwMEQ2NjciLCJwYXlsb2FkIjoie1wiYXNzZXNzbWVudFwiOntcImFuc3dlcl9qc29uXCI6XCJ7XFxcImNob2ljZVxcXCI6XFxcInN1cHBvcnRzXFxcIixcXFwiY29uZmlkZW5jZVxcXCI6MC45NSxcXFwicHJvYmFiaWxpdGllc1xcXCI6e1xcXCJjb250cmFkaWN0c1xcXCI6MC4wMSxcXFwiaW5zdWZmaWNpZW50XFxcIjowLjAxLFxcXCJzdXBwb3J0c1xcXCI6MC45OH0sXFxcInR5cGVcXFwiOlxcXCJjaG9pY2VcXFwifVwiLFwia2luZFwiOlwiamV2XCIsXCJyZXF1ZXN0X3NoYTI1NlwiOlwiQUQ2MkYxMTkyM0Y5M0Q4QURDNTUyNDNEMkMwMzQ2MDgzODMxNENCQUVDNjhFODk1MDM5QzEyNUNENzk5RTdDQlwiLFwicmVzcG9uc2Vfc2hhMjU2XCI6XCI3RDlDQzNEQTU4MzUyQTU4RDZERTFEOTAyODk3RTUwOEM0RjcwMkI2NjkxQUI0ODc5RjRDM0FCRTY3QzQ5RkExXCIsXCJyZXR1cm5lZF9tb2RlbFwiOlwiamV2LWxhdGVzdFwifSxcImNsYWltXCI6XCJNYXlhIGNvbXBsZXRlZCB0aGUgaW50cm9kdWN0b3J5IGNvdXJzZS5cIixcImludGVuZGVkX3VzZVwiOlwiUFVSUE9TRV9TVU1NQVJZXCIsXCJzb3VyY2VfcmV2aXNpb25cIjoxLFwic291cmNlX3NoYTI1NlwiOlwiRUI0OEEwQTI0RkMxRjk3OEYwNjIwREZFRjZEMjJDQjE3MjBDRTE0Q0RDQTExQjAyMDlBQzk0RDYwNTM5RjQ0QlwifSIsInNvdXJjZV9yZWNvcmRfcmVmcyI6WyJTT1VSQ0VfQUZFMjRFMjUxQjU2RjI3RjhBMjExNkMxODY3MjRFQjA1QjYyNTQ5N0JFRDMzM0E3OTlFNTVBMjU3RjE5NDJFRiJdLCJ2ZXJzaW9uIjoyfV0sImNsb3N1cmVfYXR0ZXN0YXRpb25zIjpbeyJjbG9zZWRfcmVjb3JkX2NsYXNzZXMiOlsiQ0xBSU1fVkVSU0lPTiIsIkRFQ0xBUkFUSU9OX1JFQ09SRCIsIk1BTkRBVEVfUkVDT1JEIiwiVVNFX1JFQ09SRCJdLCJjbG9zZWRfdGhyb3VnaCI6IjIwMjYtMDktMDVUMTI6MDA6MDFaIiwiY2xvc3VyZV9hdHRlc3RhdGlvbl9pZCI6IkNMT1NVUkVfNjc1MUQyNkI5QUM0MTY3MzQ2RUFFRDQyMTVCNEM0REE0NkFBOTFENDZGRENBNUQyNTg3MTUwN0Y3NTE0Njc0NCIsImNvbW1pdHRlZF9mcm9udGllciI6MSwibGVkZ2VyX2lkIjoiTEVER0VSXzc0RDQ5MEZEMDJGNTkzMjg1NDk1M0UzNTczQ0YzM0UwNDc1RUVGMzlFRjlEMEEwMzhCMTI4QTNCNEREMEJEMDUiLCJzb3VyY2VfZXh0ZW50IjpbIlNPVVJDRV9NQU5EQVRFIiwiU09VUkNFX1BSSU1BUlkiXSwidmVyaWZpY2F0aW9uX21ldGhvZF9yZWYiOiJSRUdJU1RFUkVEX0ZJTklURV9ISVNUT1JZX0NFTlNVUyJ9XSwiZGVjbGFyYXRpb25fcmVjb3JkcyI6W3siZGVjbGFyYXRpb25fa2luZCI6IkFET1BUSU9OX0RFQ0xBUkVEIiwiZGVjbGFyYXRpb25fdmVyc2lvbl9yZWYiOiJERUNMX1VTRSIsImVwaXNvZGVfaWQiOiJFUF80QTBGMTFBNjYwODg3RjJERTM1QkYyNDAiLCJleGFjdF9jbGFpbV92ZXJzaW9uX2lkIjoiQ0xBSU1fODA0Mjc5RDdGOEYxQUIxQUJFRjc1MzNEMjFDQ0NDNEIxRkY3N0UyMTI3RUIxQzVBRjYxNEFBQ0YwOEQ5ODMxMyIsImludGVydmFsIjp7ImVmZmVjdGl2ZV9mcm9tIjoiMjAyNi0wOS0wNVQxMTowMDowMFoiLCJlZmZlY3RpdmVfdW50aWwiOiIyMDI2LTA5LTA1VDEzOjAwOjAwWiJ9LCJpc3N1ZXJfY2FwYWJpbGl0eV9pZCI6IkNBUF80MUNGNjc5NEJBNDIwMEI4MzlDNTM1MzEiLCJtYW5kYXRlX3ZlcnNpb25fcmVmIjoiU1RBTkRJTkdfRUY4Mzk0OTVCRjVCMkIwQUUzMkQ0M0ZEIiwicG9saWN5X3JlZiI6IlBPTElDWV9TSEFSRURfMF8xIiwicHVycG9zZV9pZCI6IlBVUlBPU0VfU1VNTUFSWSIsInJlY2VpdmVyX2NhcGFiaWxpdHlfaWQiOiJDQVBfQThFNDNERDdBMTVFMUQ4MUFEOTEyNEFCIiwicmVjb3JkZWRfYXQiOiIyMDI2LTA5LTA1VDEyOjAwOjAwWiIsInNjb3BlX2lkIjoiU0NPUEVfVEFTSyIsInN0YW5kaW5nX2Jhc2lzX3JlZiI6IlNUQU5ESU5HX0VGODM5NDk1QkY1QjJCMEFFMzJENDNGRCJ9XSwiZG9tYWluX21hbmRhdGVfcmVjb3JkcyI6W3siaW50ZXJ2YWwiOnsiZWZmZWN0aXZlX2Zyb20iOiIyMDI2LTA5LTA1VDExOjAwOjAwWiIsImVmZmVjdGl2ZV91bnRpbCI6IjIwMjYtMDktMDVUMTM6MDA6MDBaIn0sIm1hbmRhdGVfdmVyc2lvbl9yZWYiOiJTVEFORElOR19FRjgzOTQ5NUJGNUIyQjBBRTMyRDQzRkQiLCJwZXJtaXR0ZWRfcmVjb3JkX2tpbmRzIjpbIkFET1BUSU9OX0RFQ0xBUkVEIl0sInBvbGljeV9yZWYiOiJQT0xJQ1lfU0hBUkVEXzBfMSIsInB1cnBvc2VfaWRzIjpbIlBVUlBPU0VfU1VNTUFSWSJdLCJzY29wZV9pZHMiOlsiU0NPUEVfVEFTSyJdLCJzdWJqZWN0X2NhcGFiaWxpdHlfaWQiOiJDQVBfNDFDRjY3OTRCQTQyMDBCODM5QzUzNTMxIn1dLCJkb21haW5fdm9jYWJ1bGFyeSI6eyJjYW5vbmljYWxpemF0aW9uX21ldGhvZF9yZWYiOiJFSF9DQU5PTklDQUxfSlNPTl8wXzEiLCJkb21haW5faWQiOiJSUl9MT0NBTF9DT05TVFJVQ1RFRF9XT1JLRkxPVyIsInB1cnBvc2VfZW50cmllcyI6W3siZGVzY3JpcHRpb24iOiJSZWdpc3RlcmVkIHJlY2VpdmVyIG9wZXJhdGlvbiIsImlkIjoiUFVSUE9TRV9TVU1NQVJZIn1dLCJzY29wZV9lbnRyaWVzIjpbeyJkZXNjcmlwdGlvbiI6IlJlZ2lzdGVyZWQgY29uc3RydWN0ZWQgdGFzayBzY29wZSIsImlkIjoiU0NPUEVfVEFTSyJ9XSwic2VsZWN0b3JfbGFuZ3VhZ2VfaWQiOiJFSC1TRUxFQ1RPUi1DT1JFLTBfMSIsInZvY2FidWxhcnlfaWQiOiJSUl9MT0NBTF9XT1JLRkxPV19WT0NBQiIsInZvY2FidWxhcnlfdmVyc2lvbiI6IjEuMCJ9LCJlcGlzb2RlcyI6W3siY3Jvc3NfcGFydHlfZXBpc29kZV9pZCI6IkVQXzRBMEYxMUE2NjA4ODdGMkRFMzVCRjI0MCIsImRvbWFpbl92b2NhYnVsYXJ5X3JlZiI6IlJSX0xPQ0FMX1dPUktGTE9XX1ZPQ0FCIiwiZXBpc29kZV9mYW1pbHlfaWQiOiJSUl9MT0NBTF9XT1JLRkxPVyIsImludGVydmFsIjp7ImVmZmVjdGl2ZV9mcm9tIjoiMjAyNi0wOS0wNVQxMTowMDowMFoiLCJlZmZlY3RpdmVfdW50aWwiOiIyMDI2LTA5LTA1VDEzOjAwOjAwWiJ9LCJwdXJwb3NlX2lkIjoiUFVSUE9TRV9TVU1NQVJZIiwicmVjZWl2ZXJfY2FwYWJpbGl0eV9pZCI6IkNBUF9BOEU0M0REN0ExNUUxRDgxQUQ5MTI0QUIiLCJyZWNlaXZlcl9yb2xlX2lkIjoiUk9MRV9SRUNFSVZFUiIsInNjb3BlX2lkIjoiU0NPUEVfVEFTSyIsInNlbmRlcl9jYXBhYmlsaXR5X2lkIjoiQ0FQXzQxQ0Y2Nzk0QkE0MjAwQjgzOUM1MzUzMSIsInNlbmRlcl9yb2xlX2lkIjoiUk9MRV9TRU5ERVIifV0sImZvcm1hdF92ZXJzaW9uIjoiRUgtRzAtQTItU0hBUkVELTAuMSIsImxlZGdlcl9vYnNlcnZhdGlvbnMiOlt7ImFjdGlvbl9vcl9kZWNpc2lvbl9yZWYiOiJBQ1RJT05fMzY3NkVCRTVBRTMwOTc0ODkyQUVBMzREIiwiY2FwdHVyZWRfYXQiOiIyMDI2LTA5LTA1VDEyOjAwOjAwWiIsImNvbW1pdHRlZF9mcm9udGllciI6MSwiZGVjaXNpb25fY29udGV4dF9yZWYiOiJDT05URVhUX0NPTlRST0wiLCJpbmNsdWRlZF9yZWNvcmRfcmVmcyI6WyJERUNMX1VTRSJdLCJsZWRnZXJfaWQiOiJMRURHRVJfNzRENDkwRkQwMkY1OTMyODU0OTUzRTM1NzNDRjMzRTA0NzVFRUYzOUVGOUQwQTAzOEIxMjhBM0I0REQwQkQwNSIsIm5vbmNlIjoiTk9OQ0VfQ09OVFJPTCJ9XSwib2JzZXJ2YWJsZV9leHRlcm5hbF9mYWN0cyI6W10sInJlY29yZGVkX2FjdGlvbl9ncmFudHMiOltdLCJyZWNvcmRlZF9zdXBwb3J0X2Fzc2Vzc21lbnRzIjpbXSwic291cmNlX3JlY29yZHMiOlt7Im9ic2VydmVkX2F0IjoiMjAyNi0wOS0wNVQxMjowMDowMFoiLCJwYXlsb2FkIjoie1wicmV2aXNpb25cIjoxLFwic291cmNlX3RleHRcIjpcIlRoZSB0cmFpbmluZyByZWdpc3RlciBsaXN0cyBNYXlhIGFzIGhhdmluZyBjb21wbGV0ZWQgdGhlIGludHJvZHVjdG9yeSBjb3Vyc2UuIE1heWEgaGFzIG5vdCBjb21wbGV0ZWQgdGhlIGFkdmFuY2VkIGNvdXJzZS5cIn0iLCJzb3VyY2Vfa2luZCI6IkRPQ1VNRU5UIiwic291cmNlX3JlY29yZF9pZCI6IlNPVVJDRV9BRkUyNEUyNTFCNTZGMjdGOEEyMTE2QzE4NjcyNEVCMDVCNjI1NDk3QkVEMzMzQTc5OUU1NUEyNTdGMTk0MkVGIn1dLCJ1c2VfcmVjb3JkcyI6W3siYWN0aW9uX29yX2RlY2lzaW9uX3JlZiI6IkFDVElPTl8zNjc2RUJFNUFFMzA5NzQ4OTJBRUEzNEQiLCJkZWNpc2lvbl9jb250ZXh0X3JlZiI6IkNPTlRFWFRfQ09OVFJPTCIsImRlY2xhcmVkX2Jhc2lzX3JlZnMiOlsiREVDTF9VU0UiXSwiZXBpc29kZV9pZCI6IkVQXzRBMEYxMUE2NjA4ODdGMkRFMzVCRjI0MCIsImV4YWN0X2NsYWltX3ZlcnNpb25faWQiOiJDTEFJTV80OUZBNUREMDMyM0Q5ODRFRDdGQzI1RkY5Njc5NkFEMzg1NTQwM0M5MkFDNjNDQkIzMTM5MzY0M0UwMDBENjY3Iiwib2NjdXJyZWRfYXQiOiIyMDI2LTA5LTA1VDEyOjAwOjAxWiIsInB1cnBvc2VfaWQiOiJQVVJQT1NFX1NVTU1BUlkiLCJyZWNlaXZlcl9jYXBhYmlsaXR5X2lkIjoiQ0FQX0E4RTQzREQ3QTE1RTFEODFBRDkxMjRBQiIsInNjb3BlX2lkIjoiU0NPUEVfVEFTSyIsInVzZV9pZCI6IlVTRV85RTdDMzEyMjZEQkQ4NUVDNjM3RjY4NDI0RjBENTczNjM4RjZEN0JGNzREOEQ0Q0ZGODY1NzVCRTA0NjI3NTk1In1dfSwib3BlcmF0aW9uX2hhbmRsZSI6Ik9QUl8yQjEyQzhGOEQ0MjQwRkRBNjFDREExOTgiLCJyZXF1ZXN0X2lkIjoiUlVOXzc5QzYxNTlENzBDMzI1ODY0NzE4NjIxRiJ9LCJpbm5lcl9yZXF1ZXN0X3Jhd19zaGEyNTYiOiJGNEVENDMxMEFFRjI5REM1NEE0Q0UzRTNBNTRFMTcwOUI5RkRGQkRGNTA0MjZCODk0RjIwQTRFNkMxRURBNEJCIiwib2JsaWdhdGlvbl9pZCI6Ik9CTC0yNiIsIm9wZXJhdGlvbl9oYW5kbGUiOiJPUFJfMkIxMkM4RjhENDI0MEZEQTYxQ0RBMTk4IiwicmVxdWVzdF9pZCI6IlJVTl83OUM2MTU5RDcwQzMyNTg2NDcxODYyMUYifQo=",
+        "request_sha256": "0DB596D9B73D10A84B62699FD27982B1A9A8A3B11FD07C4CA362D74FC4386D54",
+        "returned_envelope": {
+          "audit": {
+            "closure_findings": [],
+            "decision_input_sha256": "7C18E8472E141380E25170264A3DDA2D07EBA652C42CE71A4289B605891A2D82",
+            "engine_generation": "composed-0.3-frozen",
+            "first_match_predicates": {
+              "BINDING_OR_CONFLICT": false,
+              "MALFORMED_OR_BOUNDARY": false,
+              "OMISSION_OR_INCOMPLETE": false
+            },
+            "governing_authorities": {
+              "authority_register_sha256": "C3414FC751C3B5ECA43A4932C694641D801A21F2CF53C42BE3A8C87C234CF499",
+              "closure_policy_sha256": "EBA198726DE960E9F59ACE5A7E1BDB701BFBA5B1BD09BC59FF4540F2B14E8F9C",
+              "composed_contract_sha256": "6B2CAD02DDE7388D63D66E4863E5233CFBD1DC413575D9D260DB9799C7023A12",
+              "decision_table_contract_sha256": "DCFCB0714E1A7E677548057987F604D227F791F3FC3E0EA89BE5ED932447F48E",
+              "engine_capabilities_sha256": "4D9FA1C9CCB60B980BCE1739FE8FDC10E84AEFC03D4C20E2AA1A8B0BBE2D18FC",
+              "engine_runner_sha256": "83319385C8B6D28965F4683B8C0689FB70158E86ED35D54E7467E8E3DF076E09"
+            },
+            "matched_class_witness": [],
+            "record_references": [],
+            "record_references_truncated": false,
+            "request_raw_sha256": "0DB596D9B73D10A84B62699FD27982B1A9A8A3B11FD07C4CA362D74FC4386D54"
+          },
+          "audit_sha256": "ECBCE090E63C6ACA68C33B174E141C7B17C5C210C9739E22950B8EF68BF712A7",
+          "audited_behavior_class": "VALID",
+          "exit_code": 0,
+          "format_version": "B1-AUDITED-DECISION-0.4.2",
+          "sealed_response": {
+            "errors": [],
+            "exit_code": 0,
+            "format_version": "PCB-RUNNER-RESPONSE-0.2",
+            "ok": true,
+            "output": {
+              "effect_receipt_sha256": "6BAD48EDA2D7252EAC077EBDB4E0C912838B69C8602DFDBEEA232045CC1D5DC6",
+              "obligation_id": "OBL-26",
+              "operation_handle": "OPR_2B12C8F8D4240FDA61CDA198",
+              "record_references": [],
+              "result_object": {
+                "behavior_class": "VALID",
+                "conclusion": "SATISFIED"
+              },
+              "status": "PASS",
+              "unresolved_reasons": []
+            },
+            "receipt_sha256": "4EF33B60349376857D5D022E7B59C61CBF716CA836B9FDE73094EDBF198EE152",
+            "request_id": "RUN_79C6159D70C325864718621F",
+            "result": "PASS"
+          }
+        }
+      }
+    ],
+    "observed": true,
+    "output_b64": "eyJjb2RlIjoiUl9BQ0NFUFRBTkNFX0lOQVBQTElDQUJMRSIsImRpc3Bvc2l0aW9uIjoiQkxPQ0siLCJmb3JtYXQiOiJSUi1TVFVEWS1UUkVBVE1FTlQtREVDSVNJT04tNSIsImlucHV0X2RpZ2VzdCI6IkUzMTI4RTg1Q0VDNUQwMjQ1QUQ2NjFGMzEzMzYzQkI1RjE3RjM1NDc4NDhFQTVFNjZBNDZDQjQ2OEMyMTQxMkIiLCJvY2N1cnJlbmNlIjowLCJwb2ludGVyIjoiIiwicmVhc29uIjoiQ09OQ0xVU0lWRV9IT0xEIiwicmVtZWRpYXRpb24iOiJSRUZFVENIIiwic3RhZ2UiOiJNT0RVTEVfU0VNQU5USUNTIiwid2l0bmVzc19kaWdlc3QiOiJEQ0FEMUZFOUU5RUE1RDBBOTI1N0FDMEU3NTRBOUVCODI3MTFDRTg5OENBQUNFRjY1NUVBNDhFRTREMkFCQzVCIn0=",
+    "output_sha256": "17AE42E695EA0101486713AB7B08BD062F16DFD2AA927B67783D72F392A92B71",
+    "package": "a",
+    "runtime_imports": [
+      "rr_full_treatment.runtime_a",
+      "rr_full_treatment.runtime_a._policy",
+      "rr_full_treatment.runtime_a._r_data",
+      "rr_full_treatment.runtime_a.common",
+      "rr_full_treatment.runtime_a.common._a2_data",
+      "rr_full_treatment.runtime_a.common._field_rows",
+      "rr_full_treatment.runtime_a.common.admission",
+      "rr_full_treatment.runtime_a.common.pins",
+      "rr_full_treatment.runtime_a.common.result",
+      "rr_full_treatment.runtime_a.common.wire",
+      "rr_full_treatment.runtime_a.r"
+    ],
+    "state_sha256": "C032111B8115C01F8F52185C5FCFF9350FC742951474B2ED275B1DCBFF13C2B7",
+    "wall_ns": 32882700,
+    "controller_wall_ns": 148446300
+  },
+  "observer": {
+    "status": "EXACT_INVOCATION_OBSERVED",
+    "common_sha256": "F941904A40299D2EEA00E4EB6884D76C738924C35F53470708A3CE237DB69362",
+    "state_sha256": "C032111B8115C01F8F52185C5FCFF9350FC742951474B2ED275B1DCBFF13C2B7",
+    "output_sha256": "17AE42E695EA0101486713AB7B08BD062F16DFD2AA927B67783D72F392A92B71",
+    "actual_engine_call_count": 1,
+    "recorded_use_sha256": "C663A0DCE45753C368FB7E6009E41B2CEC242AFE3757B5F1685873A123C3F063",
+    "engine_output_sha256": "8CD1D1976FACA688C0FBDDAC67C4D65B55C1D17D3DACEB99904475312157BDF9"
+  }
+}

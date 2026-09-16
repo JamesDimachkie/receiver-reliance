@@ -1,0 +1,354 @@
+{
+  "common": {
+    "a2_raw_shared_bundle": {
+      "bundle_id": "BUNDLE_FF53C4D2242ECF224B25D49BD9AF95BE6C23287F6497E9F6AF81CCD76303676E",
+      "capabilities": [
+        {
+          "capability_id": "CAP_41CF6794BA4200B839C53531",
+          "episode_id": "EP_6D1A8037E5AFADF356C95EDD",
+          "role_id": "ROLE_REGISTERED_ACTOR"
+        },
+        {
+          "capability_id": "CAP_A8E43DD7A15E1D81AD9124AB",
+          "episode_id": "EP_6D1A8037E5AFADF356C95EDD",
+          "role_id": "ROLE_REGISTERED_ACTOR"
+        }
+      ],
+      "claim_versions": [
+        {
+          "claim_id": "CLAIM_ACE26A9C53D7B8786973C590C35DB3C3845B62D99DD4E328E4DE6130877DB4A8",
+          "exact_claim_version_id": "CLAIM_ACE26A9C53D7B8786973C590C35DB3C3845B62D99DD4E328E4DE6130877DB4A8",
+          "payload": "{\"assessment\":{\"answer_json\":\"{\\\"choice\\\":\\\"insufficient\\\",\\\"confidence\\\":0.82,\\\"probabilities\\\":{\\\"contradicts\\\":0.06,\\\"insufficient\\\":0.88,\\\"supports\\\":0.06},\\\"type\\\":\\\"choice\\\"}\",\"kind\":\"jev\",\"request_sha256\":\"C08A4E49DB20AE4321ACA69A164C8C111D63A437CB11490BD1933FC2D6604E23\",\"response_sha256\":\"FF9B77A4E7DDA966EA34B65EAB6343B95F9FDFE81C00D1018C652EC43B099830\",\"returned_model\":\"jev-1.13.0\"},\"claim\":\"Team Fortress 2 was an independent game launched for Windows .\",\"intended_use\":\"PURPOSE_SUMMARY\",\"source_revision\":1,\"source_sha256\":\"5B5057B209C9F2C53744CC98C351177145051B859981D7ED7034EFC364708376\"}",
+          "source_record_refs": [
+            "SOURCE_13482690AF4E03722CE3217582D35CB17156B5758371F26B38604458A23F50F8"
+          ],
+          "version": 1
+        }
+      ],
+      "closure_attestations": [
+        {
+          "closed_record_classes": [
+            "CLAIM_VERSION",
+            "DECLARATION_RECORD",
+            "MANDATE_RECORD",
+            "USE_RECORD"
+          ],
+          "closed_through": "2026-09-05T12:00:01Z",
+          "closure_attestation_id": "CLOSURE_34DD529EC2CD470128A9E51F855A48465E38F455E102D0B73D637181E5ED4AF7",
+          "committed_frontier": 1,
+          "ledger_id": "LEDGER_37A2FDBE2AE48027BD37D5911EE348B675AB2F76809350705205B5F371244853",
+          "source_extent": [
+            "SOURCE_MANDATE",
+            "SOURCE_PRIMARY"
+          ],
+          "verification_method_ref": "REGISTERED_FINITE_HISTORY_CENSUS"
+        }
+      ],
+      "declaration_records": [
+        {
+          "declaration_kind": "ADOPTION_DECLARED",
+          "declaration_version_ref": "DECL_USE",
+          "episode_id": "EP_6D1A8037E5AFADF356C95EDD",
+          "exact_claim_version_id": "CLAIM_ACE26A9C53D7B8786973C590C35DB3C3845B62D99DD4E328E4DE6130877DB4A8",
+          "interval": {
+            "effective_from": "2026-09-05T11:00:00Z",
+            "effective_until": "2026-09-05T13:00:00Z"
+          },
+          "issuer_capability_id": "CAP_41CF6794BA4200B839C53531",
+          "mandate_version_ref": "STANDING_EF839495BF5B2B0AE32D43FD",
+          "policy_ref": "POLICY_SHARED_0_1",
+          "purpose_id": "PURPOSE_SUMMARY",
+          "receiver_capability_id": "CAP_A8E43DD7A15E1D81AD9124AB",
+          "recorded_at": "2026-09-05T12:00:00Z",
+          "scope_id": "SCOPE_TASK",
+          "standing_basis_ref": "STANDING_EF839495BF5B2B0AE32D43FD"
+        }
+      ],
+      "domain_mandate_records": [
+        {
+          "interval": {
+            "effective_from": "2026-09-05T11:00:00Z",
+            "effective_until": "2026-09-05T13:00:00Z"
+          },
+          "mandate_version_ref": "STANDING_EF839495BF5B2B0AE32D43FD",
+          "permitted_record_kinds": [
+            "ADOPTION_DECLARED"
+          ],
+          "policy_ref": "POLICY_SHARED_0_1",
+          "purpose_ids": [
+            "PURPOSE_SUMMARY"
+          ],
+          "scope_ids": [
+            "SCOPE_TASK"
+          ],
+          "subject_capability_id": "CAP_41CF6794BA4200B839C53531"
+        }
+      ],
+      "domain_vocabulary": {
+        "canonicalization_method_ref": "EH_CANONICAL_JSON_0_1",
+        "domain_id": "RR_LOCAL_CONSTRUCTED_WORKFLOW",
+        "purpose_entries": [
+          {
+            "description": "Registered receiver operation",
+            "id": "PURPOSE_SUMMARY"
+          }
+        ],
+        "scope_entries": [
+          {
+            "description": "Registered constructed task scope",
+            "id": "SCOPE_TASK"
+          }
+        ],
+        "selector_language_id": "EH-SELECTOR-CORE-0_1",
+        "vocabulary_id": "RR_LOCAL_WORKFLOW_VOCAB",
+        "vocabulary_version": "1.0"
+      },
+      "episodes": [
+        {
+          "cross_party_episode_id": "EP_6D1A8037E5AFADF356C95EDD",
+          "domain_vocabulary_ref": "RR_LOCAL_WORKFLOW_VOCAB",
+          "episode_family_id": "RR_LOCAL_WORKFLOW",
+          "interval": {
+            "effective_from": "2026-09-05T11:00:00Z",
+            "effective_until": "2026-09-05T13:00:00Z"
+          },
+          "purpose_id": "PURPOSE_SUMMARY",
+          "receiver_capability_id": "CAP_A8E43DD7A15E1D81AD9124AB",
+          "receiver_role_id": "ROLE_RECEIVER",
+          "scope_id": "SCOPE_TASK",
+          "sender_capability_id": "CAP_41CF6794BA4200B839C53531",
+          "sender_role_id": "ROLE_SENDER"
+        }
+      ],
+      "format_version": "EH-G0-A2-SHARED-0.1",
+      "ledger_observations": [
+        {
+          "action_or_decision_ref": "ACTION_3676EBE5AE30974892AEA34D",
+          "captured_at": "2026-09-05T12:00:00Z",
+          "committed_frontier": 1,
+          "decision_context_ref": "CONTEXT_CONTROL",
+          "included_record_refs": [
+            "DECL_USE"
+          ],
+          "ledger_id": "LEDGER_37A2FDBE2AE48027BD37D5911EE348B675AB2F76809350705205B5F371244853",
+          "nonce": "NONCE_CONTROL"
+        }
+      ],
+      "observable_external_facts": [],
+      "recorded_action_grants": [],
+      "recorded_support_assessments": [],
+      "source_records": [
+        {
+          "observed_at": "2026-09-05T12:00:00Z",
+          "payload": "{\"revision\":2,\"source_text\":\"The game was released for Windows in April 2008 and was updated to support OS X in June 2010 and Linux in February 2013 .\"}",
+          "source_kind": "DOCUMENT",
+          "source_record_id": "SOURCE_13482690AF4E03722CE3217582D35CB17156B5758371F26B38604458A23F50F8"
+        }
+      ],
+      "use_records": [
+        {
+          "action_or_decision_ref": "ACTION_3676EBE5AE30974892AEA34D",
+          "decision_context_ref": "CONTEXT_CONTROL",
+          "declared_basis_refs": [
+            "DECL_USE"
+          ],
+          "episode_id": "EP_6D1A8037E5AFADF356C95EDD",
+          "exact_claim_version_id": "CLAIM_ACE26A9C53D7B8786973C590C35DB3C3845B62D99DD4E328E4DE6130877DB4A8",
+          "occurred_at": "2026-09-05T12:00:01Z",
+          "purpose_id": "PURPOSE_SUMMARY",
+          "receiver_capability_id": "CAP_A8E43DD7A15E1D81AD9124AB",
+          "scope_id": "SCOPE_TASK",
+          "use_id": "USE_EC783ACF5BF965DAE973D9E118864A78623D965820E8D46D140A253DAD512802"
+        }
+      ]
+    },
+    "comparison_facts": {
+      "carrier_fence": 1,
+      "consumed_representation_sha256": "ACE26A9C53D7B8786973C590C35DB3C3845B62D99DD4E328E4DE6130877DB4A8",
+      "current_fence": 1,
+      "expected_action_class": "PERMIT",
+      "expected_authority": "AUTH_LOCAL",
+      "expected_carrier": "CARRIER_CONTROL",
+      "expected_direct_parents": [
+        "PARENT_2180C50B036FF1ABB934B6E5E49AA2BB3470EAF6F60E52123C37A60063B740A8"
+      ],
+      "expected_generation": 1,
+      "expected_owner": "OWNER_LOCAL",
+      "expected_principal": "CAP_41CF6794BA4200B839C53531",
+      "expected_purpose": "PURPOSE_SUMMARY",
+      "expected_receiver_capability": "CAP_A8E43DD7A15E1D81AD9124AB",
+      "expected_representation_sha256": "ACE26A9C53D7B8786973C590C35DB3C3845B62D99DD4E328E4DE6130877DB4A8",
+      "expected_route": "ROUTE_CONTROL",
+      "expected_scope": [
+        "SCOPE_TASK"
+      ],
+      "expected_slot": "SLOT_CONTROL",
+      "observed_action_class": "PERMIT",
+      "observed_authority": "AUTH_LOCAL",
+      "observed_carrier": "CARRIER_CONTROL",
+      "observed_direct_parents": [
+        "PARENT_5423AD6004D3C48ED77BD2D84C2041D47CF5C86FB1BE4BB3F6D0AC5E06E893D6"
+      ],
+      "observed_generation": 1,
+      "observed_owner": "OWNER_LOCAL",
+      "observed_principal": "CAP_41CF6794BA4200B839C53531",
+      "observed_purpose": "PURPOSE_SUMMARY",
+      "observed_receiver_capability": "CAP_A8E43DD7A15E1D81AD9124AB",
+      "observed_route": "ROUTE_CONTROL",
+      "observed_scope": [
+        "SCOPE_TASK"
+      ],
+      "observed_slot": "SLOT_CONTROL",
+      "origin_finalized": true,
+      "revocation_active": false,
+      "use_time_ns": 1001,
+      "valid_from_ns": 0,
+      "valid_until_ns": 10000
+    },
+    "delivered_artifact_envelope": {
+      "artifact_id": "ART_CONTROL",
+      "content_b64": "eyJhc3Nlc3NtZW50Ijp7ImFuc3dlcl9qc29uIjoie1wiY2hvaWNlXCI6XCJpbnN1ZmZpY2llbnRcIixcImNvbmZpZGVuY2VcIjowLjgyLFwicHJvYmFiaWxpdGllc1wiOntcImNvbnRyYWRpY3RzXCI6MC4wNixcImluc3VmZmljaWVudFwiOjAuODgsXCJzdXBwb3J0c1wiOjAuMDZ9LFwidHlwZVwiOlwiY2hvaWNlXCJ9Iiwia2luZCI6ImpldiIsInJlcXVlc3Rfc2hhMjU2IjoiQzA4QTRFNDlEQjIwQUU0MzIxQUNBNjlBMTY0QzhDMTExRDYzQTQzN0NCMTE0OTBCRDE5MzNGQzJENjYwNEUyMyIsInJlc3BvbnNlX3NoYTI1NiI6IkZGOUI3N0E0RTdEREE5NjZFQTM0QjY1RUFCNjM0M0I5NUY5RkRGRTgxQzAwRDEwMThDNjUyRUM0M0IwOTk4MzAiLCJyZXR1cm5lZF9tb2RlbCI6Impldi0xLjEzLjAifSwiY2xhaW0iOiJUZWFtIEZvcnRyZXNzIDIgd2FzIGFuIGluZGVwZW5kZW50IGdhbWUgbGF1bmNoZWQgZm9yIFdpbmRvd3MgLiIsImludGVuZGVkX3VzZSI6IlBVUlBPU0VfU1VNTUFSWSIsInNvdXJjZV9yZXZpc2lvbiI6MSwic291cmNlX3NoYTI1NiI6IjVCNTA1N0IyMDlDOUYyQzUzNzQ0Q0M5OEMzNTExNzcxNDUwNTFCODU5OTgxRDdFRDcwMzRFRkMzNjQ3MDgzNzYifQ==",
+      "format": "RR-SCIENTIFIC-CLOSED-ARTIFACT-1",
+      "media_type": "application/json",
+      "revision": 1
+    },
+    "format": "RR-STUDY-TREATMENT-COMMON-5",
+    "guard_observation_facts": {
+      "consumption_state": "UNUSED",
+      "effect_receipt_count": 1,
+      "effect_sha256": "952C70AE21D17CEA319BD27A3F4CC7F1C7734358133D78F477AD9084F1468B2A",
+      "execution_receipt_effect_sha256": "952C70AE21D17CEA319BD27A3F4CC7F1C7734358133D78F477AD9084F1468B2A",
+      "grant_expires_at": 2000,
+      "grant_not_before": 0,
+      "invocation_nonce": "NONCE_INGRESS",
+      "invocation_time": 1000,
+      "prior_invocation_nonces": [],
+      "revocation_checked_at": 1000,
+      "revoked_at": null
+    },
+    "remediation": {
+      "attempt_ordinal": 0,
+      "refetch_budget": 1
+    },
+    "requested_delivered_transfer": {
+      "declared_sha256": "ACE26A9C53D7B8786973C590C35DB3C3845B62D99DD4E328E4DE6130877DB4A8",
+      "delivered_artifact_id": "ART_CONTROL",
+      "delivered_revision": 1,
+      "requested_artifact_id": "ART_CONTROL",
+      "requested_revision": 1
+    },
+    "source_lineage_observation": {
+      "format": "RR-SCIENTIFIC-CLOSED-LINEAGE-OBSERVATION-1",
+      "source_artifact_id": "SOURCE_13482690AF4E03722CE3217582D35CB17156B5758371F26B38604458A23F50F8",
+      "source_revision": 0,
+      "source_sha256": "13482690AF4E03722CE3217582D35CB17156B5758371F26B38604458A23F50F8"
+    },
+    "task_id": "TASK_A8E95D4FB1B44A73DE2AFDA49D4C6EB5AE4E0FCBE1347200F9B002DA2B85A043",
+    "task_instruction_constraints": {
+      "constraints": [],
+      "instruction": "Use the exact supported factual claim for the declared purpose."
+    }
+  },
+  "receipt": {
+    "arm": "R",
+    "common_sha256": "215BA8626A0CE3E6DBD05C0C55C63753D6DF64D9D0F249234CD6D5A6680576AB",
+    "constructions": [
+      {
+        "evidence": {
+          "code": "R_LINEAGE_CONCLUSIVE",
+          "module": "R",
+          "occurrence": 0,
+          "pointer": "",
+          "semantic_evidence": null,
+          "stage": "MODULE_SEMANTICS"
+        },
+        "output_sha256": "30E0D18692A578A3A191716DA51178A11E0AB28BF4C5D05B3C0ED38CF532FB6C"
+      }
+    ],
+    "cpu_ns": 31250000,
+    "engine_calls": [
+      {
+        "request_b64": "eyJkZWNpc2lvbl9pbnB1dCI6eyJmYWN0cyI6eyJjb25zdW1wdGlvbl9zdGF0ZSI6IlVOVVNFRCIsImVmZmVjdF9yZWNlaXB0X2NvdW50IjoxLCJlZmZlY3Rfc2hhMjU2IjoiOTUyQzcwQUUyMUQxN0NFQTMxOUJEMjdBM0Y0Q0M3RjFDNzczNDM1ODEzM0Q3OEY0NzdBRDkwODRGMTQ2OEIyQSIsImV4ZWN1dGlvbl9yZWNlaXB0X2VmZmVjdF9zaGEyNTYiOiI5NTJDNzBBRTIxRDE3Q0VBMzE5QkQyN0EzRjRDQzdGMUM3NzM0MzU4MTMzRDc4RjQ3N0FEOTA4NEYxNDY4QjJBIiwiZ3JhbnRfZXhwaXJlc19hdCI6MjAwMCwiZ3JhbnRfbm90X2JlZm9yZSI6MCwiaW52b2NhdGlvbl9ub25jZSI6Ik5PTkNFX0lOR1JFU1MiLCJpbnZvY2F0aW9uX3RpbWUiOjEwMDAsInByaW9yX2ludm9jYXRpb25fbm9uY2VzIjpbXSwicmV2b2NhdGlvbl9jaGVja2VkX2F0IjoxMDAwLCJyZXZva2VkX2F0IjpudWxsfSwiZm9ybWF0X3ZlcnNpb24iOiJCMS1TRU1BTlRJQy1GQUNUUy0wLjIiLCJvYmxpZ2F0aW9uX2lkIjoiT0JMLTI2Iiwib3BlcmF0aW9uX2hhbmRsZSI6Ik9QUl8yQjEyQzhGOEQ0MjQwRkRBNjFDREExOTgifSwiZm9ybWF0X3ZlcnNpb24iOiJCMS1TRU1BTlRJQy1ERUNJU0lPTi1SRVFVRVNULTAuMiIsImlubmVyX2lucHV0X3NoYTI1NiI6IkQ5NTk4Qzg0QkY2QzIzNjRGMUU3RTQzMDFFQzI3MTA1RTNEREFDODQxN0U0NkY0NkY4MzI1OTJERkYzREY1MzMiLCJpbm5lcl9yZXF1ZXN0Ijp7ImNvbmZpZ3VyYXRpb25faGFuZGxlIjoiQ0ZHX0IwNkJDQUFCMEY1NzEzQjc1QUMwRjEyNiIsImZvcm1hdF92ZXJzaW9uIjoiUENCLVJVTk5FUi1SRVFVRVNULTAuMiIsImlucHV0Ijp7ImJ1bmRsZV9pZCI6IkJVTkRMRV9GRjUzQzREMjI0MkVDRjIyNEIyNUQ0OUJEOUFGOTVCRTZDMjMyODdGNjQ5N0U5RjZBRjgxQ0NENzYzMDM2NzZFIiwiY2FwYWJpbGl0aWVzIjpbeyJjYXBhYmlsaXR5X2lkIjoiQ0FQXzQxQ0Y2Nzk0QkE0MjAwQjgzOUM1MzUzMSIsImVwaXNvZGVfaWQiOiJFUF82RDFBODAzN0U1QUZBREYzNTZDOTVFREQiLCJyb2xlX2lkIjoiUk9MRV9SRUdJU1RFUkVEX0FDVE9SIn0seyJjYXBhYmlsaXR5X2lkIjoiQ0FQX0E4RTQzREQ3QTE1RTFEODFBRDkxMjRBQiIsImVwaXNvZGVfaWQiOiJFUF82RDFBODAzN0U1QUZBREYzNTZDOTVFREQiLCJyb2xlX2lkIjoiUk9MRV9SRUdJU1RFUkVEX0FDVE9SIn1dLCJjbGFpbV92ZXJzaW9ucyI6W3siY2xhaW1faWQiOiJDTEFJTV9BQ0UyNkE5QzUzRDdCODc4Njk3M0M1OTBDMzVEQjNDMzg0NUI2MkQ5OURENEUzMjhFNERFNjEzMDg3N0RCNEE4IiwiZXhhY3RfY2xhaW1fdmVyc2lvbl9pZCI6IkNMQUlNX0FDRTI2QTlDNTNEN0I4Nzg2OTczQzU5MEMzNURCM0MzODQ1QjYyRDk5REQ0RTMyOEU0REU2MTMwODc3REI0QTgiLCJwYXlsb2FkIjoie1wiYXNzZXNzbWVudFwiOntcImFuc3dlcl9qc29uXCI6XCJ7XFxcImNob2ljZVxcXCI6XFxcImluc3VmZmljaWVudFxcXCIsXFxcImNvbmZpZGVuY2VcXFwiOjAuODIsXFxcInByb2JhYmlsaXRpZXNcXFwiOntcXFwiY29udHJhZGljdHNcXFwiOjAuMDYsXFxcImluc3VmZmljaWVudFxcXCI6MC44OCxcXFwic3VwcG9ydHNcXFwiOjAuMDZ9LFxcXCJ0eXBlXFxcIjpcXFwiY2hvaWNlXFxcIn1cIixcImtpbmRcIjpcImpldlwiLFwicmVxdWVzdF9zaGEyNTZcIjpcIkMwOEE0RTQ5REIyMEFFNDMyMUFDQTY5QTE2NEM4QzExMUQ2M0E0MzdDQjExNDkwQkQxOTMzRkMyRDY2MDRFMjNcIixcInJlc3BvbnNlX3NoYTI1NlwiOlwiRkY5Qjc3QTRFN0REQTk2NkVBMzRCNjVFQUI2MzQzQjk1RjlGREZFODFDMDBEMTAxOEM2NTJFQzQzQjA5OTgzMFwiLFwicmV0dXJuZWRfbW9kZWxcIjpcImpldi0xLjEzLjBcIn0sXCJjbGFpbVwiOlwiVGVhbSBGb3J0cmVzcyAyIHdhcyBhbiBpbmRlcGVuZGVudCBnYW1lIGxhdW5jaGVkIGZvciBXaW5kb3dzIC5cIixcImludGVuZGVkX3VzZVwiOlwiUFVSUE9TRV9TVU1NQVJZXCIsXCJzb3VyY2VfcmV2aXNpb25cIjoxLFwic291cmNlX3NoYTI1NlwiOlwiNUI1MDU3QjIwOUM5RjJDNTM3NDRDQzk4QzM1MTE3NzE0NTA1MUI4NTk5ODFEN0VENzAzNEVGQzM2NDcwODM3NlwifSIsInNvdXJjZV9yZWNvcmRfcmVmcyI6WyJTT1VSQ0VfMTM0ODI2OTBBRjRFMDM3MjJDRTMyMTc1ODJEMzVDQjE3MTU2QjU3NTgzNzFGMjZCMzg2MDQ0NThBMjNGNTBGOCJdLCJ2ZXJzaW9uIjoxfV0sImNsb3N1cmVfYXR0ZXN0YXRpb25zIjpbeyJjbG9zZWRfcmVjb3JkX2NsYXNzZXMiOlsiQ0xBSU1fVkVSU0lPTiIsIkRFQ0xBUkFUSU9OX1JFQ09SRCIsIk1BTkRBVEVfUkVDT1JEIiwiVVNFX1JFQ09SRCJdLCJjbG9zZWRfdGhyb3VnaCI6IjIwMjYtMDktMDVUMTI6MDA6MDFaIiwiY2xvc3VyZV9hdHRlc3RhdGlvbl9pZCI6IkNMT1NVUkVfMzRERDUyOUVDMkNENDcwMTI4QTlFNTFGODU1QTQ4NDY1RTM4RjQ1NUUxMDJEMEI3M0Q2MzcxODFFNUVENEFGNyIsImNvbW1pdHRlZF9mcm9udGllciI6MSwibGVkZ2VyX2lkIjoiTEVER0VSXzM3QTJGREJFMkFFNDgwMjdCRDM3RDU5MTFFRTM0OEI2NzVBQjJGNzY4MDkzNTA3MDUyMDVCNUYzNzEyNDQ4NTMiLCJzb3VyY2VfZXh0ZW50IjpbIlNPVVJDRV9NQU5EQVRFIiwiU09VUkNFX1BSSU1BUlkiXSwidmVyaWZpY2F0aW9uX21ldGhvZF9yZWYiOiJSRUdJU1RFUkVEX0ZJTklURV9ISVNUT1JZX0NFTlNVUyJ9XSwiZGVjbGFyYXRpb25fcmVjb3JkcyI6W3siZGVjbGFyYXRpb25fa2luZCI6IkFET1BUSU9OX0RFQ0xBUkVEIiwiZGVjbGFyYXRpb25fdmVyc2lvbl9yZWYiOiJERUNMX1VTRSIsImVwaXNvZGVfaWQiOiJFUF82RDFBODAzN0U1QUZBREYzNTZDOTVFREQiLCJleGFjdF9jbGFpbV92ZXJzaW9uX2lkIjoiQ0xBSU1fQUNFMjZBOUM1M0Q3Qjg3ODY5NzNDNTkwQzM1REIzQzM4NDVCNjJEOTlERDRFMzI4RTRERTYxMzA4NzdEQjRBOCIsImludGVydmFsIjp7ImVmZmVjdGl2ZV9mcm9tIjoiMjAyNi0wOS0wNVQxMTowMDowMFoiLCJlZmZlY3RpdmVfdW50aWwiOiIyMDI2LTA5LTA1VDEzOjAwOjAwWiJ9LCJpc3N1ZXJfY2FwYWJpbGl0eV9pZCI6IkNBUF80MUNGNjc5NEJBNDIwMEI4MzlDNTM1MzEiLCJtYW5kYXRlX3ZlcnNpb25fcmVmIjoiU1RBTkRJTkdfRUY4Mzk0OTVCRjVCMkIwQUUzMkQ0M0ZEIiwicG9saWN5X3JlZiI6IlBPTElDWV9TSEFSRURfMF8xIiwicHVycG9zZV9pZCI6IlBVUlBPU0VfU1VNTUFSWSIsInJlY2VpdmVyX2NhcGFiaWxpdHlfaWQiOiJDQVBfQThFNDNERDdBMTVFMUQ4MUFEOTEyNEFCIiwicmVjb3JkZWRfYXQiOiIyMDI2LTA5LTA1VDEyOjAwOjAwWiIsInNjb3BlX2lkIjoiU0NPUEVfVEFTSyIsInN0YW5kaW5nX2Jhc2lzX3JlZiI6IlNUQU5ESU5HX0VGODM5NDk1QkY1QjJCMEFFMzJENDNGRCJ9XSwiZG9tYWluX21hbmRhdGVfcmVjb3JkcyI6W3siaW50ZXJ2YWwiOnsiZWZmZWN0aXZlX2Zyb20iOiIyMDI2LTA5LTA1VDExOjAwOjAwWiIsImVmZmVjdGl2ZV91bnRpbCI6IjIwMjYtMDktMDVUMTM6MDA6MDBaIn0sIm1hbmRhdGVfdmVyc2lvbl9yZWYiOiJTVEFORElOR19FRjgzOTQ5NUJGNUIyQjBBRTMyRDQzRkQiLCJwZXJtaXR0ZWRfcmVjb3JkX2tpbmRzIjpbIkFET1BUSU9OX0RFQ0xBUkVEIl0sInBvbGljeV9yZWYiOiJQT0xJQ1lfU0hBUkVEXzBfMSIsInB1cnBvc2VfaWRzIjpbIlBVUlBPU0VfU1VNTUFSWSJdLCJzY29wZV9pZHMiOlsiU0NPUEVfVEFTSyJdLCJzdWJqZWN0X2NhcGFiaWxpdHlfaWQiOiJDQVBfNDFDRjY3OTRCQTQyMDBCODM5QzUzNTMxIn1dLCJkb21haW5fdm9jYWJ1bGFyeSI6eyJjYW5vbmljYWxpemF0aW9uX21ldGhvZF9yZWYiOiJFSF9DQU5PTklDQUxfSlNPTl8wXzEiLCJkb21haW5faWQiOiJSUl9MT0NBTF9DT05TVFJVQ1RFRF9XT1JLRkxPVyIsInB1cnBvc2VfZW50cmllcyI6W3siZGVzY3JpcHRpb24iOiJSZWdpc3RlcmVkIHJlY2VpdmVyIG9wZXJhdGlvbiIsImlkIjoiUFVSUE9TRV9TVU1NQVJZIn1dLCJzY29wZV9lbnRyaWVzIjpbeyJkZXNjcmlwdGlvbiI6IlJlZ2lzdGVyZWQgY29uc3RydWN0ZWQgdGFzayBzY29wZSIsImlkIjoiU0NPUEVfVEFTSyJ9XSwic2VsZWN0b3JfbGFuZ3VhZ2VfaWQiOiJFSC1TRUxFQ1RPUi1DT1JFLTBfMSIsInZvY2FidWxhcnlfaWQiOiJSUl9MT0NBTF9XT1JLRkxPV19WT0NBQiIsInZvY2FidWxhcnlfdmVyc2lvbiI6IjEuMCJ9LCJlcGlzb2RlcyI6W3siY3Jvc3NfcGFydHlfZXBpc29kZV9pZCI6IkVQXzZEMUE4MDM3RTVBRkFERjM1NkM5NUVERCIsImRvbWFpbl92b2NhYnVsYXJ5X3JlZiI6IlJSX0xPQ0FMX1dPUktGTE9XX1ZPQ0FCIiwiZXBpc29kZV9mYW1pbHlfaWQiOiJSUl9MT0NBTF9XT1JLRkxPVyIsImludGVydmFsIjp7ImVmZmVjdGl2ZV9mcm9tIjoiMjAyNi0wOS0wNVQxMTowMDowMFoiLCJlZmZlY3RpdmVfdW50aWwiOiIyMDI2LTA5LTA1VDEzOjAwOjAwWiJ9LCJwdXJwb3NlX2lkIjoiUFVSUE9TRV9TVU1NQVJZIiwicmVjZWl2ZXJfY2FwYWJpbGl0eV9pZCI6IkNBUF9BOEU0M0REN0ExNUUxRDgxQUQ5MTI0QUIiLCJyZWNlaXZlcl9yb2xlX2lkIjoiUk9MRV9SRUNFSVZFUiIsInNjb3BlX2lkIjoiU0NPUEVfVEFTSyIsInNlbmRlcl9jYXBhYmlsaXR5X2lkIjoiQ0FQXzQxQ0Y2Nzk0QkE0MjAwQjgzOUM1MzUzMSIsInNlbmRlcl9yb2xlX2lkIjoiUk9MRV9TRU5ERVIifV0sImZvcm1hdF92ZXJzaW9uIjoiRUgtRzAtQTItU0hBUkVELTAuMSIsImxlZGdlcl9vYnNlcnZhdGlvbnMiOlt7ImFjdGlvbl9vcl9kZWNpc2lvbl9yZWYiOiJBQ1RJT05fMzY3NkVCRTVBRTMwOTc0ODkyQUVBMzREIiwiY2FwdHVyZWRfYXQiOiIyMDI2LTA5LTA1VDEyOjAwOjAwWiIsImNvbW1pdHRlZF9mcm9udGllciI6MSwiZGVjaXNpb25fY29udGV4dF9yZWYiOiJDT05URVhUX0NPTlRST0wiLCJpbmNsdWRlZF9yZWNvcmRfcmVmcyI6WyJERUNMX1VTRSJdLCJsZWRnZXJfaWQiOiJMRURHRVJfMzdBMkZEQkUyQUU0ODAyN0JEMzdENTkxMUVFMzQ4QjY3NUFCMkY3NjgwOTM1MDcwNTIwNUI1RjM3MTI0NDg1MyIsIm5vbmNlIjoiTk9OQ0VfQ09OVFJPTCJ9XSwib2JzZXJ2YWJsZV9leHRlcm5hbF9mYWN0cyI6W10sInJlY29yZGVkX2FjdGlvbl9ncmFudHMiOltdLCJyZWNvcmRlZF9zdXBwb3J0X2Fzc2Vzc21lbnRzIjpbXSwic291cmNlX3JlY29yZHMiOlt7Im9ic2VydmVkX2F0IjoiMjAyNi0wOS0wNVQxMjowMDowMFoiLCJwYXlsb2FkIjoie1wicmV2aXNpb25cIjoyLFwic291cmNlX3RleHRcIjpcIlRoZSBnYW1lIHdhcyByZWxlYXNlZCBmb3IgV2luZG93cyBpbiBBcHJpbCAyMDA4IGFuZCB3YXMgdXBkYXRlZCB0byBzdXBwb3J0IE9TIFggaW4gSnVuZSAyMDEwIGFuZCBMaW51eCBpbiBGZWJydWFyeSAyMDEzIC5cIn0iLCJzb3VyY2Vfa2luZCI6IkRPQ1VNRU5UIiwic291cmNlX3JlY29yZF9pZCI6IlNPVVJDRV8xMzQ4MjY5MEFGNEUwMzcyMkNFMzIxNzU4MkQzNUNCMTcxNTZCNTc1ODM3MUYyNkIzODYwNDQ1OEEyM0Y1MEY4In1dLCJ1c2VfcmVjb3JkcyI6W3siYWN0aW9uX29yX2RlY2lzaW9uX3JlZiI6IkFDVElPTl8zNjc2RUJFNUFFMzA5NzQ4OTJBRUEzNEQiLCJkZWNpc2lvbl9jb250ZXh0X3JlZiI6IkNPTlRFWFRfQ09OVFJPTCIsImRlY2xhcmVkX2Jhc2lzX3JlZnMiOlsiREVDTF9VU0UiXSwiZXBpc29kZV9pZCI6IkVQXzZEMUE4MDM3RTVBRkFERjM1NkM5NUVERCIsImV4YWN0X2NsYWltX3ZlcnNpb25faWQiOiJDTEFJTV9BQ0UyNkE5QzUzRDdCODc4Njk3M0M1OTBDMzVEQjNDMzg0NUI2MkQ5OURENEUzMjhFNERFNjEzMDg3N0RCNEE4Iiwib2NjdXJyZWRfYXQiOiIyMDI2LTA5LTA1VDEyOjAwOjAxWiIsInB1cnBvc2VfaWQiOiJQVVJQT1NFX1NVTU1BUlkiLCJyZWNlaXZlcl9jYXBhYmlsaXR5X2lkIjoiQ0FQX0E4RTQzREQ3QTE1RTFEODFBRDkxMjRBQiIsInNjb3BlX2lkIjoiU0NPUEVfVEFTSyIsInVzZV9pZCI6IlVTRV9FQzc4M0FDRjVCRjk2NURBRTk3M0Q5RTExODg2NEE3ODYyM0Q5NjU4MjBFOEQ0NkQxNDBBMjUzREFENTEyODAyIn1dfSwib3BlcmF0aW9uX2hhbmRsZSI6Ik9QUl8yQjEyQzhGOEQ0MjQwRkRBNjFDREExOTgiLCJyZXF1ZXN0X2lkIjoiUlVOXzc5QzYxNTlENzBDMzI1ODY0NzE4NjIxRiJ9LCJpbm5lcl9yZXF1ZXN0X3Jhd19zaGEyNTYiOiJFMTRDMjVGQUI2OUY0MDhDODkyNDJBN0ZEMzlCNTBGNUREQkFBQTJGODcxQTEzMkZFNTgyMjY2QTM0QTE3MUZEIiwib2JsaWdhdGlvbl9pZCI6Ik9CTC0yNiIsIm9wZXJhdGlvbl9oYW5kbGUiOiJPUFJfMkIxMkM4RjhENDI0MEZEQTYxQ0RBMTk4IiwicmVxdWVzdF9pZCI6IlJVTl83OUM2MTU5RDcwQzMyNTg2NDcxODYyMUYifQo=",
+        "request_sha256": "377108516516513B96D35D35746D2B1E27FCBD600CB334A9109D3AB9AA5B20B2",
+        "returned_envelope": {
+          "audit": {
+            "closure_findings": [],
+            "decision_input_sha256": "FB31AADDF80979428E3C23917FEA8B6498BBD8A704A1A7983FDFD067BBAC8668",
+            "engine_generation": "composed-0.3-frozen",
+            "first_match_predicates": {
+              "BINDING_OR_CONFLICT": false,
+              "MALFORMED_OR_BOUNDARY": false,
+              "OMISSION_OR_INCOMPLETE": false
+            },
+            "governing_authorities": {
+              "authority_register_sha256": "C3414FC751C3B5ECA43A4932C694641D801A21F2CF53C42BE3A8C87C234CF499",
+              "closure_policy_sha256": "EBA198726DE960E9F59ACE5A7E1BDB701BFBA5B1BD09BC59FF4540F2B14E8F9C",
+              "composed_contract_sha256": "6B2CAD02DDE7388D63D66E4863E5233CFBD1DC413575D9D260DB9799C7023A12",
+              "decision_table_contract_sha256": "DCFCB0714E1A7E677548057987F604D227F791F3FC3E0EA89BE5ED932447F48E",
+              "engine_capabilities_sha256": "4D9FA1C9CCB60B980BCE1739FE8FDC10E84AEFC03D4C20E2AA1A8B0BBE2D18FC",
+              "engine_runner_sha256": "83319385C8B6D28965F4683B8C0689FB70158E86ED35D54E7467E8E3DF076E09"
+            },
+            "matched_class_witness": [],
+            "record_references": [],
+            "record_references_truncated": false,
+            "request_raw_sha256": "377108516516513B96D35D35746D2B1E27FCBD600CB334A9109D3AB9AA5B20B2"
+          },
+          "audit_sha256": "8C932D8B66CDDFDC49FFCCAB1834F3F915D9B3FA681D0F49B2EAF855BC845F7C",
+          "audited_behavior_class": "VALID",
+          "exit_code": 0,
+          "format_version": "B1-AUDITED-DECISION-0.4.2",
+          "sealed_response": {
+            "errors": [],
+            "exit_code": 0,
+            "format_version": "PCB-RUNNER-RESPONSE-0.2",
+            "ok": true,
+            "output": {
+              "effect_receipt_sha256": "082A24E5B3ED4EEC3982DD77ED3F76C0E0B013A01F7E457CCD9D23E8FE34BBE1",
+              "obligation_id": "OBL-26",
+              "operation_handle": "OPR_2B12C8F8D4240FDA61CDA198",
+              "record_references": [],
+              "result_object": {
+                "behavior_class": "VALID",
+                "conclusion": "SATISFIED"
+              },
+              "status": "PASS",
+              "unresolved_reasons": []
+            },
+            "receipt_sha256": "B79798408D89EF03BA90219D4BDB9C42CC1694A0F81904B3FF7FBCBC0359228D",
+            "request_id": "RUN_79C6159D70C325864718621F",
+            "result": "PASS"
+          }
+        }
+      }
+    ],
+    "observed": true,
+    "output_b64": "eyJjb2RlIjoiUl9MSU5FQUdFX0NPTkNMVVNJVkUiLCJkaXNwb3NpdGlvbiI6IkJMT0NLIiwiZm9ybWF0IjoiUlItU1RVRFktVFJFQVRNRU5ULURFQ0lTSU9OLTUiLCJpbnB1dF9kaWdlc3QiOiIyMkQ5MzdDNDJCREZFQUYwQ0EwNzI2RDY1ODY4QzgwNDUwODBGRjRCRTlEODI1NTgzMEJGNzc1RjFGOTg1QjM1Iiwib2NjdXJyZW5jZSI6MCwicG9pbnRlciI6IiIsInJlYXNvbiI6IkNPTkNMVVNJVkVfSE9MRCIsInJlbWVkaWF0aW9uIjoiUkVGRVRDSCIsInN0YWdlIjoiTU9EVUxFX1NFTUFOVElDUyIsIndpdG5lc3NfZGlnZXN0IjoiMDc2RTU3NjQ0NzUyMkNCNjVERDE2QTE0NkQzRDFGQzE2MjdGQTVDM0EyREIwMEU1QzA4QjQyNzA1RDExOTRCOCJ9",
+    "output_sha256": "30E0D18692A578A3A191716DA51178A11E0AB28BF4C5D05B3C0ED38CF532FB6C",
+    "package": "a",
+    "runtime_imports": [
+      "rr_full_treatment.runtime_a",
+      "rr_full_treatment.runtime_a._policy",
+      "rr_full_treatment.runtime_a._r_data",
+      "rr_full_treatment.runtime_a.common",
+      "rr_full_treatment.runtime_a.common._a2_data",
+      "rr_full_treatment.runtime_a.common._field_rows",
+      "rr_full_treatment.runtime_a.common.admission",
+      "rr_full_treatment.runtime_a.common.pins",
+      "rr_full_treatment.runtime_a.common.result",
+      "rr_full_treatment.runtime_a.common.wire",
+      "rr_full_treatment.runtime_a.r"
+    ],
+    "state_sha256": "C032111B8115C01F8F52185C5FCFF9350FC742951474B2ED275B1DCBFF13C2B7",
+    "wall_ns": 32631800,
+    "controller_wall_ns": 151944700
+  },
+  "observer": {
+    "status": "EXACT_INVOCATION_OBSERVED",
+    "common_sha256": "215BA8626A0CE3E6DBD05C0C55C63753D6DF64D9D0F249234CD6D5A6680576AB",
+    "state_sha256": "C032111B8115C01F8F52185C5FCFF9350FC742951474B2ED275B1DCBFF13C2B7",
+    "output_sha256": "30E0D18692A578A3A191716DA51178A11E0AB28BF4C5D05B3C0ED38CF532FB6C",
+    "actual_engine_call_count": 1,
+    "recorded_use_sha256": "76C06500409056107FDE717A84EE73C7B590DBE86C1BC1691229363F555F10DC",
+    "engine_output_sha256": "939D7F51DCD633B2DD0486189DE632B3F5E13949F8C5E4B28DA696CDD24D773E"
+  }
+}

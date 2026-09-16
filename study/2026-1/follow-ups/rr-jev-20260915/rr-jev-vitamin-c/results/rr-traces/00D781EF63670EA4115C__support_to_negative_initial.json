@@ -1,0 +1,354 @@
+{
+  "common": {
+    "a2_raw_shared_bundle": {
+      "bundle_id": "BUNDLE_D56D531C9ACCF4EF28256CAEB244D0E582C5C4802C6DB3076DF8EB8FBBF48385",
+      "capabilities": [
+        {
+          "capability_id": "CAP_41CF6794BA4200B839C53531",
+          "episode_id": "EP_A3C403DBA355C35CA6F1A13A",
+          "role_id": "ROLE_REGISTERED_ACTOR"
+        },
+        {
+          "capability_id": "CAP_A8E43DD7A15E1D81AD9124AB",
+          "episode_id": "EP_A3C403DBA355C35CA6F1A13A",
+          "role_id": "ROLE_REGISTERED_ACTOR"
+        }
+      ],
+      "claim_versions": [
+        {
+          "claim_id": "CLAIM_816B8870E527BBA5968D29D1193194F31A3C2CB816C8412F22B5DB7DDAE29817",
+          "exact_claim_version_id": "CLAIM_816B8870E527BBA5968D29D1193194F31A3C2CB816C8412F22B5DB7DDAE29817",
+          "payload": "{\"assessment\":{\"answer_json\":\"{\\\"choice\\\":\\\"supports\\\",\\\"confidence\\\":0.99,\\\"probabilities\\\":{\\\"contradicts\\\":0.0,\\\"insufficient\\\":0.0,\\\"supports\\\":1.0},\\\"type\\\":\\\"choice\\\"}\",\"kind\":\"jev\",\"request_sha256\":\"C5D7DE00E6229112E64FAD143EF10E6021EDC735506B8059EF7D21BF445AD90E\",\"response_sha256\":\"5B2D185724D014CB4D7A2ADC71DA6F5165169490B046DF90C506C73FEDB20FFD\",\"returned_model\":\"jev-1.13.0\"},\"claim\":\"S. Robson Walton was worth more than $ 42 billion before March 2018 .\",\"intended_use\":\"PURPOSE_SUMMARY\",\"source_revision\":1,\"source_sha256\":\"F5B1CFF075307429F9AAEC2B038D509A38A193428F69BD54E0C53E9DD10AF82E\"}",
+          "source_record_refs": [
+            "SOURCE_C18BA06E3D25CB36A300E3F04A26885B1DD22AB7440BE2EA631E842E0CAEC02F"
+          ],
+          "version": 1
+        }
+      ],
+      "closure_attestations": [
+        {
+          "closed_record_classes": [
+            "CLAIM_VERSION",
+            "DECLARATION_RECORD",
+            "MANDATE_RECORD",
+            "USE_RECORD"
+          ],
+          "closed_through": "2026-09-05T12:00:01Z",
+          "closure_attestation_id": "CLOSURE_9E1AD2F358BFA92B8CA1D1630794BD40F17040F2F24ECF418D26BF0C8DC52993",
+          "committed_frontier": 1,
+          "ledger_id": "LEDGER_6CF8D0A83C3EE07933116402981424807829BB3AA8C82F5371243EDE0BD88545",
+          "source_extent": [
+            "SOURCE_MANDATE",
+            "SOURCE_PRIMARY"
+          ],
+          "verification_method_ref": "REGISTERED_FINITE_HISTORY_CENSUS"
+        }
+      ],
+      "declaration_records": [
+        {
+          "declaration_kind": "ADOPTION_DECLARED",
+          "declaration_version_ref": "DECL_USE",
+          "episode_id": "EP_A3C403DBA355C35CA6F1A13A",
+          "exact_claim_version_id": "CLAIM_816B8870E527BBA5968D29D1193194F31A3C2CB816C8412F22B5DB7DDAE29817",
+          "interval": {
+            "effective_from": "2026-09-05T11:00:00Z",
+            "effective_until": "2026-09-05T13:00:00Z"
+          },
+          "issuer_capability_id": "CAP_41CF6794BA4200B839C53531",
+          "mandate_version_ref": "STANDING_EF839495BF5B2B0AE32D43FD",
+          "policy_ref": "POLICY_SHARED_0_1",
+          "purpose_id": "PURPOSE_SUMMARY",
+          "receiver_capability_id": "CAP_A8E43DD7A15E1D81AD9124AB",
+          "recorded_at": "2026-09-05T12:00:00Z",
+          "scope_id": "SCOPE_TASK",
+          "standing_basis_ref": "STANDING_EF839495BF5B2B0AE32D43FD"
+        }
+      ],
+      "domain_mandate_records": [
+        {
+          "interval": {
+            "effective_from": "2026-09-05T11:00:00Z",
+            "effective_until": "2026-09-05T13:00:00Z"
+          },
+          "mandate_version_ref": "STANDING_EF839495BF5B2B0AE32D43FD",
+          "permitted_record_kinds": [
+            "ADOPTION_DECLARED"
+          ],
+          "policy_ref": "POLICY_SHARED_0_1",
+          "purpose_ids": [
+            "PURPOSE_SUMMARY"
+          ],
+          "scope_ids": [
+            "SCOPE_TASK"
+          ],
+          "subject_capability_id": "CAP_41CF6794BA4200B839C53531"
+        }
+      ],
+      "domain_vocabulary": {
+        "canonicalization_method_ref": "EH_CANONICAL_JSON_0_1",
+        "domain_id": "RR_LOCAL_CONSTRUCTED_WORKFLOW",
+        "purpose_entries": [
+          {
+            "description": "Registered receiver operation",
+            "id": "PURPOSE_SUMMARY"
+          }
+        ],
+        "scope_entries": [
+          {
+            "description": "Registered constructed task scope",
+            "id": "SCOPE_TASK"
+          }
+        ],
+        "selector_language_id": "EH-SELECTOR-CORE-0_1",
+        "vocabulary_id": "RR_LOCAL_WORKFLOW_VOCAB",
+        "vocabulary_version": "1.0"
+      },
+      "episodes": [
+        {
+          "cross_party_episode_id": "EP_A3C403DBA355C35CA6F1A13A",
+          "domain_vocabulary_ref": "RR_LOCAL_WORKFLOW_VOCAB",
+          "episode_family_id": "RR_LOCAL_WORKFLOW",
+          "interval": {
+            "effective_from": "2026-09-05T11:00:00Z",
+            "effective_until": "2026-09-05T13:00:00Z"
+          },
+          "purpose_id": "PURPOSE_SUMMARY",
+          "receiver_capability_id": "CAP_A8E43DD7A15E1D81AD9124AB",
+          "receiver_role_id": "ROLE_RECEIVER",
+          "scope_id": "SCOPE_TASK",
+          "sender_capability_id": "CAP_41CF6794BA4200B839C53531",
+          "sender_role_id": "ROLE_SENDER"
+        }
+      ],
+      "format_version": "EH-G0-A2-SHARED-0.1",
+      "ledger_observations": [
+        {
+          "action_or_decision_ref": "ACTION_3676EBE5AE30974892AEA34D",
+          "captured_at": "2026-09-05T12:00:00Z",
+          "committed_frontier": 1,
+          "decision_context_ref": "CONTEXT_CONTROL",
+          "included_record_refs": [
+            "DECL_USE"
+          ],
+          "ledger_id": "LEDGER_6CF8D0A83C3EE07933116402981424807829BB3AA8C82F5371243EDE0BD88545",
+          "nonce": "NONCE_CONTROL"
+        }
+      ],
+      "observable_external_facts": [],
+      "recorded_action_grants": [],
+      "recorded_support_assessments": [],
+      "source_records": [
+        {
+          "observed_at": "2026-09-05T12:00:00Z",
+          "payload": "{\"revision\":2,\"source_text\":\"As of March 2018 , Walton had a net worth of $ 41.7 billion , making him the 17th richest person in the world.\"}",
+          "source_kind": "DOCUMENT",
+          "source_record_id": "SOURCE_C18BA06E3D25CB36A300E3F04A26885B1DD22AB7440BE2EA631E842E0CAEC02F"
+        }
+      ],
+      "use_records": [
+        {
+          "action_or_decision_ref": "ACTION_3676EBE5AE30974892AEA34D",
+          "decision_context_ref": "CONTEXT_CONTROL",
+          "declared_basis_refs": [
+            "DECL_USE"
+          ],
+          "episode_id": "EP_A3C403DBA355C35CA6F1A13A",
+          "exact_claim_version_id": "CLAIM_816B8870E527BBA5968D29D1193194F31A3C2CB816C8412F22B5DB7DDAE29817",
+          "occurred_at": "2026-09-05T12:00:01Z",
+          "purpose_id": "PURPOSE_SUMMARY",
+          "receiver_capability_id": "CAP_A8E43DD7A15E1D81AD9124AB",
+          "scope_id": "SCOPE_TASK",
+          "use_id": "USE_1A371A08D789A75606B2227E14E27EC1AFE972C4F59CB9EFC944805629B42A21"
+        }
+      ]
+    },
+    "comparison_facts": {
+      "carrier_fence": 1,
+      "consumed_representation_sha256": "816B8870E527BBA5968D29D1193194F31A3C2CB816C8412F22B5DB7DDAE29817",
+      "current_fence": 1,
+      "expected_action_class": "PERMIT",
+      "expected_authority": "AUTH_LOCAL",
+      "expected_carrier": "CARRIER_CONTROL",
+      "expected_direct_parents": [
+        "PARENT_309FDDA8E9F375D8E46ADBFE7EE27CACCE2AB25F8A577F9AD3A9A48CD2CEEE2D"
+      ],
+      "expected_generation": 1,
+      "expected_owner": "OWNER_LOCAL",
+      "expected_principal": "CAP_41CF6794BA4200B839C53531",
+      "expected_purpose": "PURPOSE_SUMMARY",
+      "expected_receiver_capability": "CAP_A8E43DD7A15E1D81AD9124AB",
+      "expected_representation_sha256": "816B8870E527BBA5968D29D1193194F31A3C2CB816C8412F22B5DB7DDAE29817",
+      "expected_route": "ROUTE_CONTROL",
+      "expected_scope": [
+        "SCOPE_TASK"
+      ],
+      "expected_slot": "SLOT_CONTROL",
+      "observed_action_class": "PERMIT",
+      "observed_authority": "AUTH_LOCAL",
+      "observed_carrier": "CARRIER_CONTROL",
+      "observed_direct_parents": [
+        "PARENT_99C8F34D640E07911A1F324842B2981BBB81EFFB575F8B77BE6056F46430A101"
+      ],
+      "observed_generation": 1,
+      "observed_owner": "OWNER_LOCAL",
+      "observed_principal": "CAP_41CF6794BA4200B839C53531",
+      "observed_purpose": "PURPOSE_SUMMARY",
+      "observed_receiver_capability": "CAP_A8E43DD7A15E1D81AD9124AB",
+      "observed_route": "ROUTE_CONTROL",
+      "observed_scope": [
+        "SCOPE_TASK"
+      ],
+      "observed_slot": "SLOT_CONTROL",
+      "origin_finalized": true,
+      "revocation_active": false,
+      "use_time_ns": 1001,
+      "valid_from_ns": 0,
+      "valid_until_ns": 10000
+    },
+    "delivered_artifact_envelope": {
+      "artifact_id": "ART_CONTROL",
+      "content_b64": "eyJhc3Nlc3NtZW50Ijp7ImFuc3dlcl9qc29uIjoie1wiY2hvaWNlXCI6XCJzdXBwb3J0c1wiLFwiY29uZmlkZW5jZVwiOjAuOTksXCJwcm9iYWJpbGl0aWVzXCI6e1wiY29udHJhZGljdHNcIjowLjAsXCJpbnN1ZmZpY2llbnRcIjowLjAsXCJzdXBwb3J0c1wiOjEuMH0sXCJ0eXBlXCI6XCJjaG9pY2VcIn0iLCJraW5kIjoiamV2IiwicmVxdWVzdF9zaGEyNTYiOiJDNUQ3REUwMEU2MjI5MTEyRTY0RkFEMTQzRUYxMEU2MDIxRURDNzM1NTA2QjgwNTlFRjdEMjFCRjQ0NUFEOTBFIiwicmVzcG9uc2Vfc2hhMjU2IjoiNUIyRDE4NTcyNEQwMTRDQjREN0EyQURDNzFEQTZGNTE2NTE2OTQ5MEIwNDZERjkwQzUwNkM3M0ZFREIyMEZGRCIsInJldHVybmVkX21vZGVsIjoiamV2LTEuMTMuMCJ9LCJjbGFpbSI6IlMuIFJvYnNvbiBXYWx0b24gd2FzIHdvcnRoIG1vcmUgdGhhbiAkIDQyIGJpbGxpb24gYmVmb3JlIE1hcmNoIDIwMTggLiIsImludGVuZGVkX3VzZSI6IlBVUlBPU0VfU1VNTUFSWSIsInNvdXJjZV9yZXZpc2lvbiI6MSwic291cmNlX3NoYTI1NiI6IkY1QjFDRkYwNzUzMDc0MjlGOUFBRUMyQjAzOEQ1MDlBMzhBMTkzNDI4RjY5QkQ1NEUwQzUzRTlERDEwQUY4MkUifQ==",
+      "format": "RR-SCIENTIFIC-CLOSED-ARTIFACT-1",
+      "media_type": "application/json",
+      "revision": 1
+    },
+    "format": "RR-STUDY-TREATMENT-COMMON-5",
+    "guard_observation_facts": {
+      "consumption_state": "UNUSED",
+      "effect_receipt_count": 1,
+      "effect_sha256": "27C29A24654EB2C5D63210BFAB6C64E4B38FDB2A771119A01AF320F23C84AF76",
+      "execution_receipt_effect_sha256": "27C29A24654EB2C5D63210BFAB6C64E4B38FDB2A771119A01AF320F23C84AF76",
+      "grant_expires_at": 2000,
+      "grant_not_before": 0,
+      "invocation_nonce": "NONCE_INGRESS",
+      "invocation_time": 1000,
+      "prior_invocation_nonces": [],
+      "revocation_checked_at": 1000,
+      "revoked_at": null
+    },
+    "remediation": {
+      "attempt_ordinal": 0,
+      "refetch_budget": 1
+    },
+    "requested_delivered_transfer": {
+      "declared_sha256": "816B8870E527BBA5968D29D1193194F31A3C2CB816C8412F22B5DB7DDAE29817",
+      "delivered_artifact_id": "ART_CONTROL",
+      "delivered_revision": 1,
+      "requested_artifact_id": "ART_CONTROL",
+      "requested_revision": 1
+    },
+    "source_lineage_observation": {
+      "format": "RR-SCIENTIFIC-CLOSED-LINEAGE-OBSERVATION-1",
+      "source_artifact_id": "SOURCE_C18BA06E3D25CB36A300E3F04A26885B1DD22AB7440BE2EA631E842E0CAEC02F",
+      "source_revision": 0,
+      "source_sha256": "C18BA06E3D25CB36A300E3F04A26885B1DD22AB7440BE2EA631E842E0CAEC02F"
+    },
+    "task_id": "TASK_A8E95D4FB1B44A73DE2AFDA49D4C6EB5AE4E0FCBE1347200F9B002DA2B85A043",
+    "task_instruction_constraints": {
+      "constraints": [],
+      "instruction": "Use the exact supported factual claim for the declared purpose."
+    }
+  },
+  "receipt": {
+    "arm": "R",
+    "common_sha256": "E2AF8BFD17098EE544374391CE91E34152D49510703E0090F1B56D772E7DDCE4",
+    "constructions": [
+      {
+        "evidence": {
+          "code": "R_LINEAGE_CONCLUSIVE",
+          "module": "R",
+          "occurrence": 0,
+          "pointer": "",
+          "semantic_evidence": null,
+          "stage": "MODULE_SEMANTICS"
+        },
+        "output_sha256": "2562B72760452D89932487F0130B9CAC885172C84C34758F7E05E9F28268C05A"
+      }
+    ],
+    "cpu_ns": 31250000,
+    "engine_calls": [
+      {
+        "request_b64": "eyJkZWNpc2lvbl9pbnB1dCI6eyJmYWN0cyI6eyJjb25zdW1wdGlvbl9zdGF0ZSI6IlVOVVNFRCIsImVmZmVjdF9yZWNlaXB0X2NvdW50IjoxLCJlZmZlY3Rfc2hhMjU2IjoiMjdDMjlBMjQ2NTRFQjJDNUQ2MzIxMEJGQUI2QzY0RTRCMzhGREIyQTc3MTExOUEwMUFGMzIwRjIzQzg0QUY3NiIsImV4ZWN1dGlvbl9yZWNlaXB0X2VmZmVjdF9zaGEyNTYiOiIyN0MyOUEyNDY1NEVCMkM1RDYzMjEwQkZBQjZDNjRFNEIzOEZEQjJBNzcxMTE5QTAxQUYzMjBGMjNDODRBRjc2IiwiZ3JhbnRfZXhwaXJlc19hdCI6MjAwMCwiZ3JhbnRfbm90X2JlZm9yZSI6MCwiaW52b2NhdGlvbl9ub25jZSI6Ik5PTkNFX0lOR1JFU1MiLCJpbnZvY2F0aW9uX3RpbWUiOjEwMDAsInByaW9yX2ludm9jYXRpb25fbm9uY2VzIjpbXSwicmV2b2NhdGlvbl9jaGVja2VkX2F0IjoxMDAwLCJyZXZva2VkX2F0IjpudWxsfSwiZm9ybWF0X3ZlcnNpb24iOiJCMS1TRU1BTlRJQy1GQUNUUy0wLjIiLCJvYmxpZ2F0aW9uX2lkIjoiT0JMLTI2Iiwib3BlcmF0aW9uX2hhbmRsZSI6Ik9QUl8yQjEyQzhGOEQ0MjQwRkRBNjFDREExOTgifSwiZm9ybWF0X3ZlcnNpb24iOiJCMS1TRU1BTlRJQy1ERUNJU0lPTi1SRVFVRVNULTAuMiIsImlubmVyX2lucHV0X3NoYTI1NiI6IkE5MTZDRjM5NjBDRjgyMTg4OEJFOUI0MjE2MzRGRkY0NjE4QkVENEI3MTY2NjlDRDVBMDYzQzNCMzlCNjRFNDAiLCJpbm5lcl9yZXF1ZXN0Ijp7ImNvbmZpZ3VyYXRpb25faGFuZGxlIjoiQ0ZHX0IwNkJDQUFCMEY1NzEzQjc1QUMwRjEyNiIsImZvcm1hdF92ZXJzaW9uIjoiUENCLVJVTk5FUi1SRVFVRVNULTAuMiIsImlucHV0Ijp7ImJ1bmRsZV9pZCI6IkJVTkRMRV9ENTZENTMxQzlBQ0NGNEVGMjgyNTZDQUVCMjQ0RDBFNTgyQzVDNDgwMkM2REIzMDc2REY4RUI4RkJCRjQ4Mzg1IiwiY2FwYWJpbGl0aWVzIjpbeyJjYXBhYmlsaXR5X2lkIjoiQ0FQXzQxQ0Y2Nzk0QkE0MjAwQjgzOUM1MzUzMSIsImVwaXNvZGVfaWQiOiJFUF9BM0M0MDNEQkEzNTVDMzVDQTZGMUExM0EiLCJyb2xlX2lkIjoiUk9MRV9SRUdJU1RFUkVEX0FDVE9SIn0seyJjYXBhYmlsaXR5X2lkIjoiQ0FQX0E4RTQzREQ3QTE1RTFEODFBRDkxMjRBQiIsImVwaXNvZGVfaWQiOiJFUF9BM0M0MDNEQkEzNTVDMzVDQTZGMUExM0EiLCJyb2xlX2lkIjoiUk9MRV9SRUdJU1RFUkVEX0FDVE9SIn1dLCJjbGFpbV92ZXJzaW9ucyI6W3siY2xhaW1faWQiOiJDTEFJTV84MTZCODg3MEU1MjdCQkE1OTY4RDI5RDExOTMxOTRGMzFBM0MyQ0I4MTZDODQxMkYyMkI1REI3RERBRTI5ODE3IiwiZXhhY3RfY2xhaW1fdmVyc2lvbl9pZCI6IkNMQUlNXzgxNkI4ODcwRTUyN0JCQTU5NjhEMjlEMTE5MzE5NEYzMUEzQzJDQjgxNkM4NDEyRjIyQjVEQjdEREFFMjk4MTciLCJwYXlsb2FkIjoie1wiYXNzZXNzbWVudFwiOntcImFuc3dlcl9qc29uXCI6XCJ7XFxcImNob2ljZVxcXCI6XFxcInN1cHBvcnRzXFxcIixcXFwiY29uZmlkZW5jZVxcXCI6MC45OSxcXFwicHJvYmFiaWxpdGllc1xcXCI6e1xcXCJjb250cmFkaWN0c1xcXCI6MC4wLFxcXCJpbnN1ZmZpY2llbnRcXFwiOjAuMCxcXFwic3VwcG9ydHNcXFwiOjEuMH0sXFxcInR5cGVcXFwiOlxcXCJjaG9pY2VcXFwifVwiLFwia2luZFwiOlwiamV2XCIsXCJyZXF1ZXN0X3NoYTI1NlwiOlwiQzVEN0RFMDBFNjIyOTExMkU2NEZBRDE0M0VGMTBFNjAyMUVEQzczNTUwNkI4MDU5RUY3RDIxQkY0NDVBRDkwRVwiLFwicmVzcG9uc2Vfc2hhMjU2XCI6XCI1QjJEMTg1NzI0RDAxNENCNEQ3QTJBREM3MURBNkY1MTY1MTY5NDkwQjA0NkRGOTBDNTA2QzczRkVEQjIwRkZEXCIsXCJyZXR1cm5lZF9tb2RlbFwiOlwiamV2LTEuMTMuMFwifSxcImNsYWltXCI6XCJTLiBSb2Jzb24gV2FsdG9uIHdhcyB3b3J0aCBtb3JlIHRoYW4gJCA0MiBiaWxsaW9uIGJlZm9yZSBNYXJjaCAyMDE4IC5cIixcImludGVuZGVkX3VzZVwiOlwiUFVSUE9TRV9TVU1NQVJZXCIsXCJzb3VyY2VfcmV2aXNpb25cIjoxLFwic291cmNlX3NoYTI1NlwiOlwiRjVCMUNGRjA3NTMwNzQyOUY5QUFFQzJCMDM4RDUwOUEzOEExOTM0MjhGNjlCRDU0RTBDNTNFOUREMTBBRjgyRVwifSIsInNvdXJjZV9yZWNvcmRfcmVmcyI6WyJTT1VSQ0VfQzE4QkEwNkUzRDI1Q0IzNkEzMDBFM0YwNEEyNjg4NUIxREQyMkFCNzQ0MEJFMkVBNjMxRTg0MkUwQ0FFQzAyRiJdLCJ2ZXJzaW9uIjoxfV0sImNsb3N1cmVfYXR0ZXN0YXRpb25zIjpbeyJjbG9zZWRfcmVjb3JkX2NsYXNzZXMiOlsiQ0xBSU1fVkVSU0lPTiIsIkRFQ0xBUkFUSU9OX1JFQ09SRCIsIk1BTkRBVEVfUkVDT1JEIiwiVVNFX1JFQ09SRCJdLCJjbG9zZWRfdGhyb3VnaCI6IjIwMjYtMDktMDVUMTI6MDA6MDFaIiwiY2xvc3VyZV9hdHRlc3RhdGlvbl9pZCI6IkNMT1NVUkVfOUUxQUQyRjM1OEJGQTkyQjhDQTFEMTYzMDc5NEJENDBGMTcwNDBGMkYyNEVDRjQxOEQyNkJGMEM4REM1Mjk5MyIsImNvbW1pdHRlZF9mcm9udGllciI6MSwibGVkZ2VyX2lkIjoiTEVER0VSXzZDRjhEMEE4M0MzRUUwNzkzMzExNjQwMjk4MTQyNDgwNzgyOUJCM0FBOEM4MkY1MzcxMjQzRURFMEJEODg1NDUiLCJzb3VyY2VfZXh0ZW50IjpbIlNPVVJDRV9NQU5EQVRFIiwiU09VUkNFX1BSSU1BUlkiXSwidmVyaWZpY2F0aW9uX21ldGhvZF9yZWYiOiJSRUdJU1RFUkVEX0ZJTklURV9ISVNUT1JZX0NFTlNVUyJ9XSwiZGVjbGFyYXRpb25fcmVjb3JkcyI6W3siZGVjbGFyYXRpb25fa2luZCI6IkFET1BUSU9OX0RFQ0xBUkVEIiwiZGVjbGFyYXRpb25fdmVyc2lvbl9yZWYiOiJERUNMX1VTRSIsImVwaXNvZGVfaWQiOiJFUF9BM0M0MDNEQkEzNTVDMzVDQTZGMUExM0EiLCJleGFjdF9jbGFpbV92ZXJzaW9uX2lkIjoiQ0xBSU1fODE2Qjg4NzBFNTI3QkJBNTk2OEQyOUQxMTkzMTk0RjMxQTNDMkNCODE2Qzg0MTJGMjJCNURCN0REQUUyOTgxNyIsImludGVydmFsIjp7ImVmZmVjdGl2ZV9mcm9tIjoiMjAyNi0wOS0wNVQxMTowMDowMFoiLCJlZmZlY3RpdmVfdW50aWwiOiIyMDI2LTA5LTA1VDEzOjAwOjAwWiJ9LCJpc3N1ZXJfY2FwYWJpbGl0eV9pZCI6IkNBUF80MUNGNjc5NEJBNDIwMEI4MzlDNTM1MzEiLCJtYW5kYXRlX3ZlcnNpb25fcmVmIjoiU1RBTkRJTkdfRUY4Mzk0OTVCRjVCMkIwQUUzMkQ0M0ZEIiwicG9saWN5X3JlZiI6IlBPTElDWV9TSEFSRURfMF8xIiwicHVycG9zZV9pZCI6IlBVUlBPU0VfU1VNTUFSWSIsInJlY2VpdmVyX2NhcGFiaWxpdHlfaWQiOiJDQVBfQThFNDNERDdBMTVFMUQ4MUFEOTEyNEFCIiwicmVjb3JkZWRfYXQiOiIyMDI2LTA5LTA1VDEyOjAwOjAwWiIsInNjb3BlX2lkIjoiU0NPUEVfVEFTSyIsInN0YW5kaW5nX2Jhc2lzX3JlZiI6IlNUQU5ESU5HX0VGODM5NDk1QkY1QjJCMEFFMzJENDNGRCJ9XSwiZG9tYWluX21hbmRhdGVfcmVjb3JkcyI6W3siaW50ZXJ2YWwiOnsiZWZmZWN0aXZlX2Zyb20iOiIyMDI2LTA5LTA1VDExOjAwOjAwWiIsImVmZmVjdGl2ZV91bnRpbCI6IjIwMjYtMDktMDVUMTM6MDA6MDBaIn0sIm1hbmRhdGVfdmVyc2lvbl9yZWYiOiJTVEFORElOR19FRjgzOTQ5NUJGNUIyQjBBRTMyRDQzRkQiLCJwZXJtaXR0ZWRfcmVjb3JkX2tpbmRzIjpbIkFET1BUSU9OX0RFQ0xBUkVEIl0sInBvbGljeV9yZWYiOiJQT0xJQ1lfU0hBUkVEXzBfMSIsInB1cnBvc2VfaWRzIjpbIlBVUlBPU0VfU1VNTUFSWSJdLCJzY29wZV9pZHMiOlsiU0NPUEVfVEFTSyJdLCJzdWJqZWN0X2NhcGFiaWxpdHlfaWQiOiJDQVBfNDFDRjY3OTRCQTQyMDBCODM5QzUzNTMxIn1dLCJkb21haW5fdm9jYWJ1bGFyeSI6eyJjYW5vbmljYWxpemF0aW9uX21ldGhvZF9yZWYiOiJFSF9DQU5PTklDQUxfSlNPTl8wXzEiLCJkb21haW5faWQiOiJSUl9MT0NBTF9DT05TVFJVQ1RFRF9XT1JLRkxPVyIsInB1cnBvc2VfZW50cmllcyI6W3siZGVzY3JpcHRpb24iOiJSZWdpc3RlcmVkIHJlY2VpdmVyIG9wZXJhdGlvbiIsImlkIjoiUFVSUE9TRV9TVU1NQVJZIn1dLCJzY29wZV9lbnRyaWVzIjpbeyJkZXNjcmlwdGlvbiI6IlJlZ2lzdGVyZWQgY29uc3RydWN0ZWQgdGFzayBzY29wZSIsImlkIjoiU0NPUEVfVEFTSyJ9XSwic2VsZWN0b3JfbGFuZ3VhZ2VfaWQiOiJFSC1TRUxFQ1RPUi1DT1JFLTBfMSIsInZvY2FidWxhcnlfaWQiOiJSUl9MT0NBTF9XT1JLRkxPV19WT0NBQiIsInZvY2FidWxhcnlfdmVyc2lvbiI6IjEuMCJ9LCJlcGlzb2RlcyI6W3siY3Jvc3NfcGFydHlfZXBpc29kZV9pZCI6IkVQX0EzQzQwM0RCQTM1NUMzNUNBNkYxQTEzQSIsImRvbWFpbl92b2NhYnVsYXJ5X3JlZiI6IlJSX0xPQ0FMX1dPUktGTE9XX1ZPQ0FCIiwiZXBpc29kZV9mYW1pbHlfaWQiOiJSUl9MT0NBTF9XT1JLRkxPVyIsImludGVydmFsIjp7ImVmZmVjdGl2ZV9mcm9tIjoiMjAyNi0wOS0wNVQxMTowMDowMFoiLCJlZmZlY3RpdmVfdW50aWwiOiIyMDI2LTA5LTA1VDEzOjAwOjAwWiJ9LCJwdXJwb3NlX2lkIjoiUFVSUE9TRV9TVU1NQVJZIiwicmVjZWl2ZXJfY2FwYWJpbGl0eV9pZCI6IkNBUF9BOEU0M0REN0ExNUUxRDgxQUQ5MTI0QUIiLCJyZWNlaXZlcl9yb2xlX2lkIjoiUk9MRV9SRUNFSVZFUiIsInNjb3BlX2lkIjoiU0NPUEVfVEFTSyIsInNlbmRlcl9jYXBhYmlsaXR5X2lkIjoiQ0FQXzQxQ0Y2Nzk0QkE0MjAwQjgzOUM1MzUzMSIsInNlbmRlcl9yb2xlX2lkIjoiUk9MRV9TRU5ERVIifV0sImZvcm1hdF92ZXJzaW9uIjoiRUgtRzAtQTItU0hBUkVELTAuMSIsImxlZGdlcl9vYnNlcnZhdGlvbnMiOlt7ImFjdGlvbl9vcl9kZWNpc2lvbl9yZWYiOiJBQ1RJT05fMzY3NkVCRTVBRTMwOTc0ODkyQUVBMzREIiwiY2FwdHVyZWRfYXQiOiIyMDI2LTA5LTA1VDEyOjAwOjAwWiIsImNvbW1pdHRlZF9mcm9udGllciI6MSwiZGVjaXNpb25fY29udGV4dF9yZWYiOiJDT05URVhUX0NPTlRST0wiLCJpbmNsdWRlZF9yZWNvcmRfcmVmcyI6WyJERUNMX1VTRSJdLCJsZWRnZXJfaWQiOiJMRURHRVJfNkNGOEQwQTgzQzNFRTA3OTMzMTE2NDAyOTgxNDI0ODA3ODI5QkIzQUE4QzgyRjUzNzEyNDNFREUwQkQ4ODU0NSIsIm5vbmNlIjoiTk9OQ0VfQ09OVFJPTCJ9XSwib2JzZXJ2YWJsZV9leHRlcm5hbF9mYWN0cyI6W10sInJlY29yZGVkX2FjdGlvbl9ncmFudHMiOltdLCJyZWNvcmRlZF9zdXBwb3J0X2Fzc2Vzc21lbnRzIjpbXSwic291cmNlX3JlY29yZHMiOlt7Im9ic2VydmVkX2F0IjoiMjAyNi0wOS0wNVQxMjowMDowMFoiLCJwYXlsb2FkIjoie1wicmV2aXNpb25cIjoyLFwic291cmNlX3RleHRcIjpcIkFzIG9mIE1hcmNoIDIwMTggLCBXYWx0b24gaGFkIGEgbmV0IHdvcnRoIG9mICQgNDEuNyBiaWxsaW9uICwgbWFraW5nIGhpbSB0aGUgMTd0aCByaWNoZXN0IHBlcnNvbiBpbiB0aGUgd29ybGQuXCJ9Iiwic291cmNlX2tpbmQiOiJET0NVTUVOVCIsInNvdXJjZV9yZWNvcmRfaWQiOiJTT1VSQ0VfQzE4QkEwNkUzRDI1Q0IzNkEzMDBFM0YwNEEyNjg4NUIxREQyMkFCNzQ0MEJFMkVBNjMxRTg0MkUwQ0FFQzAyRiJ9XSwidXNlX3JlY29yZHMiOlt7ImFjdGlvbl9vcl9kZWNpc2lvbl9yZWYiOiJBQ1RJT05fMzY3NkVCRTVBRTMwOTc0ODkyQUVBMzREIiwiZGVjaXNpb25fY29udGV4dF9yZWYiOiJDT05URVhUX0NPTlRST0wiLCJkZWNsYXJlZF9iYXNpc19yZWZzIjpbIkRFQ0xfVVNFIl0sImVwaXNvZGVfaWQiOiJFUF9BM0M0MDNEQkEzNTVDMzVDQTZGMUExM0EiLCJleGFjdF9jbGFpbV92ZXJzaW9uX2lkIjoiQ0xBSU1fODE2Qjg4NzBFNTI3QkJBNTk2OEQyOUQxMTkzMTk0RjMxQTNDMkNCODE2Qzg0MTJGMjJCNURCN0REQUUyOTgxNyIsIm9jY3VycmVkX2F0IjoiMjAyNi0wOS0wNVQxMjowMDowMVoiLCJwdXJwb3NlX2lkIjoiUFVSUE9TRV9TVU1NQVJZIiwicmVjZWl2ZXJfY2FwYWJpbGl0eV9pZCI6IkNBUF9BOEU0M0REN0ExNUUxRDgxQUQ5MTI0QUIiLCJzY29wZV9pZCI6IlNDT1BFX1RBU0siLCJ1c2VfaWQiOiJVU0VfMUEzNzFBMDhENzg5QTc1NjA2QjIyMjdFMTRFMjdFQzFBRkU5NzJDNEY1OUNCOUVGQzk0NDgwNTYyOUI0MkEyMSJ9XX0sIm9wZXJhdGlvbl9oYW5kbGUiOiJPUFJfMkIxMkM4RjhENDI0MEZEQTYxQ0RBMTk4IiwicmVxdWVzdF9pZCI6IlJVTl83OUM2MTU5RDcwQzMyNTg2NDcxODYyMUYifSwiaW5uZXJfcmVxdWVzdF9yYXdfc2hhMjU2IjoiRDcwMTUzRjhGQUE5RjgyRTRENENFMTMwMjQ0QTkwMDgyNTUzNTM5RTVDNkZBRURGMDcxNDNBMzRGQUFBRTQ0QSIsIm9ibGlnYXRpb25faWQiOiJPQkwtMjYiLCJvcGVyYXRpb25faGFuZGxlIjoiT1BSXzJCMTJDOEY4RDQyNDBGREE2MUNEQTE5OCIsInJlcXVlc3RfaWQiOiJSVU5fNzlDNjE1OUQ3MEMzMjU4NjQ3MTg2MjFGIn0K",
+        "request_sha256": "522CE25C4280633A1486BCEA1D4D388F8C1D2803675777DFCBABC80BFF52BFF4",
+        "returned_envelope": {
+          "audit": {
+            "closure_findings": [],
+            "decision_input_sha256": "F7821352174A2450AEEF2CA770895FA0B19A6CE2405AD1EFDD1AAE1758E907B5",
+            "engine_generation": "composed-0.3-frozen",
+            "first_match_predicates": {
+              "BINDING_OR_CONFLICT": false,
+              "MALFORMED_OR_BOUNDARY": false,
+              "OMISSION_OR_INCOMPLETE": false
+            },
+            "governing_authorities": {
+              "authority_register_sha256": "C3414FC751C3B5ECA43A4932C694641D801A21F2CF53C42BE3A8C87C234CF499",
+              "closure_policy_sha256": "EBA198726DE960E9F59ACE5A7E1BDB701BFBA5B1BD09BC59FF4540F2B14E8F9C",
+              "composed_contract_sha256": "6B2CAD02DDE7388D63D66E4863E5233CFBD1DC413575D9D260DB9799C7023A12",
+              "decision_table_contract_sha256": "DCFCB0714E1A7E677548057987F604D227F791F3FC3E0EA89BE5ED932447F48E",
+              "engine_capabilities_sha256": "4D9FA1C9CCB60B980BCE1739FE8FDC10E84AEFC03D4C20E2AA1A8B0BBE2D18FC",
+              "engine_runner_sha256": "83319385C8B6D28965F4683B8C0689FB70158E86ED35D54E7467E8E3DF076E09"
+            },
+            "matched_class_witness": [],
+            "record_references": [],
+            "record_references_truncated": false,
+            "request_raw_sha256": "522CE25C4280633A1486BCEA1D4D388F8C1D2803675777DFCBABC80BFF52BFF4"
+          },
+          "audit_sha256": "9733DA137A29E9BE3C0D356A39CAD0A7CDA834C2AC7ED938D71D325854E0B880",
+          "audited_behavior_class": "VALID",
+          "exit_code": 0,
+          "format_version": "B1-AUDITED-DECISION-0.4.2",
+          "sealed_response": {
+            "errors": [],
+            "exit_code": 0,
+            "format_version": "PCB-RUNNER-RESPONSE-0.2",
+            "ok": true,
+            "output": {
+              "effect_receipt_sha256": "03219ECED43B0B19FAEF399BCBC7DD4E96EAB71F61ADD8713FF4F47274B32CDB",
+              "obligation_id": "OBL-26",
+              "operation_handle": "OPR_2B12C8F8D4240FDA61CDA198",
+              "record_references": [],
+              "result_object": {
+                "behavior_class": "VALID",
+                "conclusion": "SATISFIED"
+              },
+              "status": "PASS",
+              "unresolved_reasons": []
+            },
+            "receipt_sha256": "ECCB94EEE472EF3AF4E252524EAEC2C34FA9B99EBD54CD1E9851E8F6BB41EBE3",
+            "request_id": "RUN_79C6159D70C325864718621F",
+            "result": "PASS"
+          }
+        }
+      }
+    ],
+    "observed": true,
+    "output_b64": "eyJjb2RlIjoiUl9MSU5FQUdFX0NPTkNMVVNJVkUiLCJkaXNwb3NpdGlvbiI6IkJMT0NLIiwiZm9ybWF0IjoiUlItU1RVRFktVFJFQVRNRU5ULURFQ0lTSU9OLTUiLCJpbnB1dF9kaWdlc3QiOiI3MkNCMkNDRDhBMzMyODhCRThDQjEwQ0U5NjYzOTQ2QzQ4QkE2RjhFOTI2Mjc3OUEwQjk4Qjk0MTM2M0Y0ODVEIiwib2NjdXJyZW5jZSI6MCwicG9pbnRlciI6IiIsInJlYXNvbiI6IkNPTkNMVVNJVkVfSE9MRCIsInJlbWVkaWF0aW9uIjoiUkVGRVRDSCIsInN0YWdlIjoiTU9EVUxFX1NFTUFOVElDUyIsIndpdG5lc3NfZGlnZXN0IjoiRTJFMjcwRkE0QzMxNjUzNzE4NTQyNjA2MzJENTg4RjY4RDEyM0ZCMDE1MzI4MTlENEQ0QjdGMDcxNDYyRUJCMiJ9",
+    "output_sha256": "2562B72760452D89932487F0130B9CAC885172C84C34758F7E05E9F28268C05A",
+    "package": "a",
+    "runtime_imports": [
+      "rr_full_treatment.runtime_a",
+      "rr_full_treatment.runtime_a._policy",
+      "rr_full_treatment.runtime_a._r_data",
+      "rr_full_treatment.runtime_a.common",
+      "rr_full_treatment.runtime_a.common._a2_data",
+      "rr_full_treatment.runtime_a.common._field_rows",
+      "rr_full_treatment.runtime_a.common.admission",
+      "rr_full_treatment.runtime_a.common.pins",
+      "rr_full_treatment.runtime_a.common.result",
+      "rr_full_treatment.runtime_a.common.wire",
+      "rr_full_treatment.runtime_a.r"
+    ],
+    "state_sha256": "C032111B8115C01F8F52185C5FCFF9350FC742951474B2ED275B1DCBFF13C2B7",
+    "wall_ns": 33131100,
+    "controller_wall_ns": 151076600
+  },
+  "observer": {
+    "status": "EXACT_INVOCATION_OBSERVED",
+    "common_sha256": "E2AF8BFD17098EE544374391CE91E34152D49510703E0090F1B56D772E7DDCE4",
+    "state_sha256": "C032111B8115C01F8F52185C5FCFF9350FC742951474B2ED275B1DCBFF13C2B7",
+    "output_sha256": "2562B72760452D89932487F0130B9CAC885172C84C34758F7E05E9F28268C05A",
+    "actual_engine_call_count": 1,
+    "recorded_use_sha256": "4147296984BAB0D58CD361A2E0D90AE530B64D87959ABBD9520C776ED7C06324",
+    "engine_output_sha256": "AE226D0BE36240C0A6375A2DFA49E891CFFFC028304E980C982A8BFAA28832BD"
+  }
+}

@@ -1,0 +1,165 @@
+{
+  "at": "2026-09-16T01:07:54.806718+00:00",
+  "reviewer": "vitc_final_audit",
+  "status": "PASS",
+  "material_defects": [],
+  "repair_required": false,
+  "scope": "Author-separated fresh-context offline final evidence audit; no API calls, credentials, model reruns, or RR engine reruns.",
+  "results_report_sha256": "F7D1B6E40EBE8B7810AE30DC77270FE9B0197B0C450C5752728F36A0203DAA84",
+  "freeze_sha256": "B0C298E3ED1DA82EFE1DA9B4BDD12D90FBF25578C3B8C075655EE0705712420D",
+  "summary_sha256": "5DD354358B80490DC9081F1F855034557C7F6AE5F842982BB523E967CF731DAA",
+  "semantic_sha256": "8D5CE27BE26602AF07BBB4BE539496596AA7463EDD59724D2F718D44942D9FB0",
+  "workflow_rows_sha256": "99DF257E4569A2D08131D0C02740187A2B6DC1F218F97EDCBB85F7BDAD7070C2",
+  "independent_checks": {
+    "frozen_study_files": 9,
+    "frozen_rr_files": 59,
+    "dataset_hash_verified": true,
+    "selection_reconstructed": true,
+    "distinct_pages": 120,
+    "label_strata": {
+      "NOT ENOUGH INFO": 60,
+      "REFUTES": 60
+    },
+    "request_plan_reconstructed": true,
+    "attempts_matched": 240,
+    "raw_responses_matched": 240,
+    "missing_or_extra_response_records": 0,
+    "submitted_bytes": 259220,
+    "raw_semantic_rows_recomputed": 240,
+    "pair_rows_recomputed": 120,
+    "episodes_reconstructed": 480,
+    "workflow_rows_recomputed": 1440,
+    "rr_receipts_verified_offline": 720,
+    "actual_engine_calls_in_receipts": 720,
+    "rr_codes": {
+      "R_LINEAGE_CONCLUSIVE": 240,
+      "R_ACCEPTANCE_APPLICABLE": 480
+    },
+    "qualification_receipts_verified_offline": 32,
+    "exact_presentations_verified": 332,
+    "complete_trace_and_presentation_coverage": true,
+    "all_summary_metrics_recomputed": true
+  },
+  "verified_metrics": {
+    "judgments": 240,
+    "correct": 194,
+    "confusion": {
+      "supports": {
+        "supports": 101,
+        "contradicts": 7,
+        "insufficient": 12
+      },
+      "contradicts": {
+        "supports": 3,
+        "insufficient": 14,
+        "contradicts": 43
+      },
+      "insufficient": {
+        "supports": 4,
+        "insufficient": 50,
+        "contradicts": 6
+      }
+    },
+    "pairs": 120,
+    "both_labels_correct": 81,
+    "both_release_decisions_correct": 81,
+    "prediction_changes": 101,
+    "support_probability_decreased": 112,
+    "median_support_probability_drop": 0.95,
+    "unsupported_releases": 1,
+    "unsupported_examples": 120,
+    "withheld_support": 38,
+    "supported_examples": 120,
+    "threshold_diagnostics": {
+      "0.5": {
+        "unsupported_release": 1,
+        "withheld_support": 32
+      },
+      "0.8": {
+        "unsupported_release": 1,
+        "withheld_support": 32
+      },
+      "0.9": {
+        "unsupported_release": 1,
+        "withheld_support": 38
+      },
+      "0.95": {
+        "unsupported_release": 1,
+        "withheld_support": 45
+      },
+      "0.99": {
+        "unsupported_release": 1,
+        "withheld_support": 67
+      }
+    },
+    "actual_api_calls": 240,
+    "actual_submitted_bytes": 259220,
+    "actual_input_tokens": 125692,
+    "returned_models": {
+      "jev-1.13.0": 240
+    },
+    "median_http_seconds": 0.23809549999714363,
+    "max_http_seconds": 0.3694543000019621
+  },
+  "workflow_totals": {
+    "rr": {
+      "episodes": 480,
+      "released": 166,
+      "unsupported_release": 2,
+      "withheld_support": 76,
+      "refreshed": 240,
+      "logical_checks": 720,
+      "logical_input_tokens": 377076
+    },
+    "conventional": {
+      "episodes": 480,
+      "released": 166,
+      "unsupported_release": 2,
+      "withheld_support": 76,
+      "refreshed": 240,
+      "logical_checks": 720,
+      "logical_input_tokens": 377076
+    },
+    "stale_cache_diagnostic": {
+      "episodes": 480,
+      "released": 166,
+      "unsupported_release": 83,
+      "withheld_support": 157,
+      "refreshed": 0,
+      "logical_checks": 480,
+      "logical_input_tokens": 251384
+    }
+  },
+  "semantic_findings": [
+    {
+      "pair_id": "0012D56A7F2646890268",
+      "issue": "Gold SUPPORTS; claim has 250 recoveries, source has 243 on the same date. Withholding agrees with supplied-source contradiction."
+    },
+    {
+      "pair_id": "0047BE43CEBDFD573A9F",
+      "issue": "Gold SUPPORTS; Rotten Tomatoes claim is not established by a passage about Metacritic. Withholding is defensible under the supplied-source question."
+    },
+    {
+      "pair_id": "01796F4EDF78B1C1ED82",
+      "issue": "Gold SUPPORTS; Man United claim is not established by Manchester City passage. This does not prove no other match occurred."
+    },
+    {
+      "pair_id": "00FB48EB337F08B01DF9",
+      "issue": "Gold SUPPORTS; Dutch founding is attributed to Huys de Goede Hoop, not Windsor, which the passage calls an English settlement."
+    },
+    {
+      "pair_id": "0001D8737E66301336D1",
+      "issue": "Sole benchmark-negative release: district of Heinsberg vs Heinsberg. Confident disagreement is verified; unequivocal factual falsity is not established by the supplied excerpt."
+    }
+  ],
+  "interpretation_limits": [
+    "No relabeling or clean accuracy estimate; semantic inspection was purposive and post-outcome, not exhaustive blind adjudication.",
+    "Page-title and antecedent context was excluded; this can alter supplied-source entailment relative to benchmark labels.",
+    "480 episodes are correlated replay of 240 judgments over 120 pages; no extra independent evidence from repetition.",
+    "RR/comparator parity applies to this simulated honest-host direct-mandate source-change contract, not general equivalence, security efficacy, or field value.",
+    "Confidence and probability concentration are not verified correctness or general calibration.",
+    "Receipt integrity is an offline honest-host consistency check, not remote service attestation or resistance to a malicious administrator.",
+    "Credential storage, ACL/authentication, and plaintext scan are root-owned separate checks; reviewer accessed no secret and does not independently attest those claims.",
+    "External pricing, invoice, training contamination, future model alias behavior, and current Wikipedia truth were not revalidated by this bounded audit."
+  ]
+}

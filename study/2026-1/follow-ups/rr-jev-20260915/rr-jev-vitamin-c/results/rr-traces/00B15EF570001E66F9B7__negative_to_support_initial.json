@@ -1,0 +1,354 @@
+{
+  "common": {
+    "a2_raw_shared_bundle": {
+      "bundle_id": "BUNDLE_B040028183ECC5746B547DBF319EAA8905A9FAAD679097830A60BA796F88E6EB",
+      "capabilities": [
+        {
+          "capability_id": "CAP_41CF6794BA4200B839C53531",
+          "episode_id": "EP_682D9C023ECDF9C68008A542",
+          "role_id": "ROLE_REGISTERED_ACTOR"
+        },
+        {
+          "capability_id": "CAP_A8E43DD7A15E1D81AD9124AB",
+          "episode_id": "EP_682D9C023ECDF9C68008A542",
+          "role_id": "ROLE_REGISTERED_ACTOR"
+        }
+      ],
+      "claim_versions": [
+        {
+          "claim_id": "CLAIM_EBE52DFEEDE5719B02569245BAA4CABFCAC937CE68FD60DCF9B11BA0AF893DD2",
+          "exact_claim_version_id": "CLAIM_EBE52DFEEDE5719B02569245BAA4CABFCAC937CE68FD60DCF9B11BA0AF893DD2",
+          "payload": "{\"assessment\":{\"answer_json\":\"{\\\"choice\\\":\\\"insufficient\\\",\\\"confidence\\\":0.53,\\\"probabilities\\\":{\\\"contradicts\\\":0.31,\\\"insufficient\\\":0.69,\\\"supports\\\":0.0},\\\"type\\\":\\\"choice\\\"}\",\"kind\":\"jev\",\"request_sha256\":\"4AFD923D891AF01EDC132DBEBB696CBFD9A495B02E1E8FD8C44F13DA99DB81BF\",\"response_sha256\":\"C158F79868AF79F3A04CC80F5D945DAA1B755B43CB8F46257B7494B93766A703\",\"returned_model\":\"jev-1.13.0\"},\"claim\":\"Before April 15 , 2020 , Palestine had 13 cases with less than 10 recoveries due to the coronavirus pandemic .\",\"intended_use\":\"PURPOSE_SUMMARY\",\"source_revision\":1,\"source_sha256\":\"4EA18BA3BBE2A5295C8B75D11886119B4FB8763E07A8B20FFA6556070612CAF5\"}",
+          "source_record_refs": [
+            "SOURCE_7F8B005134999BFA16A1144CB86318599FC0A340F492B4456B011EF6A2C69B6B"
+          ],
+          "version": 1
+        }
+      ],
+      "closure_attestations": [
+        {
+          "closed_record_classes": [
+            "CLAIM_VERSION",
+            "DECLARATION_RECORD",
+            "MANDATE_RECORD",
+            "USE_RECORD"
+          ],
+          "closed_through": "2026-09-05T12:00:01Z",
+          "closure_attestation_id": "CLOSURE_0A926FA1B63D9363C16621F9941ED84765ED3ED8C48B4E78CAF8D0A2F7A25591",
+          "committed_frontier": 1,
+          "ledger_id": "LEDGER_70A3582561EDEAE7E55622DD5F7D0AFBFCFA5547B261B50C2F33A6B3BA3CB074",
+          "source_extent": [
+            "SOURCE_MANDATE",
+            "SOURCE_PRIMARY"
+          ],
+          "verification_method_ref": "REGISTERED_FINITE_HISTORY_CENSUS"
+        }
+      ],
+      "declaration_records": [
+        {
+          "declaration_kind": "ADOPTION_DECLARED",
+          "declaration_version_ref": "DECL_USE",
+          "episode_id": "EP_682D9C023ECDF9C68008A542",
+          "exact_claim_version_id": "CLAIM_EBE52DFEEDE5719B02569245BAA4CABFCAC937CE68FD60DCF9B11BA0AF893DD2",
+          "interval": {
+            "effective_from": "2026-09-05T11:00:00Z",
+            "effective_until": "2026-09-05T13:00:00Z"
+          },
+          "issuer_capability_id": "CAP_41CF6794BA4200B839C53531",
+          "mandate_version_ref": "STANDING_EF839495BF5B2B0AE32D43FD",
+          "policy_ref": "POLICY_SHARED_0_1",
+          "purpose_id": "PURPOSE_SUMMARY",
+          "receiver_capability_id": "CAP_A8E43DD7A15E1D81AD9124AB",
+          "recorded_at": "2026-09-05T12:00:00Z",
+          "scope_id": "SCOPE_TASK",
+          "standing_basis_ref": "STANDING_EF839495BF5B2B0AE32D43FD"
+        }
+      ],
+      "domain_mandate_records": [
+        {
+          "interval": {
+            "effective_from": "2026-09-05T11:00:00Z",
+            "effective_until": "2026-09-05T13:00:00Z"
+          },
+          "mandate_version_ref": "STANDING_EF839495BF5B2B0AE32D43FD",
+          "permitted_record_kinds": [
+            "ADOPTION_DECLARED"
+          ],
+          "policy_ref": "POLICY_SHARED_0_1",
+          "purpose_ids": [
+            "PURPOSE_SUMMARY"
+          ],
+          "scope_ids": [
+            "SCOPE_TASK"
+          ],
+          "subject_capability_id": "CAP_41CF6794BA4200B839C53531"
+        }
+      ],
+      "domain_vocabulary": {
+        "canonicalization_method_ref": "EH_CANONICAL_JSON_0_1",
+        "domain_id": "RR_LOCAL_CONSTRUCTED_WORKFLOW",
+        "purpose_entries": [
+          {
+            "description": "Registered receiver operation",
+            "id": "PURPOSE_SUMMARY"
+          }
+        ],
+        "scope_entries": [
+          {
+            "description": "Registered constructed task scope",
+            "id": "SCOPE_TASK"
+          }
+        ],
+        "selector_language_id": "EH-SELECTOR-CORE-0_1",
+        "vocabulary_id": "RR_LOCAL_WORKFLOW_VOCAB",
+        "vocabulary_version": "1.0"
+      },
+      "episodes": [
+        {
+          "cross_party_episode_id": "EP_682D9C023ECDF9C68008A542",
+          "domain_vocabulary_ref": "RR_LOCAL_WORKFLOW_VOCAB",
+          "episode_family_id": "RR_LOCAL_WORKFLOW",
+          "interval": {
+            "effective_from": "2026-09-05T11:00:00Z",
+            "effective_until": "2026-09-05T13:00:00Z"
+          },
+          "purpose_id": "PURPOSE_SUMMARY",
+          "receiver_capability_id": "CAP_A8E43DD7A15E1D81AD9124AB",
+          "receiver_role_id": "ROLE_RECEIVER",
+          "scope_id": "SCOPE_TASK",
+          "sender_capability_id": "CAP_41CF6794BA4200B839C53531",
+          "sender_role_id": "ROLE_SENDER"
+        }
+      ],
+      "format_version": "EH-G0-A2-SHARED-0.1",
+      "ledger_observations": [
+        {
+          "action_or_decision_ref": "ACTION_3676EBE5AE30974892AEA34D",
+          "captured_at": "2026-09-05T12:00:00Z",
+          "committed_frontier": 1,
+          "decision_context_ref": "CONTEXT_CONTROL",
+          "included_record_refs": [
+            "DECL_USE"
+          ],
+          "ledger_id": "LEDGER_70A3582561EDEAE7E55622DD5F7D0AFBFCFA5547B261B50C2F33A6B3BA3CB074",
+          "nonce": "NONCE_CONTROL"
+        }
+      ],
+      "observable_external_facts": [],
+      "recorded_action_grants": [],
+      "recorded_support_assessments": [],
+      "source_records": [
+        {
+          "observed_at": "2026-09-05T12:00:00Z",
+          "payload": "{\"revision\":2,\"source_text\":\"There are 13 cases as of 6 April , 2020 , 9 of whom have recovered.\"}",
+          "source_kind": "DOCUMENT",
+          "source_record_id": "SOURCE_7F8B005134999BFA16A1144CB86318599FC0A340F492B4456B011EF6A2C69B6B"
+        }
+      ],
+      "use_records": [
+        {
+          "action_or_decision_ref": "ACTION_3676EBE5AE30974892AEA34D",
+          "decision_context_ref": "CONTEXT_CONTROL",
+          "declared_basis_refs": [
+            "DECL_USE"
+          ],
+          "episode_id": "EP_682D9C023ECDF9C68008A542",
+          "exact_claim_version_id": "CLAIM_EBE52DFEEDE5719B02569245BAA4CABFCAC937CE68FD60DCF9B11BA0AF893DD2",
+          "occurred_at": "2026-09-05T12:00:01Z",
+          "purpose_id": "PURPOSE_SUMMARY",
+          "receiver_capability_id": "CAP_A8E43DD7A15E1D81AD9124AB",
+          "scope_id": "SCOPE_TASK",
+          "use_id": "USE_CF7F48664AEB0A009CB6F9D6F1B32A7BE1128E65E4CB93398E66AAEBD871D1FB"
+        }
+      ]
+    },
+    "comparison_facts": {
+      "carrier_fence": 1,
+      "consumed_representation_sha256": "EBE52DFEEDE5719B02569245BAA4CABFCAC937CE68FD60DCF9B11BA0AF893DD2",
+      "current_fence": 1,
+      "expected_action_class": "PERMIT",
+      "expected_authority": "AUTH_LOCAL",
+      "expected_carrier": "CARRIER_CONTROL",
+      "expected_direct_parents": [
+        "PARENT_09E5BA46F1336E239977B90AB4BFBF2B931A2D192F84BF43F6ABA71B24711032"
+      ],
+      "expected_generation": 1,
+      "expected_owner": "OWNER_LOCAL",
+      "expected_principal": "CAP_41CF6794BA4200B839C53531",
+      "expected_purpose": "PURPOSE_SUMMARY",
+      "expected_receiver_capability": "CAP_A8E43DD7A15E1D81AD9124AB",
+      "expected_representation_sha256": "EBE52DFEEDE5719B02569245BAA4CABFCAC937CE68FD60DCF9B11BA0AF893DD2",
+      "expected_route": "ROUTE_CONTROL",
+      "expected_scope": [
+        "SCOPE_TASK"
+      ],
+      "expected_slot": "SLOT_CONTROL",
+      "observed_action_class": "PERMIT",
+      "observed_authority": "AUTH_LOCAL",
+      "observed_carrier": "CARRIER_CONTROL",
+      "observed_direct_parents": [
+        "PARENT_DFB0ED3BDB847A9009B667D5F601454438A418E479E6339E83AA891CFB327BFB"
+      ],
+      "observed_generation": 1,
+      "observed_owner": "OWNER_LOCAL",
+      "observed_principal": "CAP_41CF6794BA4200B839C53531",
+      "observed_purpose": "PURPOSE_SUMMARY",
+      "observed_receiver_capability": "CAP_A8E43DD7A15E1D81AD9124AB",
+      "observed_route": "ROUTE_CONTROL",
+      "observed_scope": [
+        "SCOPE_TASK"
+      ],
+      "observed_slot": "SLOT_CONTROL",
+      "origin_finalized": true,
+      "revocation_active": false,
+      "use_time_ns": 1001,
+      "valid_from_ns": 0,
+      "valid_until_ns": 10000
+    },
+    "delivered_artifact_envelope": {
+      "artifact_id": "ART_CONTROL",
+      "content_b64": "eyJhc3Nlc3NtZW50Ijp7ImFuc3dlcl9qc29uIjoie1wiY2hvaWNlXCI6XCJpbnN1ZmZpY2llbnRcIixcImNvbmZpZGVuY2VcIjowLjUzLFwicHJvYmFiaWxpdGllc1wiOntcImNvbnRyYWRpY3RzXCI6MC4zMSxcImluc3VmZmljaWVudFwiOjAuNjksXCJzdXBwb3J0c1wiOjAuMH0sXCJ0eXBlXCI6XCJjaG9pY2VcIn0iLCJraW5kIjoiamV2IiwicmVxdWVzdF9zaGEyNTYiOiI0QUZEOTIzRDg5MUFGMDFFREMxMzJEQkVCQjY5NkNCRkQ5QTQ5NUIwMkUxRThGRDhDNDRGMTNEQTk5REI4MUJGIiwicmVzcG9uc2Vfc2hhMjU2IjoiQzE1OEY3OTg2OEFGNzlGM0EwNENDODBGNUQ5NDVEQUExQjc1NUI0M0NCOEY0NjI1N0I3NDk0QjkzNzY2QTcwMyIsInJldHVybmVkX21vZGVsIjoiamV2LTEuMTMuMCJ9LCJjbGFpbSI6IkJlZm9yZSBBcHJpbCAxNSAsIDIwMjAgLCBQYWxlc3RpbmUgaGFkIDEzIGNhc2VzIHdpdGggbGVzcyB0aGFuIDEwIHJlY292ZXJpZXMgZHVlIHRvIHRoZSBjb3JvbmF2aXJ1cyBwYW5kZW1pYyAuIiwiaW50ZW5kZWRfdXNlIjoiUFVSUE9TRV9TVU1NQVJZIiwic291cmNlX3JldmlzaW9uIjoxLCJzb3VyY2Vfc2hhMjU2IjoiNEVBMThCQTNCQkUyQTUyOTVDOEI3NUQxMTg4NjExOUI0RkI4NzYzRTA3QThCMjBGRkE2NTU2MDcwNjEyQ0FGNSJ9",
+      "format": "RR-SCIENTIFIC-CLOSED-ARTIFACT-1",
+      "media_type": "application/json",
+      "revision": 1
+    },
+    "format": "RR-STUDY-TREATMENT-COMMON-5",
+    "guard_observation_facts": {
+      "consumption_state": "UNUSED",
+      "effect_receipt_count": 1,
+      "effect_sha256": "15C6E24B56A82F55BCC6CFE1C998BD59600A285696004C484B69AC306B70D050",
+      "execution_receipt_effect_sha256": "15C6E24B56A82F55BCC6CFE1C998BD59600A285696004C484B69AC306B70D050",
+      "grant_expires_at": 2000,
+      "grant_not_before": 0,
+      "invocation_nonce": "NONCE_INGRESS",
+      "invocation_time": 1000,
+      "prior_invocation_nonces": [],
+      "revocation_checked_at": 1000,
+      "revoked_at": null
+    },
+    "remediation": {
+      "attempt_ordinal": 0,
+      "refetch_budget": 1
+    },
+    "requested_delivered_transfer": {
+      "declared_sha256": "EBE52DFEEDE5719B02569245BAA4CABFCAC937CE68FD60DCF9B11BA0AF893DD2",
+      "delivered_artifact_id": "ART_CONTROL",
+      "delivered_revision": 1,
+      "requested_artifact_id": "ART_CONTROL",
+      "requested_revision": 1
+    },
+    "source_lineage_observation": {
+      "format": "RR-SCIENTIFIC-CLOSED-LINEAGE-OBSERVATION-1",
+      "source_artifact_id": "SOURCE_7F8B005134999BFA16A1144CB86318599FC0A340F492B4456B011EF6A2C69B6B",
+      "source_revision": 0,
+      "source_sha256": "7F8B005134999BFA16A1144CB86318599FC0A340F492B4456B011EF6A2C69B6B"
+    },
+    "task_id": "TASK_A8E95D4FB1B44A73DE2AFDA49D4C6EB5AE4E0FCBE1347200F9B002DA2B85A043",
+    "task_instruction_constraints": {
+      "constraints": [],
+      "instruction": "Use the exact supported factual claim for the declared purpose."
+    }
+  },
+  "receipt": {
+    "arm": "R",
+    "common_sha256": "42D4504A70D2DB8C15B66C18449D375DE89653D11031B4A0F4A49C4CF006AEC5",
+    "constructions": [
+      {
+        "evidence": {
+          "code": "R_LINEAGE_CONCLUSIVE",
+          "module": "R",
+          "occurrence": 0,
+          "pointer": "",
+          "semantic_evidence": null,
+          "stage": "MODULE_SEMANTICS"
+        },
+        "output_sha256": "3C32145282712D83FC179DD36645478185B3F69B9961C0D6CD35E1B2249456E7"
+      }
+    ],
+    "cpu_ns": 31250000,
+    "engine_calls": [
+      {
+        "request_b64": "eyJkZWNpc2lvbl9pbnB1dCI6eyJmYWN0cyI6eyJjb25zdW1wdGlvbl9zdGF0ZSI6IlVOVVNFRCIsImVmZmVjdF9yZWNlaXB0X2NvdW50IjoxLCJlZmZlY3Rfc2hhMjU2IjoiMTVDNkUyNEI1NkE4MkY1NUJDQzZDRkUxQzk5OEJENTk2MDBBMjg1Njk2MDA0QzQ4NEI2OUFDMzA2QjcwRDA1MCIsImV4ZWN1dGlvbl9yZWNlaXB0X2VmZmVjdF9zaGEyNTYiOiIxNUM2RTI0QjU2QTgyRjU1QkNDNkNGRTFDOTk4QkQ1OTYwMEEyODU2OTYwMDRDNDg0QjY5QUMzMDZCNzBEMDUwIiwiZ3JhbnRfZXhwaXJlc19hdCI6MjAwMCwiZ3JhbnRfbm90X2JlZm9yZSI6MCwiaW52b2NhdGlvbl9ub25jZSI6Ik5PTkNFX0lOR1JFU1MiLCJpbnZvY2F0aW9uX3RpbWUiOjEwMDAsInByaW9yX2ludm9jYXRpb25fbm9uY2VzIjpbXSwicmV2b2NhdGlvbl9jaGVja2VkX2F0IjoxMDAwLCJyZXZva2VkX2F0IjpudWxsfSwiZm9ybWF0X3ZlcnNpb24iOiJCMS1TRU1BTlRJQy1GQUNUUy0wLjIiLCJvYmxpZ2F0aW9uX2lkIjoiT0JMLTI2Iiwib3BlcmF0aW9uX2hhbmRsZSI6Ik9QUl8yQjEyQzhGOEQ0MjQwRkRBNjFDREExOTgifSwiZm9ybWF0X3ZlcnNpb24iOiJCMS1TRU1BTlRJQy1ERUNJU0lPTi1SRVFVRVNULTAuMiIsImlubmVyX2lucHV0X3NoYTI1NiI6IjREMkFGMjUyMDBBRjM3MzA4NjMxNjk0MTdDOThDN0JFMTJDMjAzNTZFRDlENjIwQ0VGODkxN0RGQUM3MjNGMTMiLCJpbm5lcl9yZXF1ZXN0Ijp7ImNvbmZpZ3VyYXRpb25faGFuZGxlIjoiQ0ZHX0IwNkJDQUFCMEY1NzEzQjc1QUMwRjEyNiIsImZvcm1hdF92ZXJzaW9uIjoiUENCLVJVTk5FUi1SRVFVRVNULTAuMiIsImlucHV0Ijp7ImJ1bmRsZV9pZCI6IkJVTkRMRV9CMDQwMDI4MTgzRUNDNTc0NkI1NDdEQkYzMTlFQUE4OTA1QTlGQUFENjc5MDk3ODMwQTYwQkE3OTZGODhFNkVCIiwiY2FwYWJpbGl0aWVzIjpbeyJjYXBhYmlsaXR5X2lkIjoiQ0FQXzQxQ0Y2Nzk0QkE0MjAwQjgzOUM1MzUzMSIsImVwaXNvZGVfaWQiOiJFUF82ODJEOUMwMjNFQ0RGOUM2ODAwOEE1NDIiLCJyb2xlX2lkIjoiUk9MRV9SRUdJU1RFUkVEX0FDVE9SIn0seyJjYXBhYmlsaXR5X2lkIjoiQ0FQX0E4RTQzREQ3QTE1RTFEODFBRDkxMjRBQiIsImVwaXNvZGVfaWQiOiJFUF82ODJEOUMwMjNFQ0RGOUM2ODAwOEE1NDIiLCJyb2xlX2lkIjoiUk9MRV9SRUdJU1RFUkVEX0FDVE9SIn1dLCJjbGFpbV92ZXJzaW9ucyI6W3siY2xhaW1faWQiOiJDTEFJTV9FQkU1MkRGRUVERTU3MTlCMDI1NjkyNDVCQUE0Q0FCRkNBQzkzN0NFNjhGRDYwRENGOUIxMUJBMEFGODkzREQyIiwiZXhhY3RfY2xhaW1fdmVyc2lvbl9pZCI6IkNMQUlNX0VCRTUyREZFRURFNTcxOUIwMjU2OTI0NUJBQTRDQUJGQ0FDOTM3Q0U2OEZENjBEQ0Y5QjExQkEwQUY4OTNERDIiLCJwYXlsb2FkIjoie1wiYXNzZXNzbWVudFwiOntcImFuc3dlcl9qc29uXCI6XCJ7XFxcImNob2ljZVxcXCI6XFxcImluc3VmZmljaWVudFxcXCIsXFxcImNvbmZpZGVuY2VcXFwiOjAuNTMsXFxcInByb2JhYmlsaXRpZXNcXFwiOntcXFwiY29udHJhZGljdHNcXFwiOjAuMzEsXFxcImluc3VmZmljaWVudFxcXCI6MC42OSxcXFwic3VwcG9ydHNcXFwiOjAuMH0sXFxcInR5cGVcXFwiOlxcXCJjaG9pY2VcXFwifVwiLFwia2luZFwiOlwiamV2XCIsXCJyZXF1ZXN0X3NoYTI1NlwiOlwiNEFGRDkyM0Q4OTFBRjAxRURDMTMyREJFQkI2OTZDQkZEOUE0OTVCMDJFMUU4RkQ4QzQ0RjEzREE5OURCODFCRlwiLFwicmVzcG9uc2Vfc2hhMjU2XCI6XCJDMTU4Rjc5ODY4QUY3OUYzQTA0Q0M4MEY1RDk0NURBQTFCNzU1QjQzQ0I4RjQ2MjU3Qjc0OTRCOTM3NjZBNzAzXCIsXCJyZXR1cm5lZF9tb2RlbFwiOlwiamV2LTEuMTMuMFwifSxcImNsYWltXCI6XCJCZWZvcmUgQXByaWwgMTUgLCAyMDIwICwgUGFsZXN0aW5lIGhhZCAxMyBjYXNlcyB3aXRoIGxlc3MgdGhhbiAxMCByZWNvdmVyaWVzIGR1ZSB0byB0aGUgY29yb25hdmlydXMgcGFuZGVtaWMgLlwiLFwiaW50ZW5kZWRfdXNlXCI6XCJQVVJQT1NFX1NVTU1BUllcIixcInNvdXJjZV9yZXZpc2lvblwiOjEsXCJzb3VyY2Vfc2hhMjU2XCI6XCI0RUExOEJBM0JCRTJBNTI5NUM4Qjc1RDExODg2MTE5QjRGQjg3NjNFMDdBOEIyMEZGQTY1NTYwNzA2MTJDQUY1XCJ9Iiwic291cmNlX3JlY29yZF9yZWZzIjpbIlNPVVJDRV83RjhCMDA1MTM0OTk5QkZBMTZBMTE0NENCODYzMTg1OTlGQzBBMzQwRjQ5MkI0NDU2QjAxMUVGNkEyQzY5QjZCIl0sInZlcnNpb24iOjF9XSwiY2xvc3VyZV9hdHRlc3RhdGlvbnMiOlt7ImNsb3NlZF9yZWNvcmRfY2xhc3NlcyI6WyJDTEFJTV9WRVJTSU9OIiwiREVDTEFSQVRJT05fUkVDT1JEIiwiTUFOREFURV9SRUNPUkQiLCJVU0VfUkVDT1JEIl0sImNsb3NlZF90aHJvdWdoIjoiMjAyNi0wOS0wNVQxMjowMDowMVoiLCJjbG9zdXJlX2F0dGVzdGF0aW9uX2lkIjoiQ0xPU1VSRV8wQTkyNkZBMUI2M0Q5MzYzQzE2NjIxRjk5NDFFRDg0NzY1RUQzRUQ4QzQ4QjRFNzhDQUY4RDBBMkY3QTI1NTkxIiwiY29tbWl0dGVkX2Zyb250aWVyIjoxLCJsZWRnZXJfaWQiOiJMRURHRVJfNzBBMzU4MjU2MUVERUFFN0U1NTYyMkRENUY3RDBBRkJGQ0ZBNTU0N0IyNjFCNTBDMkYzM0E2QjNCQTNDQjA3NCIsInNvdXJjZV9leHRlbnQiOlsiU09VUkNFX01BTkRBVEUiLCJTT1VSQ0VfUFJJTUFSWSJdLCJ2ZXJpZmljYXRpb25fbWV0aG9kX3JlZiI6IlJFR0lTVEVSRURfRklOSVRFX0hJU1RPUllfQ0VOU1VTIn1dLCJkZWNsYXJhdGlvbl9yZWNvcmRzIjpbeyJkZWNsYXJhdGlvbl9raW5kIjoiQURPUFRJT05fREVDTEFSRUQiLCJkZWNsYXJhdGlvbl92ZXJzaW9uX3JlZiI6IkRFQ0xfVVNFIiwiZXBpc29kZV9pZCI6IkVQXzY4MkQ5QzAyM0VDREY5QzY4MDA4QTU0MiIsImV4YWN0X2NsYWltX3ZlcnNpb25faWQiOiJDTEFJTV9FQkU1MkRGRUVERTU3MTlCMDI1NjkyNDVCQUE0Q0FCRkNBQzkzN0NFNjhGRDYwRENGOUIxMUJBMEFGODkzREQyIiwiaW50ZXJ2YWwiOnsiZWZmZWN0aXZlX2Zyb20iOiIyMDI2LTA5LTA1VDExOjAwOjAwWiIsImVmZmVjdGl2ZV91bnRpbCI6IjIwMjYtMDktMDVUMTM6MDA6MDBaIn0sImlzc3Vlcl9jYXBhYmlsaXR5X2lkIjoiQ0FQXzQxQ0Y2Nzk0QkE0MjAwQjgzOUM1MzUzMSIsIm1hbmRhdGVfdmVyc2lvbl9yZWYiOiJTVEFORElOR19FRjgzOTQ5NUJGNUIyQjBBRTMyRDQzRkQiLCJwb2xpY3lfcmVmIjoiUE9MSUNZX1NIQVJFRF8wXzEiLCJwdXJwb3NlX2lkIjoiUFVSUE9TRV9TVU1NQVJZIiwicmVjZWl2ZXJfY2FwYWJpbGl0eV9pZCI6IkNBUF9BOEU0M0REN0ExNUUxRDgxQUQ5MTI0QUIiLCJyZWNvcmRlZF9hdCI6IjIwMjYtMDktMDVUMTI6MDA6MDBaIiwic2NvcGVfaWQiOiJTQ09QRV9UQVNLIiwic3RhbmRpbmdfYmFzaXNfcmVmIjoiU1RBTkRJTkdfRUY4Mzk0OTVCRjVCMkIwQUUzMkQ0M0ZEIn1dLCJkb21haW5fbWFuZGF0ZV9yZWNvcmRzIjpbeyJpbnRlcnZhbCI6eyJlZmZlY3RpdmVfZnJvbSI6IjIwMjYtMDktMDVUMTE6MDA6MDBaIiwiZWZmZWN0aXZlX3VudGlsIjoiMjAyNi0wOS0wNVQxMzowMDowMFoifSwibWFuZGF0ZV92ZXJzaW9uX3JlZiI6IlNUQU5ESU5HX0VGODM5NDk1QkY1QjJCMEFFMzJENDNGRCIsInBlcm1pdHRlZF9yZWNvcmRfa2luZHMiOlsiQURPUFRJT05fREVDTEFSRUQiXSwicG9saWN5X3JlZiI6IlBPTElDWV9TSEFSRURfMF8xIiwicHVycG9zZV9pZHMiOlsiUFVSUE9TRV9TVU1NQVJZIl0sInNjb3BlX2lkcyI6WyJTQ09QRV9UQVNLIl0sInN1YmplY3RfY2FwYWJpbGl0eV9pZCI6IkNBUF80MUNGNjc5NEJBNDIwMEI4MzlDNTM1MzEifV0sImRvbWFpbl92b2NhYnVsYXJ5Ijp7ImNhbm9uaWNhbGl6YXRpb25fbWV0aG9kX3JlZiI6IkVIX0NBTk9OSUNBTF9KU09OXzBfMSIsImRvbWFpbl9pZCI6IlJSX0xPQ0FMX0NPTlNUUlVDVEVEX1dPUktGTE9XIiwicHVycG9zZV9lbnRyaWVzIjpbeyJkZXNjcmlwdGlvbiI6IlJlZ2lzdGVyZWQgcmVjZWl2ZXIgb3BlcmF0aW9uIiwiaWQiOiJQVVJQT1NFX1NVTU1BUlkifV0sInNjb3BlX2VudHJpZXMiOlt7ImRlc2NyaXB0aW9uIjoiUmVnaXN0ZXJlZCBjb25zdHJ1Y3RlZCB0YXNrIHNjb3BlIiwiaWQiOiJTQ09QRV9UQVNLIn1dLCJzZWxlY3Rvcl9sYW5ndWFnZV9pZCI6IkVILVNFTEVDVE9SLUNPUkUtMF8xIiwidm9jYWJ1bGFyeV9pZCI6IlJSX0xPQ0FMX1dPUktGTE9XX1ZPQ0FCIiwidm9jYWJ1bGFyeV92ZXJzaW9uIjoiMS4wIn0sImVwaXNvZGVzIjpbeyJjcm9zc19wYXJ0eV9lcGlzb2RlX2lkIjoiRVBfNjgyRDlDMDIzRUNERjlDNjgwMDhBNTQyIiwiZG9tYWluX3ZvY2FidWxhcnlfcmVmIjoiUlJfTE9DQUxfV09SS0ZMT1dfVk9DQUIiLCJlcGlzb2RlX2ZhbWlseV9pZCI6IlJSX0xPQ0FMX1dPUktGTE9XIiwiaW50ZXJ2YWwiOnsiZWZmZWN0aXZlX2Zyb20iOiIyMDI2LTA5LTA1VDExOjAwOjAwWiIsImVmZmVjdGl2ZV91bnRpbCI6IjIwMjYtMDktMDVUMTM6MDA6MDBaIn0sInB1cnBvc2VfaWQiOiJQVVJQT1NFX1NVTU1BUlkiLCJyZWNlaXZlcl9jYXBhYmlsaXR5X2lkIjoiQ0FQX0E4RTQzREQ3QTE1RTFEODFBRDkxMjRBQiIsInJlY2VpdmVyX3JvbGVfaWQiOiJST0xFX1JFQ0VJVkVSIiwic2NvcGVfaWQiOiJTQ09QRV9UQVNLIiwic2VuZGVyX2NhcGFiaWxpdHlfaWQiOiJDQVBfNDFDRjY3OTRCQTQyMDBCODM5QzUzNTMxIiwic2VuZGVyX3JvbGVfaWQiOiJST0xFX1NFTkRFUiJ9XSwiZm9ybWF0X3ZlcnNpb24iOiJFSC1HMC1BMi1TSEFSRUQtMC4xIiwibGVkZ2VyX29ic2VydmF0aW9ucyI6W3siYWN0aW9uX29yX2RlY2lzaW9uX3JlZiI6IkFDVElPTl8zNjc2RUJFNUFFMzA5NzQ4OTJBRUEzNEQiLCJjYXB0dXJlZF9hdCI6IjIwMjYtMDktMDVUMTI6MDA6MDBaIiwiY29tbWl0dGVkX2Zyb250aWVyIjoxLCJkZWNpc2lvbl9jb250ZXh0X3JlZiI6IkNPTlRFWFRfQ09OVFJPTCIsImluY2x1ZGVkX3JlY29yZF9yZWZzIjpbIkRFQ0xfVVNFIl0sImxlZGdlcl9pZCI6IkxFREdFUl83MEEzNTgyNTYxRURFQUU3RTU1NjIyREQ1RjdEMEFGQkZDRkE1NTQ3QjI2MUI1MEMyRjMzQTZCM0JBM0NCMDc0Iiwibm9uY2UiOiJOT05DRV9DT05UUk9MIn1dLCJvYnNlcnZhYmxlX2V4dGVybmFsX2ZhY3RzIjpbXSwicmVjb3JkZWRfYWN0aW9uX2dyYW50cyI6W10sInJlY29yZGVkX3N1cHBvcnRfYXNzZXNzbWVudHMiOltdLCJzb3VyY2VfcmVjb3JkcyI6W3sib2JzZXJ2ZWRfYXQiOiIyMDI2LTA5LTA1VDEyOjAwOjAwWiIsInBheWxvYWQiOiJ7XCJyZXZpc2lvblwiOjIsXCJzb3VyY2VfdGV4dFwiOlwiVGhlcmUgYXJlIDEzIGNhc2VzIGFzIG9mIDYgQXByaWwgLCAyMDIwICwgOSBvZiB3aG9tIGhhdmUgcmVjb3ZlcmVkLlwifSIsInNvdXJjZV9raW5kIjoiRE9DVU1FTlQiLCJzb3VyY2VfcmVjb3JkX2lkIjoiU09VUkNFXzdGOEIwMDUxMzQ5OTlCRkExNkExMTQ0Q0I4NjMxODU5OUZDMEEzNDBGNDkyQjQ0NTZCMDExRUY2QTJDNjlCNkIifV0sInVzZV9yZWNvcmRzIjpbeyJhY3Rpb25fb3JfZGVjaXNpb25fcmVmIjoiQUNUSU9OXzM2NzZFQkU1QUUzMDk3NDg5MkFFQTM0RCIsImRlY2lzaW9uX2NvbnRleHRfcmVmIjoiQ09OVEVYVF9DT05UUk9MIiwiZGVjbGFyZWRfYmFzaXNfcmVmcyI6WyJERUNMX1VTRSJdLCJlcGlzb2RlX2lkIjoiRVBfNjgyRDlDMDIzRUNERjlDNjgwMDhBNTQyIiwiZXhhY3RfY2xhaW1fdmVyc2lvbl9pZCI6IkNMQUlNX0VCRTUyREZFRURFNTcxOUIwMjU2OTI0NUJBQTRDQUJGQ0FDOTM3Q0U2OEZENjBEQ0Y5QjExQkEwQUY4OTNERDIiLCJvY2N1cnJlZF9hdCI6IjIwMjYtMDktMDVUMTI6MDA6MDFaIiwicHVycG9zZV9pZCI6IlBVUlBPU0VfU1VNTUFSWSIsInJlY2VpdmVyX2NhcGFiaWxpdHlfaWQiOiJDQVBfQThFNDNERDdBMTVFMUQ4MUFEOTEyNEFCIiwic2NvcGVfaWQiOiJTQ09QRV9UQVNLIiwidXNlX2lkIjoiVVNFX0NGN0Y0ODY2NEFFQjBBMDA5Q0I2RjlENkYxQjMyQTdCRTExMjhFNjVFNENCOTMzOThFNjZBQUVCRDg3MUQxRkIifV19LCJvcGVyYXRpb25faGFuZGxlIjoiT1BSXzJCMTJDOEY4RDQyNDBGREE2MUNEQTE5OCIsInJlcXVlc3RfaWQiOiJSVU5fNzlDNjE1OUQ3MEMzMjU4NjQ3MTg2MjFGIn0sImlubmVyX3JlcXVlc3RfcmF3X3NoYTI1NiI6IjdDNkZGQkUwOTRGNDQ4OUMzMkRCQzAwOURBRUIyRkJFOTIzMENBM0I5N0NBMTdFQUMzODAxMUM5MDJBMDZEQzEiLCJvYmxpZ2F0aW9uX2lkIjoiT0JMLTI2Iiwib3BlcmF0aW9uX2hhbmRsZSI6Ik9QUl8yQjEyQzhGOEQ0MjQwRkRBNjFDREExOTgiLCJyZXF1ZXN0X2lkIjoiUlVOXzc5QzYxNTlENzBDMzI1ODY0NzE4NjIxRiJ9Cg==",
+        "request_sha256": "8F2689DBE46B2767F6E4E829CD35384D520601C01863C713FAEEDEF8895D13EB",
+        "returned_envelope": {
+          "audit": {
+            "closure_findings": [],
+            "decision_input_sha256": "B769788754E217F2A9B506A839FACB9F71FDF4C7EF1042DF6FBECFAB43CA7D1F",
+            "engine_generation": "composed-0.3-frozen",
+            "first_match_predicates": {
+              "BINDING_OR_CONFLICT": false,
+              "MALFORMED_OR_BOUNDARY": false,
+              "OMISSION_OR_INCOMPLETE": false
+            },
+            "governing_authorities": {
+              "authority_register_sha256": "C3414FC751C3B5ECA43A4932C694641D801A21F2CF53C42BE3A8C87C234CF499",
+              "closure_policy_sha256": "EBA198726DE960E9F59ACE5A7E1BDB701BFBA5B1BD09BC59FF4540F2B14E8F9C",
+              "composed_contract_sha256": "6B2CAD02DDE7388D63D66E4863E5233CFBD1DC413575D9D260DB9799C7023A12",
+              "decision_table_contract_sha256": "DCFCB0714E1A7E677548057987F604D227F791F3FC3E0EA89BE5ED932447F48E",
+              "engine_capabilities_sha256": "4D9FA1C9CCB60B980BCE1739FE8FDC10E84AEFC03D4C20E2AA1A8B0BBE2D18FC",
+              "engine_runner_sha256": "83319385C8B6D28965F4683B8C0689FB70158E86ED35D54E7467E8E3DF076E09"
+            },
+            "matched_class_witness": [],
+            "record_references": [],
+            "record_references_truncated": false,
+            "request_raw_sha256": "8F2689DBE46B2767F6E4E829CD35384D520601C01863C713FAEEDEF8895D13EB"
+          },
+          "audit_sha256": "DE3F8AA1DF6425F2A3805BE7802FDC8C6BFE744C1AF4E63FC0D0262E413AABE0",
+          "audited_behavior_class": "VALID",
+          "exit_code": 0,
+          "format_version": "B1-AUDITED-DECISION-0.4.2",
+          "sealed_response": {
+            "errors": [],
+            "exit_code": 0,
+            "format_version": "PCB-RUNNER-RESPONSE-0.2",
+            "ok": true,
+            "output": {
+              "effect_receipt_sha256": "09627D645A5F020B460D3F9E2F1F4452136893D60DC73BDCD31C67D34407D52E",
+              "obligation_id": "OBL-26",
+              "operation_handle": "OPR_2B12C8F8D4240FDA61CDA198",
+              "record_references": [],
+              "result_object": {
+                "behavior_class": "VALID",
+                "conclusion": "SATISFIED"
+              },
+              "status": "PASS",
+              "unresolved_reasons": []
+            },
+            "receipt_sha256": "46B297B9D9EA94BAD46B54E249AA1DC2F6907889155B61CC1DFFD4CEB94747AB",
+            "request_id": "RUN_79C6159D70C325864718621F",
+            "result": "PASS"
+          }
+        }
+      }
+    ],
+    "observed": true,
+    "output_b64": "eyJjb2RlIjoiUl9MSU5FQUdFX0NPTkNMVVNJVkUiLCJkaXNwb3NpdGlvbiI6IkJMT0NLIiwiZm9ybWF0IjoiUlItU1RVRFktVFJFQVRNRU5ULURFQ0lTSU9OLTUiLCJpbnB1dF9kaWdlc3QiOiJDRTlGOUE1RDM2MTVBOTQ1M0YxNDg0NTVEMzU3RDYwRURBMkE2RDFCRkU3NjZCNTg3NjNGN0VCMDczMEMyOEY5Iiwib2NjdXJyZW5jZSI6MCwicG9pbnRlciI6IiIsInJlYXNvbiI6IkNPTkNMVVNJVkVfSE9MRCIsInJlbWVkaWF0aW9uIjoiUkVGRVRDSCIsInN0YWdlIjoiTU9EVUxFX1NFTUFOVElDUyIsIndpdG5lc3NfZGlnZXN0IjoiNUZCQ0M5Njg3NjhGMjc4NjY2OEU1RjcwNzUxNTc0QzBBRDA2MTMzMzkyOEIxN0IwQzBCODJENjlENUMyQ0M2RiJ9",
+    "output_sha256": "3C32145282712D83FC179DD36645478185B3F69B9961C0D6CD35E1B2249456E7",
+    "package": "a",
+    "runtime_imports": [
+      "rr_full_treatment.runtime_a",
+      "rr_full_treatment.runtime_a._policy",
+      "rr_full_treatment.runtime_a._r_data",
+      "rr_full_treatment.runtime_a.common",
+      "rr_full_treatment.runtime_a.common._a2_data",
+      "rr_full_treatment.runtime_a.common._field_rows",
+      "rr_full_treatment.runtime_a.common.admission",
+      "rr_full_treatment.runtime_a.common.pins",
+      "rr_full_treatment.runtime_a.common.result",
+      "rr_full_treatment.runtime_a.common.wire",
+      "rr_full_treatment.runtime_a.r"
+    ],
+    "state_sha256": "C032111B8115C01F8F52185C5FCFF9350FC742951474B2ED275B1DCBFF13C2B7",
+    "wall_ns": 33566100,
+    "controller_wall_ns": 152446000
+  },
+  "observer": {
+    "status": "EXACT_INVOCATION_OBSERVED",
+    "common_sha256": "42D4504A70D2DB8C15B66C18449D375DE89653D11031B4A0F4A49C4CF006AEC5",
+    "state_sha256": "C032111B8115C01F8F52185C5FCFF9350FC742951474B2ED275B1DCBFF13C2B7",
+    "output_sha256": "3C32145282712D83FC179DD36645478185B3F69B9961C0D6CD35E1B2249456E7",
+    "actual_engine_call_count": 1,
+    "recorded_use_sha256": "1CB5118D1F6C92856575716606573D143AACE59DCAFAB25D1498725C0127B2C5",
+    "engine_output_sha256": "84E256138DE8CF194F2BB847B9C0BF55B540F6D7954AE02EA8F5E331B233DE34"
+  }
+}

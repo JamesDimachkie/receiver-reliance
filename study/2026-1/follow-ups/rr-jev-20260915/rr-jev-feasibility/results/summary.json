@@ -1,0 +1,82 @@
+{
+  "at": "2026-09-16T00:30:16.227389+00:00",
+  "status": "EXPLORATORY_PILOT_COMPLETE",
+  "case_count": 48,
+  "families": 6,
+  "actual_post_calls": 30,
+  "reported_input_tokens": 14521,
+  "estimated_usd_at_published_rate": 0.0006098820000000001,
+  "service_median_seconds": 0.22703884999646107,
+  "service_max_seconds": 0.2844500000064727,
+  "semantic_label_correct": 30,
+  "semantic_unique_questions": 30,
+  "totals": {
+    "conventional_without_jev": {
+      "released": 42,
+      "bad_semantic_release": 12,
+      "revocation_violation": 0,
+      "useful_withheld": 0,
+      "refreshed": 36,
+      "reused": 6,
+      "logical_checks": 0,
+      "logical_input_tokens": 0,
+      "rr_seconds": 0.0,
+      "episodes": 48
+    },
+    "rr_without_jev": {
+      "released": 42,
+      "bad_semantic_release": 12,
+      "revocation_violation": 0,
+      "useful_withheld": 0,
+      "refreshed": 36,
+      "reused": 6,
+      "logical_checks": 0,
+      "logical_input_tokens": 0,
+      "rr_seconds": 13.7189015,
+      "episodes": 48
+    },
+    "conventional_with_jev": {
+      "released": 30,
+      "bad_semantic_release": 0,
+      "revocation_violation": 0,
+      "useful_withheld": 0,
+      "refreshed": 36,
+      "reused": 6,
+      "logical_checks": 84,
+      "logical_input_tokens": 40648,
+      "rr_seconds": 0.0,
+      "episodes": 48
+    },
+    "rr_with_jev": {
+      "released": 30,
+      "bad_semantic_release": 0,
+      "revocation_violation": 0,
+      "useful_withheld": 0,
+      "refreshed": 36,
+      "reused": 6,
+      "logical_checks": 84,
+      "logical_input_tokens": 40648,
+      "rr_seconds": 13.8459998,
+      "episodes": 48
+    },
+    "conventional_always_recheck": {
+      "released": 30,
+      "bad_semantic_release": 0,
+      "revocation_violation": 0,
+      "useful_withheld": 0,
+      "refreshed": 42,
+      "reused": 0,
+      "logical_checks": 90,
+      "logical_input_tokens": 43551,
+      "rr_seconds": 0.0,
+      "episodes": 48
+    }
+  },
+  "limits": [
+    "Hand-authored development fixtures; six correlated families, not held-out evidence or field prevalence",
+    "Identical bank responses coupled across arms; logical token costs are replay projections, not separately billed workflows",
+    "Actual RR invoked; comparator implements only declared pilot contract; honest simulated host",
+    "No generated semantic repairs or human-review outcomes; no engineering-effort comparison",
+    "Model alias can change; stored-response replay reproducible, future inference not guaranteed identical"
+  ]
+}

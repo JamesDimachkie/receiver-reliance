@@ -1,0 +1,1106 @@
+[
+  {
+    "id": "tests__unchanged",
+    "family": "tests",
+    "transition": "unchanged",
+    "initial": {
+      "claim": "All Atlas unit tests passed.",
+      "source": "The Atlas report records that all unit tests passed. One integration test failed.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "All Atlas unit tests passed.",
+      "source": "The Atlas report records that all unit tests passed. One integration test failed.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": true,
+    "expected_final_structural": true
+  },
+  {
+    "id": "tests__source_contradicts",
+    "family": "tests",
+    "transition": "source_contradicts",
+    "initial": {
+      "claim": "All Atlas unit tests passed.",
+      "source": "The Atlas report records that all unit tests passed. One integration test failed.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "All Atlas unit tests passed.",
+      "source": "The corrected Atlas report records that three unit tests failed. One integration test failed.",
+      "source_revision": 2,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "contradicts",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "tests__source_reworded",
+    "family": "tests",
+    "transition": "source_reworded",
+    "initial": {
+      "claim": "All Atlas unit tests passed.",
+      "source": "The Atlas report records that all unit tests passed. One integration test failed.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "All Atlas unit tests passed.",
+      "source": "Atlas unit testing finished with every test passing. Integration testing included one failure.",
+      "source_revision": 2,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "tests__claim_overstated",
+    "family": "tests",
+    "transition": "claim_overstated",
+    "initial": {
+      "claim": "All Atlas unit tests passed.",
+      "source": "The Atlas report records that all unit tests passed. One integration test failed.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "All Atlas unit and integration tests passed.",
+      "source": "The Atlas report records that all unit tests passed. One integration test failed.",
+      "source_revision": 1,
+      "artifact_revision": 2,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "contradicts",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "tests__purpose_changed",
+    "family": "tests",
+    "transition": "purpose_changed",
+    "initial": {
+      "claim": "All Atlas unit tests passed.",
+      "source": "The Atlas report records that all unit tests passed. One integration test failed.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "All Atlas unit tests passed.",
+      "source": "The Atlas report records that all unit tests passed. One integration test failed.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_INDEX"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "tests__revision_changed",
+    "family": "tests",
+    "transition": "revision_changed",
+    "initial": {
+      "claim": "All Atlas unit tests passed.",
+      "source": "The Atlas report records that all unit tests passed. One integration test failed.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "All Atlas unit tests passed.",
+      "source": "The Atlas report records that all unit tests passed. One integration test failed.",
+      "source_revision": 1,
+      "artifact_revision": 2,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "tests__expired",
+    "family": "tests",
+    "transition": "expired",
+    "initial": {
+      "claim": "All Atlas unit tests passed.",
+      "source": "The Atlas report records that all unit tests passed. One integration test failed.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "All Atlas unit tests passed.",
+      "source": "The Atlas report records that all unit tests passed. One integration test failed.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "tests__revoked",
+    "family": "tests",
+    "transition": "revoked",
+    "initial": {
+      "claim": "All Atlas unit tests passed.",
+      "source": "The Atlas report records that all unit tests passed. One integration test failed.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "All Atlas unit tests passed.",
+      "source": "The Atlas report records that all unit tests passed. One integration test failed.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": false,
+    "expected_initial_structural": false,
+    "expected_final_structural": false
+  },
+  {
+    "id": "stock__unchanged",
+    "family": "stock",
+    "transition": "unchanged",
+    "initial": {
+      "claim": "Blue cases are in stock.",
+      "source": "The warehouse count lists eight blue cases and no red cases in stock.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "Blue cases are in stock.",
+      "source": "The warehouse count lists eight blue cases and no red cases in stock.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": true,
+    "expected_final_structural": true
+  },
+  {
+    "id": "stock__source_contradicts",
+    "family": "stock",
+    "transition": "source_contradicts",
+    "initial": {
+      "claim": "Blue cases are in stock.",
+      "source": "The warehouse count lists eight blue cases and no red cases in stock.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "Blue cases are in stock.",
+      "source": "The revised warehouse count lists no blue cases and eight red cases in stock.",
+      "source_revision": 2,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "contradicts",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "stock__source_reworded",
+    "family": "stock",
+    "transition": "source_reworded",
+    "initial": {
+      "claim": "Blue cases are in stock.",
+      "source": "The warehouse count lists eight blue cases and no red cases in stock.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "Blue cases are in stock.",
+      "source": "Eight cases in the blue variant are available in the warehouse; the red variant has zero stock.",
+      "source_revision": 2,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "stock__claim_overstated",
+    "family": "stock",
+    "transition": "claim_overstated",
+    "initial": {
+      "claim": "Blue cases are in stock.",
+      "source": "The warehouse count lists eight blue cases and no red cases in stock.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "The blue cases will arrive at the customer's address tomorrow.",
+      "source": "The warehouse count lists eight blue cases and no red cases in stock.",
+      "source_revision": 1,
+      "artifact_revision": 2,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "insufficient",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "stock__purpose_changed",
+    "family": "stock",
+    "transition": "purpose_changed",
+    "initial": {
+      "claim": "Blue cases are in stock.",
+      "source": "The warehouse count lists eight blue cases and no red cases in stock.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "Blue cases are in stock.",
+      "source": "The warehouse count lists eight blue cases and no red cases in stock.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_INDEX"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "stock__revision_changed",
+    "family": "stock",
+    "transition": "revision_changed",
+    "initial": {
+      "claim": "Blue cases are in stock.",
+      "source": "The warehouse count lists eight blue cases and no red cases in stock.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "Blue cases are in stock.",
+      "source": "The warehouse count lists eight blue cases and no red cases in stock.",
+      "source_revision": 1,
+      "artifact_revision": 2,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "stock__expired",
+    "family": "stock",
+    "transition": "expired",
+    "initial": {
+      "claim": "Blue cases are in stock.",
+      "source": "The warehouse count lists eight blue cases and no red cases in stock.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "Blue cases are in stock.",
+      "source": "The warehouse count lists eight blue cases and no red cases in stock.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "stock__revoked",
+    "family": "stock",
+    "transition": "revoked",
+    "initial": {
+      "claim": "Blue cases are in stock.",
+      "source": "The warehouse count lists eight blue cases and no red cases in stock.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "Blue cases are in stock.",
+      "source": "The warehouse count lists eight blue cases and no red cases in stock.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": false,
+    "expected_initial_structural": false,
+    "expected_final_structural": false
+  },
+  {
+    "id": "schedule__unchanged",
+    "family": "schedule",
+    "transition": "unchanged",
+    "initial": {
+      "claim": "The Cedar workshop is scheduled for Tuesday.",
+      "source": "The Cedar workshop is scheduled for Tuesday at 10:00. A remote attendance option has not been announced.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "The Cedar workshop is scheduled for Tuesday.",
+      "source": "The Cedar workshop is scheduled for Tuesday at 10:00. A remote attendance option has not been announced.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": true,
+    "expected_final_structural": true
+  },
+  {
+    "id": "schedule__source_contradicts",
+    "family": "schedule",
+    "transition": "source_contradicts",
+    "initial": {
+      "claim": "The Cedar workshop is scheduled for Tuesday.",
+      "source": "The Cedar workshop is scheduled for Tuesday at 10:00. A remote attendance option has not been announced.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "The Cedar workshop is scheduled for Tuesday.",
+      "source": "The Cedar workshop has moved to Thursday at 10:00; it will not take place on Tuesday.",
+      "source_revision": 2,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "contradicts",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "schedule__source_reworded",
+    "family": "schedule",
+    "transition": "source_reworded",
+    "initial": {
+      "claim": "The Cedar workshop is scheduled for Tuesday.",
+      "source": "The Cedar workshop is scheduled for Tuesday at 10:00. A remote attendance option has not been announced.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "The Cedar workshop is scheduled for Tuesday.",
+      "source": "Cedar's workshop is on the calendar for 10:00 Tuesday. There is no announcement about remote attendance.",
+      "source_revision": 2,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "schedule__claim_overstated",
+    "family": "schedule",
+    "transition": "claim_overstated",
+    "initial": {
+      "claim": "The Cedar workshop is scheduled for Tuesday.",
+      "source": "The Cedar workshop is scheduled for Tuesday at 10:00. A remote attendance option has not been announced.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "The Cedar workshop supports remote attendance.",
+      "source": "The Cedar workshop is scheduled for Tuesday at 10:00. A remote attendance option has not been announced.",
+      "source_revision": 1,
+      "artifact_revision": 2,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "insufficient",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "schedule__purpose_changed",
+    "family": "schedule",
+    "transition": "purpose_changed",
+    "initial": {
+      "claim": "The Cedar workshop is scheduled for Tuesday.",
+      "source": "The Cedar workshop is scheduled for Tuesday at 10:00. A remote attendance option has not been announced.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "The Cedar workshop is scheduled for Tuesday.",
+      "source": "The Cedar workshop is scheduled for Tuesday at 10:00. A remote attendance option has not been announced.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_INDEX"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "schedule__revision_changed",
+    "family": "schedule",
+    "transition": "revision_changed",
+    "initial": {
+      "claim": "The Cedar workshop is scheduled for Tuesday.",
+      "source": "The Cedar workshop is scheduled for Tuesday at 10:00. A remote attendance option has not been announced.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "The Cedar workshop is scheduled for Tuesday.",
+      "source": "The Cedar workshop is scheduled for Tuesday at 10:00. A remote attendance option has not been announced.",
+      "source_revision": 1,
+      "artifact_revision": 2,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "schedule__expired",
+    "family": "schedule",
+    "transition": "expired",
+    "initial": {
+      "claim": "The Cedar workshop is scheduled for Tuesday.",
+      "source": "The Cedar workshop is scheduled for Tuesday at 10:00. A remote attendance option has not been announced.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "The Cedar workshop is scheduled for Tuesday.",
+      "source": "The Cedar workshop is scheduled for Tuesday at 10:00. A remote attendance option has not been announced.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "schedule__revoked",
+    "family": "schedule",
+    "transition": "revoked",
+    "initial": {
+      "claim": "The Cedar workshop is scheduled for Tuesday.",
+      "source": "The Cedar workshop is scheduled for Tuesday at 10:00. A remote attendance option has not been announced.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "The Cedar workshop is scheduled for Tuesday.",
+      "source": "The Cedar workshop is scheduled for Tuesday at 10:00. A remote attendance option has not been announced.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": false,
+    "expected_initial_structural": false,
+    "expected_final_structural": false
+  },
+  {
+    "id": "training__unchanged",
+    "family": "training",
+    "transition": "unchanged",
+    "initial": {
+      "claim": "Maya completed the introductory course.",
+      "source": "The training register lists Maya as having completed the introductory course. Maya has not completed the advanced course.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "Maya completed the introductory course.",
+      "source": "The training register lists Maya as having completed the introductory course. Maya has not completed the advanced course.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": true,
+    "expected_final_structural": true
+  },
+  {
+    "id": "training__source_contradicts",
+    "family": "training",
+    "transition": "source_contradicts",
+    "initial": {
+      "claim": "Maya completed the introductory course.",
+      "source": "The training register lists Maya as having completed the introductory course. Maya has not completed the advanced course.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "Maya completed the introductory course.",
+      "source": "The corrected training register lists Maya's introductory course as incomplete.",
+      "source_revision": 2,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "contradicts",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "training__source_reworded",
+    "family": "training",
+    "transition": "source_reworded",
+    "initial": {
+      "claim": "Maya completed the introductory course.",
+      "source": "The training register lists Maya as having completed the introductory course. Maya has not completed the advanced course.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "Maya completed the introductory course.",
+      "source": "Maya finished the introductory training course; the advanced course remains unfinished.",
+      "source_revision": 2,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "training__claim_overstated",
+    "family": "training",
+    "transition": "claim_overstated",
+    "initial": {
+      "claim": "Maya completed the introductory course.",
+      "source": "The training register lists Maya as having completed the introductory course. Maya has not completed the advanced course.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "Maya completed both the introductory and advanced courses.",
+      "source": "The training register lists Maya as having completed the introductory course. Maya has not completed the advanced course.",
+      "source_revision": 1,
+      "artifact_revision": 2,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "contradicts",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "training__purpose_changed",
+    "family": "training",
+    "transition": "purpose_changed",
+    "initial": {
+      "claim": "Maya completed the introductory course.",
+      "source": "The training register lists Maya as having completed the introductory course. Maya has not completed the advanced course.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "Maya completed the introductory course.",
+      "source": "The training register lists Maya as having completed the introductory course. Maya has not completed the advanced course.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_INDEX"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "training__revision_changed",
+    "family": "training",
+    "transition": "revision_changed",
+    "initial": {
+      "claim": "Maya completed the introductory course.",
+      "source": "The training register lists Maya as having completed the introductory course. Maya has not completed the advanced course.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "Maya completed the introductory course.",
+      "source": "The training register lists Maya as having completed the introductory course. Maya has not completed the advanced course.",
+      "source_revision": 1,
+      "artifact_revision": 2,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "training__expired",
+    "family": "training",
+    "transition": "expired",
+    "initial": {
+      "claim": "Maya completed the introductory course.",
+      "source": "The training register lists Maya as having completed the introductory course. Maya has not completed the advanced course.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "Maya completed the introductory course.",
+      "source": "The training register lists Maya as having completed the introductory course. Maya has not completed the advanced course.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "training__revoked",
+    "family": "training",
+    "transition": "revoked",
+    "initial": {
+      "claim": "Maya completed the introductory course.",
+      "source": "The training register lists Maya as having completed the introductory course. Maya has not completed the advanced course.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "Maya completed the introductory course.",
+      "source": "The training register lists Maya as having completed the introductory course. Maya has not completed the advanced course.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": false,
+    "expected_initial_structural": false,
+    "expected_final_structural": false
+  },
+  {
+    "id": "maintenance__unchanged",
+    "family": "maintenance",
+    "transition": "unchanged",
+    "initial": {
+      "claim": "Pump P2 passed inspection.",
+      "source": "The maintenance log states that pump P2 passed its inspection. No inspection result is recorded for pump P3.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "Pump P2 passed inspection.",
+      "source": "The maintenance log states that pump P2 passed its inspection. No inspection result is recorded for pump P3.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": true,
+    "expected_final_structural": true
+  },
+  {
+    "id": "maintenance__source_contradicts",
+    "family": "maintenance",
+    "transition": "source_contradicts",
+    "initial": {
+      "claim": "Pump P2 passed inspection.",
+      "source": "The maintenance log states that pump P2 passed its inspection. No inspection result is recorded for pump P3.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "Pump P2 passed inspection.",
+      "source": "The corrected maintenance log states that pump P2 failed inspection.",
+      "source_revision": 2,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "contradicts",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "maintenance__source_reworded",
+    "family": "maintenance",
+    "transition": "source_reworded",
+    "initial": {
+      "claim": "Pump P2 passed inspection.",
+      "source": "The maintenance log states that pump P2 passed its inspection. No inspection result is recorded for pump P3.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "Pump P2 passed inspection.",
+      "source": "Inspection of P2 was completed with a passing result. P3 has no recorded inspection outcome.",
+      "source_revision": 2,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "maintenance__claim_overstated",
+    "family": "maintenance",
+    "transition": "claim_overstated",
+    "initial": {
+      "claim": "Pump P2 passed inspection.",
+      "source": "The maintenance log states that pump P2 passed its inspection. No inspection result is recorded for pump P3.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "Pump P3 passed inspection.",
+      "source": "The maintenance log states that pump P2 passed its inspection. No inspection result is recorded for pump P3.",
+      "source_revision": 1,
+      "artifact_revision": 2,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "insufficient",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "maintenance__purpose_changed",
+    "family": "maintenance",
+    "transition": "purpose_changed",
+    "initial": {
+      "claim": "Pump P2 passed inspection.",
+      "source": "The maintenance log states that pump P2 passed its inspection. No inspection result is recorded for pump P3.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "Pump P2 passed inspection.",
+      "source": "The maintenance log states that pump P2 passed its inspection. No inspection result is recorded for pump P3.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_INDEX"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "maintenance__revision_changed",
+    "family": "maintenance",
+    "transition": "revision_changed",
+    "initial": {
+      "claim": "Pump P2 passed inspection.",
+      "source": "The maintenance log states that pump P2 passed its inspection. No inspection result is recorded for pump P3.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "Pump P2 passed inspection.",
+      "source": "The maintenance log states that pump P2 passed its inspection. No inspection result is recorded for pump P3.",
+      "source_revision": 1,
+      "artifact_revision": 2,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "maintenance__expired",
+    "family": "maintenance",
+    "transition": "expired",
+    "initial": {
+      "claim": "Pump P2 passed inspection.",
+      "source": "The maintenance log states that pump P2 passed its inspection. No inspection result is recorded for pump P3.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "Pump P2 passed inspection.",
+      "source": "The maintenance log states that pump P2 passed its inspection. No inspection result is recorded for pump P3.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "maintenance__revoked",
+    "family": "maintenance",
+    "transition": "revoked",
+    "initial": {
+      "claim": "Pump P2 passed inspection.",
+      "source": "The maintenance log states that pump P2 passed its inspection. No inspection result is recorded for pump P3.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "Pump P2 passed inspection.",
+      "source": "The maintenance log states that pump P2 passed its inspection. No inspection result is recorded for pump P3.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": false,
+    "expected_initial_structural": false,
+    "expected_final_structural": false
+  },
+  {
+    "id": "backup__unchanged",
+    "family": "backup",
+    "transition": "unchanged",
+    "initial": {
+      "claim": "The nightly backup completed.",
+      "source": "The run log states that the nightly backup completed. The restore test failed.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "The nightly backup completed.",
+      "source": "The run log states that the nightly backup completed. The restore test failed.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": true,
+    "expected_final_structural": true
+  },
+  {
+    "id": "backup__source_contradicts",
+    "family": "backup",
+    "transition": "source_contradicts",
+    "initial": {
+      "claim": "The nightly backup completed.",
+      "source": "The run log states that the nightly backup completed. The restore test failed.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "The nightly backup completed.",
+      "source": "The corrected run log states that the nightly backup did not complete.",
+      "source_revision": 2,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "contradicts",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "backup__source_reworded",
+    "family": "backup",
+    "transition": "source_reworded",
+    "initial": {
+      "claim": "The nightly backup completed.",
+      "source": "The run log states that the nightly backup completed. The restore test failed.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "The nightly backup completed.",
+      "source": "The nightly backup job finished successfully, but its restore test was unsuccessful.",
+      "source_revision": 2,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "backup__claim_overstated",
+    "family": "backup",
+    "transition": "claim_overstated",
+    "initial": {
+      "claim": "The nightly backup completed.",
+      "source": "The run log states that the nightly backup completed. The restore test failed.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "Both the nightly backup and its restore test succeeded.",
+      "source": "The run log states that the nightly backup completed. The restore test failed.",
+      "source_revision": 1,
+      "artifact_revision": 2,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "contradicts",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "backup__purpose_changed",
+    "family": "backup",
+    "transition": "purpose_changed",
+    "initial": {
+      "claim": "The nightly backup completed.",
+      "source": "The run log states that the nightly backup completed. The restore test failed.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "The nightly backup completed.",
+      "source": "The run log states that the nightly backup completed. The restore test failed.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_INDEX"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "backup__revision_changed",
+    "family": "backup",
+    "transition": "revision_changed",
+    "initial": {
+      "claim": "The nightly backup completed.",
+      "source": "The run log states that the nightly backup completed. The restore test failed.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "The nightly backup completed.",
+      "source": "The run log states that the nightly backup completed. The restore test failed.",
+      "source_revision": 1,
+      "artifact_revision": 2,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "backup__expired",
+    "family": "backup",
+    "transition": "expired",
+    "initial": {
+      "claim": "The nightly backup completed.",
+      "source": "The run log states that the nightly backup completed. The restore test failed.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "The nightly backup completed.",
+      "source": "The run log states that the nightly backup completed. The restore test failed.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": true,
+    "expected_initial_structural": false,
+    "expected_final_structural": true
+  },
+  {
+    "id": "backup__revoked",
+    "family": "backup",
+    "transition": "revoked",
+    "initial": {
+      "claim": "The nightly backup completed.",
+      "source": "The run log states that the nightly backup completed. The restore test failed.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "current": {
+      "claim": "The nightly backup completed.",
+      "source": "The run log states that the nightly backup completed. The restore test failed.",
+      "source_revision": 1,
+      "artifact_revision": 1,
+      "purpose": "PURPOSE_SUMMARY"
+    },
+    "gold": "supports",
+    "may_reissue": false,
+    "expected_initial_structural": false,
+    "expected_final_structural": false
+  }
+]

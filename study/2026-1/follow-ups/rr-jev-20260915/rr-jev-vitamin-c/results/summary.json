@@ -1,0 +1,103 @@
+{
+  "at": "2026-09-16T00:57:43.106331+00:00",
+  "judgments": 240,
+  "correct": 194,
+  "confusion": {
+    "supports": {
+      "supports": 101,
+      "contradicts": 7,
+      "insufficient": 12
+    },
+    "contradicts": {
+      "supports": 3,
+      "insufficient": 14,
+      "contradicts": 43
+    },
+    "insufficient": {
+      "supports": 4,
+      "insufficient": 50,
+      "contradicts": 6
+    }
+  },
+  "pairs": 120,
+  "both_labels_correct": 81,
+  "both_release_decisions_correct": 81,
+  "prediction_changes": 101,
+  "support_probability_decreased": 112,
+  "median_support_probability_drop": 0.95,
+  "unsupported_releases": 1,
+  "unsupported_examples": 120,
+  "unsupported_release_wilson95": [
+    0.0014725557333420923,
+    0.045696291245049675
+  ],
+  "withheld_support": 38,
+  "supported_examples": 120,
+  "withheld_support_wilson95": [
+    0.24022834604198925,
+    0.40447868164486867
+  ],
+  "threshold_diagnostics": {
+    "0.5": {
+      "unsupported_release": 1,
+      "withheld_support": 32
+    },
+    "0.8": {
+      "unsupported_release": 1,
+      "withheld_support": 32
+    },
+    "0.9": {
+      "unsupported_release": 1,
+      "withheld_support": 38
+    },
+    "0.95": {
+      "unsupported_release": 1,
+      "withheld_support": 45
+    },
+    "0.99": {
+      "unsupported_release": 1,
+      "withheld_support": 67
+    }
+  },
+  "arms": {
+    "rr": {
+      "episodes": 480,
+      "released": 166,
+      "unsupported_release": 2,
+      "withheld_support": 76,
+      "refreshed": 240,
+      "logical_checks": 720,
+      "logical_input_tokens": 377076
+    },
+    "conventional": {
+      "episodes": 480,
+      "released": 166,
+      "unsupported_release": 2,
+      "withheld_support": 76,
+      "refreshed": 240,
+      "logical_checks": 720,
+      "logical_input_tokens": 377076
+    },
+    "stale_cache_diagnostic": {
+      "episodes": 480,
+      "released": 166,
+      "unsupported_release": 83,
+      "withheld_support": 157,
+      "refreshed": 0,
+      "logical_checks": 480,
+      "logical_input_tokens": 251384
+    }
+  },
+  "primary_policy_mismatches": [],
+  "actual_api_calls": 240,
+  "actual_submitted_bytes": 259220,
+  "actual_input_tokens": 125692,
+  "returned_models": {
+    "jev-1.13.0": 240
+  },
+  "median_http_seconds": 0.23809549999714363,
+  "max_http_seconds": 0.3694543000019621,
+  "rr_worker_seconds": 111.656724,
+  "rr_invocations": 720,
+  "presentation_files": 332
+}

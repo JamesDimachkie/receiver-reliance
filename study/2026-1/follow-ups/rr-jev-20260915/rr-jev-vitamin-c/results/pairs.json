@@ -1,0 +1,842 @@
+[
+  {
+    "pair_id": "0001D8737E66301336D1",
+    "both_correct": false,
+    "prediction_changes": false,
+    "support_probability_drop": 0.0,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "000484CA60044098C334",
+    "both_correct": false,
+    "prediction_changes": false,
+    "support_probability_drop": 0.27,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "0007D433AD8B2B860B66",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 1.0,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "000F490CFCDA892BCFEB",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.97,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "0010EC0F3E00DFA6E5A7",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.94,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "0012843EA7791A9C5528",
+    "both_correct": false,
+    "prediction_changes": true,
+    "support_probability_drop": 0.89,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "0012D56A7F2646890268",
+    "both_correct": false,
+    "prediction_changes": true,
+    "support_probability_drop": 0.0,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "0015B633DA5591863E1A",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.78,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "00283B52405188176E6B",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.99,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "002CD5FC5333FDC24DB6",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.97,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "002DC099172E86F8E833",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.79,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "003033CB7181297D7E97",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.6,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "0031393DB34495FEAB91",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.91,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "003F77BD62648E2E9AAF",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.92,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "0040193668F28F003BCB",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.6,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "0043D56BCEA022B6C8D9",
+    "both_correct": false,
+    "prediction_changes": true,
+    "support_probability_drop": 0.8099999999999999,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "0047BE43CEBDFD573A9F",
+    "both_correct": false,
+    "prediction_changes": false,
+    "support_probability_drop": 0.0,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "004CFE77A6F0E4E5CE8B",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.96,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "0052113BB704A4181465",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 1.0,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "0053B056ABAD2F5C6D1B",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.88,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "00636783317C0BC44BCA",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.71,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "00673467D25490F94E57",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.99,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "006A478E1B89721B74E0",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 1.0,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "006C8C6CEE07DF592527",
+    "both_correct": false,
+    "prediction_changes": false,
+    "support_probability_drop": 0.22999999999999998,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "006FF38F9A6A533ABB5E",
+    "both_correct": false,
+    "prediction_changes": false,
+    "support_probability_drop": 0.17000000000000004,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "0079CEDA54DA54556003",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.89,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "0081B1D27E91D346C808",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.95,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00844EFFAFEF7D3057BC",
+    "both_correct": false,
+    "prediction_changes": true,
+    "support_probability_drop": 0.31,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "0085CC68F1DED805AEE0",
+    "both_correct": false,
+    "prediction_changes": false,
+    "support_probability_drop": 0.25,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "0086C90EF6BFAF19DAC6",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 1.0,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "008828FC781063B8C630",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.99,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00887EA858BF8BC93709",
+    "both_correct": false,
+    "prediction_changes": false,
+    "support_probability_drop": 0.02,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "009077D655D70874AD4E",
+    "both_correct": false,
+    "prediction_changes": false,
+    "support_probability_drop": 0.20999999999999996,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "009307341EB628F3F49F",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.48,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "0099A0CF7DEE42390598",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.98,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "009AF2EF49CD84CB311B",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.94,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00A5176F967CA70B2C5E",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.5700000000000001,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00A62D73C2A540261E8B",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.99,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00A8335671AD18DA6544",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 1.0,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00AB1087A82E0DE13DDC",
+    "both_correct": false,
+    "prediction_changes": true,
+    "support_probability_drop": 1.0,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00B0A9D164040E4D18FC",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.99,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00B0FFB727B9C1BB64AF",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.96,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00B15EF570001E66F9B7",
+    "both_correct": false,
+    "prediction_changes": true,
+    "support_probability_drop": 0.86,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "00B1E02ABC7E64CC9DB3",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.99,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00B35C14504B668638A8",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.98,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00B6FBDDDDD3DA5CF0E4",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.96,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00B8116FF1D9346AC68D",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 1.0,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00B9504A42CC18A8AFDD",
+    "both_correct": false,
+    "prediction_changes": false,
+    "support_probability_drop": 0.35,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "00BB55A0468B22388839",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 1.0,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00BB9379C3AEF1FDFBDF",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 1.0,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00BBE0247E97399CB3B0",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.87,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "00BBF877ABC563E8A0D5",
+    "both_correct": false,
+    "prediction_changes": true,
+    "support_probability_drop": 0.87,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00BE8EE4418CCEE09B86",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.82,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00C624299242D0ABE562",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.99,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00C63C757CAC6AE36EB3",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.97,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00C987A3238E11F27900",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.5900000000000001,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00D11F9601CC38D9C25A",
+    "both_correct": false,
+    "prediction_changes": true,
+    "support_probability_drop": 0.01,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "00D32E7426FEA885436A",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 1.0,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00D781EF63670EA4115C",
+    "both_correct": false,
+    "prediction_changes": true,
+    "support_probability_drop": 1.0,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00D811B425B12D8268F0",
+    "both_correct": false,
+    "prediction_changes": false,
+    "support_probability_drop": 0.06,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "00E0792FB07B1080E07A",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.84,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "00E157D4920930F38E3B",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 1.0,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00E21A839170FA13E772",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.96,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00E93664AFF956DC3EFF",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 1.0,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00ECA7F9CDF26F7A6908",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.88,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "00ED22810D2A56A59880",
+    "both_correct": false,
+    "prediction_changes": false,
+    "support_probability_drop": 0.32999999999999996,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00EE9A699EBEC8908D3E",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 1.0,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00F83574314F85EE22B9",
+    "both_correct": false,
+    "prediction_changes": true,
+    "support_probability_drop": 0.97,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00FB3443C275E267C649",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.99,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "00FB48EB337F08B01DF9",
+    "both_correct": false,
+    "prediction_changes": false,
+    "support_probability_drop": 0.22,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "0113415CB0C27DCE9F48",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 1.0,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "011390C40D2CBD7B0884",
+    "both_correct": false,
+    "prediction_changes": false,
+    "support_probability_drop": 0.44,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "0113D1286911FC815DF5",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 1.0,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "01155BAA42EA84D37E26",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.99,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "01199CFA5AFF8D2305A8",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.99,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "012016E40EC337B99EDC",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.97,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "0120E55180C3FEE78E80",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.71,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "01248D97D1C810FA25BC",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 1.0,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "012BB87CE72133AF0CBE",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.98,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "0139A397EB20A63BC22B",
+    "both_correct": false,
+    "prediction_changes": false,
+    "support_probability_drop": 0.05,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "013CE9AD6D68324D1777",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.75,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "013DEEB1360F55626E2A",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.46,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "0146BBBFE67CFF9EDD5B",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.7,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "0149BE8B21A2EB058D50",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.99,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "015263CFCDBAD4BA2908",
+    "both_correct": false,
+    "prediction_changes": false,
+    "support_probability_drop": -0.06,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "01544928DA0370C291C9",
+    "both_correct": false,
+    "prediction_changes": true,
+    "support_probability_drop": 0.9299999999999999,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "015D55870C17AED17D1F",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 1.0,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "016BF358A8FC04AC91C2",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.96,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "016DF180FEE9B3A36E05",
+    "both_correct": false,
+    "prediction_changes": false,
+    "support_probability_drop": 0.19,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "017486B60371C744E683",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.6499999999999999,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "01753A7E4CC469C22248",
+    "both_correct": false,
+    "prediction_changes": true,
+    "support_probability_drop": 0.96,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "0178C65B776EC347225D",
+    "both_correct": false,
+    "prediction_changes": true,
+    "support_probability_drop": -0.08000000000000002,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "01796F4EDF78B1C1ED82",
+    "both_correct": false,
+    "prediction_changes": false,
+    "support_probability_drop": 0.0,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "017B63DB12F485BA3182",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.61,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "01842C59687FF8A315AB",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.97,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "01881119EE47CCDBC266",
+    "both_correct": false,
+    "prediction_changes": true,
+    "support_probability_drop": 1.0,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "018D92927A0115BF7C8F",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.98,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "01944233FEC9CA6F03B7",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.98,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "0195B8CC828DCC256455",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.76,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "0195C40178BB2F5AA3BC",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.99,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "019AE3100C354AB91DD1",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.95,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "01AC982A04C35763D2D3",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 1.0,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "01B0A9009422516BBC32",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 1.0,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "01B225432A3A365710A5",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.91,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "01BAF68E92CC4EDA2EE1",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 1.0,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "01C192E95FAC21D7958C",
+    "both_correct": false,
+    "prediction_changes": true,
+    "support_probability_drop": 0.96,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "01C5B722A756A0ECC5BD",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.78,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "01E5F06F85AD032AEA88",
+    "both_correct": false,
+    "prediction_changes": true,
+    "support_probability_drop": -0.32,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "01E61E98B49DE76C0DE7",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 1.0,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "01F00595D7F79C2F909B",
+    "both_correct": false,
+    "prediction_changes": false,
+    "support_probability_drop": -0.009999999999999953,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "01F1895E6CE0196C689D",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.99,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "01F41A349B7BF183BC43",
+    "both_correct": false,
+    "prediction_changes": true,
+    "support_probability_drop": 0.94,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "01FB7C01455C496D47EF",
+    "both_correct": false,
+    "prediction_changes": true,
+    "support_probability_drop": 0.96,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "0221F60E2FEB8B474CB7",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.76,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "0222B5356F552D22F1A3",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.98,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "0223A8DF745C097A7A95",
+    "both_correct": false,
+    "prediction_changes": true,
+    "support_probability_drop": 0.14,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "0224087589F314441309",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 0.99,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "02421E2F61B8E4529A31",
+    "both_correct": false,
+    "prediction_changes": false,
+    "support_probability_drop": 0.26,
+    "release_correct_both": false
+  },
+  {
+    "pair_id": "024A7BCBCA65CA9564A0",
+    "both_correct": false,
+    "prediction_changes": true,
+    "support_probability_drop": 0.98,
+    "release_correct_both": true
+  },
+  {
+    "pair_id": "025335645FC4F204BBB3",
+    "both_correct": true,
+    "prediction_changes": true,
+    "support_probability_drop": 1.0,
+    "release_correct_both": true
+  }
+]

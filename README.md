@@ -16,6 +16,12 @@ what it recomputes at the bytes you hold and what only replays against
 recorded transcripts. The same ledger records what is recorded and unfixed
 between this artifact and one you can adopt.
 
+## Research update: September 15, 2026
+
+The [completed 1,805-episode study](https://doi.org/10.5281/zenodo.22492561) and its published archive are unchanged. Two subsequent Jev semantic-checking pilots found **no incremental RR release-decision benefit over an equally informed conventional policy in the tested contracts**. Jev showed useful evidence sensitivity, but benchmark-label conflicts and missing context limit claims about accuracy. These results do not establish broad policy equivalence or measure engineering and auditability benefits. Read the [dated research addendum](study/2026-1/follow-ups/rr-jev-20260915/ADDENDUM.md) for both protocols, results, limitations and evidence. This separate follow-up is not an erratum or a new software release.
+
+Follow-up evidence archive: [10.5281/zenodo.22783171](https://doi.org/10.5281/zenodo.22783171).
+
 ## The decision surface, as sets
 
 **The decision law.** Each of the 30 operations classifies a fact profile

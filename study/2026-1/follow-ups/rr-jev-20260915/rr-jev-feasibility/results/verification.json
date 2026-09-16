@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "frozen_sources_match": true,
+  "unique_live_calls": 30,
+  "submitted_bytes": 28542,
+  "policy_rows": 240,
+  "exact_presentations_checked": 174,
+  "independent_rr_observations_reverified": 168,
+  "primary_comparators_tie_on_every_episode": true,
+  "returned_models": [
+    "jev-1.13.0"
+  ],
+  "limit": "Artifact, accounting and decision replay audit; not independent human gold labeling or field validity."
+}

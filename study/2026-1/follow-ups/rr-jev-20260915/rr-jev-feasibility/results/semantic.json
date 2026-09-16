@@ -1,0 +1,482 @@
+[
+  {
+    "request_sha256": "8EDD766460447599394F7BF8E635952CC44DC97BF5C0359C0C4A4E4507D65834",
+    "gold": "supports",
+    "answer": {
+      "type": "choice",
+      "choice": "supports",
+      "confidence": 0.99,
+      "probabilities": {
+        "insufficient": 0.01,
+        "contradicts": 0.0,
+        "supports": 0.99
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": true
+  },
+  {
+    "request_sha256": "BA71EDDCA9138447A03543ECD6487141E569D66F60BBA8607028481AB4E6093D",
+    "gold": "contradicts",
+    "answer": {
+      "type": "choice",
+      "choice": "contradicts",
+      "confidence": 1.0,
+      "probabilities": {
+        "insufficient": 0.0,
+        "supports": 0.0,
+        "contradicts": 1.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": false
+  },
+  {
+    "request_sha256": "ABC68F2F50BDB73D0CB89A1BC1631831DAABCFF965E6475CD23D38F5EE8DE462",
+    "gold": "supports",
+    "answer": {
+      "type": "choice",
+      "choice": "supports",
+      "confidence": 1.0,
+      "probabilities": {
+        "supports": 1.0,
+        "contradicts": 0.0,
+        "insufficient": 0.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": true
+  },
+  {
+    "request_sha256": "C6DC307A784A41249BF1A9139A27EDB53BE52BAB0C63BD49924CD7C706077BDF",
+    "gold": "contradicts",
+    "answer": {
+      "type": "choice",
+      "choice": "contradicts",
+      "confidence": 1.0,
+      "probabilities": {
+        "supports": 0.0,
+        "contradicts": 1.0,
+        "insufficient": 0.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": false
+  },
+  {
+    "request_sha256": "1FEC1B5EB09B2A8D5A2656865F5901E8D4A91D4AA28E5E56DAF15AD1C9D313EF",
+    "gold": "supports",
+    "answer": {
+      "type": "choice",
+      "choice": "supports",
+      "confidence": 0.97,
+      "probabilities": {
+        "supports": 0.98,
+        "insufficient": 0.02,
+        "contradicts": 0.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": true
+  },
+  {
+    "request_sha256": "72778A7FFFE95A0355ADFEEF5C8570D6C0D3447043E7C25F03CB7B234FAE9DB0",
+    "gold": "supports",
+    "answer": {
+      "type": "choice",
+      "choice": "supports",
+      "confidence": 1.0,
+      "probabilities": {
+        "supports": 1.0,
+        "contradicts": 0.0,
+        "insufficient": 0.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": true
+  },
+  {
+    "request_sha256": "55C7B82DA3D303B58C314CDCD6E7A1B643471CFC1371B4872A4DB69C5520D62F",
+    "gold": "contradicts",
+    "answer": {
+      "type": "choice",
+      "choice": "contradicts",
+      "confidence": 1.0,
+      "probabilities": {
+        "insufficient": 0.0,
+        "contradicts": 1.0,
+        "supports": 0.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": false
+  },
+  {
+    "request_sha256": "B9627E94ABE1D31B740FC3781EF29D95ADA7F5937B0BF3588ACAB0E254D2469F",
+    "gold": "supports",
+    "answer": {
+      "type": "choice",
+      "choice": "supports",
+      "confidence": 1.0,
+      "probabilities": {
+        "insufficient": 0.0,
+        "contradicts": 0.0,
+        "supports": 1.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": true
+  },
+  {
+    "request_sha256": "BF0639D64E9E9A0222A496948F4B42A1BCAD262FC3CFF76F31B0E4490DAF5F24",
+    "gold": "insufficient",
+    "answer": {
+      "type": "choice",
+      "choice": "insufficient",
+      "confidence": 1.0,
+      "probabilities": {
+        "contradicts": 0.0,
+        "insufficient": 1.0,
+        "supports": 0.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": false
+  },
+  {
+    "request_sha256": "2792AEC1156B2B58AEAC5FC6F0660AC3ED711D063DDC23973009DF7C4B76ED73",
+    "gold": "supports",
+    "answer": {
+      "type": "choice",
+      "choice": "supports",
+      "confidence": 1.0,
+      "probabilities": {
+        "insufficient": 0.0,
+        "contradicts": 0.0,
+        "supports": 1.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": true
+  },
+  {
+    "request_sha256": "38FA96A6A5E3D683278BD8455F38D4B5B708B8D06D067DACFA96869BB5A45FF1",
+    "gold": "supports",
+    "answer": {
+      "type": "choice",
+      "choice": "supports",
+      "confidence": 1.0,
+      "probabilities": {
+        "supports": 1.0,
+        "insufficient": 0.0,
+        "contradicts": 0.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": true
+  },
+  {
+    "request_sha256": "55C916872917F1E2A7CFBED1B4A63BE8B5AD573390940E3513B25761916A1A28",
+    "gold": "contradicts",
+    "answer": {
+      "type": "choice",
+      "choice": "contradicts",
+      "confidence": 1.0,
+      "probabilities": {
+        "insufficient": 0.0,
+        "contradicts": 1.0,
+        "supports": 0.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": false
+  },
+  {
+    "request_sha256": "75E08A7709B895439482D9CFB0AC1ADB99A20AC666D66BCB39A2DAAD156BC782",
+    "gold": "supports",
+    "answer": {
+      "type": "choice",
+      "choice": "supports",
+      "confidence": 1.0,
+      "probabilities": {
+        "supports": 1.0,
+        "contradicts": 0.0,
+        "insufficient": 0.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": true
+  },
+  {
+    "request_sha256": "DA51A64D30B99981CC90CB92DBC5EE1BD6E5069DBF197A7DF9C896357B700DEF",
+    "gold": "insufficient",
+    "answer": {
+      "type": "choice",
+      "choice": "insufficient",
+      "confidence": 0.49,
+      "probabilities": {
+        "insufficient": 0.66,
+        "contradicts": 0.34,
+        "supports": 0.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": false
+  },
+  {
+    "request_sha256": "46D9D59420EEF29B7A61B796FE7ED4D0DE2A909397890704834A73218F417727",
+    "gold": "supports",
+    "answer": {
+      "type": "choice",
+      "choice": "supports",
+      "confidence": 1.0,
+      "probabilities": {
+        "insufficient": 0.0,
+        "contradicts": 0.0,
+        "supports": 1.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": true
+  },
+  {
+    "request_sha256": "AD62F11923F93D8ADC55243D2C03460838314CBAEC68E895039C125CD799E7CB",
+    "gold": "supports",
+    "answer": {
+      "type": "choice",
+      "choice": "supports",
+      "confidence": 1.0,
+      "probabilities": {
+        "supports": 1.0,
+        "insufficient": 0.0,
+        "contradicts": 0.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": true
+  },
+  {
+    "request_sha256": "C551E65F045FD3ED7B677F6CFFE87F254427640EABC5912120360EC38840CC83",
+    "gold": "contradicts",
+    "answer": {
+      "type": "choice",
+      "choice": "contradicts",
+      "confidence": 1.0,
+      "probabilities": {
+        "insufficient": 0.0,
+        "supports": 0.0,
+        "contradicts": 1.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": false
+  },
+  {
+    "request_sha256": "B96A1D5AAD3E5022F6BAE8DBF5F43569424304647B230F36BDE08531BB29DBC4",
+    "gold": "supports",
+    "answer": {
+      "type": "choice",
+      "choice": "supports",
+      "confidence": 0.98,
+      "probabilities": {
+        "insufficient": 0.01,
+        "contradicts": 0.0,
+        "supports": 0.99
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": true
+  },
+  {
+    "request_sha256": "6C91A53A10228943B4AD11B95951FF97BEDE0550556E4D742318C6AC8699741B",
+    "gold": "contradicts",
+    "answer": {
+      "type": "choice",
+      "choice": "contradicts",
+      "confidence": 1.0,
+      "probabilities": {
+        "contradicts": 1.0,
+        "insufficient": 0.0,
+        "supports": 0.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": false
+  },
+  {
+    "request_sha256": "DC76E8FBC8501D4FF7EA8C4A4013FD1550A66F355E898E06E18DE7DDE46E2BB1",
+    "gold": "supports",
+    "answer": {
+      "type": "choice",
+      "choice": "supports",
+      "confidence": 1.0,
+      "probabilities": {
+        "contradicts": 0.0,
+        "insufficient": 0.0,
+        "supports": 1.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": true
+  },
+  {
+    "request_sha256": "799479CCC2BBFF3D386FA980DCB7CB0CBAB88AED412F3B07C9F3EEBDD933F490",
+    "gold": "supports",
+    "answer": {
+      "type": "choice",
+      "choice": "supports",
+      "confidence": 1.0,
+      "probabilities": {
+        "insufficient": 0.0,
+        "contradicts": 0.0,
+        "supports": 1.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": true
+  },
+  {
+    "request_sha256": "CF37CF8DBF07E23D2BBF1659E08F412FA7CB59AFD2EFE258BC853D356779002A",
+    "gold": "contradicts",
+    "answer": {
+      "type": "choice",
+      "choice": "contradicts",
+      "confidence": 1.0,
+      "probabilities": {
+        "supports": 0.0,
+        "insufficient": 0.0,
+        "contradicts": 1.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": false
+  },
+  {
+    "request_sha256": "785BEE381644BC0786944C453FDB75142A3522C079D5268BD61168F5E6D327FD",
+    "gold": "supports",
+    "answer": {
+      "type": "choice",
+      "choice": "supports",
+      "confidence": 1.0,
+      "probabilities": {
+        "supports": 1.0,
+        "contradicts": 0.0,
+        "insufficient": 0.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": true
+  },
+  {
+    "request_sha256": "A4127DCE40CC52795332926E93764E459E8997EC797F5A6B323C1EF9305F3DAC",
+    "gold": "insufficient",
+    "answer": {
+      "type": "choice",
+      "choice": "insufficient",
+      "confidence": 0.95,
+      "probabilities": {
+        "supports": 0.0,
+        "contradicts": 0.04,
+        "insufficient": 0.96
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": false
+  },
+  {
+    "request_sha256": "F2192F2180E6E116D4463E401CD2E89854A84D1BEB0011B5A55C52BA55C52631",
+    "gold": "supports",
+    "answer": {
+      "type": "choice",
+      "choice": "supports",
+      "confidence": 1.0,
+      "probabilities": {
+        "contradicts": 0.0,
+        "insufficient": 0.0,
+        "supports": 1.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": true
+  },
+  {
+    "request_sha256": "57620AC6E2058D0B689A49142AFA42757855DE5DBE005451486D07F64A780ADC",
+    "gold": "supports",
+    "answer": {
+      "type": "choice",
+      "choice": "supports",
+      "confidence": 1.0,
+      "probabilities": {
+        "supports": 1.0,
+        "contradicts": 0.0,
+        "insufficient": 0.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": true
+  },
+  {
+    "request_sha256": "1D80A954943868B71150983963B9ABA4E1F89FBC13506BDE15D8FEB9552B72B0",
+    "gold": "contradicts",
+    "answer": {
+      "type": "choice",
+      "choice": "contradicts",
+      "confidence": 1.0,
+      "probabilities": {
+        "insufficient": 0.0,
+        "supports": 0.0,
+        "contradicts": 1.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": false
+  },
+  {
+    "request_sha256": "7960FD8702E493AC5C58C2E65BEFB451B841CA6E9281083D88B746035A827969",
+    "gold": "supports",
+    "answer": {
+      "type": "choice",
+      "choice": "supports",
+      "confidence": 0.88,
+      "probabilities": {
+        "supports": 0.92,
+        "contradicts": 0.01,
+        "insufficient": 0.07
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": true
+  },
+  {
+    "request_sha256": "131D9FB3E2B920BD16ECF5596659B791FB85903CA52EF4BACAF68014CEE2E7F2",
+    "gold": "contradicts",
+    "answer": {
+      "type": "choice",
+      "choice": "contradicts",
+      "confidence": 1.0,
+      "probabilities": {
+        "supports": 0.0,
+        "contradicts": 1.0,
+        "insufficient": 0.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": false
+  },
+  {
+    "request_sha256": "42F353777600E40B32766CF0E4C292C025DC826CE7C6FFA129B352BA107E70BF",
+    "gold": "supports",
+    "answer": {
+      "type": "choice",
+      "choice": "supports",
+      "confidence": 1.0,
+      "probabilities": {
+        "insufficient": 0.0,
+        "contradicts": 0.0,
+        "supports": 1.0
+      }
+    },
+    "correct_label": true,
+    "released_by_threshold": true
+  }
+]
